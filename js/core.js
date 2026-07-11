@@ -26,7 +26,8 @@ const ROID_JAIL_CLICKS = 5;
 const ROID_ESCAPE_COST = GYM_COST * 4;
 
 const ALLIANCE_BUFF = 2; // legal work nudges toward Holy Good
-const ALLIANCE_DEBUFF = 4; // getting caught nudges toward Dirty Bad
+const ALLIANCE_DEBUFF = 6; // getting caught (or committing crime) nudges toward Dirty Bad
+const ALLIANCE_DEBUFF_MINOR = 3; // smaller nudge toward Dirty Bad for lower-stakes bad acts (e.g. Slut)
 const ALLIANCE_TIERS = [
   { max: 19, label: 'Holy Good' },
   { max: 39, label: 'Good' },
@@ -40,14 +41,46 @@ const GUZMAN_MIN_ALLIANCE = 60; // Bad Hustles (jobs, dealing, robbery) require 
 const GOOD_HUSTLE_MAX_ALLIANCE = 59; // Good Hustles allowed for Neutral or better, blocked for Bad
 const COMBAT_GOOD_MAX_ALLIANCE = 39; // Combat: Good alignment (not Neutral) fights Gangsters/Thugs
 
-const GOOD_HUSTLE_COOLDOWN_MS = 2000; // shared cooldown for job Work/Train clicks, good and bad
 const GOOD_HUSTLE_MIN = 0.10;
 const GOOD_HUSTLE_MAX = 0.50;
 
 // Skill training is intentionally slow — 4 skills per job, each 0-100, ground out in tiny increments.
 const JOB_SKILL_TRAIN_MIN = 0.02;
 const JOB_SKILL_TRAIN_MAX = 0.06;
-const JOB_WAGE_MAX_MULT = 3; // wage multiplier ranges from 1x (base rank) to 1+this (all 4 skills maxed)
+const LOOKS_TRAIN_BONUS_MAX = 0.5; // high Looks trains job skills up to 50% faster (charisma/presence helps you get noticed and promoted)
+
+// Job "promotions": average of the 4 job skills decides your rank. Each promotion is a real raise
+// (bigger wage multiplier) AND a shorter cooldown between clicks, like a real job giving you more
+// responsibility (and more throughput) the longer you stick with it. This is what makes grinding a
+// New Milos City job eventually beat just clicking Work in Da Skreetz.
+const JOB_RANKS = [
+  { minAvg: 0, title: 'Trainee', wageMult: 1, cooldownMs: 2000 },
+  { minAvg: 15, title: 'Associate', wageMult: 2, cooldownMs: 1800 },
+  { minAvg: 35, title: 'Senior Associate', wageMult: 3.5, cooldownMs: 1600 },
+  { minAvg: 55, title: 'Supervisor', wageMult: 5.5, cooldownMs: 1400 },
+  { minAvg: 75, title: 'Manager', wageMult: 8, cooldownMs: 1200 },
+  { minAvg: 95, title: 'Regional Manager', wageMult: 12, cooldownMs: 1000 },
+];
+const BAD_JOB_RANKS = [
+  { minAvg: 0, title: 'Rookie', wageMult: 1, cooldownMs: 2000 },
+  { minAvg: 15, title: 'Associate', wageMult: 2, cooldownMs: 1800 },
+  { minAvg: 35, title: 'Enforcer', wageMult: 3.5, cooldownMs: 1600 },
+  { minAvg: 55, title: 'Lieutenant', wageMult: 5.5, cooldownMs: 1400 },
+  { minAvg: 75, title: 'Underboss', wageMult: 8, cooldownMs: 1200 },
+  { minAvg: 95, title: 'Boss', wageMult: 12, cooldownMs: 1000 },
+];
+
+function rankFor(ranks, avg) {
+  let current = ranks[0];
+  for (const rank of ranks) {
+    if (avg >= rank.minAvg) current = rank;
+  }
+  return current;
+}
+
+function nextRankFor(ranks, avg) {
+  return ranks.find((rank) => rank.minAvg > avg) || null;
+}
 
 const GOOD_JOBS = [
   {
@@ -143,6 +176,49 @@ const ROBBERY_MIN = 20;
 const ROBBERY_MAX = 150;
 const ROBBERY_JAIL_YEARS = 1;
 
+// ---------- Crime tiers (New Milos City) ----------
+// A crime record system: every time you're busted for a crime (Da Skreetz Crime or one of these
+// tiers), your "streak" goes up, and every future sentence gets longer as a result (repeat
+// offenders get thrown the book). Community Service is the release valve — pay down your streak
+// before you get caught again.
+const CRIME_TIERS = [
+  { id: 'shoplift', name: 'Shoplifting', desc: 'Slip something into your jacket at a corner store.', minReward: 80, maxReward: 200, jailYears: 1, baseRisk: 0.35 },
+  { id: 'pettytheft', name: 'Petty Theft', desc: 'Pick a pocket or snatch a purse off a table.', minReward: 350, maxReward: 650, jailYears: 1, baseRisk: 0.45 },
+  { id: 'burglary', name: 'Burglary', desc: "Break into a house while nobody's home.", minReward: 1200, maxReward: 2200, jailYears: 4, baseRisk: 0.5 },
+  { id: 'grandtheft', name: 'Grand Theft Auto', desc: 'Boost a car off the street and flip it.', minReward: 4000, maxReward: 6000, jailYears: 10, baseRisk: 0.6 },
+];
+const CRIME_COOLDOWN_MS = 12000;
+const CRIME_RISK_MIN = 0.05;
+const CRIME_STAT_MITIGATION = 0.5; // max reduction to a tier's baseRisk from Attack/Speed at 100/100
+const CRIME_STREAK_MAX = 12; // cap on how much a record can escalate a sentence
+const COMMUNITY_SERVICE_COOLDOWN_MS = 60000;
+const COMMUNITY_SERVICE_BASE_COST = 750; // scales with current streak
+const COMMUNITY_SERVICE_STREAK_REDUCTION = 2;
+
+function crimeFailChance(tier) {
+  const statScore = (character.stats.speed + character.stats.attack) / 200; // 0..1 at 100/100
+  const reduction = Math.min(CRIME_STAT_MITIGATION, statScore * CRIME_STAT_MITIGATION);
+  return Math.max(CRIME_RISK_MIN, tier.baseRisk - reduction);
+}
+
+function crimeStreakYears() {
+  return character.crimeRecord.streak;
+}
+
+function bumpCrimeStreak() {
+  character.crimeRecord.streak = Math.min(CRIME_STREAK_MAX, character.crimeRecord.streak + 1);
+}
+
+function doCommunityService() {
+  if (character.crimeRecord.streak <= 0) return { ok: false, reason: 'Your record is already clean.' };
+  const cost = COMMUNITY_SERVICE_BASE_COST * (1 + character.crimeRecord.streak);
+  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash = round2(character.cash - cost);
+  character.crimeRecord.streak = Math.max(0, character.crimeRecord.streak - COMMUNITY_SERVICE_STREAK_REDUCTION);
+  character.cooldowns.communityService = Date.now();
+  return { ok: true, message: `Completed community service for $${cost.toLocaleString()}. Your criminal record improved.`, cls: 'gain' };
+}
+
 const BANK_TIERS = [
   { name: 'New Milos Discovery', cardName: 'NMB Discovery', maxBalance: 5000, upgradeCost: 0 },
   { name: 'New Milos Bank Card', cardName: 'NMB Advantage Standard', maxBalance: 25000, upgradeCost: 10000 },
@@ -210,15 +286,23 @@ const GOOD_SEASON1_TITLES = [
 const RENAME_COST = 10000;
 
 const PISTOL_ITEMS = [
-  { id: 'glock19', name: 'Glock 19', type: 'pistol', caliber: '9mm', cost: 500 },
-  { id: 'm9', name: 'Beretta M9', type: 'pistol', caliber: '9mm', cost: 650 },
+  { id: 'glock19', name: 'Glock 19', type: 'pistol', caliber: '9mm', cost: 500, atkBonus: 6 },
+  { id: 'm9', name: 'Beretta M9', type: 'pistol', caliber: '9mm', cost: 650, atkBonus: 7 },
 ];
 const RIFLE_ITEMS = [
-  { id: 'ar15', name: 'AR-15', type: 'rifle', caliber: '5.56', cost: 2500 },
-  { id: 'm4', name: 'M4 Carbine', type: 'rifle', caliber: '5.56', cost: 3200 },
+  { id: 'ar15', name: 'AR-15', type: 'rifle', caliber: '5.56', cost: 2500, atkBonus: 12 },
+  { id: 'm4', name: 'M4 Carbine', type: 'rifle', caliber: '5.56', cost: 3200, atkBonus: 14 },
 ];
 const GUN_ITEMS_BY_ID = {};
 [...PISTOL_ITEMS, ...RIFLE_ITEMS].forEach((item) => { GUN_ITEMS_BY_ID[item.id] = item; });
+
+// Melee weapons: no license needed, legal to carry, cheap alternative to a gun for Combat.
+const MELEE_ITEMS = [
+  { id: 'knuckles', name: 'Brass Knuckles', type: 'melee', cost: 75, atkBonus: 2 },
+  { id: 'knife', name: 'Switchblade Knife', type: 'melee', cost: 200, atkBonus: 4 },
+];
+const MELEE_ITEMS_BY_ID = {};
+MELEE_ITEMS.forEach((item) => { MELEE_ITEMS_BY_ID[item.id] = item; });
 
 const AMMO_ITEMS = [
   { id: 'ammo9mm', name: '9mm Ammo Box', type: 'ammo', caliber: '9mm', cost: 50 },
@@ -273,6 +357,7 @@ function round1(v) {
 
 function getItemDef(itemId) {
   if (GUN_ITEMS_BY_ID[itemId]) return GUN_ITEMS_BY_ID[itemId];
+  if (MELEE_ITEMS_BY_ID[itemId]) return MELEE_ITEMS_BY_ID[itemId];
   if (AMMO_ITEMS_BY_ID[itemId]) return AMMO_ITEMS_BY_ID[itemId];
   if (DRUG_ITEMS_BY_ID[itemId]) return DRUG_ITEMS_BY_ID[itemId];
   const title = allTitleDefs().find((t) => t.id === itemId);
@@ -317,8 +402,9 @@ function load() {
   if (loaded.licenses === undefined) loaded.licenses = { gunSafety: false, concealedPermit: false, concealedPendingUntil: 0 };
   if (loaded.inventory === undefined) loaded.inventory = [];
   if (loaded.equipment === undefined) {
-    loaded.equipment = { helmet: null, chest: null, pants: null, feet: null, holsterL: null, holsterR: null, openCarry: null };
+    loaded.equipment = { helmet: null, chest: null, pants: null, feet: null, holsterL: null, holsterR: null, openCarry: null, melee: null };
   }
+  if (loaded.equipment.melee === undefined) loaded.equipment.melee = null;
   if (loaded.weaponSkills === undefined) loaded.weaponSkills = { shooting: 0, draw: 0, magReload: 0 };
   if (loaded.cooldowns.rangeShoot === undefined) loaded.cooldowns.rangeShoot = 0;
   if (loaded.cooldowns.rangeDraw === undefined) loaded.cooldowns.rangeDraw = 0;
@@ -345,6 +431,12 @@ function load() {
     const key = `dealer_${d.id}`;
     if (loaded.cooldowns[key] === undefined) loaded.cooldowns[key] = 0;
   });
+  CRIME_TIERS.forEach((t) => {
+    const key = `crime_${t.id}`;
+    if (loaded.cooldowns[key] === undefined) loaded.cooldowns[key] = 0;
+  });
+  if (loaded.cooldowns.communityService === undefined) loaded.cooldowns.communityService = 0;
+  if (loaded.crimeRecord === undefined) loaded.crimeRecord = { streak: 0 };
   return loaded;
 }
 
@@ -361,6 +453,10 @@ function allianceBuff() {
 
 function allianceDebuff() {
   character.alliance = clampStat(character.alliance + ALLIANCE_DEBUFF);
+}
+
+function allianceDebuffMinor() {
+  character.alliance = clampStat(character.alliance + ALLIANCE_DEBUFF_MINOR);
 }
 
 function formatHeight(inches) {
@@ -404,7 +500,9 @@ function newCharacter(firstName, lastName) {
       work: 0, slut: 0, crime: 0, combat: 0, rangeShoot: 0, rangeDraw: 0, rangeReload: 0, robbery: 0,
       jobWork: 0, jobSkill1: 0, jobSkill2: 0, jobSkill3: 0, jobSkill4: 0,
       badJobWork: 0, badJobSkill1: 0, badJobSkill2: 0, badJobSkill3: 0, badJobSkill4: 0,
+      communityService: 0,
       ...Object.fromEntries(DEALER_TIERS.map((d) => [`dealer_${d.id}`, 0])),
+      ...Object.fromEntries(CRIME_TIERS.map((t) => [`crime_${t.id}`, 0])),
     },
     gym: { steroidsActive: false, roidJailClicksRemaining: 0 },
     jail: { inJail: false, crime: null, yearsRemaining: 0, serving: false },
@@ -413,13 +511,14 @@ function newCharacter(firstName, lastName) {
     marriage: { proposedTo: null, spouseName: null },
     licenses: { gunSafety: false, concealedPermit: false, concealedPendingUntil: 0 },
     inventory: [],
-    equipment: { helmet: null, chest: null, pants: null, feet: null, holsterL: null, holsterR: null, openCarry: null },
+    equipment: { helmet: null, chest: null, pants: null, feet: null, holsterL: null, holsterR: null, openCarry: null, melee: null },
     weaponSkills: { shooting: 0, draw: 0, magReload: 0 },
     bank: { tier: 0, balance: 0, hasCreditCard: false, creditBalance: 0, lastBillTs: Date.now() },
     arrestRecord: [],
     jobs: { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 } },
     badJobs: { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 } },
     drugDealer: { unitsSold: 0 },
+    crimeRecord: { streak: 0 },
   };
 }
 

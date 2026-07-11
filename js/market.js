@@ -48,6 +48,7 @@ function doHustle(type) {
   } else if (type === 'slut') {
     const gain = randInt(5, 60);
     character.cash += gain;
+    allianceDebuffMinor();
     entries.push({ message: `Turned a trick: +${gain} Floydbucks.`, cls: 'gain' });
     if (Math.random() < 0.3) {
       character.cash = Math.max(0, character.cash - gain);
@@ -55,17 +56,20 @@ function doHustle(type) {
     }
   } else if (type === 'crime') {
     if (Math.random() < 0.3) {
-      const years = randInt(1, 5);
+      const years = 1 + crimeStreakYears();
+      bumpCrimeStreak();
       allianceDebuff();
       character.jail.inJail = true;
       character.jail.crime = 'Crime';
       character.jail.yearsRemaining = years;
       character.jail.serving = false;
-      entries.push({ message: `Busted committing a crime! Sentenced to ${years} year(s).`, cls: 'loss' });
+      const streakNote = years > 1 ? ` Repeat offender: +${years - 1} year(s) added to your usual sentence.` : '';
+      entries.push({ message: `Busted committing a crime! Sentenced to ${years} year(s).${streakNote}`, cls: 'loss' });
       return { entries, jailed: true };
     }
     const gain = randInt(100, 1000);
     character.cash += gain;
+    allianceDebuff();
     entries.push({ message: `Pulled off a crime: +${gain} Floydbucks.`, cls: 'gain' });
   }
   character.cooldowns[type] = Date.now();
