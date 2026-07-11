@@ -83,12 +83,12 @@
           </div>
           <div class="hustle-card">
             <h3>Slut</h3>
-            <p>5-60 Floydbucks per click. 30% chance to get robbed for the same amount.</p>
+            <p>5-60 Floydbucks per click. 30% chance to get robbed for the same amount. Nudges your Alliance toward Bad.</p>
             <button class="hustle-btn" data-hustle="slut">Slut</button>
           </div>
           <div class="hustle-card">
             <h3>Crime</h3>
-            <p>100-1000 Floydbucks per click. 30% chance to land in Jail.</p>
+            <p>100-1000 Floydbucks per click. 30% chance to land in Jail. Nudges your Alliance toward Bad &mdash; and every time you're caught, your criminal record makes the next sentence longer (see New Milos City &rarr; Crime for Community Service).</p>
             <button class="hustle-btn" data-hustle="crime">Crime</button>
           </div>
         </div>
@@ -260,6 +260,7 @@
             <div class="market-tabs">
               <button class="milos-tab-btn active" data-milos="hustles">Hustles</button>
               <button class="milos-tab-btn" data-milos="combat">Combat</button>
+              <button class="milos-tab-btn" data-milos="crime">Crime</button>
               <button class="milos-tab-btn" data-milos="cityhall">City Hall</button>
               <button class="milos-tab-btn" data-milos="gunclub">NMC Gun Club</button>
               <button class="milos-tab-btn" data-milos="bank">Bank</button>
@@ -299,7 +300,7 @@
                   </div>
                   <div class="hustle-card">
                     <h3>Attempt Robbery</h3>
-                    <p>Rob a random person on the street. Your Speed determines if they notice. If they fight back and win, that's a year in jail.</p>
+                    <p>Rob a random person on the street. Your Speed (mostly) and Looks (a little) determine if they notice. If they fight back and win, that's a year in jail.</p>
                     <button id="btnRobbery">Attempt Robbery</button>
                   </div>
                 </div>
@@ -309,7 +310,7 @@
             </div>
 
             <div id="milos-combat" class="milos-subpage hidden">
-              <p>Your alliance decides who's waiting for you in the alley. Good alignment runs into Gangsters &amp; Thugs. Bad alignment runs into Citizens &amp; Cops. Neutral could meet anyone.</p>
+              <p>Your alliance decides who's waiting for you in the alley. Good alignment runs into Gangsters &amp; Thugs. Bad alignment runs into Citizens &amp; Cops. Neutral could meet anyone. Height adds a little max HP and Attack, Speed gives you a chance to dodge outright, and any gun or melee weapon equipped adds its Attack bonus to your hits.</p>
 
               <div id="combatIdle">
                 <button id="btnFindFight">Find a Fight</button>
@@ -335,6 +336,22 @@
               </div>
 
               <div id="combatLog" class="log"></div>
+            </div>
+
+            <div id="milos-crime" class="milos-subpage hidden">
+              <p>Real crimes with a real record. Reward and sentence are fixed per crime &mdash; your Attack and Speed lower your odds of getting caught. Getting caught raises your record, and every future sentence gets longer until you pay it down. Bad alliance or worse required.</p>
+              <p id="crimeRecordStatus"></p>
+              <div id="crimeContainer" class="hustle-grid"></div>
+
+              <div class="hustle-grid">
+                <div class="hustle-card">
+                  <h3>Community Service</h3>
+                  <p>Dedicate cash (scales with your record) to knock strikes off your criminal record and shorten your next sentence.</p>
+                  <button id="btnCommunityService">Community Service</button>
+                </div>
+              </div>
+
+              <div id="crimeLog" class="log"></div>
             </div>
 
             <div id="milos-cityhall" class="milos-subpage hidden">
@@ -376,6 +393,9 @@
                 <div class="hustle-grid" id="pistolGrid"></div>
                 <h3 class="gunclub-section-title">5.56 Rifles</h3>
                 <div class="hustle-grid" id="rifleGrid"></div>
+                <h3 class="gunclub-section-title">Melee Weapons</h3>
+                <p>No license needed, legal to carry, and cheap &mdash; a solid alternative if you can't afford (or aren't licensed for) a gun yet.</p>
+                <div class="hustle-grid" id="meleeGrid"></div>
               </div>
 
               <div id="gunclub-ammo" class="gunclub-subpage hidden">
@@ -519,6 +539,7 @@
             <div class="equip-slot" data-slot="holsterL"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
             <div class="equip-slot" data-slot="holsterR"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
             <div class="equip-slot equip-slot-opencarry" data-slot="openCarry"><span class="equip-slot-label">OPEN CARRY</span><span class="equip-slot-item"></span></div>
+            <div class="equip-slot" data-slot="melee"><span class="equip-slot-label">MELEE</span><span class="equip-slot-item"></span></div>
           </div>
         </div>
       </div>
@@ -547,6 +568,8 @@
           <button id="btnStopServe">Stop</button>
         </div>
 
+        <p class="gun-license-note">Repeat crimes add to your criminal record and lengthen every future sentence &mdash; pay it down with Community Service in New Milos City &rarr; Crime once you're out.</p>
+
         <h3 class="gunclub-section-title">Arrest Record</h3>
         <div id="arrestRecordList" class="wiki-entry-list"></div>
       </div>
@@ -557,12 +580,12 @@
 
         <div class="wiki-entry">
           <h3>Da Skreetz</h3>
-          <p>Instant-payout hustles on a 10 second cooldown. <b>Work</b> is safe and pays $2&ndash;$10. <b>Slut</b> pays $5&ndash;$60 with a 30% chance of getting robbed for the same amount. <b>Crime</b> pays $100&ndash;$1,000 with a 30% chance of landing in Jail.</p>
+          <p>Instant-payout hustles on a 10 second cooldown. <b>Work</b> is safe and pays $2&ndash;$10. <b>Slut</b> pays $5&ndash;$60 with a 30% chance of getting robbed for the same amount, and nudges your Alliance toward Bad. <b>Crime</b> pays $100&ndash;$1,000 with a 30% chance of landing in Jail; each time you're caught your criminal record grows, adding a year to every future sentence (from any crime) until you pay it down with Community Service.</p>
         </div>
 
         <div class="wiki-entry">
           <h3>Milos Market</h3>
-          <p><b>Plan-it Fitness</b> burns weight for Speed/Defense gains. <b>Pete's Pies</b> and <b>Luke's Maxxerstore</b> trade weight and cash for Looks. <b>Cosmetixxx</b> sells titles and gacha crates. Max every stat to 100 to earn the PEAK CIVILIAN title.</p>
+          <p><b>Plan-it Fitness</b> burns weight for Speed/Defense gains. <b>Pete's Pies</b> and <b>Luke's Maxxerstore</b> trade weight and cash for Looks. <b>Cosmetixxx</b> sells titles and gacha crates. Max every stat to 100 to earn the PEAK CIVILIAN title. Looks speeds up job skill training, Height and Speed help you in a fight, Speed/Defense help you dodge a bust on the job, and high HP means you keep more cash when you lose a fight.</p>
         </div>
 
         <div class="wiki-entry">
@@ -572,17 +595,17 @@
 
         <div class="wiki-entry">
           <h3>New Milos City</h3>
-          <p><b>Hustles</b> splits into Good Hustles (small steady legal cash, Neutral alliance or better) and Bad Hustles (drug running, dealing, and robbery &mdash; Bad alliance required, high risk of jail). <b>Combat</b> matches you against NPCs based on your Alliance. <b>City Hall</b> handles renames, marriage, and the Gun Safety Course. <b>NMC Gun Club</b> sells weapons, ammo, a shooting range, and carry licenses &mdash; you need the Gun Safety License from City Hall before you can buy a gun. <b>Bank</b> keeps your cash safe from robbery, lets you upgrade to hold more, and offers a credit card billed every 24 real-life hours.</p>
+          <p><b>Hustles</b> splits into Good Hustles (small steady legal cash, Neutral alliance or better) and Bad Hustles (drug running, dealing, and robbery &mdash; Bad alliance required, high risk of jail). Both jobs use a promotion ladder: as your average skill climbs, you get promoted to a better title with a bigger wage multiplier <i>and</i> a shorter cooldown &mdash; a maxed-out job comfortably outpaces just clicking Work in Da Skreetz. <b>Combat</b> matches you against NPCs based on your Alliance; Height and equipped weapons boost your Attack, Speed lets you dodge outright, and HP protects your cash if you lose. <b>Crime</b> is a set of fixed-payout crimes (Shoplifting up through Grand Theft Auto) where Attack and Speed lower your odds of getting caught, and repeat busts escalate every future sentence until you spend cash on Community Service. <b>City Hall</b> handles renames, marriage, and the Gun Safety Course. <b>NMC Gun Club</b> sells guns, ammo, melee weapons (no license needed), a shooting range, and carry licenses &mdash; you need the Gun Safety License from City Hall before you can buy a gun. <b>Bank</b> keeps your cash safe from robbery, lets you upgrade to hold more, and offers a credit card billed every 24 real-life hours.</p>
         </div>
 
         <div class="wiki-entry">
           <h3>Inventory</h3>
-          <p>Split into <b>Licenses</b>, <b>Items</b>, and <b>Cosmetics</b>. Equip guns, ammo, and cosmetics on your 7-slot Equipment board. Carrying a gun without the right license or permit risks arrest &mdash; check the law banner at the top of New Milos City.</p>
+          <p>Split into <b>Licenses</b>, <b>Items</b>, and <b>Cosmetics</b>. Equip guns, melee weapons, ammo, and cosmetics on your 8-slot Equipment board. Carrying a gun without the right license or permit risks arrest &mdash; check the law banner at the top of New Milos City. Melee weapons (brass knuckles, knives) need no license and carry no arrest risk.</p>
         </div>
 
         <div class="wiki-entry">
           <h3>Jail</h3>
-          <p>Only reachable if you're arrested &mdash; all other pages grey out. <b>Serve Time</b> removes 1 year every 10 seconds. <b>Hire Lawyer</b> pays cash for immediate release.</p>
+          <p>Only reachable if you're arrested &mdash; all other pages grey out. <b>Serve Time</b> removes 1 year every 10 seconds. <b>Hire Lawyer</b> pays cash for immediate release. Repeat offenses raise your criminal record and lengthen future sentences &mdash; use Community Service (New Milos City &rarr; Crime) once you're free to pay it down.</p>
         </div>
       </div>
 

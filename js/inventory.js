@@ -110,6 +110,7 @@ btnTradeSend.addEventListener('click', () => {
 function slotAcceptsItem(slot, item) {
   if (slot === 'holsterL' || slot === 'holsterR') return item.type === 'pistol';
   if (slot === 'openCarry') return item.type === 'pistol' || item.type === 'rifle';
+  if (slot === 'melee') return item.type === 'melee';
   return false;
 }
 
@@ -123,7 +124,7 @@ function renderEquipmentBoard() {
 }
 
 function openEquipPicker(slot) {
-  equipPickerTitle.textContent = `Equip — ${slot.replace('holsterL', 'Holster (Left)').replace('holsterR', 'Holster (Right)').replace('openCarry', 'Open Carry').toUpperCase()}`;
+  equipPickerTitle.textContent = `Equip — ${slot.replace('holsterL', 'Holster (Left)').replace('holsterR', 'Holster (Right)').replace('openCarry', 'Open Carry').replace('melee', 'Melee Weapon').toUpperCase()}`;
   const currentItemId = character.equipment[slot];
   const eligibleStacks = character.inventory.filter((stack) => {
     const item = getItemDef(stack.id);

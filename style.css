@@ -1509,6 +1509,7 @@ button:disabled {
 .equip-slot[data-slot="holsterR"] { grid-column: 3; grid-row: 2; }
 .equip-slot[data-slot="pants"] { grid-column: 2; grid-row: 3; }
 .equip-slot[data-slot="feet"] { grid-column: 2; grid-row: 4; }
+.equip-slot[data-slot="melee"] { grid-column: 1; grid-row: 1; }
 .equip-slot.equip-slot-opencarry { grid-column: 1 / span 3; grid-row: 5; width: 320px; margin: 0 auto; }
 
 .equip-picker-list {
@@ -1567,6 +1568,10 @@ button:disabled {
 
 .job-payout-line {
   color: #7ed67e;
+}
+
+.job-rank-title {
+  color: #f2c94c;
 }
 
 .item-subheading {
