@@ -1,0 +1,184 @@
+// ---------- Inventory & Equipment ----------
+const licensesGrid = document.getElementById('licensesGrid');
+const itemsGrid = document.getElementById('itemsGrid');
+const cosmeticsGrid = document.getElementById('cosmeticsGrid');
+const inventoryLog = document.getElementById('inventoryLog');
+const tradeItemSelect = document.getElementById('tradeItemSelect');
+const tradeUsernameInput = document.getElementById('tradeUsernameInput');
+const btnTradeSend = document.getElementById('btnTradeSend');
+const equipSlotEls = document.querySelectorAll('.equip-slot');
+const equipPickerModal = document.getElementById('equipPickerModal');
+const equipPickerTitle = document.getElementById('equipPickerTitle');
+const equipPickerList = document.getElementById('equipPickerList');
+const btnEquipPickerClose = document.getElementById('btnEquipPickerClose');
+
+function licenseCardHtml(name, lines) {
+  return `
+    <div class="hustle-card">
+      <div class="title-hover-wrap">
+        <span class="title-badge title-peak"><span class="title-text">${name}</span></span>
+        <div class="title-info-card">
+          ${lines.map((line, i) => `<p class="${i === 0 ? 'title-info-rank' : 'title-info-how'}">${line}</p>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function nmcLicenseCardHtml() {
+  const fullName = `${character.firstName} ${character.lastName}`;
+  return licenseCardHtml('NMC License', [fullName, 'NMC Resident']);
+}
+
+function gunSafetyLicenseCardHtml() {
+  if (!character.licenses.gunSafety) return '';
+  const s = character.weaponSkills;
+  return licenseCardHtml('Gun Safety License', [
+    'Weapon Skills',
+    `Shooting: ${s.shooting.toFixed(2)}`,
+    `Draw: ${s.draw.toFixed(2)}`,
+    `Mag Reload: ${s.magReload.toFixed(2)}`,
+  ]);
+}
+
+function concealedPermitCardHtml() {
+  if (!character.licenses.concealedPermit) return '';
+  return licenseCardHtml('Concealed Carry Permit', [
+    'Concealed Carry Permit',
+    'Granted. Lets you legally holster a pistol in New Milos City.',
+  ]);
+}
+
+function buildInventoryGrid() {
+  if (!licensesGrid) return;
+
+  licensesGrid.innerHTML = nmcLicenseCardHtml() + gunSafetyLicenseCardHtml() + concealedPermitCardHtml();
+
+  const gunAndAmmoStacks = character.inventory.filter((stack) => {
+    const item = getItemDef(stack.id);
+    return item && item.type !== 'title';
+  });
+  itemsGrid.innerHTML = gunAndAmmoStacks.length
+    ? gunAndAmmoStacks.map((stack) => {
+      const item = getItemDef(stack.id);
+      return `
+        <div class="hustle-card">
+          <h3>${item.name}</h3>
+          <p>${item.caliber ? `${item.caliber} ` : ''}${item.type} &times; ${stack.qty}</p>
+        </div>
+      `;
+    }).join('')
+    : '<p class="equip-picker-empty">No items yet. Buy a gun or ammo at the NMC Gun Club, or drugs from Guzman.</p>';
+
+  const titleStacks = character.inventory.filter((stack) => {
+    const item = getItemDef(stack.id);
+    return item && item.type === 'title';
+  });
+  cosmeticsGrid.innerHTML = titleStacks.length
+    ? titleStacks.map((stack) => {
+      const item = getItemDef(stack.id);
+      return `
+        <div class="hustle-card">
+          <h3>${item.name}</h3>
+          <p class="item-subheading">Title</p>
+          <div class="title-preview">${titleBadgeMarkup(item)}</div>
+          <p>&times; ${stack.qty}</p>
+        </div>
+      `;
+    }).join('')
+    : '<p class="equip-picker-empty">No titles yet. Win them from a crate in Cosmetixxx.</p>';
+
+  tradeItemSelect.innerHTML = character.inventory.length
+    ? character.inventory.map((stack) => {
+      const item = getItemDef(stack.id);
+      if (!item) return '';
+      const label = item.type === 'title' ? `${item.name} (Title)` : item.name;
+      return `<option value="${stack.id}">${label} (x${stack.qty})</option>`;
+    }).join('')
+    : '<option value="">No items to trade</option>';
+}
+
+btnTradeSend.addEventListener('click', () => {
+  const itemId = tradeItemSelect.value;
+  const username = tradeUsernameInput.value.trim();
+  if (!itemId || !username) return;
+  const item = getItemDef(itemId);
+  logTo(inventoryLog, `Trade offer for ${item ? item.name : itemId} sent to ${username}. They'll see it once multiplayer is live.`, 'gain');
+  tradeUsernameInput.value = '';
+});
+
+function slotAcceptsItem(slot, item) {
+  if (slot === 'holsterL' || slot === 'holsterR') return item.type === 'pistol';
+  if (slot === 'openCarry') return item.type === 'pistol' || item.type === 'rifle';
+  return false;
+}
+
+function renderEquipmentBoard() {
+  equipSlotEls.forEach((slotEl) => {
+    const slot = slotEl.dataset.slot;
+    const itemId = character.equipment[slot];
+    const itemLabelEl = slotEl.querySelector('.equip-slot-item');
+    itemLabelEl.textContent = itemId ? (getItemDef(itemId)?.name || itemId) : '(empty)';
+  });
+}
+
+function openEquipPicker(slot) {
+  equipPickerTitle.textContent = `Equip — ${slot.replace('holsterL', 'Holster (Left)').replace('holsterR', 'Holster (Right)').replace('openCarry', 'Open Carry').toUpperCase()}`;
+  const currentItemId = character.equipment[slot];
+  const eligibleStacks = character.inventory.filter((stack) => {
+    const item = getItemDef(stack.id);
+    return item && slotAcceptsItem(slot, item);
+  });
+
+  let html = '';
+  if (currentItemId) {
+    const currentItem = getItemDef(currentItemId);
+    html += `<div class="equip-picker-item" data-unequip="1"><span>Unequip ${currentItem ? currentItem.name : currentItemId}</span><span>&times;</span></div>`;
+  }
+  if (eligibleStacks.length === 0) {
+    html += '<div class="equip-picker-empty">No eligible items available for this slot.</div>';
+  } else {
+    html += eligibleStacks.map((stack) => {
+      const item = getItemDef(stack.id);
+      return `<div class="equip-picker-item" data-equip-item="${item.id}"><span>${item.name} (x${stack.qty})</span><span>Equip</span></div>`;
+    }).join('');
+  }
+  equipPickerList.innerHTML = html;
+
+  equipPickerList.querySelectorAll('[data-equip-item]').forEach((el) => {
+    el.addEventListener('click', () => {
+      doEquipItem(slot, el.dataset.equipItem);
+      save();
+      renderAll();
+      equipPickerModal.classList.add('hidden');
+    });
+  });
+  const unequipEl = equipPickerList.querySelector('[data-unequip]');
+  if (unequipEl) {
+    unequipEl.addEventListener('click', () => {
+      doUnequipItem(slot);
+      save();
+      renderAll();
+      equipPickerModal.classList.add('hidden');
+    });
+  }
+
+  equipPickerModal.classList.remove('hidden');
+}
+
+function doEquipItem(slot, itemId) {
+  character.equipment[slot] = itemId;
+}
+
+function doUnequipItem(slot) {
+  character.equipment[slot] = null;
+}
+
+equipSlotEls.forEach((slotEl) => {
+  slotEl.addEventListener('click', () => openEquipPicker(slotEl.dataset.slot));
+});
+
+btnEquipPickerClose.addEventListener('click', () => {
+  equipPickerModal.classList.add('hidden');
+});
+

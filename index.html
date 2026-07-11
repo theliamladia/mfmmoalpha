@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SpecialUNITS GUI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- CHARACTER CREATION -->
+<section id="screen-create" class="screen">
+  <div class="panel">
+    <h1>SpecialUNITS GUI</h1>
+    <h2>Create Your Character</h2>
+
+    <label>First Name
+      <input type="text" id="firstName" placeholder="Floyd" maxlength="10">
+    </label>
+    <label>Last Name
+      <input type="text" id="lastName" placeholder="Mayweather" maxlength="10">
+    </label>
+
+    <div class="derived-preview">
+      <p>Everyone starts as a <b>Lvl 1 CIVILIAN</b>: 10 in every stat, 5'5" (150 lbs), Looks tier "Normie".</p>
+      <p>Grind Da Skreetz for cash, then trade weight for gains at Milos Market.</p>
+    </div>
+
+    <p id="createError" class="error"></p>
+    <button id="btnCreate">Start Game</button>
+  </div>
+</section>
+
+<!-- MAIN GAME -->
+<section id="screen-game" class="screen hidden">
+  <div class="topbar">
+    <div id="charName"></div>
+    <div class="topbar-actions">
+      <button id="btnAdmin" title="Admin">Admin</button>
+      <button id="btnReset" title="Delete character and start over">Reset</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav id="sidebar">
+      <div class="sidebar-stats">
+        <div class="badges">
+          <span id="rankBadge" class="badge">CIVILIAN</span>
+          <button id="btnTitleChevron" class="chevron-btn" title="Switch title">&#9662;</button>
+          <div id="titleDropdown" class="title-dropdown hidden"></div>
+          <span id="levelBadge" class="badge">Lvl 1</span>
+        </div>
+        <div class="stat-grid">
+          <span>HP <b id="statHealth"></b></span>
+          <span>ATK <b id="statAttack"></b></span>
+          <span>SPD <b id="statSpeed"></b></span>
+          <span>DEF <b id="statDefense"></b></span>
+        </div>
+        <div class="stat-line">LOOKS <b id="statLooks"></b> <i id="looksTier"></i></div>
+        <div class="stat-line">ALLIANCE <i id="statAlliance"></i></div>
+        <div class="stat-line">Height <b id="statHeight"></b> &nbsp; Weight <b id="statWeight"></b></div>
+        <div class="stat-line cash">Floydbucks: <b id="cash">0</b></div>
+      </div>
+
+      <button class="nav-btn active" data-page="streets">Da Skreetz</button>
+      <button class="nav-btn" data-page="market">Milos Market</button>
+      <button class="nav-btn" data-page="casino">Midas Casino</button>
+      <button class="nav-btn" data-page="milos">New Milos City</button>
+      <button class="nav-btn" data-page="inventory">Inventory</button>
+      <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">Jail</button>
+      <button class="nav-btn" data-page="wiki">Wiki</button>
+    </nav>
+
+    <main id="content">
+
+      <div id="page-streets" class="page">
+        <h2>Da Skreetz</h2>
+        <p>Each hustle pays out instantly, then needs 10 seconds to cool down.</p>
+        <div class="hustle-grid">
+          <div class="hustle-card">
+            <h3>Work</h3>
+            <p>2-10 Floydbucks per click. Safe.</p>
+            <button class="hustle-btn" data-hustle="work">Work</button>
+          </div>
+          <div class="hustle-card">
+            <h3>Slut</h3>
+            <p>5-60 Floydbucks per click. 30% chance to get robbed for the same amount.</p>
+            <button class="hustle-btn" data-hustle="slut">Slut</button>
+          </div>
+          <div class="hustle-card">
+            <h3>Crime</h3>
+            <p>100-1000 Floydbucks per click. 30% chance to land in Jail.</p>
+            <button class="hustle-btn" data-hustle="crime">Crime</button>
+          </div>
+        </div>
+
+        <div id="activityLog" class="log"></div>
+      </div>
+
+      <div id="page-market" class="page hidden">
+        <h2>Milos Market</h2>
+        <div class="market-tabs">
+          <button class="market-tab-btn active" data-shop="gym">Plan-it Fitness</button>
+          <button class="market-tab-btn" data-shop="pizza">Pete's Pies</button>
+          <button class="market-tab-btn" data-shop="maxx">Luke's Maxxerstore</button>
+          <button class="market-tab-btn" data-shop="titles">Cosmetixxx</button>
+        </div>
+
+        <div id="shop-gym" class="shop">
+          <p>Fuel from eating: <b id="gymFuel">0</b> lbs available to burn.</p>
+
+          <div id="roidJailBanner" class="roid-banner hidden">
+            <p>&#9760; ROID JAIL &mdash; <span id="roidClicksLeft">0</span> click(s) of zero gains remaining.</p>
+            <button id="btnRoidEscape">Pay $80 to Get Out Early</button>
+          </div>
+
+          <div class="hustle-grid">
+            <div class="hustle-card">
+              <h3>Workout</h3>
+              <p>$20, burns 0.5 lbs &rarr; +0.5 Looks, +0.6 Speed. Requires 0.5 lbs of fuel.</p>
+              <button id="btnWorkout">Workout ($20)</button>
+            </div>
+            <div class="hustle-card">
+              <h3>Steroids</h3>
+              <p>Triples cost and gains ($60, burns 0.5 lbs &rarr; +1.5 Looks, +1.8 Speed). 40% chance of 5 clicks in Roid Jail.</p>
+              <button id="btnSteroidsToggle">Enable Steroids</button>
+            </div>
+          </div>
+
+          <div id="gymLog" class="log"></div>
+        </div>
+
+        <div id="shop-pizza" class="shop hidden">
+          <p>Eating adds weight (fuel for the gym), permanently raises Defense, and temporarily costs Speed.</p>
+          <div class="hustle-grid" id="foodGrid"></div>
+          <div id="pizzaLog" class="log"></div>
+        </div>
+
+        <div id="shop-maxx" class="shop hidden">
+          <p>Expensive looksmaxxing shortcuts. No weight required.</p>
+          <div class="hustle-grid" id="maxxGrid"></div>
+          <div id="maxxLog" class="log"></div>
+        </div>
+
+        <div id="shop-titles" class="shop hidden">
+          <div class="feature-banner">
+            <div class="feature-banner-text">
+              <h3>&#128230; OPEN BETA CRATE</h3>
+              <p>Buy a spin for the exclusive <span class="title-badge title-openbeta"><span class="title-text">OPEN BETA</span></span> title.</p>
+            </div>
+            <div class="feature-banner-actions">
+              <button id="btnViewCrate" class="secondary-btn">View Crate</button>
+              <button id="btnBetaSpin">Spin ($5,000)</button>
+            </div>
+          </div>
+
+          <div class="feature-banner rgb-blue-banner">
+            <div class="feature-banner-text">
+              <h3>&#127942; GOOD® Season 1</h3>
+              <p>GOOD® Season 1 Limited Banners &mdash; buy a spin for exclusive Season 1 flex titles.</p>
+            </div>
+            <div class="feature-banner-actions">
+              <button id="btnViewGoodSeasonCrate" class="secondary-btn">View Crate</button>
+              <button id="btnGoodSeasonSpin">Spin ($5,000)</button>
+            </div>
+          </div>
+          <p id="goodSeasonSpinMessage"></p>
+
+          <div id="crateReelWrap" class="crate-reel-wrap hidden">
+            <div class="crate-reel-viewport">
+              <div class="crate-reel-pointer"></div>
+              <div id="crateReelTrack" class="crate-reel-track"></div>
+            </div>
+          </div>
+          <p id="betaSpinMessage"></p>
+
+          <p>Flex your bank account. Buy a title, then switch which one you display with the chevron next to your name.</p>
+          <div class="hustle-grid" id="titleGrid"></div>
+
+          <div id="titleLog" class="log"></div>
+        </div>
+      </div>
+
+      <div id="page-casino" class="page hidden">
+        <h2>Midas Casino</h2>
+        <p class="chip-counter">Your Chips: <b id="casinoChipCounter">0</b></p>
+        <div class="market-tabs">
+          <button class="casino-tab-btn active" data-shop="cashier">Cashier</button>
+          <button class="casino-tab-btn" data-shop="blackjack">Blackjack</button>
+          <button class="casino-tab-btn" data-shop="slots">Slots</button>
+        </div>
+
+        <div id="shop-cashier" class="shop">
+          <p>Floydbucks don't play at the tables &mdash; convert to Chips first. Rate: 1 Floydbuck = 1 Chip.</p>
+          <div class="hustle-grid">
+            <div class="hustle-card">
+              <h3>Buy Chips</h3>
+              <p>Convert Floydbucks into Chips.</p>
+              <input type="number" id="buyChipsInput" min="1" value="100">
+              <button id="btnBuyChips">Buy Chips</button>
+            </div>
+            <div class="hustle-card">
+              <h3>Cash Out</h3>
+              <p>Convert Chips back into Floydbucks.</p>
+              <input type="number" id="cashOutInput" min="1" value="100">
+              <button id="btnCashOut">Cash Out</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="shop-blackjack" class="shop hidden">
+          <p>Dealer stands on 17. Blackjack pays 3:2.</p>
+          <div class="bj-table">
+            <div class="bj-dealer">
+              <h4>Dealer <span id="bjDealerTotal"></span></h4>
+              <div id="bjDealerCards" class="card-row"></div>
+            </div>
+            <div class="bj-player">
+              <h4>You <span id="bjPlayerTotal"></span></h4>
+              <div id="bjPlayerCards" class="card-row"></div>
+            </div>
+          </div>
+          <div class="bj-controls">
+            <label>Bet <input type="number" id="bjBetInput" min="1" value="10"></label>
+            <button id="btnBjDeal">Deal</button>
+            <button id="btnBjHit" disabled>Hit</button>
+            <button id="btnBjStand" disabled>Stand</button>
+          </div>
+          <p id="bjMessage"></p>
+          <div id="bjLog" class="log"></div>
+        </div>
+
+        <div id="shop-slots" class="shop hidden">
+          <div class="slot-reels">
+            <span class="reel" id="reel0">?</span>
+            <span class="reel" id="reel1">?</span>
+            <span class="reel" id="reel2">?</span>
+          </div>
+          <div class="hustle-grid">
+            <div class="hustle-card">
+              <h3>Spin</h3>
+              <p>Match 3 symbols for a payout. Two cherries refunds your bet.</p>
+              <label>Bet <input type="number" id="slotBetInput" min="1" value="10"></label>
+              <button id="btnSlotSpin">Spin</button>
+            </div>
+          </div>
+          <p id="slotMessage"></p>
+          <div id="slotLog" class="log"></div>
+        </div>
+      </div>
+
+      <div id="page-milos" class="page hidden">
+        <div id="milosLawBanner" class="law-banner hidden"></div>
+        <div id="milosConcealedBanner" class="concealed-banner hidden"></div>
+
+        <div class="milos-columns">
+          <div class="milos-main">
+            <h2>New Milos City</h2>
+            <p>Two more ways to make money out here &mdash; but keep your head up, this part of town isn't safe.</p>
+
+            <div class="market-tabs">
+              <button class="milos-tab-btn active" data-milos="hustles">Hustles</button>
+              <button class="milos-tab-btn" data-milos="combat">Combat</button>
+              <button class="milos-tab-btn" data-milos="cityhall">City Hall</button>
+              <button class="milos-tab-btn" data-milos="gunclub">NMC Gun Club</button>
+              <button class="milos-tab-btn" data-milos="bank">Bank</button>
+            </div>
+
+            <div id="milos-hustles" class="milos-subpage">
+              <div class="market-tabs">
+                <button class="hustle-tab-btn active" data-hustle="good">Good Hustles</button>
+                <button class="hustle-tab-btn" data-hustle="bad">Bad Hustles</button>
+              </div>
+
+              <div id="hustles-good" class="hustle-subpage">
+                <h3 class="gunclub-section-title">Good Hustles</h3>
+                <p>Small, steady, and mostly legal. Neutral alliance or better &mdash; Bad alliance is not welcome. Apply to one job at a time; resign to try another.</p>
+                <div id="goodJobsContainer" class="hustle-grid"></div>
+              </div>
+
+              <div id="hustles-bad" class="hustle-subpage hidden">
+                <h3 class="gunclub-section-title bad-hustle-title">Bad Hustles</h3>
+                <p>Real risk, real jail time. Bad alliance or worse required.</p>
+
+                <h3 class="gunclub-section-title bad-hustle-title">Illegal Jobs</h3>
+                <p>Same deal as legit work &mdash; apply to one, train up 4 skills, resign to switch. Getting caught costs you more here.</p>
+                <div id="badJobsContainer" class="hustle-grid"></div>
+
+                <h3 class="gunclub-section-title bad-hustle-title">Drug Dealing</h3>
+                <p id="drugRankStatus"></p>
+                <div id="dealerContainer" class="hustle-grid"></div>
+
+                <div class="hustle-grid">
+                  <div class="hustle-card">
+                    <h3>Sell Drugs</h3>
+                    <p id="sellDrugsDesc">Sell drugs from your Inventory on the street. Risk and jail time scale with the drug and the amount.</p>
+                    <select id="drugSellSelect"></select>
+                    <input type="number" id="drugSellQty" min="1" value="1">
+                    <button id="btnSellDrugs">Sell</button>
+                  </div>
+                  <div class="hustle-card">
+                    <h3>Attempt Robbery</h3>
+                    <p>Rob a random person on the street. Your Speed determines if they notice. If they fight back and win, that's a year in jail.</p>
+                    <button id="btnRobbery">Attempt Robbery</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="milosLog" class="log"></div>
+            </div>
+
+            <div id="milos-combat" class="milos-subpage hidden">
+              <p>Your alliance decides who's waiting for you in the alley. Good alignment runs into Gangsters &amp; Thugs. Bad alignment runs into Citizens &amp; Cops. Neutral could meet anyone.</p>
+
+              <div id="combatIdle">
+                <button id="btnFindFight">Find a Fight</button>
+              </div>
+
+              <div id="combatArena" class="hidden">
+                <div class="combat-row">
+                  <div class="combatant">
+                    <h4>You</h4>
+                    <div class="hp-bar-outer"><div id="playerHpBar" class="hp-bar-inner"></div></div>
+                    <p><span id="playerHpText"></span> HP</p>
+                  </div>
+                  <div class="combatant">
+                    <h4 id="enemyName">Enemy</h4>
+                    <div class="hp-bar-outer"><div id="enemyHpBar" class="hp-bar-inner enemy"></div></div>
+                    <p><span id="enemyHpText"></span> HP</p>
+                  </div>
+                </div>
+                <div class="combat-controls">
+                  <button id="btnAttack">Attack</button>
+                  <button id="btnFlee">Flee</button>
+                </div>
+              </div>
+
+              <div id="combatLog" class="log"></div>
+            </div>
+
+            <div id="milos-cityhall" class="milos-subpage hidden">
+              <div class="hustle-grid">
+                <div class="hustle-card">
+                  <h3>Change Name</h3>
+                  <p>$10,000. Max 10 characters per name.</p>
+                  <input type="text" id="cityHallFirstName" placeholder="First name" maxlength="10">
+                  <input type="text" id="cityHallLastName" placeholder="Last name" maxlength="10">
+                  <button id="btnCityHallRename">Change Name ($10,000)</button>
+                </div>
+                <div class="hustle-card">
+                  <h3>Marriage</h3>
+                  <p id="cityHallMarriageStatus">You are not married.</p>
+                  <input type="text" id="marriageProposeInput" placeholder="Player username">
+                  <button id="btnMarriagePropose">Send Proposal</button>
+                </div>
+                <div class="hustle-card">
+                  <h3>Gun Safety Course</h3>
+                  <p id="gunSafetyStatus">Required for a Concealed Carry Permit. 10 questions, 70% to pass.</p>
+                  <button id="btnStartGunSafety">Take the Course</button>
+                </div>
+              </div>
+              <div id="cityHallLog" class="log"></div>
+            </div>
+
+            <div id="milos-gunclub" class="milos-subpage hidden">
+              <p>Owning a gun is legal. Equipping one without the right paperwork is not &mdash; see the warning above if it applies to you.</p>
+
+              <div class="market-tabs">
+                <button class="gunclub-tab-btn active" data-gunclub="weapons">Weapons</button>
+                <button class="gunclub-tab-btn" data-gunclub="ammo">Ammo</button>
+                <button class="gunclub-tab-btn" data-gunclub="range">Gun Range</button>
+                <button class="gunclub-tab-btn" data-gunclub="licenses">Licenses</button>
+              </div>
+
+              <div id="gunclub-weapons" class="gunclub-subpage">
+                <h3 class="gunclub-section-title">9mm Pistols</h3>
+                <div class="hustle-grid" id="pistolGrid"></div>
+                <h3 class="gunclub-section-title">5.56 Rifles</h3>
+                <div class="hustle-grid" id="rifleGrid"></div>
+              </div>
+
+              <div id="gunclub-ammo" class="gunclub-subpage hidden">
+                <h3 class="gunclub-section-title">Ammo</h3>
+                <div class="hustle-grid" id="ammoGrid"></div>
+              </div>
+
+              <div id="gunclub-range" class="gunclub-subpage hidden">
+                <div class="hustle-card range-weapon-card">
+                  <h3>Select a Weapon</h3>
+                  <select id="rangeWeaponSelect"></select>
+                </div>
+                <div class="hustle-grid">
+                  <div class="hustle-card">
+                    <h3>Live Fire</h3>
+                    <p>Click every 3 seconds to shoot. Score 0.01&ndash;0.10 added to SHOOTING.</p>
+                    <button id="btnRangeShoot">Shoot</button>
+                  </div>
+                  <div class="hustle-card">
+                    <h3>Draw Practice</h3>
+                    <p>+0.01 DRAW every 3 seconds.</p>
+                    <button id="btnRangeDraw">Draw</button>
+                  </div>
+                  <div class="hustle-card">
+                    <h3>Reload Practice</h3>
+                    <p>+0.01 MAG RELOAD every 3 seconds.</p>
+                    <button id="btnRangeReload">Reload Mag</button>
+                  </div>
+                </div>
+                <div id="rangeLog" class="log"></div>
+              </div>
+
+              <div id="gunclub-licenses" class="gunclub-subpage hidden">
+                <div class="hustle-grid">
+                  <div class="hustle-card">
+                    <h3>Concealed Carry Permit</h3>
+                    <p id="concealedStatus">Apply for $2,000 and wait 10 minutes.</p>
+                    <button id="btnConcealedFreeWait">Apply ($2,000, 10 min wait)</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="gunClubLog" class="log"></div>
+            </div>
+
+            <div id="milos-bank" class="milos-subpage hidden">
+              <p id="bankAccountDesc">Deposits are safe from robbery. Upgrade your account to raise how much you can hold.</p>
+
+              <div class="hustle-grid">
+                <div class="hustle-card">
+                  <h3 id="bankTierName">Beginner Account</h3>
+                  <p>Balance: $<b id="bankBalance">0</b> / $<b id="bankMax">5,000</b></p>
+                  <input type="number" id="bankDepositAmount" min="1" placeholder="Amount">
+                  <button id="btnBankDeposit">Deposit</button>
+                  <button id="btnBankWithdraw">Withdraw</button>
+                </div>
+                <div class="hustle-card">
+                  <h3>Upgrade Account</h3>
+                  <p id="bankUpgradeDesc">Upgrade to raise your max balance.</p>
+                  <button id="btnBankUpgrade">Upgrade</button>
+                </div>
+                <div class="hustle-card">
+                  <h3 id="bankCreditCardName">Credit Card</h3>
+                  <p id="bankCreditDesc">Apply for a credit card with a limit based on your bank balance.</p>
+                  <button id="btnBankApplyCredit">Apply for Credit Card</button>
+                  <hr class="hustle-divider">
+                  <p id="bankCreditStatus" class="hidden">Limit: $<b id="bankCreditLimit">0</b> &mdash; Owed: $<b id="bankCreditOwed">0</b></p>
+                  <p id="bankDraftCountdown" class="bank-countdown hidden">Next draft in: <b id="bankDraftCountdownText">24h 00m 00s</b></p>
+                  <input type="number" id="bankAdvanceAmount" min="1" placeholder="Cash advance amount" class="hidden">
+                  <button id="btnBankCashAdvance" class="hidden">Take Cash Advance</button>
+                  <button id="btnBankPayCredit" class="hidden">Pay Off Balance</button>
+                  <p id="bankBillNote" class="gun-license-note hidden">Your full balance is auto-drafted from your bank every 24 real-life hours. If your bank can't cover it, you'll be arrested and the difference seized from your pocket cash.</p>
+                </div>
+              </div>
+
+              <div id="bankLog" class="log"></div>
+            </div>
+
+            <div class="side-panel chat-box milos-chat-row">
+              <h3>Chat</h3>
+              <p class="chat-note">Multiplayer chat is coming soon &mdash; for now, your messages just stay on your screen.</p>
+              <div id="chatMessages" class="chat-messages"></div>
+              <div class="chat-input-row">
+                <input type="text" id="chatInput" placeholder="Say something...">
+                <button id="btnChatSend">Send</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="milos-side">
+            <div class="side-panel milos-players-panel">
+              <h3>Players Online</h3>
+              <ul id="playerListEl"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-inventory" class="page hidden">
+        <h2>Inventory</h2>
+        <div class="market-tabs">
+          <button class="inv-tab-btn active" data-inv="items">Inventory</button>
+          <button class="inv-tab-btn" data-inv="equipment">Equipment</button>
+        </div>
+
+        <div id="inv-items" class="inv-subpage">
+          <p>Everything you own. Trade with a player online by typing their username.</p>
+
+          <div class="market-tabs">
+            <button class="invcat-tab-btn active" data-invcat="licenses">Licenses</button>
+            <button class="invcat-tab-btn" data-invcat="items">Items</button>
+            <button class="invcat-tab-btn" data-invcat="cosmetics">Cosmetics</button>
+          </div>
+
+          <div id="invcat-licenses" class="invcat-subpage">
+            <div class="hustle-grid" id="licensesGrid"></div>
+          </div>
+          <div id="invcat-items" class="invcat-subpage hidden">
+            <div class="hustle-grid" id="itemsGrid"></div>
+          </div>
+          <div id="invcat-cosmetics" class="invcat-subpage hidden">
+            <div class="hustle-grid" id="cosmeticsGrid"></div>
+          </div>
+
+          <div class="hustle-card trade-card">
+            <h3>Trade</h3>
+            <select id="tradeItemSelect"></select>
+            <input type="text" id="tradeUsernameInput" placeholder="Player username">
+            <button id="btnTradeSend">Send Trade</button>
+          </div>
+          <div id="inventoryLog" class="log"></div>
+        </div>
+
+        <div id="inv-equipment" class="inv-subpage hidden">
+          <p>Owning a weapon is legal. Equipping it without the right license is what gets you in trouble in New Milos City.</p>
+          <div class="equipment-board">
+            <div class="equip-slot" data-slot="helmet"><span class="equip-slot-label">HELMET</span><span class="equip-slot-item"></span></div>
+            <div class="equip-slot" data-slot="chest"><span class="equip-slot-label">CHEST</span><span class="equip-slot-item"></span></div>
+            <div class="equip-slot" data-slot="pants"><span class="equip-slot-label">PANTS</span><span class="equip-slot-item"></span></div>
+            <div class="equip-slot" data-slot="feet"><span class="equip-slot-label">FEET</span><span class="equip-slot-item"></span></div>
+            <div class="equip-slot" data-slot="holsterL"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
+            <div class="equip-slot" data-slot="holsterR"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
+            <div class="equip-slot equip-slot-opencarry" data-slot="openCarry"><span class="equip-slot-label">OPEN CARRY</span><span class="equip-slot-item"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-jail" class="page hidden">
+        <h2>Jail</h2>
+        <p>You were arrested for <b id="jailCrime">Crime</b>.</p>
+        <p>Sentence remaining: <b id="jailYears">0</b> year(s)</p>
+
+        <div class="hustle-grid">
+          <div class="hustle-card">
+            <h3>Serve Time</h3>
+            <p>Removes 1 year every 10 seconds.</p>
+            <button id="btnServe">Start Serving</button>
+          </div>
+          <div class="hustle-card">
+            <h3>Hire Lawyer</h3>
+            <p>Pay <b id="lawyerCost">--</b> Floydbucks for immediate release.</p>
+            <button id="btnLawyer">Hire Lawyer</button>
+          </div>
+        </div>
+
+        <div id="jailStatus" class="status-box hidden">
+          <p>Serving time...</p>
+          <div class="progress-outer"><div id="jailProgress" class="progress-inner"></div></div>
+          <button id="btnStopServe">Stop</button>
+        </div>
+
+        <h3 class="gunclub-section-title">Arrest Record</h3>
+        <div id="arrestRecordList" class="wiki-entry-list"></div>
+      </div>
+
+      <div id="page-wiki" class="page hidden">
+        <h2>Wiki</h2>
+        <p>A quick rundown of every page and how to use it.</p>
+
+        <div class="wiki-entry">
+          <h3>Da Skreetz</h3>
+          <p>Instant-payout hustles on a 10 second cooldown. <b>Work</b> is safe and pays $2&ndash;$10. <b>Slut</b> pays $5&ndash;$60 with a 30% chance of getting robbed for the same amount. <b>Crime</b> pays $100&ndash;$1,000 with a 30% chance of landing in Jail.</p>
+        </div>
+
+        <div class="wiki-entry">
+          <h3>Milos Market</h3>
+          <p><b>Plan-it Fitness</b> burns weight for Speed/Defense gains. <b>Pete's Pies</b> and <b>Luke's Maxxerstore</b> trade weight and cash for Looks. <b>Cosmetixxx</b> sells titles and gacha crates. Max every stat to 100 to earn the PEAK CIVILIAN title.</p>
+        </div>
+
+        <div class="wiki-entry">
+          <h3>Midas Casino</h3>
+          <p>Convert Floydbucks to Chips at the <b>Cashier</b>, then play <b>Blackjack</b> or <b>Slots</b>. Chips only exist in the Casino &mdash; cash back out at the Cashier when you're done.</p>
+        </div>
+
+        <div class="wiki-entry">
+          <h3>New Milos City</h3>
+          <p><b>Hustles</b> splits into Good Hustles (small steady legal cash, Neutral alliance or better) and Bad Hustles (drug running, dealing, and robbery &mdash; Bad alliance required, high risk of jail). <b>Combat</b> matches you against NPCs based on your Alliance. <b>City Hall</b> handles renames, marriage, and the Gun Safety Course. <b>NMC Gun Club</b> sells weapons, ammo, a shooting range, and carry licenses &mdash; you need the Gun Safety License from City Hall before you can buy a gun. <b>Bank</b> keeps your cash safe from robbery, lets you upgrade to hold more, and offers a credit card billed every 24 real-life hours.</p>
+        </div>
+
+        <div class="wiki-entry">
+          <h3>Inventory</h3>
+          <p>Split into <b>Licenses</b>, <b>Items</b>, and <b>Cosmetics</b>. Equip guns, ammo, and cosmetics on your 7-slot Equipment board. Carrying a gun without the right license or permit risks arrest &mdash; check the law banner at the top of New Milos City.</p>
+        </div>
+
+        <div class="wiki-entry">
+          <h3>Jail</h3>
+          <p>Only reachable if you're arrested &mdash; all other pages grey out. <b>Serve Time</b> removes 1 year every 10 seconds. <b>Hire Lawyer</b> pays cash for immediate release.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <div id="milosWarningModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>&#9888; Entering New Milos City</h3>
+      <p>This part of town is rough. While you're here, you're susceptible to being robbed.</p>
+      <label class="checkbox-label">
+        <input type="checkbox" id="milosWarningDontShow">
+        Do not show again
+      </label>
+      <button id="btnMilosWarningOk">Got it</button>
+    </div>
+  </div>
+
+  <div id="adminPasswordModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>Admin Access</h3>
+      <p>Enter the admin password.</p>
+      <input type="password" id="adminPasswordInput" placeholder="Password">
+      <p id="adminPasswordError" class="error"></p>
+      <div class="modal-actions">
+        <button id="btnAdminPasswordCancel" class="secondary-btn">Cancel</button>
+        <button id="btnAdminPasswordSubmit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminMenuModal" class="modal-overlay hidden">
+    <div class="modal-box admin-box">
+      <h3>&#9881; Admin Cheat Menu</h3>
+
+      <div class="admin-row">
+        <label>Add Cash <input type="number" id="adminCashInput" value="1000"></label>
+        <button id="btnAdminAddCash">Add</button>
+      </div>
+      <div class="admin-row">
+        <label>Add Chips <input type="number" id="adminChipsInput" value="500"></label>
+        <button id="btnAdminAddChips">Add</button>
+      </div>
+      <div class="admin-row">
+        <label>Add Weight (lbs) <input type="number" id="adminWeightInput" value="10"></label>
+        <button id="btnAdminAddWeight">Add</button>
+      </div>
+      <div class="admin-row">
+        <label>Add to All Stats <input type="number" id="adminStatInput" value="10"></label>
+        <button id="btnAdminAddStats">Add</button>
+      </div>
+
+      <div class="admin-block">
+        <p>Set Alliance</p>
+        <div class="admin-alliance-buttons">
+          <button data-alliance="10">Holy Good</button>
+          <button data-alliance="30">Good</button>
+          <button data-alliance="50">Neutral</button>
+          <button data-alliance="70">Bad</button>
+          <button data-alliance="90">Dirty Bad</button>
+        </div>
+      </div>
+
+      <div class="admin-block admin-misc">
+        <button id="btnAdminMaxStats">Max All Stats</button>
+        <button id="btnAdminReleaseJail">Release From Jail</button>
+        <button id="btnAdminGiveAdminTitle">Give ADMIN Title</button>
+      </div>
+
+      <button id="btnAdminClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
+  <div id="crateOddsModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="crateOddsTitle">&#128230; OPEN BETA CRATE Odds</h3>
+      <div id="crateOddsList" class="crate-odds-list"></div>
+      <button id="btnCrateOddsClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
+  <div id="crateResultModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>You Won!</h3>
+      <div id="crateResultBadge" class="crate-result-badge"></div>
+      <p id="crateResultNote" class="crate-result-note"></p>
+      <div class="crate-result-actions">
+        <button id="btnCrateResultEquip">Equip Title</button>
+        <button id="btnCrateResultContinue" class="secondary-btn">Continue Without Equipping</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="equipPickerModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="equipPickerTitle">Equip Item</h3>
+      <div id="equipPickerList" class="equip-picker-list"></div>
+      <button id="btnEquipPickerClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
+  <div id="quizModal" class="modal-overlay hidden">
+    <div class="modal-box quiz-box">
+      <h3 id="quizTitle">Quiz</h3>
+      <div id="quizQuestions" class="quiz-questions"></div>
+      <p id="quizResult"></p>
+      <div class="modal-actions">
+        <button id="btnQuizCancel" class="secondary-btn">Cancel</button>
+        <button id="btnQuizSubmit">Submit</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="js/core.js"></script>
+<script src="js/market.js"></script>
+<script src="js/bank.js"></script>
+<script src="js/casino.js"></script>
+<script src="js/milos.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/jail.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
