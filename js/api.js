@@ -48,3 +48,7 @@ function apiMe() {
 function apiWork() {
   return apiRequest('/hustle/work', { method: 'POST' });
 }
+
+function apiOnlinePlayers() {
+  return apiRequest('/players/online');
+}

@@ -16,13 +16,15 @@ const badJobsContainer = document.getElementById('badJobsContainer');
 const dealerContainer = document.getElementById('dealerContainer');
 const drugRankStatus = document.getElementById('drugRankStatus');
 
+let onlinePlayersCache = [];
+
 function renderPlayerList() {
   const display = getDisplayTitle();
   const badgeMarkup = display
     ? titleHoverMarkup(display)
     : `<span class="badge rank-badge">${computeRank()}</span>`;
   const fullName = `${character.firstName} ${character.lastName}`;
-  playerListEl.innerHTML = `
+  const youRow = `
     <li class="player-row">
       ${badgeMarkup}
       <span class="player-name">${fullName} (you)</span>
@@ -33,7 +35,34 @@ function renderPlayerList() {
       </div>
     </li>
   `;
+
+  const otherRows = onlinePlayersCache.map((p) => `
+    <li class="player-row">
+      <span class="badge rank-badge">🟢</span>
+      <span class="player-name">${p.firstName} ${p.lastName}</span>
+    </li>
+  `).join('');
+
+  playerListEl.innerHTML = youRow + otherRows;
 }
+
+// Presence is server-tracked (last_seen updates on every authenticated request); poll
+// periodically so the roster reflects who's actually logged in right now.
+const ONLINE_POLL_MS = 15000;
+
+async function refreshOnlinePlayers() {
+  if (!getAuthToken()) return;
+  try {
+    const result = await apiOnlinePlayers();
+    onlinePlayersCache = result.players.filter((p) => !p.you);
+  } catch {
+    // Presence is best-effort -- keep showing the last known list if the poll fails.
+  }
+  if (!pageMilos.classList.contains('hidden')) renderPlayerList();
+}
+
+setInterval(refreshOnlinePlayers, ONLINE_POLL_MS);
+refreshOnlinePlayers();
 
 function renderMilos() {
   if (!goodJobsContainer) return;

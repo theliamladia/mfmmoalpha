@@ -35,6 +35,7 @@ function enterGameWithCharacter(serverCharacter) {
   save();
   screenAuth.classList.add('hidden');
   showGame();
+  refreshOnlinePlayers();
 }
 
 btnLogin.addEventListener('click', async () => {
