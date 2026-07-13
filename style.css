@@ -79,7 +79,8 @@ h3 {
 }
 
 .panel input[type="text"],
-.panel input[type="number"] {
+.panel input[type="number"],
+.panel input[type="password"] {
   display: block;
   width: 100%;
   margin-top: 6px;
@@ -94,7 +95,8 @@ h3 {
 }
 
 .panel input[type="text"]:focus,
-.panel input[type="number"]:focus {
+.panel input[type="number"]:focus,
+.panel input[type="password"]:focus {
   outline: none;
   border-color: #f2c94c;
 }
