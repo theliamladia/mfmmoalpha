@@ -965,8 +965,8 @@ function renderCombat() {
   const remaining = getRemainingCooldown('combat', COMBAT_COOLDOWN_MS);
   btnFindFight.disabled = combatState.active || character.jail.inJail || remaining > 0;
   btnFindFight.textContent = !combatState.active && remaining > 0
-    ? `Find a Fight (${Math.ceil(remaining / 1000)}s)`
-    : 'Find a Fight';
+    ? `🥊 Find a Fight (${Math.ceil(remaining / 1000)}s)`
+    : '🥊 Find a Fight';
 }
 
 // Height gives a reach/frame advantage in a fight: extra max HP and a small attack bonus.

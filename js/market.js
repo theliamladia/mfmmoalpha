@@ -95,15 +95,16 @@ hustleButtons.forEach((btn) => {
   });
 });
 
+const HUSTLE_EMOJI = { work: '💼', slut: '💋', crime: '🔪' };
+
 function tickCooldownUI() {
   if (!character) return;
   hustleButtons.forEach((btn) => {
     const type = btn.dataset.hustle;
     const remaining = getRemainingCooldown(type);
     btn.disabled = remaining > 0;
-    btn.textContent = remaining > 0
-      ? `${type.charAt(0).toUpperCase() + type.slice(1)} (${Math.ceil(remaining / 1000)}s)`
-      : type.charAt(0).toUpperCase() + type.slice(1);
+    const label = `${HUSTLE_EMOJI[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}`.trim();
+    btn.textContent = remaining > 0 ? `${label} (${Math.ceil(remaining / 1000)}s)` : label;
   });
   tickMilosCooldownUI();
   tickBankCountdown();

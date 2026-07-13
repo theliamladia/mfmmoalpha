@@ -22,9 +22,9 @@ const GYM_LOOKS_GAIN = 0.5;
 const GYM_SPEED_GAIN = 0.6; // > SPEED_LOSS_PER_LB * GYM_BURN_LBS (0.5), so a full cycle nets +speed
 // Steroid cycles: bigger multiplier on cost/gains trades off against worse roid-jail odds and length.
 const STEROID_TIERS = [
-  { id: 'mild', name: 'Mild Cycle', mult: 1.75, jailChance: 0.2, jailClicks: 3 },
-  { id: 'standard', name: 'Standard Cycle', mult: 3, jailChance: 0.4, jailClicks: 5 },
-  { id: 'heavy', name: 'Heavy Cycle', mult: 5, jailChance: 0.6, jailClicks: 9 },
+  { id: 'mild', name: '💊 Mild Cycle', mult: 1.75, jailChance: 0.2, jailClicks: 3 },
+  { id: 'standard', name: '💉 Standard Cycle', mult: 3, jailChance: 0.4, jailClicks: 5 },
+  { id: 'heavy', name: '☠️ Heavy Cycle', mult: 5, jailChance: 0.6, jailClicks: 9 },
 ];
 const STEROID_TIERS_BY_ID = {};
 STEROID_TIERS.forEach((t) => { STEROID_TIERS_BY_ID[t.id] = t; });
@@ -34,11 +34,11 @@ const ALLIANCE_BUFF = 2; // legal work nudges toward Holy Good
 const ALLIANCE_DEBUFF = 6; // getting caught (or committing crime) nudges toward Dirty Bad
 const ALLIANCE_DEBUFF_MINOR = 3; // smaller nudge toward Dirty Bad for lower-stakes bad acts (e.g. Slut)
 const ALLIANCE_TIERS = [
-  { max: 19, label: 'Holy Good' },
-  { max: 39, label: 'Good' },
-  { max: 59, label: 'Neutral' },
-  { max: 79, label: 'Bad' },
-  { max: 100, label: 'Dirty Bad' },
+  { max: 19, label: '😇 Holy Good' },
+  { max: 39, label: '🙂 Good' },
+  { max: 59, label: '😐 Neutral' },
+  { max: 79, label: '😈 Bad' },
+  { max: 100, label: '💀 Dirty Bad' },
 ];
 
 const GUZMAN_MIN_ALLIANCE = 60; // Bad Hustles (jobs, dealing, robbery) require Bad or worse
@@ -50,9 +50,9 @@ const MORALS_GOOD_STEP = 2;
 const MORALS_BAD_STEP = 2;
 const MORALS_NEUTRAL_STEP = 3;
 const MORALS_CHOICES = {
-  acceptRicardo: { name: 'Accept Ricardo', desc: 'Every 10s, nudge your Alliance toward Good.' },
-  renounceRicardo: { name: 'Renounce Ricardo', desc: 'Every 10s, nudge your Alliance toward Bad.' },
-  invokeNeutrality: { name: 'Invoke Neutrality', desc: 'Every 10s, pull your Alliance back toward Neutral (50).' },
+  acceptRicardo: { name: '😇 Accept Ricardo', desc: 'Every 10s, nudge your Alliance toward Good.' },
+  renounceRicardo: { name: '😈 Renounce Ricardo', desc: 'Every 10s, nudge your Alliance toward Bad.' },
+  invokeNeutrality: { name: '😐 Invoke Neutrality', desc: 'Every 10s, pull your Alliance back toward Neutral (50).' },
 };
 
 const GOOD_HUSTLE_MAX_ALLIANCE = 59; // Good Hustles allowed for Neutral or better, blocked for Bad
@@ -89,20 +89,20 @@ const BAD_JOB_RANKS = [
 
 // Job-specific perks, unlocked once that job's skill average hits JOB_PERK_MIN_AVG while employed there.
 const JOB_PERKS = {
-  milos11: { name: 'Employee Discount', desc: "20% off Pete's Pies while you're clocked in at Milos11." },
-  pizza: { name: 'Delivery Legs', desc: 'A permanent +2 Speed the moment you hit the threshold, from all those sprints up stairs.' },
-  wrestler: { name: 'Wrestling Gear Access', desc: 'Unlocks the Wrestling Gear Store below -- exclusive combat gear only wrestlers can buy.' },
-  getaway: { name: 'Evasion Instincts', desc: '-3% bust chance on this job while employed as a Getaway Driver.' },
-  fence: { name: 'Inside Contacts', desc: '15% off everything at the NMC Gun Club while employed as The Fence.' },
+  milos11: { name: '🏷️ Employee Discount', desc: "20% off Pete's Pies while you're clocked in at Milos11." },
+  pizza: { name: '🏃 Delivery Legs', desc: 'A permanent +2 Speed the moment you hit the threshold, from all those sprints up stairs.' },
+  wrestler: { name: '🤼 Wrestling Gear Access', desc: 'Unlocks the Wrestling Gear Store below -- exclusive combat gear only wrestlers can buy.' },
+  getaway: { name: '🏎️ Evasion Instincts', desc: '-3% bust chance on this job while employed as a Getaway Driver.' },
+  fence: { name: '🕴️ Inside Contacts', desc: '15% off everything at the NMC Gun Club while employed as The Fence.' },
 };
 
 // Wrestling-job-exclusive gear: equips into the Character > Equipment board's otherwise-empty
 // helmet/chest/pants/feet slots, adding flat combat stat bonuses on top of the usual gun/melee bonus.
 const WRESTLING_GEAR_ITEMS = [
-  { id: 'wrestHeadgear', name: 'Wrestling Headgear', type: 'gear', slot: 'helmet', cost: 2000, statBonuses: { defense: 3, health: 5 }, desc: '+3 Defense, +5 HP in a fight.' },
-  { id: 'wrestBelt', name: 'Championship Belt', type: 'gear', slot: 'chest', cost: 3000, statBonuses: { defense: 6 }, desc: '+6 Defense in a fight.' },
-  { id: 'wrestSinglet', name: 'Singlet Padding', type: 'gear', slot: 'pants', cost: 2500, statBonuses: { attack: 4 }, desc: '+4 Attack in a fight.' },
-  { id: 'wrestBoots', name: 'Grappling Boots', type: 'gear', slot: 'feet', cost: 2200, statBonuses: { speed: 5 }, desc: '+5 Speed (dodge chance) in a fight.' },
+  { id: 'wrestHeadgear', name: '🪖 Wrestling Headgear', type: 'gear', slot: 'helmet', cost: 2000, statBonuses: { defense: 3, health: 5 }, desc: '+3 Defense, +5 HP in a fight.' },
+  { id: 'wrestBelt', name: '🏆 Championship Belt', type: 'gear', slot: 'chest', cost: 3000, statBonuses: { defense: 6 }, desc: '+6 Defense in a fight.' },
+  { id: 'wrestSinglet', name: '🥋 Singlet Padding', type: 'gear', slot: 'pants', cost: 2500, statBonuses: { attack: 4 }, desc: '+4 Attack in a fight.' },
+  { id: 'wrestBoots', name: '🥾 Grappling Boots', type: 'gear', slot: 'feet', cost: 2200, statBonuses: { speed: 5 }, desc: '+5 Speed (dodge chance) in a fight.' },
 ];
 const WRESTLING_GEAR_ITEMS_BY_ID = {};
 WRESTLING_GEAR_ITEMS.forEach((item) => { WRESTLING_GEAR_ITEMS_BY_ID[item.id] = item; });
@@ -122,7 +122,7 @@ function nextRankFor(ranks, avg) {
 const GOOD_JOBS = [
   {
     id: 'milos11',
-    name: 'Milos11',
+    name: '🏪 Milos11',
     desc: 'Clock in at the convenience store.',
     skills: [
       { key: 'skill1', label: 'Register Speed' },
@@ -133,7 +133,7 @@ const GOOD_JOBS = [
   },
   {
     id: 'pizza',
-    name: "Pete'sza Delivery",
+    name: "🍕 Pete'sza Delivery",
     desc: 'Deliver pies around town.',
     skills: [
       { key: 'skill1', label: 'Navigation' },
@@ -144,7 +144,7 @@ const GOOD_JOBS = [
   },
   {
     id: 'wrestler',
-    name: 'Krogue Wrestler Gear',
+    name: '🤼 Krogue Wrestler Gear',
     desc: 'Hawk wrestling merch on the corner.',
     skills: [
       { key: 'skill1', label: 'Haggling' },
@@ -158,7 +158,7 @@ const GOOD_JOBS = [
 const BAD_JOBS = [
   {
     id: 'getaway',
-    name: 'Getaway Driver',
+    name: '🏎️ Getaway Driver',
     desc: "Wheelman for whoever's paying. Keep the engine running.",
     skills: [
       { key: 'skill1', label: 'Driving' },
@@ -169,7 +169,7 @@ const BAD_JOBS = [
   },
   {
     id: 'fence',
-    name: 'The Fence',
+    name: '🕴️ The Fence',
     desc: 'Move stolen goods for cash, no questions asked.',
     skills: [
       { key: 'skill1', label: 'Appraisal' },
@@ -185,10 +185,10 @@ const BAD_JOB_BUST_MIN = 0.02; // bust chance at maxed-out skill
 const BAD_JOB_JAIL_YEARS = 1;
 
 const DRUG_ITEMS = [
-  { id: 'drugWeed', name: 'Weed', type: 'drug', wholesaleCost: 20, sellMin: 30, sellMax: 50, jailYearsPerUnit: 0.2, riskBase: 0.05, riskPerUnit: 0.02 },
-  { id: 'drugPills', name: 'Pills', type: 'drug', wholesaleCost: 60, sellMin: 90, sellMax: 140, jailYearsPerUnit: 0.5, riskBase: 0.12, riskPerUnit: 0.03 },
-  { id: 'drugMeth', name: 'Meth', type: 'drug', wholesaleCost: 100, sellMin: 160, sellMax: 260, jailYearsPerUnit: 1.5, riskBase: 0.25, riskPerUnit: 0.05 },
-  { id: 'drugCoke', name: 'Cocaine', type: 'drug', wholesaleCost: 150, sellMin: 220, sellMax: 320, jailYearsPerUnit: 1, riskBase: 0.2, riskPerUnit: 0.04 },
+  { id: 'drugWeed', name: '🌿 Weed', type: 'drug', wholesaleCost: 20, sellMin: 30, sellMax: 50, jailYearsPerUnit: 0.2, riskBase: 0.05, riskPerUnit: 0.02 },
+  { id: 'drugPills', name: '💊 Pills', type: 'drug', wholesaleCost: 60, sellMin: 90, sellMax: 140, jailYearsPerUnit: 0.5, riskBase: 0.12, riskPerUnit: 0.03 },
+  { id: 'drugMeth', name: '🧪 Meth', type: 'drug', wholesaleCost: 100, sellMin: 160, sellMax: 260, jailYearsPerUnit: 1.5, riskBase: 0.25, riskPerUnit: 0.05 },
+  { id: 'drugCoke', name: '❄️ Cocaine', type: 'drug', wholesaleCost: 150, sellMin: 220, sellMax: 320, jailYearsPerUnit: 1, riskBase: 0.2, riskPerUnit: 0.04 },
 ];
 const DRUG_ITEMS_BY_ID = {};
 DRUG_ITEMS.forEach((d) => { DRUG_ITEMS_BY_ID[d.id] = d; });
@@ -196,10 +196,10 @@ DRUG_ITEMS.forEach((d) => { DRUG_ITEMS_BY_ID[d.id] = d; });
 // Guzman is the street-level entry point: cheap product, marginal profit. Selling more units on
 // the street raises your drug dealing rank and introduces higher-end dealers with better product.
 const DEALER_TIERS = [
-  { id: 'guzman', name: 'Guzman Nestor', drugId: 'drugWeed', unlockUnits: 0 },
-  { id: 'esteban', name: 'Esteban Vico', drugId: 'drugPills', unlockUnits: 40 },
-  { id: 'ramon', name: 'Ramon Castillo', drugId: 'drugMeth', unlockUnits: 100 },
-  { id: 'dmitri', name: 'Dmitri Kovash', drugId: 'drugCoke', unlockUnits: 200 },
+  { id: 'guzman', name: '🕴️ Guzman Nestor', drugId: 'drugWeed', unlockUnits: 0 },
+  { id: 'esteban', name: '🕴️ Esteban Vico', drugId: 'drugPills', unlockUnits: 40 },
+  { id: 'ramon', name: '🕴️ Ramon Castillo', drugId: 'drugMeth', unlockUnits: 100 },
+  { id: 'dmitri', name: '🕴️ Dmitri Kovash', drugId: 'drugCoke', unlockUnits: 200 },
 ];
 const DEALER_QUICK_MIN = 3;
 const DEALER_QUICK_MAX = 12;
@@ -217,10 +217,10 @@ const ROBBERY_JAIL_YEARS = 1;
 // offenders get thrown the book). Community Service is the release valve — pay down your streak
 // before you get caught again.
 const CRIME_TIERS = [
-  { id: 'shoplift', name: 'Shoplifting', desc: 'Slip something into your jacket at a corner store.', minReward: 80, maxReward: 200, jailYears: 1, baseRisk: 0.35 },
-  { id: 'pettytheft', name: 'Petty Theft', desc: 'Pick a pocket or snatch a purse off a table.', minReward: 350, maxReward: 650, jailYears: 1, baseRisk: 0.45 },
-  { id: 'burglary', name: 'Burglary', desc: "Break into a house while nobody's home.", minReward: 1200, maxReward: 2200, jailYears: 4, baseRisk: 0.5 },
-  { id: 'grandtheft', name: 'Grand Theft Auto', desc: 'Boost a car off the street and flip it.', minReward: 4000, maxReward: 6000, jailYears: 10, baseRisk: 0.6 },
+  { id: 'shoplift', name: '🛍️ Shoplifting', desc: 'Slip something into your jacket at a corner store.', minReward: 80, maxReward: 200, jailYears: 1, baseRisk: 0.35 },
+  { id: 'pettytheft', name: '👛 Petty Theft', desc: 'Pick a pocket or snatch a purse off a table.', minReward: 350, maxReward: 650, jailYears: 1, baseRisk: 0.45 },
+  { id: 'burglary', name: '🏚️ Burglary', desc: "Break into a house while nobody's home.", minReward: 1200, maxReward: 2200, jailYears: 4, baseRisk: 0.5 },
+  { id: 'grandtheft', name: '🚗 Grand Theft Auto', desc: 'Boost a car off the street and flip it.', minReward: 4000, maxReward: 6000, jailYears: 10, baseRisk: 0.6 },
 ];
 const CRIME_COOLDOWN_MS = 12000;
 const CRIME_RISK_MIN = 0.05;
@@ -255,11 +255,11 @@ function doCommunityService() {
 }
 
 const BANK_TIERS = [
-  { name: 'New Milos Discovery', cardName: 'NMB Discovery', maxBalance: 5000, upgradeCost: 0 },
-  { name: 'New Milos Bank Card', cardName: 'NMB Advantage Standard', maxBalance: 25000, upgradeCost: 10000 },
-  { name: 'New Milos Phalanx', cardName: 'NMB Advantage Elevated', maxBalance: 100000, upgradeCost: 50000 },
-  { name: 'New Milos Praetorian', cardName: 'NMB Endeavor Credit', maxBalance: 500000, upgradeCost: 250000 },
-  { name: 'New Milos Caesar Titanum', cardName: 'NMB Ti Casear', maxBalance: 2000000, upgradeCost: 1000000 },
+  { name: '🏦 New Milos Discovery', cardName: 'NMB Discovery', maxBalance: 5000, upgradeCost: 0 },
+  { name: '🏦 New Milos Bank Card', cardName: 'NMB Advantage Standard', maxBalance: 25000, upgradeCost: 10000 },
+  { name: '🏦 New Milos Phalanx', cardName: 'NMB Advantage Elevated', maxBalance: 100000, upgradeCost: 50000 },
+  { name: '🏦 New Milos Praetorian', cardName: 'NMB Endeavor Credit', maxBalance: 500000, upgradeCost: 250000 },
+  { name: '🏦 New Milos Caesar Titanum', cardName: 'NMB Ti Casear', maxBalance: 2000000, upgradeCost: 1000000 },
 ];
 const BANK_CREDIT_LIMIT_PCT = 0.5;
 const BANK_BILLING_INTERVAL_MS = 24 * 60 * 60 * 1000;
@@ -267,27 +267,27 @@ const BANK_DEFAULT_JAIL_YEARS = 2;
 
 const COMBAT_COOLDOWN_MS = 5000;
 const NPC_TYPES = {
-  citizen: { name: 'Citizen', hp: 20, attack: 5, defense: 2, minReward: 30, maxReward: 90 },
-  cop: { name: 'Cop', hp: 50, attack: 14, defense: 9, minReward: 90, maxReward: 220 },
-  thug: { name: 'Thug', hp: 30, attack: 8, defense: 4, minReward: 65, maxReward: 160 },
-  gangster: { name: 'Gangster', hp: 45, attack: 12, defense: 7, minReward: 130, maxReward: 300 },
+  citizen: { name: '🧍 Citizen', hp: 20, attack: 5, defense: 2, minReward: 30, maxReward: 90 },
+  cop: { name: '👮 Cop', hp: 50, attack: 14, defense: 9, minReward: 90, maxReward: 220 },
+  thug: { name: '🥷 Thug', hp: 30, attack: 8, defense: 4, minReward: 65, maxReward: 160 },
+  gangster: { name: '🕴️ Gangster', hp: 45, attack: 12, defense: 7, minReward: 130, maxReward: 300 },
 };
 
 // Cost-per-calorie rises with size -- a bigger pie is never a better deal than a slice, just less clicking.
 const FOOD_ITEMS = [
-  { id: 'pizza', name: 'Pizza Slice', cost: 1, calories: 285 },
-  { id: 'calzone', name: 'Calzone', cost: 3, calories: 650 },
-  { id: 'pizzamax', name: 'Pizzamax (Whole Pie)', cost: 10, calories: 2000 },
+  { id: 'pizza', name: '🍕 Pizza Slice', cost: 1, calories: 285 },
+  { id: 'calzone', name: '🥟 Calzone', cost: 3, calories: 650 },
+  { id: 'pizzamax', name: '🍕 Pizzamax (Whole Pie)', cost: 10, calories: 2000 },
 ];
 
 // Cost-per-Looks-point rises with tier so a pricier item is never a worse deal than a cheaper one.
 const MAXX_ITEMS = [
-  { id: 'mewing', name: 'Mewing Course', cost: 500, looks: 1, desc: '+1 Looks' },
-  { id: 'bonesmash', name: 'Bone Smashing Kit', cost: 1600, looks: 2, desc: '+2 Looks' },
-  { id: 'hairline', name: 'Hair Transplant', cost: 3200, looks: 3, desc: '+3 Looks' },
-  { id: 'jaw', name: 'Jawline Filler', cost: 5200, looks: 4, desc: '+4 Looks' },
-  { id: 'canthal', name: 'Canthal Tilt Surgery', cost: 10000, looks: 6, desc: '+6 Looks' },
-  { id: 'limblength', name: 'Limb Lengthening Surgery', cost: 12000, height: 1, speed: 1, desc: '+1" Height, +1 Speed' },
+  { id: 'mewing', name: '💋 Mewing Course', cost: 500, looks: 1, desc: '+1 Looks' },
+  { id: 'bonesmash', name: '🔨 Bone Smashing Kit', cost: 1600, looks: 2, desc: '+2 Looks' },
+  { id: 'hairline', name: '💇 Hair Transplant', cost: 3200, looks: 3, desc: '+3 Looks' },
+  { id: 'jaw', name: '💉 Jawline Filler', cost: 5200, looks: 4, desc: '+4 Looks' },
+  { id: 'canthal', name: '👁️ Canthal Tilt Surgery', cost: 10000, looks: 6, desc: '+6 Looks' },
+  { id: 'limblength', name: '🦴 Limb Lengthening Surgery', cost: 12000, height: 1, speed: 1, desc: '+1" Height, +1 Speed' },
 ];
 
 const TITLES = [
@@ -323,27 +323,27 @@ const GOOD_SEASON1_TITLES = [
 const RENAME_COST = 10000;
 
 const PISTOL_ITEMS = [
-  { id: 'glock19', name: 'Glock 19', type: 'pistol', caliber: '9mm', cost: 500, atkBonus: 6 },
-  { id: 'm9', name: 'Beretta M9', type: 'pistol', caliber: '9mm', cost: 650, atkBonus: 7 },
+  { id: 'glock19', name: '🔫 Glock 19', type: 'pistol', caliber: '9mm', cost: 500, atkBonus: 6 },
+  { id: 'm9', name: '🔫 Beretta M9', type: 'pistol', caliber: '9mm', cost: 650, atkBonus: 7 },
 ];
 const RIFLE_ITEMS = [
-  { id: 'ar15', name: 'AR-15', type: 'rifle', caliber: '5.56', cost: 2500, atkBonus: 12 },
-  { id: 'm4', name: 'M4 Carbine', type: 'rifle', caliber: '5.56', cost: 3200, atkBonus: 14 },
+  { id: 'ar15', name: '🎯 AR-15', type: 'rifle', caliber: '5.56', cost: 2500, atkBonus: 12 },
+  { id: 'm4', name: '🎯 M4 Carbine', type: 'rifle', caliber: '5.56', cost: 3200, atkBonus: 14 },
 ];
 const GUN_ITEMS_BY_ID = {};
 [...PISTOL_ITEMS, ...RIFLE_ITEMS].forEach((item) => { GUN_ITEMS_BY_ID[item.id] = item; });
 
 // Melee weapons: no license needed, legal to carry, cheap alternative to a gun for Combat.
 const MELEE_ITEMS = [
-  { id: 'knuckles', name: 'Brass Knuckles', type: 'melee', cost: 75, atkBonus: 2 },
-  { id: 'knife', name: 'Switchblade Knife', type: 'melee', cost: 200, atkBonus: 4 },
+  { id: 'knuckles', name: '👊 Brass Knuckles', type: 'melee', cost: 75, atkBonus: 2 },
+  { id: 'knife', name: '🔪 Switchblade Knife', type: 'melee', cost: 200, atkBonus: 4 },
 ];
 const MELEE_ITEMS_BY_ID = {};
 MELEE_ITEMS.forEach((item) => { MELEE_ITEMS_BY_ID[item.id] = item; });
 
 const AMMO_ITEMS = [
-  { id: 'ammo9mm', name: '9mm Ammo Box', type: 'ammo', caliber: '9mm', cost: 50 },
-  { id: 'ammo556', name: '5.56 Ammo Box', type: 'ammo', caliber: '5.56', cost: 80 },
+  { id: 'ammo9mm', name: '📦 9mm Ammo Box', type: 'ammo', caliber: '9mm', cost: 50 },
+  { id: 'ammo556', name: '📦 5.56 Ammo Box', type: 'ammo', caliber: '5.56', cost: 80 },
 ];
 const AMMO_ITEMS_BY_ID = {};
 AMMO_ITEMS.forEach((item) => { AMMO_ITEMS_BY_ID[item.id] = item; });
@@ -660,7 +660,7 @@ function renderAll() {
   processBankBilling();
   processMoralsCenter();
   charNameEl.textContent = `${character.firstName} ${character.lastName}`;
-  levelBadgeEl.textContent = `Lvl ${computeLevel()}`;
+  levelBadgeEl.textContent = `⭐ Lvl ${computeLevel()}`;
 
   const s = character.stats;
   statHealthEl.textContent = round1(s.health);
