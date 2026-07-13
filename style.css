@@ -752,6 +752,8 @@ button:disabled {
   border-radius: 10px;
   padding: 18px;
   width: 230px;
+  display: flex;
+  flex-direction: column;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
@@ -768,6 +770,10 @@ button:disabled {
   line-height: 1.55;
   color: #9a9ca6;
   min-height: 52px;
+}
+
+.hustle-card > p:first-of-type {
+  flex: 1 0 auto;
 }
 
 .hustle-btn {
