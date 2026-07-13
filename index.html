@@ -10,8 +10,53 @@
 </head>
 <body>
 
-<!-- CHARACTER CREATION -->
-<section id="screen-create" class="screen">
+<!-- LOGIN / REGISTER -->
+<section id="screen-auth" class="screen hidden">
+  <div class="panel">
+    <h2 id="authSubtitle">Log In</h2>
+
+    <div class="market-tabs">
+      <button class="auth-tab-btn active" data-auth-tab="login">Log In</button>
+      <button class="auth-tab-btn" data-auth-tab="register">Register</button>
+    </div>
+
+    <div id="authLoginForm">
+      <label>Username
+        <input type="text" id="loginUsername" placeholder="Username">
+      </label>
+      <label>Password
+        <input type="password" id="loginPassword" placeholder="Password">
+      </label>
+      <p id="loginError" class="error"></p>
+      <button id="btnLogin">Log In</button>
+    </div>
+
+    <div id="authRegisterForm" class="hidden">
+      <label>Username
+        <input type="text" id="registerUsername" placeholder="3-20 characters: letters, numbers, _" maxlength="20">
+      </label>
+      <label>Password
+        <input type="password" id="registerPassword" placeholder="At least 4 characters">
+      </label>
+      <label>First Name
+        <input type="text" id="registerFirstName" placeholder="Floyd" maxlength="10">
+      </label>
+      <label>Last Name
+        <input type="text" id="registerLastName" placeholder="Mayweather" maxlength="10">
+      </label>
+
+      <div class="derived-preview">
+        <p>Everyone starts as a <b>Lvl 1 CIVILIAN</b>: 10 in every stat, 5'5" (150 lbs), Looks tier "Normie".</p>
+      </div>
+
+      <p id="registerError" class="error"></p>
+      <button id="btnRegister">Create Account</button>
+    </div>
+  </div>
+</section>
+
+<!-- CHARACTER CREATION (legacy local-only flow, unused once an account exists) -->
+<section id="screen-create" class="screen hidden">
   <div class="panel">
     <h1>SpecialUNITS GUI</h1>
     <h2>Create Your Character</h2>
@@ -892,6 +937,7 @@
   </div>
 </section>
 
+<script src="js/api.js"></script>
 <script src="js/core.js"></script>
 <script src="js/serverstate.js"></script>
 <script src="js/market.js"></script>
@@ -903,5 +949,6 @@
 <script src="js/penitentiary.js"></script>
 <script src="js/jail.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/clientAuth.js"></script>
 </body>
 </html>

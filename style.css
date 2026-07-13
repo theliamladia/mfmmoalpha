@@ -883,6 +883,18 @@ button:disabled {
   color: #1b1d22;
 }
 
+.auth-tab-btn {
+  background: #24262e;
+  color: #b9bbc4;
+  border: 1px solid #35373f;
+  flex: 1;
+}
+
+.auth-tab-btn.active {
+  background: #f2c94c;
+  color: #1b1d22;
+}
+
 .casino-tab-btn {
   background: #24262e;
   color: #b9bbc4;

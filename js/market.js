@@ -87,10 +87,28 @@ function runHustle(type) {
   renderAll();
 }
 
+// Work is server-authoritative (the first ported slice); Slut and Crime are still local-only.
+async function runWorkViaServer(btn) {
+  btn.disabled = true;
+  try {
+    const result = await apiWork();
+    character = result.character;
+    logMessage(result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    logMessage(err.reason || 'Could not reach the server.', 'loss');
+  }
+}
+
 hustleButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
     const type = btn.dataset.hustle;
     if (getRemainingCooldown(type) > 0) return;
+    if (type === 'work') {
+      runWorkViaServer(btn);
+      return;
+    }
     runHustle(type);
   });
 });

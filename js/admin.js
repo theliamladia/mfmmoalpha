@@ -190,10 +190,3 @@ btnAdminInvCheck.addEventListener('click', () => {
   renderInvCheckResult(result);
 });
 
-// ---------- init ----------
-(function init() {
-  character = load();
-  if (character) {
-    showGame();
-  }
-})();

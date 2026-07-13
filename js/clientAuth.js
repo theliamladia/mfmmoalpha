@@ -1,0 +1,88 @@
+// ---------- Client-side auth flow ----------
+// Replaces the old "load from localStorage or show character creation" init with an
+// account-backed flow: log in or register against mfmmoserver, then show the game with
+// whatever character the server returns.
+const screenAuth = document.getElementById('screen-auth');
+const authSubtitle = document.getElementById('authSubtitle');
+const authTabBtns = document.querySelectorAll('.auth-tab-btn');
+const authLoginForm = document.getElementById('authLoginForm');
+const authRegisterForm = document.getElementById('authRegisterForm');
+
+const loginUsernameInput = document.getElementById('loginUsername');
+const loginPasswordInput = document.getElementById('loginPassword');
+const loginError = document.getElementById('loginError');
+const btnLogin = document.getElementById('btnLogin');
+
+const registerUsernameInput = document.getElementById('registerUsername');
+const registerPasswordInput = document.getElementById('registerPassword');
+const registerFirstNameInput = document.getElementById('registerFirstName');
+const registerLastNameInput = document.getElementById('registerLastName');
+const registerError = document.getElementById('registerError');
+const btnRegister = document.getElementById('btnRegister');
+
+authTabBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    authTabBtns.forEach((b) => b.classList.toggle('active', b === btn));
+    const isLogin = btn.dataset.authTab === 'login';
+    authLoginForm.classList.toggle('hidden', !isLogin);
+    authRegisterForm.classList.toggle('hidden', isLogin);
+    authSubtitle.textContent = isLogin ? 'Log In' : 'Create Account';
+  });
+});
+
+function enterGameWithCharacter(serverCharacter) {
+  character = serverCharacter;
+  save();
+  screenAuth.classList.add('hidden');
+  showGame();
+}
+
+btnLogin.addEventListener('click', async () => {
+  loginError.textContent = '';
+  btnLogin.disabled = true;
+  try {
+    const result = await apiLogin(loginUsernameInput.value.trim(), loginPasswordInput.value);
+    setAuthToken(result.token);
+    enterGameWithCharacter(result.character);
+  } catch (err) {
+    loginError.textContent = err.reason || 'Login failed.';
+  } finally {
+    btnLogin.disabled = false;
+  }
+});
+
+btnRegister.addEventListener('click', async () => {
+  registerError.textContent = '';
+  btnRegister.disabled = true;
+  try {
+    const result = await apiRegister(
+      registerUsernameInput.value.trim(),
+      registerPasswordInput.value,
+      registerFirstNameInput.value.trim(),
+      registerLastNameInput.value.trim()
+    );
+    setAuthToken(result.token);
+    enterGameWithCharacter(result.character);
+  } catch (err) {
+    registerError.textContent = err.reason || 'Registration failed.';
+  } finally {
+    btnRegister.disabled = false;
+  }
+});
+
+// ---------- init ----------
+(async function init() {
+  const token = getAuthToken();
+  if (!token) {
+    screenAuth.classList.remove('hidden');
+    return;
+  }
+
+  try {
+    const result = await apiMe();
+    enterGameWithCharacter(result.character);
+  } catch {
+    clearAuthToken();
+    screenAuth.classList.remove('hidden');
+  }
+})();
