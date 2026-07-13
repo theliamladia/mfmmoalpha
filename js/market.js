@@ -391,6 +391,25 @@ function getDisplayTitle() {
   return null;
 }
 
+// Read-only variant of getDisplayTitle()/computeRank() for other players' characters (e.g. the
+// online roster) -- takes the character as a parameter instead of touching the global `character`,
+// and skips checkPeakTitleGrant() since we shouldn't be mutating someone else's save.
+function displayBadgeMarkupFor(otherChar) {
+  const equippedId = otherChar.titles && otherChar.titles.equipped;
+  let title = null;
+  if (equippedId) {
+    const owned = CRATE_TITLE_IDS.has(equippedId)
+      ? (otherChar.inventory || []).some((stack) => stack.id === equippedId && stack.qty > 0)
+      : (otherChar.titles.owned || []).includes(equippedId);
+    if (owned) title = allTitleDefs().find((t) => t.id === equippedId) || null;
+  }
+  if (title) return titleHoverMarkup(title);
+
+  const s = otherChar.stats;
+  const allMax = [s.health, s.attack, s.speed, s.defense, s.looks].every((v) => v >= STAT_CAP);
+  return `<span class="badge rank-badge">${allMax ? 'PEAK CIVILIAN' : 'CIVILIAN'}</span>`;
+}
+
 function buildTitleGrid() {
   titleGrid.innerHTML = '';
   TITLES.forEach((title) => {

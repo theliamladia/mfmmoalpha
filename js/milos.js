@@ -38,8 +38,13 @@ function renderPlayerList() {
 
   const otherRows = onlinePlayersCache.map((p) => `
     <li class="player-row">
-      <span class="badge rank-badge">🟢</span>
-      <span class="player-name">${p.firstName} ${p.lastName}</span>
+      ${displayBadgeMarkupFor(p.character)}
+      <span class="player-name">${p.character.firstName} ${p.character.lastName}</span>
+      <div class="player-hover-card">
+        <p><b>${p.character.firstName} ${p.character.lastName}</b></p>
+        <p>Height: ${formatHeight(p.character.height)}</p>
+        <p>Weight: ${round1(150 + p.character.weightGained)} lbs</p>
+      </div>
     </li>
   `).join('');
 
