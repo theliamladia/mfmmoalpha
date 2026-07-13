@@ -1000,6 +1000,7 @@ button:disabled {
 
 .combat-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 10px;
 }
@@ -1572,6 +1573,73 @@ button:disabled {
 
 .job-rank-title {
   color: #f2c94c;
+}
+
+/* --- Skills tab --- */
+.skill-card {
+  max-width: 640px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.skill-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.skill-bar-label {
+  width: 150px;
+  flex-shrink: 0;
+  color: #b9bbc4;
+}
+
+.skill-bar-outer {
+  flex: 1;
+  margin: 0;
+}
+
+.skill-bar-value {
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+  color: #9a9ca6;
+}
+
+/* --- Alignment tab --- */
+.alignment-card {
+  max-width: 640px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.alignment-bar-outer {
+  position: relative;
+  height: 14px;
+  border-radius: 7px;
+  margin: 16px 0 8px;
+  background: linear-gradient(90deg, #56ccf2 0%, #6fcf97 25%, #9a9ca6 50%, #e0b85c 75%, #e05c5c 100%);
+}
+
+.alignment-marker {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 22px;
+  background: #fff;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  transition: left 0.3s ease;
+}
+
+.alignment-tier-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6f7178;
 }
 
 .item-subheading {

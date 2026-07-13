@@ -64,7 +64,7 @@ function buildInventoryGrid() {
       return `
         <div class="hustle-card">
           <h3>${item.name}</h3>
-          <p>${item.caliber ? `${item.caliber} ` : ''}${item.type} &times; ${stack.qty}</p>
+          <p>${item.type === 'gear' ? item.desc : `${item.caliber ? `${item.caliber} ` : ''}${item.type}`} &times; ${stack.qty}</p>
         </div>
       `;
     }).join('')
@@ -111,6 +111,7 @@ function slotAcceptsItem(slot, item) {
   if (slot === 'holsterL' || slot === 'holsterR') return item.type === 'pistol';
   if (slot === 'openCarry') return item.type === 'pistol' || item.type === 'rifle';
   if (slot === 'melee') return item.type === 'melee';
+  if (slot === 'helmet' || slot === 'chest' || slot === 'pants' || slot === 'feet') return item.type === 'gear' && item.slot === slot;
   return false;
 }
 
@@ -182,4 +183,88 @@ equipSlotEls.forEach((slotEl) => {
 btnEquipPickerClose.addEventListener('click', () => {
   equipPickerModal.classList.add('hidden');
 });
+
+// ---------- Skills tab ----------
+function skillBarRowHtml(label, value, max = 100) {
+  const pct = Math.min(100, (value / max) * 100);
+  return `
+    <div class="skill-bar-row">
+      <span class="skill-bar-label">${label}</span>
+      <div class="progress-outer skill-bar-outer"><div class="progress-inner" style="width: ${pct}%"></div></div>
+      <span class="skill-bar-value">${value.toFixed(2)}/${max}</span>
+    </div>
+  `;
+}
+
+function renderSkillsTab() {
+  const jobSection = document.getElementById('skillsJobSection');
+  const badJobSection = document.getElementById('skillsBadJobSection');
+  const weaponSection = document.getElementById('skillsWeaponSection');
+  const dealerSection = document.getElementById('skillsDealerSection');
+  if (!jobSection) return;
+
+  if (character.jobs.currentJob) {
+    const job = GOOD_JOBS.find((j) => j.id === character.jobs.currentJob);
+    const s = character.jobs.skills;
+    jobSection.innerHTML = `
+      <div class="hustle-card skill-card">
+        <h3>${job.name} (Good Hustle)</h3>
+        ${job.skills.map((sk) => skillBarRowHtml(sk.label, s[sk.key])).join('')}
+      </div>
+    `;
+  } else {
+    jobSection.innerHTML = '<div class="hustle-card skill-card"><h3>Good Hustle</h3><p class="equip-picker-empty">Not currently employed.</p></div>';
+  }
+
+  if (character.badJobs.currentJob) {
+    const job = BAD_JOBS.find((j) => j.id === character.badJobs.currentJob);
+    const s = character.badJobs.skills;
+    badJobSection.innerHTML = `
+      <div class="hustle-card skill-card">
+        <h3>${job.name} (Bad Hustle)</h3>
+        ${job.skills.map((sk) => skillBarRowHtml(sk.label, s[sk.key])).join('')}
+      </div>
+    `;
+  } else {
+    badJobSection.innerHTML = '<div class="hustle-card skill-card"><h3>Bad Hustle</h3><p class="equip-picker-empty">Not currently employed.</p></div>';
+  }
+
+  const ws = character.weaponSkills;
+  weaponSection.innerHTML = `
+    <div class="hustle-card skill-card">
+      <h3>Weapon Skills</h3>
+      ${skillBarRowHtml('Shooting', ws.shooting)}
+      ${skillBarRowHtml('Draw', ws.draw)}
+      ${skillBarRowHtml('Mag Reload', ws.magReload)}
+    </div>
+  `;
+
+  const locked = nextLockedDealer();
+  const unitsSold = character.drugDealer.unitsSold;
+  dealerSection.innerHTML = `
+    <div class="hustle-card skill-card">
+      <h3>Drug Dealer Reputation</h3>
+      ${locked
+        ? skillBarRowHtml(`Units sold toward ${locked.name}`, unitsSold, locked.unlockUnits)
+        : `<p>Units sold: ${unitsSold}. You've met every dealer in town.</p>`}
+    </div>
+  `;
+}
+
+// ---------- Alignment tab ----------
+function renderAlignmentTab() {
+  const marker = document.getElementById('alignmentMarker');
+  if (!marker) return;
+  marker.style.left = `${character.alliance}%`;
+
+  document.getElementById('alignmentStatusText').textContent =
+    `You are currently ${allianceLabel(character.alliance)} (${round1(character.alliance)}/100).`;
+
+  const s = character.stats;
+  const avg = (s.health + s.attack + s.speed + s.defense + s.looks) / 5;
+  document.getElementById('journeyLevelText').textContent = `Level ${computeLevel()} -- ${computeRank()}.`;
+  document.getElementById('journeyStatBar').style.width = `${avg}%`;
+  document.getElementById('journeyStatText').textContent =
+    `Average stat: ${round1(avg)}/100. Max all 5 stats to 100 to earn the PEAK CIVILIAN title.`;
+}
 

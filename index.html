@@ -65,7 +65,7 @@
       <button class="nav-btn" data-page="market">Milos Market</button>
       <button class="nav-btn" data-page="casino">Midas Casino</button>
       <button class="nav-btn" data-page="milos">New Milos City</button>
-      <button class="nav-btn" data-page="inventory">Inventory</button>
+      <button class="nav-btn" data-page="inventory">Character</button>
       <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">Jail</button>
       <button class="nav-btn" data-page="wiki">Wiki</button>
     </nav>
@@ -121,8 +121,8 @@
             </div>
             <div class="hustle-card">
               <h3>Steroids</h3>
-              <p>Triples cost and gains ($60, burns 0.5 lbs &rarr; +1.5 Looks, +1.8 Speed). 40% chance of 5 clicks in Roid Jail.</p>
-              <button id="btnSteroidsToggle">Enable Steroids</button>
+              <p id="steroidTierDesc">No cycle active.</p>
+              <div id="steroidTierButtons" class="admin-alliance-buttons"></div>
             </div>
           </div>
 
@@ -160,7 +160,7 @@
             </div>
             <div class="feature-banner-actions">
               <button id="btnViewGoodSeasonCrate" class="secondary-btn">View Crate</button>
-              <button id="btnGoodSeasonSpin">Spin ($5,000)</button>
+              <button id="btnGoodSeasonSpin">Spin ($10,000)</button>
             </div>
           </div>
           <p id="goodSeasonSpinMessage"></p>
@@ -264,6 +264,7 @@
               <button class="milos-tab-btn" data-milos="cityhall">City Hall</button>
               <button class="milos-tab-btn" data-milos="gunclub">NMC Gun Club</button>
               <button class="milos-tab-btn" data-milos="bank">Bank</button>
+              <button class="milos-tab-btn" data-milos="moralscenter">Morals Center</button>
             </div>
 
             <div id="milos-hustles" class="milos-subpage">
@@ -330,7 +331,10 @@
                   </div>
                 </div>
                 <div class="combat-controls">
-                  <button id="btnAttack">Attack</button>
+                  <button id="btnCombatPunch" data-combat-action="punch" title="Reliable, always hits.">Punch</button>
+                  <button id="btnCombatHeavy" data-combat-action="heavy" title="1.6x damage, 25% chance to whiff.">Heavy Strike</button>
+                  <button id="btnCombatGuard" data-combat-action="guard" title="Cuts the enemy's next hit by 70%; 20% chance to riposte.">Guard</button>
+                  <button id="btnCombatWeapon" data-combat-action="weapon" title="Uses your equipped weapon for extra damage; 10% chance to jam.">Weapon Attack</button>
                   <button id="btnFlee">Flee</button>
                 </div>
               </div>
@@ -474,6 +478,13 @@
               <div id="bankLog" class="log"></div>
             </div>
 
+            <div id="milos-moralscenter" class="milos-subpage hidden">
+              <p>Ricardo runs the moral compass of New Milos City. Pick a stance and it quietly works on your Alliance every 10 seconds &mdash; even while you're off doing something else.</p>
+              <p id="moralsCenterStatus"></p>
+              <div class="hustle-grid" id="moralsCenterGrid"></div>
+              <div id="moralsCenterLog" class="log"></div>
+            </div>
+
             <div class="side-panel chat-box milos-chat-row">
               <h3>Chat</h3>
               <p class="chat-note">Multiplayer chat is coming soon &mdash; for now, your messages just stay on your screen.</p>
@@ -495,10 +506,12 @@
       </div>
 
       <div id="page-inventory" class="page hidden">
-        <h2>Inventory</h2>
+        <h2>Character</h2>
         <div class="market-tabs">
           <button class="inv-tab-btn active" data-inv="items">Inventory</button>
           <button class="inv-tab-btn" data-inv="equipment">Equipment</button>
+          <button class="inv-tab-btn" data-inv="skills">Skills</button>
+          <button class="inv-tab-btn" data-inv="alignment">Alignment</button>
         </div>
 
         <div id="inv-items" class="inv-subpage">
@@ -540,6 +553,34 @@
             <div class="equip-slot" data-slot="holsterR"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
             <div class="equip-slot equip-slot-opencarry" data-slot="openCarry"><span class="equip-slot-label">OPEN CARRY</span><span class="equip-slot-item"></span></div>
             <div class="equip-slot" data-slot="melee"><span class="equip-slot-label">MELEE</span><span class="equip-slot-item"></span></div>
+          </div>
+        </div>
+
+        <div id="inv-skills" class="inv-subpage hidden">
+          <p>XP toward every trainable skill in New Milos City.</p>
+          <div id="skillsJobSection"></div>
+          <div id="skillsBadJobSection"></div>
+          <div id="skillsWeaponSection"></div>
+          <div id="skillsDealerSection"></div>
+        </div>
+
+        <div id="inv-alignment" class="inv-subpage hidden">
+          <p>Where you sit on the Good &harr; Bad spectrum, and how far along your MMO journey you are.</p>
+          <div class="hustle-card alignment-card">
+            <h3>Alliance</h3>
+            <div class="alignment-bar-outer">
+              <div id="alignmentMarker" class="alignment-marker"></div>
+            </div>
+            <div class="alignment-tier-labels">
+              <span>Holy Good</span><span>Good</span><span>Neutral</span><span>Bad</span><span>Dirty Bad</span>
+            </div>
+            <p id="alignmentStatusText"></p>
+          </div>
+          <div class="hustle-card alignment-card">
+            <h3>MMO Journey</h3>
+            <p id="journeyLevelText"></p>
+            <div class="progress-outer"><div id="journeyStatBar" class="progress-inner"></div></div>
+            <p id="journeyStatText"></p>
           </div>
         </div>
       </div>

@@ -58,7 +58,7 @@ function doHustle(type) {
     if (Math.random() < 0.3) {
       const years = 1 + crimeStreakYears();
       bumpCrimeStreak();
-      allianceDebuff();
+      allianceForceBad();
       character.jail.inJail = true;
       character.jail.crime = 'Crime';
       character.jail.yearsRemaining = years;
@@ -131,9 +131,14 @@ const gymFuelEl = document.getElementById('gymFuel');
 const roidJailBanner = document.getElementById('roidJailBanner');
 const roidClicksLeftEl = document.getElementById('roidClicksLeft');
 const btnWorkout = document.getElementById('btnWorkout');
-const btnSteroidsToggle = document.getElementById('btnSteroidsToggle');
+const steroidTierButtons = document.getElementById('steroidTierButtons');
+const steroidTierDesc = document.getElementById('steroidTierDesc');
 const btnRoidEscape = document.getElementById('btnRoidEscape');
 const gymLog = document.getElementById('gymLog');
+
+function currentSteroidTier() {
+  return character.gym.steroidTier ? STEROID_TIERS_BY_ID[character.gym.steroidTier] : null;
+}
 
 function renderGym() {
   gymFuelEl.textContent = round1(character.weightGained);
@@ -141,16 +146,34 @@ function renderGym() {
   roidJailBanner.classList.toggle('hidden', !inRoidJail);
   roidClicksLeftEl.textContent = character.gym.roidJailClicksRemaining;
 
-  const cost = GYM_COST * (character.gym.steroidsActive ? STEROID_MULT : 1);
+  const tier = currentSteroidTier();
+  const cost = GYM_COST * (tier ? tier.mult : 1);
   const hasFuel = character.weightGained >= GYM_BURN_LBS;
   btnWorkout.disabled = !hasFuel || character.cash < cost;
   btnWorkout.textContent = hasFuel ? `Workout ($${cost})` : 'Eat at Pete\'sza first';
 
-  btnSteroidsToggle.textContent = character.gym.steroidsActive ? 'Disable Steroids' : 'Enable Steroids';
+  steroidTierDesc.textContent = tier
+    ? `${tier.name}: ${tier.mult}x cost/gains. ${Math.round(tier.jailChance * 100)}% chance of ${tier.jailClicks} clicks in Roid Jail.`
+    : 'No cycle active -- pick one for bigger gains at the cost of Roid Jail risk.';
+
+  steroidTierButtons.innerHTML = ['none', ...STEROID_TIERS.map((t) => t.id)].map((id) => {
+    const t = id === 'none' ? null : STEROID_TIERS_BY_ID[id];
+    const active = character.gym.steroidTier === (t ? t.id : null);
+    return `<button data-steroid-tier="${id}" class="${active ? 'active-hustle' : ''}">${t ? t.name : 'None'}</button>`;
+  }).join('');
+
+  steroidTierButtons.querySelectorAll('[data-steroid-tier]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      doSetSteroidTier(btn.dataset.steroidTier === 'none' ? null : btn.dataset.steroidTier);
+      save();
+      renderAll();
+    });
+  });
 }
 
 function doWorkout() {
-  const cost = GYM_COST * (character.gym.steroidsActive ? STEROID_MULT : 1);
+  const tier = currentSteroidTier();
+  const cost = GYM_COST * (tier ? tier.mult : 1);
   if (character.weightGained < GYM_BURN_LBS) return { ok: false };
   if (character.cash < cost) return { ok: false };
 
@@ -161,11 +184,11 @@ function doWorkout() {
     character.gym.roidJailClicksRemaining -= 1;
     return { ok: true, message: 'Roid jail workout: paid, burned fuel, got nothing. Ouch.', cls: 'loss' };
   }
-  if (character.gym.steroidsActive && Math.random() < ROID_JAIL_CHANCE) {
-    character.gym.roidJailClicksRemaining = ROID_JAIL_CLICKS;
-    return { ok: true, message: 'Steroids backfired! Thrown into Roid Jail for 5 clicks.', cls: 'loss' };
+  if (tier && Math.random() < tier.jailChance) {
+    character.gym.roidJailClicksRemaining = tier.jailClicks;
+    return { ok: true, message: `${tier.name} backfired! Thrown into Roid Jail for ${tier.jailClicks} clicks.`, cls: 'loss' };
   }
-  const mult = character.gym.steroidsActive ? STEROID_MULT : 1;
+  const mult = tier ? tier.mult : 1;
   const looksGain = GYM_LOOKS_GAIN * mult;
   const speedGain = GYM_SPEED_GAIN * mult;
   character.stats.looks = clampStat(character.stats.looks + looksGain);
@@ -181,15 +204,9 @@ btnWorkout.addEventListener('click', () => {
   renderAll();
 });
 
-function doToggleSteroids() {
-  character.gym.steroidsActive = !character.gym.steroidsActive;
+function doSetSteroidTier(tierId) {
+  character.gym.steroidTier = tierId;
 }
-
-btnSteroidsToggle.addEventListener('click', () => {
-  doToggleSteroids();
-  save();
-  renderAll();
-});
 
 function doRoidEscape() {
   if (character.cash < ROID_ESCAPE_COST) return { ok: false, reason: 'Not enough Floydbucks to bribe your way out of Roid Jail.' };
@@ -212,14 +229,16 @@ const pizzaLog = document.getElementById('pizzaLog');
 
 function buildFoodGrid() {
   foodGrid.innerHTML = '';
+  const discounted = jobPerkActive('milos11', false);
   FOOD_ITEMS.forEach((item) => {
     const lbs = item.calories / CALORIES_PER_LB;
+    const cost = round2(item.cost * (discounted ? 0.8 : 1));
     const card = document.createElement('div');
     card.className = 'hustle-card';
     card.innerHTML = `
       <h3>${item.name}</h3>
       <p>${item.calories} cal &asymp; +${round1(lbs)} lbs.<br>+${round1(lbs * DEFENSE_PER_LB)} Defense, -${round1(lbs * SPEED_LOSS_PER_LB)} Speed.</p>
-      <button data-food="${item.id}">Buy ($${item.cost})</button>
+      <button data-food="${item.id}">Buy ($${cost.toFixed(2)})${discounted ? ' – Employee Discount' : ''}</button>
     `;
     foodGrid.appendChild(card);
   });
@@ -233,8 +252,9 @@ function buildFoodGrid() {
 }
 
 function doBuyFood(item) {
-  if (character.cash < item.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= item.cost;
+  const cost = round2(item.cost * (jobPerkActive('milos11', false) ? 0.8 : 1));
+  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash -= cost;
   const lbs = item.calories / CALORIES_PER_LB;
   character.weightGained += lbs;
   character.stats.defense = clampStat(character.stats.defense + lbs * DEFENSE_PER_LB);

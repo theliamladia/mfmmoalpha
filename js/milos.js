@@ -48,6 +48,7 @@ function renderMilos() {
   buildDrugSellSelect();
   buildCrimeUI();
   renderCombat();
+  buildMoralsCenterUI();
   if (!pageMilos.classList.contains('hidden')) renderPlayerList();
 }
 
@@ -111,12 +112,14 @@ function goodJobRank() {
   return rankFor(JOB_RANKS, goodJobSkillAvg());
 }
 
-function goodJobWageFactor() {
-  return goodJobRank().wageMult;
+function jobPerkActive(jobId, isBad) {
+  if (isBad) return character.badJobs.currentJob === jobId && badJobSkillAvg() >= JOB_PERK_MIN_AVG;
+  return character.jobs.currentJob === jobId && goodJobSkillAvg() >= JOB_PERK_MIN_AVG;
 }
 
+// sqrt curve so early Looks gains matter, not just Looks near the cap
 function goodJobSkillTrainMult() {
-  return 1 + (character.stats.looks / 100) * LOOKS_TRAIN_BONUS_MAX;
+  return 1 + Math.sqrt(character.stats.looks / 100) * LOOKS_TRAIN_BONUS_MAX;
 }
 
 function doApplyGoodJob(jobId) {
@@ -137,13 +140,21 @@ function doResignGoodJob() {
 
 function doGoodJobWork(skillKey, cooldownKey) {
   const job = GOOD_JOBS.find((j) => j.id === character.jobs.currentJob);
-  const gain = round2(randFloat(GOOD_HUSTLE_MIN, GOOD_HUSTLE_MAX) * goodJobWageFactor());
+  const rank = goodJobRank();
+  const gain = round2(randFloat(rank.payMin, rank.payMax));
   character.cash = round2(character.cash + gain);
-  const skillGain = round2(randFloat(JOB_SKILL_TRAIN_MIN, JOB_SKILL_TRAIN_MAX) * goodJobSkillTrainMult());
+  const skillGain = randFloat(JOB_SKILL_TRAIN_MIN, JOB_SKILL_TRAIN_MAX) * goodJobSkillTrainMult();
   character.jobs.skills[skillKey] = clampStat(character.jobs.skills[skillKey] + skillGain);
   character.cooldowns[cooldownKey] = Date.now();
   allianceBuff();
-  return { gain, skillGain, jobName: job.name };
+
+  const perkMessages = [];
+  if (job.id === 'pizza' && !character.jobs.pizzaPerkGranted && jobPerkActive('pizza', false)) {
+    character.stats.speed = clampStat(character.stats.speed + 2);
+    character.jobs.pizzaPerkGranted = true;
+    perkMessages.push(`Perk unlocked -- ${JOB_PERKS.pizza.name}: permanent +2 Speed!`);
+  }
+  return { gain, skillGain, jobName: job.name, perkMessages };
 }
 
 function buildGoodJobsUI() {
@@ -180,12 +191,19 @@ function buildGoodJobsUI() {
   const rank = goodJobRank();
   const next = nextRankFor(JOB_RANKS, avg);
   const nextLine = next
-    ? `Next promotion: <b>${next.title}</b> at ${next.minAvg} average skill (${(next.wageMult).toFixed(1)}x wage, ${(next.cooldownMs / 1000).toFixed(1)}s cooldown).`
+    ? `Next promotion: <b>${next.title}</b> at ${next.minAvg} average skill ($${next.payMin.toFixed(2)}&ndash;$${next.payMax.toFixed(2)} per click, ${(next.cooldownMs / 1000).toFixed(1)}s cooldown).`
     : 'You\'ve hit the top of the ladder &mdash; nowhere to go but stay sharp.';
+  const perk = JOB_PERKS[job.id];
+  const perkUnlocked = jobPerkActive(job.id, false);
+  const perkLine = perk
+    ? `<p class="job-payout-line">${perkUnlocked ? '✓' : '\u{1F512}'} <b>${perk.name}</b> (unlocks at Supervisor): ${perk.desc}</p>`
+    : '';
   goodJobsContainer.innerHTML = `
     <div class="hustle-card job-card">
       <h3>${job.name} &mdash; <span class="job-rank-title">${rank.title}</span></h3>
-      <p>Wage multiplier: <b>${goodJobWageFactor().toFixed(2)}x</b> base ($${GOOD_HUSTLE_MIN.toFixed(2)}&ndash;$${GOOD_HUSTLE_MAX.toFixed(2)}), cooldown <b>${(rank.cooldownMs / 1000).toFixed(1)}s</b>. ${nextLine}</p>
+      <p>Pay per click: <b>$${rank.payMin.toFixed(2)}&ndash;$${rank.payMax.toFixed(2)}</b>, cooldown <b>${(rank.cooldownMs / 1000).toFixed(1)}s</b>. ${nextLine}</p>
+      <p class="job-payout-line">Looks Training Bonus: +${Math.round((goodJobSkillTrainMult() - 1) * 100)}% skill gain per click (from ${round1(character.stats.looks)} Looks).</p>
+      ${perkLine}
       <p>Each button below pays out and trains that skill. Higher Looks trains skills faster. Promotions raise both your pay and your cooldown speed &mdash; the grind gets a lot better at the top.</p>
       ${job.skills.map((sk, i) => `
         <div class="job-skill-row">
@@ -193,6 +211,7 @@ function buildGoodJobsUI() {
           <button data-work-good="${sk.key}" data-cooldown="jobSkill${i + 1}">Work</button>
         </div>
       `).join('')}
+      ${job.id === 'wrestler' && perkUnlocked ? buildWrestlingGearStoreHtml() : ''}
       <hr class="hustle-divider">
       <button id="btnResignGood" class="secondary-btn">Resign</button>
     </div>
@@ -205,9 +224,20 @@ function buildGoodJobsUI() {
       attemptMilosAction(() => {
         const result = doGoodJobWork(btn.dataset.workGood, cooldownKey);
         logTo(milosLog, `${result.jobName}: +$${result.gain.toFixed(2)}.`, 'gain');
+        result.perkMessages.forEach((msg) => logTo(milosLog, msg, 'gain'));
         save();
         renderAll();
       });
+    });
+  });
+
+  goodJobsContainer.querySelectorAll('[data-buy-gear]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const result = doBuyGear(btn.dataset.buyGear);
+      if (!result.ok) { alert(result.reason); return; }
+      logTo(milosLog, result.message, result.cls);
+      save();
+      renderAll();
     });
   });
 
@@ -218,6 +248,35 @@ function buildGoodJobsUI() {
     save();
     renderAll();
   });
+}
+
+function buildWrestlingGearStoreHtml() {
+  return `
+    <hr class="hustle-divider">
+    <h4 class="gunclub-section-title">&#127942; Wrestling Gear Store</h4>
+    <p>Exclusive gear for wrestlers only &mdash; equip it from Character &gt; Equipment.</p>
+    <div class="hustle-grid">
+      ${WRESTLING_GEAR_ITEMS.map((item) => {
+        const owned = inventoryQty(item.id) > 0;
+        return `
+          <div class="hustle-card">
+            <h3>${item.name}</h3>
+            <p>${item.desc}</p>
+            <button data-buy-gear="${item.id}">${owned ? 'Buy Another' : 'Buy'} ($${item.cost.toLocaleString()})</button>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function doBuyGear(itemId) {
+  const item = WRESTLING_GEAR_ITEMS_BY_ID[itemId];
+  if (!item) return { ok: false };
+  if (character.cash < item.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash -= item.cost;
+  addToInventory(item.id, 1);
+  return { ok: true, message: `Purchased ${item.name}. Equip it in Character &gt; Equipment.`, cls: 'gain' };
 }
 
 function tickGoodJobsUI() {
@@ -243,19 +302,16 @@ function badJobRank() {
   return rankFor(BAD_JOB_RANKS, badJobSkillAvg());
 }
 
-function badJobWageFactor() {
-  return badJobRank().wageMult;
-}
-
 function badJobSkillTrainMult() {
-  return 1 + (character.stats.looks / 100) * LOOKS_TRAIN_BONUS_MAX;
+  return 1 + Math.sqrt(character.stats.looks / 100) * LOOKS_TRAIN_BONUS_MAX;
 }
 
 function badJobBustChance() {
   const avg = badJobSkillAvg();
   const base = Math.max(BAD_JOB_BUST_MIN, BAD_JOB_BUST_BASE - (avg / 100) * (BAD_JOB_BUST_BASE - BAD_JOB_BUST_MIN));
   const evasion = (character.stats.speed / 100) * 0.02 + (character.stats.defense / 100) * 0.01;
-  return Math.max(BAD_JOB_BUST_MIN, base - evasion);
+  const perkReduction = jobPerkActive('getaway', true) ? 0.03 : 0;
+  return Math.max(BAD_JOB_BUST_MIN, base - evasion - perkReduction);
 }
 
 function doApplyBadJob(jobId) {
@@ -278,16 +334,17 @@ function doBadJobWork(skillKey, cooldownKey) {
   const job = BAD_JOBS.find((j) => j.id === character.badJobs.currentJob);
   character.cooldowns[cooldownKey] = Date.now();
   if (Math.random() < badJobBustChance()) {
-    allianceDebuff();
+    allianceForceBad();
     character.jail.inJail = true;
     character.jail.crime = job.name;
     character.jail.yearsRemaining = BAD_JOB_JAIL_YEARS;
     character.jail.serving = false;
     return { jailed: true, message: `Busted working for ${job.name}! Sentenced to ${BAD_JOB_JAIL_YEARS} year.`, cls: 'loss' };
   }
-  const gain = round2(randFloat(BAD_JOB_MIN, BAD_JOB_MAX) * badJobWageFactor());
+  const rank = badJobRank();
+  const gain = round2(randFloat(rank.payMin, rank.payMax));
   character.cash = round2(character.cash + gain);
-  const skillGain = round2(randFloat(JOB_SKILL_TRAIN_MIN, JOB_SKILL_TRAIN_MAX) * badJobSkillTrainMult());
+  const skillGain = randFloat(JOB_SKILL_TRAIN_MIN, JOB_SKILL_TRAIN_MAX) * badJobSkillTrainMult();
   character.badJobs.skills[skillKey] = clampStat(character.badJobs.skills[skillKey] + skillGain);
   allianceDebuff();
   return { jailed: false, gain, skillGain, jobName: job.name };
@@ -327,13 +384,18 @@ function buildBadJobsUI() {
   const rank = badJobRank();
   const next = nextRankFor(BAD_JOB_RANKS, avg);
   const nextLine = next
-    ? `Next promotion: <b>${next.title}</b> at ${next.minAvg} average skill (${(next.wageMult).toFixed(1)}x wage, ${(next.cooldownMs / 1000).toFixed(1)}s cooldown).`
+    ? `Next promotion: <b>${next.title}</b> at ${next.minAvg} average skill ($${next.payMin.toFixed(2)}&ndash;$${next.payMax.toFixed(2)} per click, ${(next.cooldownMs / 1000).toFixed(1)}s cooldown).`
     : 'You run this crew now &mdash; top of the ladder.';
+  const perk = JOB_PERKS[job.id];
+  const perkLine = perk
+    ? `<p class="job-payout-line">${jobPerkActive(job.id, true) ? '✓' : '\u{1F512}'} <b>${perk.name}</b> (unlocks at Lieutenant): ${perk.desc}</p>`
+    : '';
   badJobsContainer.innerHTML = `
     <div class="hustle-card job-card">
       <h3>${job.name} &mdash; <span class="job-rank-title">${rank.title}</span></h3>
-      <p>Wage multiplier: <b>${badJobWageFactor().toFixed(2)}x</b> base ($${BAD_JOB_MIN}&ndash;$${BAD_JOB_MAX}), cooldown <b>${(rank.cooldownMs / 1000).toFixed(1)}s</b>. Bust chance: <b>${Math.round(badJobBustChance() * 100)}%</b> per job. ${nextLine}</p>
-      <p class="job-payout-line">Payout per Work: <b>$${(BAD_JOB_MIN * badJobWageFactor()).toFixed(2)}&ndash;$${(BAD_JOB_MAX * badJobWageFactor()).toFixed(2)}</b></p>
+      <p>Pay per click: <b>$${rank.payMin.toFixed(2)}&ndash;$${rank.payMax.toFixed(2)}</b>, cooldown <b>${(rank.cooldownMs / 1000).toFixed(1)}s</b>. Bust chance: <b>${Math.round(badJobBustChance() * 100)}%</b> per job. ${nextLine}</p>
+      <p class="job-payout-line">Looks Training Bonus: +${Math.round((badJobSkillTrainMult() - 1) * 100)}% skill gain per click (from ${round1(character.stats.looks)} Looks).</p>
+      ${perkLine}
       <p>Each button below pays out and trains that skill. Better skills pay more AND get you caught less &mdash; Speed and Defense also help you dodge a bust, and high Looks trains skills faster.</p>
       ${job.skills.map((sk, i) => `
         <div class="job-skill-row">
@@ -503,7 +565,7 @@ function doSellDrugs(drugId, qty) {
   if (Math.random() < riskChance) {
     const years = Math.max(1, Math.round(drug.jailYearsPerUnit * qty));
     removeFromInventory(drugId, qty);
-    allianceDebuff();
+    allianceForceBad();
     character.jail.inJail = true;
     character.jail.crime = `Selling ${drug.name}`;
     character.jail.yearsRemaining = years;
@@ -567,7 +629,7 @@ function doRobbery() {
     return { jailed: false, message: `They noticed and fought back! You won the scuffle and got away with $${gain.toFixed(2)}.`, cls: 'gain' };
   }
 
-  allianceDebuff();
+  allianceForceBad();
   character.jail.inJail = true;
   character.jail.crime = 'Attempted Robbery';
   character.jail.yearsRemaining = ROBBERY_JAIL_YEARS;
@@ -605,7 +667,7 @@ function doAttemptCrime(tierId) {
   if (Math.random() < risk) {
     const years = tier.jailYears + crimeStreakYears();
     bumpCrimeStreak();
-    allianceDebuff();
+    allianceForceBad();
     character.jail.inJail = true;
     character.jail.crime = tier.name;
     character.jail.yearsRemaining = years;
@@ -691,6 +753,77 @@ btnCommunityService.addEventListener('click', () => {
   renderAll();
 });
 
+// ---------- Morals Center of NMC ----------
+const moralsCenterStatus = document.getElementById('moralsCenterStatus');
+const moralsCenterGrid = document.getElementById('moralsCenterGrid');
+const moralsCenterLog = document.getElementById('moralsCenterLog');
+
+// Advances one tick and applies its effect. No DOM access -- safe to run headless/while catching up.
+function doMoralsCenterTick() {
+  const mc = character.moralsCenter;
+  mc.lastTickTs += MORALS_TICK_MS;
+  if (!mc.choice) return { ticked: false };
+
+  if (mc.choice === 'acceptRicardo') {
+    character.alliance = clampStat(character.alliance - MORALS_GOOD_STEP);
+  } else if (mc.choice === 'renounceRicardo') {
+    character.alliance = clampStat(character.alliance + MORALS_BAD_STEP);
+  } else if (mc.choice === 'invokeNeutrality') {
+    const diff = 50 - character.alliance;
+    const step = Math.sign(diff) * Math.min(Math.abs(diff), MORALS_NEUTRAL_STEP);
+    character.alliance = clampStat(character.alliance + step);
+  }
+  return { ticked: true };
+}
+
+function processMoralsCenter() {
+  const mc = character.moralsCenter;
+  if (character.jail.inJail) return;
+  let anyTicked = false;
+  while (Date.now() - mc.lastTickTs >= MORALS_TICK_MS) {
+    const result = doMoralsCenterTick();
+    if (result.ticked) anyTicked = true;
+  }
+  if (anyTicked) save();
+}
+
+function doSetMoralsChoice(choiceId) {
+  character.moralsCenter.choice = choiceId;
+  character.moralsCenter.lastTickTs = Date.now();
+}
+
+function buildMoralsCenterUI() {
+  if (!moralsCenterGrid) return;
+  const mc = character.moralsCenter;
+  moralsCenterStatus.textContent = mc.choice
+    ? `Active stance: ${MORALS_CHOICES[mc.choice].name}. Current Alliance: ${allianceLabel(character.alliance)} (${round1(character.alliance)}).`
+    : `No stance chosen. Current Alliance: ${allianceLabel(character.alliance)} (${round1(character.alliance)}).`;
+
+  moralsCenterGrid.innerHTML = Object.entries(MORALS_CHOICES).map(([id, choice]) => `
+    <div class="hustle-card">
+      <h3>${choice.name}</h3>
+      <p>${choice.desc}</p>
+      <button data-morals-choice="${id}" class="${mc.choice === id ? 'active-hustle' : ''}">${mc.choice === id ? 'Active' : 'Choose'}</button>
+    </div>
+  `).join('') + `
+    <div class="hustle-card">
+      <h3>Step Back</h3>
+      <p>Stop taking a stance. Your Alliance stays where it is.</p>
+      <button data-morals-choice="none" class="${!mc.choice ? 'active-hustle' : ''}">${!mc.choice ? 'Active' : 'Choose'}</button>
+    </div>
+  `;
+
+  moralsCenterGrid.querySelectorAll('[data-morals-choice]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const choiceId = btn.dataset.moralsChoice === 'none' ? null : btn.dataset.moralsChoice;
+      doSetMoralsChoice(choiceId);
+      logTo(moralsCenterLog, choiceId ? `You side with ${MORALS_CHOICES[choiceId].name}.` : 'You step back from the Morals Center.', '');
+      save();
+      renderAll();
+    });
+  });
+}
+
 // ---------- milos sub-tabs ----------
 const milosTabBtns = document.querySelectorAll('.milos-tab-btn');
 const milosSubpages = {
@@ -700,6 +833,7 @@ const milosSubpages = {
   cityhall: document.getElementById('milos-cityhall'),
   gunclub: document.getElementById('milos-gunclub'),
   bank: document.getElementById('milos-bank'),
+  moralscenter: document.getElementById('milos-moralscenter'),
 };
 
 milosTabBtns.forEach((btn) => {
@@ -714,12 +848,16 @@ const invTabBtns = document.querySelectorAll('.inv-tab-btn');
 const invSubpages = {
   items: document.getElementById('inv-items'),
   equipment: document.getElementById('inv-equipment'),
+  skills: document.getElementById('inv-skills'),
+  alignment: document.getElementById('inv-alignment'),
 };
 
 invTabBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     invTabBtns.forEach((b) => b.classList.toggle('active', b === btn));
     Object.entries(invSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.inv));
+    if (btn.dataset.inv === 'skills') renderSkillsTab();
+    if (btn.dataset.inv === 'alignment') renderAlignmentTab();
   });
 });
 
@@ -777,11 +915,25 @@ const playerHpBar = document.getElementById('playerHpBar');
 const enemyHpBar = document.getElementById('enemyHpBar');
 const playerHpText = document.getElementById('playerHpText');
 const enemyHpText = document.getElementById('enemyHpText');
-const btnAttack = document.getElementById('btnAttack');
+const btnCombatPunch = document.getElementById('btnCombatPunch');
+const btnCombatHeavy = document.getElementById('btnCombatHeavy');
+const btnCombatGuard = document.getElementById('btnCombatGuard');
+const btnCombatWeapon = document.getElementById('btnCombatWeapon');
+const combatActionBtns = [btnCombatPunch, btnCombatHeavy, btnCombatGuard, btnCombatWeapon];
 const btnFlee = document.getElementById('btnFlee');
 const combatLog = document.getElementById('combatLog');
 
-let combatState = { active: false, enemyKey: null, enemyHp: 0, enemyMaxHp: 0, playerHp: 0, playerMaxHp: 0, turn: null };
+const HEAVY_STRIKE_MULT = 1.6;
+const HEAVY_STRIKE_MISS_CHANCE = 0.25;
+const WEAPON_ATTACK_MULT = 1.5;
+const WEAPON_ATTACK_JAM_CHANCE = 0.10;
+const GUARD_DAMAGE_REDUCTION = 0.7;
+const GUARD_RIPOSTE_CHANCE = 0.2;
+const COMBAT_STAT_GAIN_CHANCE = 0.4;
+const COMBAT_STAT_GAIN_MIN = 0.1;
+const COMBAT_STAT_GAIN_MAX = 0.3;
+
+let combatState = { active: false, enemyKey: null, enemyHp: 0, enemyMaxHp: 0, playerHp: 0, playerMaxHp: 0, turn: null, guarding: false };
 
 function pickOpponentPool() {
   if (character.alliance <= COMBAT_GOOD_MAX_ALLIANCE) return ['gangster', 'thug'];
@@ -801,7 +953,11 @@ function renderCombat() {
     enemyHpText.textContent = `${combatState.enemyHp}/${combatState.enemyMaxHp}`;
     playerHpBar.style.width = `${(combatState.playerHp / combatState.playerMaxHp) * 100}%`;
     enemyHpBar.style.width = `${(combatState.enemyHp / combatState.enemyMaxHp) * 100}%`;
-    btnAttack.disabled = combatState.turn !== 'player';
+    const isPlayerTurn = combatState.turn === 'player';
+    btnCombatPunch.disabled = !isPlayerTurn;
+    btnCombatHeavy.disabled = !isPlayerTurn;
+    btnCombatGuard.disabled = !isPlayerTurn;
+    btnCombatWeapon.disabled = !isPlayerTurn || equippedWeaponAtkBonus() <= 0;
   }
 
   const remaining = getRemainingCooldown('combat', COMBAT_COOLDOWN_MS);
@@ -829,16 +985,35 @@ function equippedWeaponAtkBonus() {
   }, 0);
 }
 
+// Wrestling gear (helmet/chest/pants/feet) adds flat combat stat bonuses on top of the above.
+function gearStatBonus(stat) {
+  const ids = [character.equipment.helmet, character.equipment.chest, character.equipment.pants, character.equipment.feet].filter(Boolean);
+  return ids.reduce((sum, id) => {
+    const item = getItemDef(id);
+    return sum + (item && item.statBonuses && item.statBonuses[stat] ? item.statBonuses[stat] : 0);
+  }, 0);
+}
+
+// Bare-handed Attack, before any weapon assist -- shared by every player action below.
+function baseCombatAttack() {
+  return character.stats.attack + heightAtkBonus() + gearStatBonus('attack');
+}
+
+function combatDefense() {
+  return character.stats.defense + gearStatBonus('defense');
+}
+
 // Speed gives a chance to dodge an enemy attack outright.
 function speedDodgeChance() {
-  return Math.min(0.35, (character.stats.speed / 100) * 0.35);
+  const effectiveSpeed = character.stats.speed + gearStatBonus('speed');
+  return Math.min(0.45, (effectiveSpeed / 100) * 0.35);
 }
 
 function doStartFight() {
   const pool = pickOpponentPool();
   const key = pool[randInt(0, pool.length - 1)];
   const npc = NPC_TYPES[key];
-  const maxHp = character.stats.health + heightHpBonus();
+  const maxHp = character.stats.health + heightHpBonus() + gearStatBonus('health');
   combatState = {
     active: true,
     enemyKey: key,
@@ -847,6 +1022,7 @@ function doStartFight() {
     playerHp: maxHp,
     playerMaxHp: maxHp,
     turn: 'player',
+    guarding: false,
   };
   return { npc };
 }
@@ -862,18 +1038,68 @@ btnFindFight.addEventListener('click', () => {
   });
 });
 
-function doPlayerAttack() {
+// Every player action returns the same shape: { action, npc, dmg, missed, riposted, enemyDefeated }.
+function doPlayerAction(action) {
   const npc = NPC_TYPES[combatState.enemyKey];
-  const effectiveAttack = character.stats.attack + heightAtkBonus() + equippedWeaponAtkBonus();
-  const dmg = Math.max(1, Math.round(effectiveAttack - npc.defense * 0.4 + randInt(-3, 3)));
+  const base = baseCombatAttack();
+  const weaponBonus = equippedWeaponAtkBonus();
+
+  if (action === 'guard') {
+    combatState.guarding = true;
+    if (Math.random() < GUARD_RIPOSTE_CHANCE) {
+      const dmg = Math.max(1, Math.round(base * 0.5 - npc.defense * 0.4 + randInt(-2, 2)));
+      combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
+      return { action, npc, dmg, missed: false, riposted: true, enemyDefeated: combatState.enemyHp <= 0 };
+    }
+    return { action, npc, dmg: 0, missed: false, riposted: false, enemyDefeated: false };
+  }
+
+  if (action === 'heavy') {
+    if (Math.random() < HEAVY_STRIKE_MISS_CHANCE) {
+      return { action, npc, dmg: 0, missed: true, riposted: false, enemyDefeated: false };
+    }
+    const dmg = Math.max(1, Math.round(base * HEAVY_STRIKE_MULT + weaponBonus * 0.5 - npc.defense * 0.4 + randInt(-3, 3)));
+    combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
+    return { action, npc, dmg, missed: false, riposted: false, enemyDefeated: combatState.enemyHp <= 0 };
+  }
+
+  if (action === 'weapon') {
+    if (weaponBonus <= 0) return { action, npc, dmg: 0, missed: true, riposted: false, enemyDefeated: false };
+    if (Math.random() < WEAPON_ATTACK_JAM_CHANCE) {
+      return { action, npc, dmg: 0, missed: true, riposted: false, jammed: true, enemyDefeated: false };
+    }
+    const dmg = Math.max(1, Math.round(base + weaponBonus * WEAPON_ATTACK_MULT - npc.defense * 0.4 + randInt(-3, 3)));
+    combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
+    return { action, npc, dmg, missed: false, riposted: false, enemyDefeated: combatState.enemyHp <= 0 };
+  }
+
+  // punch: reliable, no miss chance, modest weapon assist
+  const dmg = Math.max(1, Math.round(base + weaponBonus * 0.5 - npc.defense * 0.4 + randInt(-3, 3)));
   combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
-  return { dmg, npc, enemyDefeated: combatState.enemyHp <= 0 };
+  return { action, npc, dmg, missed: false, riposted: false, enemyDefeated: combatState.enemyHp <= 0 };
 }
 
-btnAttack.addEventListener('click', () => {
+function combatActionLogMessage(result) {
+  const name = result.npc.name;
+  if (result.action === 'guard') {
+    return result.riposted
+      ? `You raise your guard and riposte the ${name} for ${result.dmg}!`
+      : 'You raise your guard, bracing for the hit.';
+  }
+  if (result.action === 'heavy') {
+    return result.missed ? `Your Heavy Strike whiffs completely!` : `Heavy Strike connects on the ${name} for ${result.dmg}!`;
+  }
+  if (result.action === 'weapon') {
+    if (result.jammed) return 'Your weapon jams!';
+    return result.missed ? 'No weapon equipped.' : `You open up on the ${name} with your weapon for ${result.dmg}!`;
+  }
+  return `You punch the ${name} for ${result.dmg}.`;
+}
+
+function handleCombatAction(action) {
   if (!combatState.active || combatState.turn !== 'player') return;
-  const result = doPlayerAttack();
-  logTo(combatLog, `You hit the ${result.npc.name} for ${result.dmg}.`, 'gain');
+  const result = doPlayerAction(action);
+  logTo(combatLog, combatActionLogMessage(result), result.missed ? 'loss' : 'gain');
 
   if (result.enemyDefeated) {
     winCombat(result.npc);
@@ -882,16 +1108,24 @@ btnAttack.addEventListener('click', () => {
   combatState.turn = 'enemy';
   renderCombat();
   setTimeout(enemyTurn, 600);
+}
+
+combatActionBtns.forEach((btn) => {
+  btn.addEventListener('click', () => handleCombatAction(btn.dataset.combatAction));
 });
 
 function doEnemyAttack() {
   const npc = NPC_TYPES[combatState.enemyKey];
+  const wasGuarding = combatState.guarding;
+  combatState.guarding = false;
+
   if (Math.random() < speedDodgeChance()) {
-    return { dmg: 0, npc, dodged: true, playerDefeated: false };
+    return { dmg: 0, npc, dodged: true, guarded: false, playerDefeated: false };
   }
-  const dmg = Math.max(1, Math.round(npc.attack - character.stats.defense * 0.4 + randInt(-3, 3)));
+  let dmg = Math.max(1, Math.round(npc.attack - combatDefense() * 0.4 + randInt(-3, 3)));
+  if (wasGuarding) dmg = Math.max(0, Math.round(dmg * (1 - GUARD_DAMAGE_REDUCTION)));
   combatState.playerHp = Math.max(0, combatState.playerHp - dmg);
-  return { dmg, npc, dodged: false, playerDefeated: combatState.playerHp <= 0 };
+  return { dmg, npc, dodged: false, guarded: wasGuarding, playerDefeated: combatState.playerHp <= 0 };
 }
 
 function enemyTurn() {
@@ -899,6 +1133,8 @@ function enemyTurn() {
   const result = doEnemyAttack();
   if (result.dodged) {
     logTo(combatLog, `You dodge the ${result.npc.name}'s attack!`, 'gain');
+  } else if (result.guarded) {
+    logTo(combatLog, `Your guard soaks most of it -- the ${result.npc.name} only hits you for ${result.dmg}.`, 'gain');
   } else {
     logTo(combatLog, `The ${result.npc.name} hits you for ${result.dmg}.`, 'loss');
   }
@@ -911,6 +1147,8 @@ function enemyTurn() {
   renderCombat();
 }
 
+const COMBAT_STAT_LABELS = { attack: 'Attack', health: 'HP' };
+
 function doWinCombat(npc) {
   const reward = randInt(npc.minReward, npc.maxReward);
   character.cash += reward;
@@ -919,12 +1157,23 @@ function doWinCombat(npc) {
   combatState.active = false;
   combatState.turn = null;
   character.cooldowns.combat = Date.now();
-  return { reward };
+
+  let statGain = null;
+  if (Math.random() < COMBAT_STAT_GAIN_CHANCE) {
+    const stat = Math.random() < 0.5 ? 'attack' : 'health';
+    const amount = round2(randFloat(COMBAT_STAT_GAIN_MIN, COMBAT_STAT_GAIN_MAX));
+    character.stats[stat] = clampStat(character.stats[stat] + amount);
+    statGain = { stat, amount };
+  }
+  return { reward, statGain };
 }
 
 function winCombat(npc) {
   const result = doWinCombat(npc);
   logTo(combatLog, `You knocked out the ${npc.name}! +${result.reward} Floydbucks.`, 'gain');
+  if (result.statGain) {
+    logTo(combatLog, `Combat experience: +${result.statGain.amount.toFixed(2)} ${COMBAT_STAT_LABELS[result.statGain.stat]}.`, 'gain');
+  }
   save();
   renderAll();
   renderCombat();
@@ -1049,6 +1298,7 @@ function doIllegalGearCheck() {
     removeFromInventory(character.equipment.openCarry, 1);
     character.equipment.openCarry = null;
   }
+  allianceForceBad();
   character.jail.inJail = true;
   character.jail.crime = 'Illegal Firearm Possession';
   character.jail.yearsRemaining = JAIL_YEARS_WEAPON;
@@ -1163,12 +1413,14 @@ function buildGunClubGrids() {
   if (!pistolGrid) return;
   const hasLicense = character.licenses.gunSafety;
   const lockedNote = hasLicense ? '' : '<p class="gun-license-note">Requires the Gun Safety License from City Hall.</p>';
+  const discounted = jobPerkActive('fence', true);
+  const discountNote = discounted ? ' – Inside Contacts' : '';
   pistolGrid.innerHTML = PISTOL_ITEMS.map((item) => `
     <div class="hustle-card">
       <h3>${item.name}</h3>
       <p>${item.caliber} pistol. Can be holstered (concealed) or open carried.</p>
       ${lockedNote}
-      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${item.cost.toLocaleString()})</button>
+      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${round2(item.cost * fenceDiscountFactor()).toFixed(2)})${discountNote}</button>
     </div>
   `).join('');
   rifleGrid.innerHTML = RIFLE_ITEMS.map((item) => `
@@ -1176,7 +1428,7 @@ function buildGunClubGrids() {
       <h3>${item.name}</h3>
       <p>${item.caliber} rifle. Cannot be holstered &mdash; open carry only.</p>
       ${lockedNote}
-      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${item.cost.toLocaleString()})</button>
+      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${round2(item.cost * fenceDiscountFactor()).toFixed(2)})${discountNote}</button>
     </div>
   `).join('');
 
@@ -1198,24 +1450,30 @@ function buildGunClubGrids() {
   buildMeleeGrid();
 }
 
+function fenceDiscountFactor() {
+  return jobPerkActive('fence', true) ? 0.85 : 1;
+}
+
 function doBuyGun(itemId) {
   const item = GUN_ITEMS_BY_ID[itemId];
   if (!item) return { ok: false };
-  if (character.cash < item.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= item.cost;
+  const cost = round2(item.cost * fenceDiscountFactor());
+  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash -= cost;
   addToInventory(item.id, 1);
-  return { ok: true, message: `Purchased a ${item.name}. It's in your Inventory &mdash; equip it to carry it.`, cls: 'gain' };
+  return { ok: true, message: `Purchased a ${item.name} for $${cost.toFixed(2)}. It's in your Inventory &mdash; equip it to carry it.`, cls: 'gain' };
 }
 
 const meleeGrid = document.getElementById('meleeGrid');
 
 function buildMeleeGrid() {
   if (!meleeGrid) return;
+  const meleeDiscountNote = jobPerkActive('fence', true) ? ' – Inside Contacts' : '';
   meleeGrid.innerHTML = MELEE_ITEMS.map((item) => `
     <div class="hustle-card">
       <h3>${item.name}</h3>
       <p>+${item.atkBonus} Attack in a fight. No license needed &mdash; legal to carry, cheaper than a gun.</p>
-      <button data-melee="${item.id}">Buy ($${item.cost.toLocaleString()})</button>
+      <button data-melee="${item.id}">Buy ($${round2(item.cost * fenceDiscountFactor()).toFixed(2)})${meleeDiscountNote}</button>
     </div>
   `).join('');
 
@@ -1233,21 +1491,23 @@ function buildMeleeGrid() {
 function doBuyMelee(itemId) {
   const item = MELEE_ITEMS_BY_ID[itemId];
   if (!item) return { ok: false };
-  if (character.cash < item.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= item.cost;
+  const cost = round2(item.cost * fenceDiscountFactor());
+  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash -= cost;
   addToInventory(item.id, 1);
-  return { ok: true, message: `Purchased a ${item.name}. It's in your Inventory &mdash; equip it to carry it.`, cls: 'gain' };
+  return { ok: true, message: `Purchased a ${item.name} for $${cost.toFixed(2)}. It's in your Inventory &mdash; equip it to carry it.`, cls: 'gain' };
 }
 
 const ammoGrid = document.getElementById('ammoGrid');
 
 function buildAmmoGrid() {
   if (!ammoGrid) return;
+  const ammoDiscountNote = jobPerkActive('fence', true) ? ' – Inside Contacts' : '';
   ammoGrid.innerHTML = AMMO_ITEMS.map((item) => `
     <div class="hustle-card">
       <h3>${item.name}</h3>
       <p>${item.caliber} ammo.</p>
-      <button data-ammo="${item.id}">Buy ($${item.cost.toLocaleString()})</button>
+      <button data-ammo="${item.id}">Buy ($${round2(item.cost * fenceDiscountFactor()).toFixed(2)})${ammoDiscountNote}</button>
     </div>
   `).join('');
 
@@ -1267,10 +1527,11 @@ function buildAmmoGrid() {
 function doBuyAmmo(itemId) {
   const item = AMMO_ITEMS_BY_ID[itemId];
   if (!item) return { ok: false };
-  if (character.cash < item.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= item.cost;
+  const cost = round2(item.cost * fenceDiscountFactor());
+  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash -= cost;
   addToInventory(item.id, 1);
-  return { ok: true, message: `Purchased a ${item.name}.`, cls: 'gain' };
+  return { ok: true, message: `Purchased a ${item.name} for $${cost.toFixed(2)}.`, cls: 'gain' };
 }
 
 function renderGunClub() {

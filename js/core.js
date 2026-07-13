@@ -20,9 +20,14 @@ const GYM_BURN_LBS = 0.5;
 const GYM_COST = 20;
 const GYM_LOOKS_GAIN = 0.5;
 const GYM_SPEED_GAIN = 0.6; // > SPEED_LOSS_PER_LB * GYM_BURN_LBS (0.5), so a full cycle nets +speed
-const STEROID_MULT = 3;
-const ROID_JAIL_CHANCE = 0.4;
-const ROID_JAIL_CLICKS = 5;
+// Steroid cycles: bigger multiplier on cost/gains trades off against worse roid-jail odds and length.
+const STEROID_TIERS = [
+  { id: 'mild', name: 'Mild Cycle', mult: 1.75, jailChance: 0.2, jailClicks: 3 },
+  { id: 'standard', name: 'Standard Cycle', mult: 3, jailChance: 0.4, jailClicks: 5 },
+  { id: 'heavy', name: 'Heavy Cycle', mult: 5, jailChance: 0.6, jailClicks: 9 },
+];
+const STEROID_TIERS_BY_ID = {};
+STEROID_TIERS.forEach((t) => { STEROID_TIERS_BY_ID[t.id] = t; });
 const ROID_ESCAPE_COST = GYM_COST * 4;
 
 const ALLIANCE_BUFF = 2; // legal work nudges toward Holy Good
@@ -38,37 +43,69 @@ const ALLIANCE_TIERS = [
 
 const GUZMAN_MIN_ALLIANCE = 60; // Bad Hustles (jobs, dealing, robbery) require Bad or worse
 
+// ---------- Morals Center of NMC ----------
+// Pick a stance and it ticks your Alliance every MORALS_TICK_MS, even while you're on another page.
+const MORALS_TICK_MS = 10000;
+const MORALS_GOOD_STEP = 2;
+const MORALS_BAD_STEP = 2;
+const MORALS_NEUTRAL_STEP = 3;
+const MORALS_CHOICES = {
+  acceptRicardo: { name: 'Accept Ricardo', desc: 'Every 10s, nudge your Alliance toward Good.' },
+  renounceRicardo: { name: 'Renounce Ricardo', desc: 'Every 10s, nudge your Alliance toward Bad.' },
+  invokeNeutrality: { name: 'Invoke Neutrality', desc: 'Every 10s, pull your Alliance back toward Neutral (50).' },
+};
+
 const GOOD_HUSTLE_MAX_ALLIANCE = 59; // Good Hustles allowed for Neutral or better, blocked for Bad
 const COMBAT_GOOD_MAX_ALLIANCE = 39; // Combat: Good alignment (not Neutral) fights Gangsters/Thugs
-
-const GOOD_HUSTLE_MIN = 0.10;
-const GOOD_HUSTLE_MAX = 0.50;
 
 // Skill training is intentionally slow — 4 skills per job, each 0-100, ground out in tiny increments.
 const JOB_SKILL_TRAIN_MIN = 0.02;
 const JOB_SKILL_TRAIN_MAX = 0.06;
-const LOOKS_TRAIN_BONUS_MAX = 0.5; // high Looks trains job skills up to 50% faster (charisma/presence helps you get noticed and promoted)
+const LOOKS_TRAIN_BONUS_MAX = 1.2; // high Looks trains job skills up to 2.2x faster (charisma/presence helps you get noticed and promoted)
 
 // Job "promotions": average of the 4 job skills decides your rank. Each promotion is a real raise
-// (bigger wage multiplier) AND a shorter cooldown between clicks, like a real job giving you more
-// responsibility (and more throughput) the longer you stick with it. This is what makes grinding a
-// New Milos City job eventually beat just clicking Work in Da Skreetz.
+// (its own pay band, floor rising faster than ceiling so income gets steadier, not just bigger) AND
+// a shorter cooldown between clicks, like a real job giving you more responsibility (and more
+// throughput) the longer you stick with it. This is what makes grinding a New Milos City job
+// eventually beat just clicking Work in Da Skreetz. Ranks past Trainee/Rookie also unlock a
+// job-specific perk (see JOB_PERKS below) once you reach them.
+const JOB_PERK_MIN_AVG = 55; // Supervisor/Lieutenant and up
 const JOB_RANKS = [
-  { minAvg: 0, title: 'Trainee', wageMult: 1, cooldownMs: 2000 },
-  { minAvg: 15, title: 'Associate', wageMult: 2, cooldownMs: 1800 },
-  { minAvg: 35, title: 'Senior Associate', wageMult: 3.5, cooldownMs: 1600 },
-  { minAvg: 55, title: 'Supervisor', wageMult: 5.5, cooldownMs: 1400 },
-  { minAvg: 75, title: 'Manager', wageMult: 8, cooldownMs: 1200 },
-  { minAvg: 95, title: 'Regional Manager', wageMult: 12, cooldownMs: 1000 },
+  { minAvg: 0, title: 'Trainee', payMin: 0.10, payMax: 0.50, cooldownMs: 2000 },
+  { minAvg: 15, title: 'Associate', payMin: 0.20, payMax: 0.75, cooldownMs: 1800 },
+  { minAvg: 35, title: 'Senior Associate', payMin: 0.40, payMax: 1.10, cooldownMs: 1600 },
+  { minAvg: 55, title: 'Supervisor', payMin: 0.70, payMax: 1.80, cooldownMs: 1400 },
+  { minAvg: 75, title: 'Manager', payMin: 1.15, payMax: 2.75, cooldownMs: 1200 },
+  { minAvg: 95, title: 'Regional Manager', payMin: 1.80, payMax: 4.00, cooldownMs: 1000 },
 ];
 const BAD_JOB_RANKS = [
-  { minAvg: 0, title: 'Rookie', wageMult: 1, cooldownMs: 2000 },
-  { minAvg: 15, title: 'Associate', wageMult: 2, cooldownMs: 1800 },
-  { minAvg: 35, title: 'Enforcer', wageMult: 3.5, cooldownMs: 1600 },
-  { minAvg: 55, title: 'Lieutenant', wageMult: 5.5, cooldownMs: 1400 },
-  { minAvg: 75, title: 'Underboss', wageMult: 8, cooldownMs: 1200 },
-  { minAvg: 95, title: 'Boss', wageMult: 12, cooldownMs: 1000 },
+  { minAvg: 0, title: 'Rookie', payMin: 5, payMax: 25, cooldownMs: 2000 },
+  { minAvg: 15, title: 'Associate', payMin: 10, payMax: 37.5, cooldownMs: 1800 },
+  { minAvg: 35, title: 'Enforcer', payMin: 20, payMax: 55, cooldownMs: 1600 },
+  { minAvg: 55, title: 'Lieutenant', payMin: 35, payMax: 90, cooldownMs: 1400 },
+  { minAvg: 75, title: 'Underboss', payMin: 57.5, payMax: 137.5, cooldownMs: 1200 },
+  { minAvg: 95, title: 'Boss', payMin: 90, payMax: 200, cooldownMs: 1000 },
 ];
+
+// Job-specific perks, unlocked once that job's skill average hits JOB_PERK_MIN_AVG while employed there.
+const JOB_PERKS = {
+  milos11: { name: 'Employee Discount', desc: "20% off Pete's Pies while you're clocked in at Milos11." },
+  pizza: { name: 'Delivery Legs', desc: 'A permanent +2 Speed the moment you hit the threshold, from all those sprints up stairs.' },
+  wrestler: { name: 'Wrestling Gear Access', desc: 'Unlocks the Wrestling Gear Store below -- exclusive combat gear only wrestlers can buy.' },
+  getaway: { name: 'Evasion Instincts', desc: '-3% bust chance on this job while employed as a Getaway Driver.' },
+  fence: { name: 'Inside Contacts', desc: '15% off everything at the NMC Gun Club while employed as The Fence.' },
+};
+
+// Wrestling-job-exclusive gear: equips into the Character > Equipment board's otherwise-empty
+// helmet/chest/pants/feet slots, adding flat combat stat bonuses on top of the usual gun/melee bonus.
+const WRESTLING_GEAR_ITEMS = [
+  { id: 'wrestHeadgear', name: 'Wrestling Headgear', type: 'gear', slot: 'helmet', cost: 2000, statBonuses: { defense: 3, health: 5 }, desc: '+3 Defense, +5 HP in a fight.' },
+  { id: 'wrestBelt', name: 'Championship Belt', type: 'gear', slot: 'chest', cost: 3000, statBonuses: { defense: 6 }, desc: '+6 Defense in a fight.' },
+  { id: 'wrestSinglet', name: 'Singlet Padding', type: 'gear', slot: 'pants', cost: 2500, statBonuses: { attack: 4 }, desc: '+4 Attack in a fight.' },
+  { id: 'wrestBoots', name: 'Grappling Boots', type: 'gear', slot: 'feet', cost: 2200, statBonuses: { speed: 5 }, desc: '+5 Speed (dodge chance) in a fight.' },
+];
+const WRESTLING_GEAR_ITEMS_BY_ID = {};
+WRESTLING_GEAR_ITEMS.forEach((item) => { WRESTLING_GEAR_ITEMS_BY_ID[item.id] = item; });
 
 function rankFor(ranks, avg) {
   let current = ranks[0];
@@ -143,8 +180,6 @@ const BAD_JOBS = [
   },
 ];
 
-const BAD_JOB_MIN = 5;
-const BAD_JOB_MAX = 25;
 const BAD_JOB_BUST_BASE = 0.08; // bust chance at base rank (0 skill)
 const BAD_JOB_BUST_MIN = 0.02; // bust chance at maxed-out skill
 const BAD_JOB_JAIL_YEARS = 1;
@@ -232,25 +267,27 @@ const BANK_DEFAULT_JAIL_YEARS = 2;
 
 const COMBAT_COOLDOWN_MS = 5000;
 const NPC_TYPES = {
-  citizen: { name: 'Citizen', hp: 20, attack: 5, defense: 2, minReward: 15, maxReward: 50 },
-  cop: { name: 'Cop', hp: 50, attack: 14, defense: 9, minReward: 50, maxReward: 130 },
-  thug: { name: 'Thug', hp: 30, attack: 8, defense: 4, minReward: 35, maxReward: 90 },
-  gangster: { name: 'Gangster', hp: 45, attack: 12, defense: 7, minReward: 70, maxReward: 170 },
+  citizen: { name: 'Citizen', hp: 20, attack: 5, defense: 2, minReward: 30, maxReward: 90 },
+  cop: { name: 'Cop', hp: 50, attack: 14, defense: 9, minReward: 90, maxReward: 220 },
+  thug: { name: 'Thug', hp: 30, attack: 8, defense: 4, minReward: 65, maxReward: 160 },
+  gangster: { name: 'Gangster', hp: 45, attack: 12, defense: 7, minReward: 130, maxReward: 300 },
 };
 
+// Cost-per-calorie rises with size -- a bigger pie is never a better deal than a slice, just less clicking.
 const FOOD_ITEMS = [
   { id: 'pizza', name: 'Pizza Slice', cost: 1, calories: 285 },
-  { id: 'calzone', name: 'Calzone', cost: 2, calories: 650 },
+  { id: 'calzone', name: 'Calzone', cost: 3, calories: 650 },
   { id: 'pizzamax', name: 'Pizzamax (Whole Pie)', cost: 10, calories: 2000 },
 ];
 
+// Cost-per-Looks-point rises with tier so a pricier item is never a worse deal than a cheaper one.
 const MAXX_ITEMS = [
   { id: 'mewing', name: 'Mewing Course', cost: 500, looks: 1, desc: '+1 Looks' },
-  { id: 'bonesmash', name: 'Bone Smashing Kit', cost: 1500, looks: 2, desc: '+2 Looks' },
-  { id: 'hairline', name: 'Hair Transplant', cost: 2000, looks: 3, desc: '+3 Looks' },
-  { id: 'jaw', name: 'Jawline Filler', cost: 3500, looks: 4, desc: '+4 Looks' },
-  { id: 'canthal', name: 'Canthal Tilt Surgery', cost: 6000, looks: 6, desc: '+6 Looks' },
-  { id: 'limblength', name: 'Limb Lengthening Surgery', cost: 10000, height: 1, speed: 1, desc: '+1" Height, +1 Speed' },
+  { id: 'bonesmash', name: 'Bone Smashing Kit', cost: 1600, looks: 2, desc: '+2 Looks' },
+  { id: 'hairline', name: 'Hair Transplant', cost: 3200, looks: 3, desc: '+3 Looks' },
+  { id: 'jaw', name: 'Jawline Filler', cost: 5200, looks: 4, desc: '+4 Looks' },
+  { id: 'canthal', name: 'Canthal Tilt Surgery', cost: 10000, looks: 6, desc: '+6 Looks' },
+  { id: 'limblength', name: 'Limb Lengthening Surgery', cost: 12000, height: 1, speed: 1, desc: '+1" Height, +1 Speed' },
 ];
 
 const TITLES = [
@@ -273,7 +310,7 @@ const BETA_SPIN_TITLES = [
   { id: 'betaSpinOpen', name: 'OPEN BETA', cssClass: 'title-openbeta', weight: 5, how: 'Won from an OPEN BETA spin in Cosmetixxx (exclusive!).' },
 ];
 
-const GOOD_SEASON1_COST = 5000;
+const GOOD_SEASON1_COST = 10000;
 const GOOD_SEASON1_TITLES = [
   { id: 'gs1CommonA', name: 'GS1®', cssClass: 'title-gs1-common', weight: 30, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
   { id: 'gs1CommonB', name: 'G®', cssClass: 'title-g-common', weight: 25, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
@@ -360,6 +397,7 @@ function getItemDef(itemId) {
   if (MELEE_ITEMS_BY_ID[itemId]) return MELEE_ITEMS_BY_ID[itemId];
   if (AMMO_ITEMS_BY_ID[itemId]) return AMMO_ITEMS_BY_ID[itemId];
   if (DRUG_ITEMS_BY_ID[itemId]) return DRUG_ITEMS_BY_ID[itemId];
+  if (WRESTLING_GEAR_ITEMS_BY_ID[itemId]) return WRESTLING_GEAR_ITEMS_BY_ID[itemId];
   const title = allTitleDefs().find((t) => t.id === itemId);
   if (title) return { id: title.id, name: title.name, type: 'title', cssClass: title.cssClass };
   return null;
@@ -392,6 +430,8 @@ function load() {
   if (!raw) return null;
   const loaded = JSON.parse(raw);
   if (loaded.chips === undefined) loaded.chips = 0;
+  if (loaded.gym.steroidTier === undefined) loaded.gym.steroidTier = loaded.gym.steroidsActive ? 'standard' : null;
+  delete loaded.gym.steroidsActive;
   if (loaded.alliance === undefined) loaded.alliance = 50;
   if (loaded.settings === undefined) loaded.settings = { hideMilosWarning: false };
   if (loaded.cooldowns.milos11 === undefined) loaded.cooldowns.milos11 = 0;
@@ -414,7 +454,8 @@ function load() {
     loaded.bank = { tier: 0, balance: 0, hasCreditCard: false, creditBalance: 0, lastBillTs: Date.now() };
   }
   if (loaded.arrestRecord === undefined) loaded.arrestRecord = [];
-  if (loaded.jobs === undefined) loaded.jobs = { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 } };
+  if (loaded.jobs === undefined) loaded.jobs = { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 }, pizzaPerkGranted: false };
+  if (loaded.jobs.pizzaPerkGranted === undefined) loaded.jobs.pizzaPerkGranted = false;
   if (loaded.badJobs === undefined) loaded.badJobs = { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 } };
   if (loaded.drugDealer === undefined) loaded.drugDealer = { unitsSold: 0 };
   if (loaded.cooldowns.jobWork === undefined) loaded.cooldowns.jobWork = 0;
@@ -437,6 +478,7 @@ function load() {
   });
   if (loaded.cooldowns.communityService === undefined) loaded.cooldowns.communityService = 0;
   if (loaded.crimeRecord === undefined) loaded.crimeRecord = { streak: 0 };
+  if (loaded.moralsCenter === undefined) loaded.moralsCenter = { choice: null, lastTickTs: Date.now() };
   return loaded;
 }
 
@@ -457,6 +499,11 @@ function allianceDebuff() {
 
 function allianceDebuffMinor() {
   character.alliance = clampStat(character.alliance + ALLIANCE_DEBUFF_MINOR);
+}
+
+// Getting caught is a hard alignment hit -- straight to Bad or worse, not a gradual nudge.
+function allianceForceBad() {
+  character.alliance = clampStat(Math.max(character.alliance, GUZMAN_MIN_ALLIANCE));
 }
 
 function formatHeight(inches) {
@@ -504,7 +551,7 @@ function newCharacter(firstName, lastName) {
       ...Object.fromEntries(DEALER_TIERS.map((d) => [`dealer_${d.id}`, 0])),
       ...Object.fromEntries(CRIME_TIERS.map((t) => [`crime_${t.id}`, 0])),
     },
-    gym: { steroidsActive: false, roidJailClicksRemaining: 0 },
+    gym: { steroidTier: null, roidJailClicksRemaining: 0 },
     jail: { inJail: false, crime: null, yearsRemaining: 0, serving: false },
     settings: { hideMilosWarning: false },
     titles: { owned: [], equipped: null },
@@ -515,10 +562,11 @@ function newCharacter(firstName, lastName) {
     weaponSkills: { shooting: 0, draw: 0, magReload: 0 },
     bank: { tier: 0, balance: 0, hasCreditCard: false, creditBalance: 0, lastBillTs: Date.now() },
     arrestRecord: [],
-    jobs: { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 } },
+    jobs: { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 }, pizzaPerkGranted: false },
     badJobs: { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 } },
     drugDealer: { unitsSold: 0 },
     crimeRecord: { streak: 0 },
+    moralsCenter: { choice: null, lastTickTs: Date.now() },
   };
 }
 
@@ -603,6 +651,7 @@ function showGame() {
 
 function renderAll() {
   processBankBilling();
+  processMoralsCenter();
   charNameEl.textContent = `${character.firstName} ${character.lastName}`;
   levelBadgeEl.textContent = `Lvl ${computeLevel()}`;
 
@@ -635,15 +684,19 @@ function renderAll() {
 
   renderArrestRecord();
   renderGym();
+  buildFoodGrid();
   renderBank();
   renderMilos();
   renderRankBadge();
   renderCityHall();
+  buildGunClubGrids();
   renderGunClub();
   buildRangeWeaponSelect();
   renderGunRange();
   buildInventoryGrid();
   renderEquipmentBoard();
+  renderSkillsTab();
+  renderAlignmentTab();
   renderLawBanner();
 }
 
