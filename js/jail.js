@@ -148,6 +148,105 @@ btnLawyer.addEventListener('click', () => {
   releaseFromJail();
 });
 
+// ---------- Yard Time ----------
+const btnJailWorkout = document.getElementById('btnJailWorkout');
+const btnJailFight = document.getElementById('btnJailFight');
+const jailContrabandGrid = document.getElementById('jailContrabandGrid');
+const jailActivityLog = document.getElementById('jailActivityLog');
+
+function doJailWorkout() {
+  character.cooldowns.jailWorkout = Date.now();
+  const atkGain = round2(randFloat(JAIL_WORKOUT_GAIN_MIN, JAIL_WORKOUT_GAIN_MAX));
+  const defGain = round2(randFloat(JAIL_WORKOUT_GAIN_MIN, JAIL_WORKOUT_GAIN_MAX));
+  character.stats.attack = clampStat(character.stats.attack + atkGain);
+  character.stats.defense = clampStat(character.stats.defense + defGain);
+  return { message: `Yard workout: +${atkGain.toFixed(2)} Attack, +${defGain.toFixed(2)} Defense.`, cls: 'gain' };
+}
+
+btnJailWorkout.addEventListener('click', () => {
+  if (getRemainingCooldown('jailWorkout', JAIL_WORKOUT_COOLDOWN_MS) > 0) return;
+  const result = doJailWorkout();
+  logTo(jailActivityLog, result.message, result.cls);
+  save();
+  renderAll();
+});
+
+function doJailFight() {
+  character.cooldowns.jailFight = Date.now();
+  const myPower = character.stats.attack + character.stats.defense + gearStatBonus('attack') + gearStatBonus('defense');
+  const inmatePower = 20;
+  const winChance = Math.max(0.2, Math.min(0.85, 0.5 + (myPower - inmatePower) * 0.01));
+
+  if (Math.random() < winChance) {
+    const stat = Math.random() < 0.5 ? 'attack' : 'defense';
+    const amount = round2(randFloat(JAIL_FIGHT_STAT_GAIN_MIN, JAIL_FIGHT_STAT_GAIN_MAX));
+    character.stats[stat] = clampStat(character.stats[stat] + amount);
+    const label = stat === 'attack' ? 'Attack' : 'Defense';
+    return { won: true, message: `You won the yard fight! +${amount.toFixed(2)} ${label}.`, cls: 'gain' };
+  }
+  const lost = Math.min(character.cash, randInt(JAIL_FIGHT_LOSS_MIN, JAIL_FIGHT_LOSS_MAX));
+  character.cash -= lost;
+  return { won: false, message: `You lost the yard fight and got shaken down for $${lost}.`, cls: 'loss' };
+}
+
+btnJailFight.addEventListener('click', () => {
+  if (getRemainingCooldown('jailFight', JAIL_FIGHT_COOLDOWN_MS) > 0) return;
+  const result = doJailFight();
+  logTo(jailActivityLog, result.message, result.cls);
+  save();
+  renderAll();
+});
+
+function jailContrabandItems() {
+  return [...MELEE_ITEMS, ...DRUG_ITEMS];
+}
+
+function jailContrabandCost(item) {
+  return round2((item.cost !== undefined ? item.cost : item.wholesaleCost) * JAIL_CONTRABAND_MARKUP);
+}
+
+function buildJailContrabandGrid() {
+  if (!jailContrabandGrid) return;
+  jailContrabandGrid.innerHTML = jailContrabandItems().map((item) => `
+    <div class="hustle-card">
+      <h3>${item.name}</h3>
+      <p>${item.type === 'drug' ? 'Smuggled product.' : `+${item.atkBonus} Attack in a fight.`}</p>
+      <button data-contraband="${item.id}">Buy ($${jailContrabandCost(item).toFixed(2)})</button>
+    </div>
+  `).join('');
+
+  jailContrabandGrid.querySelectorAll('[data-contraband]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const result = doBuyContraband(btn.dataset.contraband);
+      if (!result.ok) { alert(result.reason); return; }
+      logTo(jailActivityLog, result.message, result.cls);
+      save();
+      renderAll();
+    });
+  });
+}
+
+function doBuyContraband(itemId) {
+  const item = jailContrabandItems().find((i) => i.id === itemId);
+  if (!item) return { ok: false };
+  const cost = jailContrabandCost(item);
+  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash = round2(character.cash - cost);
+  addToInventory(item.id, 1);
+  return { ok: true, message: `Smuggled in ${item.name} for $${cost.toFixed(2)}.`, cls: 'gain' };
+}
+
+function tickJailActivityUI() {
+  if (!btnJailWorkout || pageJail.classList.contains('hidden')) return;
+  const workoutRemaining = getRemainingCooldown('jailWorkout', JAIL_WORKOUT_COOLDOWN_MS);
+  btnJailWorkout.disabled = workoutRemaining > 0;
+  btnJailWorkout.textContent = workoutRemaining > 0 ? `Work Out (${Math.ceil(workoutRemaining / 1000)}s)` : 'Work Out';
+
+  const fightRemaining = getRemainingCooldown('jailFight', JAIL_FIGHT_COOLDOWN_MS);
+  btnJailFight.disabled = fightRemaining > 0;
+  btnJailFight.textContent = fightRemaining > 0 ? `Start a Fight (${Math.ceil(fightRemaining / 1000)}s)` : 'Start a Fight';
+}
+
 // ---------- reset ----------
 document.getElementById('btnReset').addEventListener('click', () => {
   if (!confirm('This will permanently delete your character. Continue?')) return;

@@ -71,6 +71,7 @@
       <button class="nav-btn" data-page="inventory">🎒 Character</button>
       <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">⛓️ Jail</button>
       <button class="nav-btn" data-page="wiki">📖 Wiki</button>
+      <button class="nav-btn" data-page="updates">📰 Updates</button>
     </nav>
 
     <main id="content">
@@ -269,6 +270,7 @@
               <button class="milos-tab-btn" data-milos="bank">🏦 Bank</button>
               <button class="milos-tab-btn" data-milos="moralscenter">⚖️ Morals Center</button>
               <button class="milos-tab-btn" data-milos="mtn">📈 Milos Trading Network</button>
+              <button class="milos-tab-btn" data-milos="penitentiary">🔒 New Milos Penitentiary</button>
             </div>
 
             <div id="milos-hustles" class="milos-subpage">
@@ -509,6 +511,18 @@
               <div id="mtnLog" class="log"></div>
             </div>
 
+            <div id="milos-penitentiary" class="milos-subpage hidden">
+              <p>Everyone currently locked up in New Milos City &mdash; bail them out, or send a little money for their books.</p>
+
+              <h3 class="gunclub-section-title">🔒 Currently Jailed</h3>
+              <div class="hustle-grid" id="penitentiaryJailedGrid"></div>
+
+              <h3 class="gunclub-section-title">📋 Recent Arrests</h3>
+              <div id="penitentiaryHistoryList" class="wiki-entry-list"></div>
+
+              <div id="penitentiaryLog" class="log"></div>
+            </div>
+
             <div class="side-panel chat-box milos-chat-row">
               <h3>💬 Chat</h3>
               <p class="chat-note">Multiplayer chat is coming soon &mdash; for now, your messages just stay on your screen.</p>
@@ -635,6 +649,27 @@
 
         <p class="gun-license-note">Repeat crimes add to your criminal record and lengthen every future sentence &mdash; pay it down with Community Service in New Milos City &rarr; Crime once you're out.</p>
 
+        <h3 class="gunclub-section-title">🏋️ Yard Time</h3>
+        <p>Doing time doesn't have to be dead time.</p>
+        <div class="hustle-grid">
+          <div class="hustle-card">
+            <h3>🏋️ Yard Workout</h3>
+            <p>Free. Small permanent Attack and Defense gains every rep.</p>
+            <button id="btnJailWorkout">Work Out</button>
+          </div>
+          <div class="hustle-card">
+            <h3>🔪 Yard Fight</h3>
+            <p>Test yourself against another inmate. Win for a stat boost &mdash; lose and they shake you down for cash.</p>
+            <button id="btnJailFight">Start a Fight</button>
+          </div>
+        </div>
+
+        <h3 class="gunclub-section-title">🕴️ Contraband</h3>
+        <p>Smuggled-in goods cost more than buying them straight, but they're waiting in your Inventory the moment you're out.</p>
+        <div class="hustle-grid" id="jailContrabandGrid"></div>
+
+        <div id="jailActivityLog" class="log"></div>
+
         <h3 class="gunclub-section-title">📋 Arrest Record</h3>
         <div id="arrestRecordList" class="wiki-entry-list"></div>
       </div>
@@ -645,12 +680,12 @@
 
         <div class="wiki-entry">
           <h3>🛣️ Da Skreetz</h3>
-          <p>Instant-payout hustles on a 10 second cooldown. <b>Work</b> is safe and pays $2&ndash;$10. <b>Slut</b> pays $5&ndash;$60 with a 30% chance of getting robbed for the same amount, and nudges your Alliance toward Bad. <b>Crime</b> pays $100&ndash;$1,000 with a 30% chance of landing in Jail; each time you're caught your criminal record grows, adding a year to every future sentence (from any crime) until you pay it down with Community Service.</p>
+          <p>Instant-payout hustles on a 10 second cooldown. <b>Work</b> is safe and pays $2&ndash;$10. <b>Slut</b> pays $5&ndash;$60 with a 30% chance of getting robbed for the same amount, and nudges your Alliance toward Bad. <b>Crime</b> pays $100&ndash;$1,000 with a 30% chance of landing in Jail; getting caught sends your Alliance straight to Bad (or worse) instantly, and your criminal record grows, adding a year to every future sentence (from any crime) until you pay it down with Community Service.</p>
         </div>
 
         <div class="wiki-entry">
           <h3>🏬 Milos Market</h3>
-          <p><b>Plan-it Fitness</b> burns weight for Speed/Defense gains. <b>Pete's Pies</b> and <b>Luke's Maxxerstore</b> trade weight and cash for Looks. <b>Cosmetixxx</b> sells titles and gacha crates. Max every stat to 100 to earn the PEAK CIVILIAN title. Looks speeds up job skill training, Height and Speed help you in a fight, Speed/Defense help you dodge a bust on the job, and high HP means you keep more cash when you lose a fight.</p>
+          <p><b>Plan-it Fitness</b> burns weight for Speed/Defense gains &mdash; pick a Steroid cycle (Mild, Standard, or Heavy) for bigger gains at the cost of worse Roid Jail odds and longer sentences. <b>Pete's Pies</b> and <b>Luke's Maxxerstore</b> trade weight and cash for Looks; pricier items always cost more per point, never less, so there's no "cheap trap" option. <b>Cosmetixxx</b> sells titles and gacha crates (OPEN BETA $5,000, GOOD&reg; Season 1 $10,000). Max every stat to 100 to earn the PEAK CIVILIAN title. Looks speeds up job skill training, Height and Speed help you in a fight, Speed/Defense help you dodge a bust on the job, and high HP means you keep more cash when you lose a fight.</p>
         </div>
 
         <div class="wiki-entry">
@@ -660,17 +695,62 @@
 
         <div class="wiki-entry">
           <h3>🌆 New Milos City</h3>
-          <p><b>Hustles</b> splits into Good Hustles (small steady legal cash, Neutral alliance or better) and Bad Hustles (drug running, dealing, and robbery &mdash; Bad alliance required, high risk of jail). Both jobs use a promotion ladder: as your average skill climbs, you get promoted to a better title with a bigger wage multiplier <i>and</i> a shorter cooldown &mdash; a maxed-out job comfortably outpaces just clicking Work in Da Skreetz. <b>Combat</b> matches you against NPCs based on your Alliance; Height and equipped weapons boost your Attack, Speed lets you dodge outright, and HP protects your cash if you lose. <b>Crime</b> is a set of fixed-payout crimes (Shoplifting up through Grand Theft Auto) where Attack and Speed lower your odds of getting caught, and repeat busts escalate every future sentence until you spend cash on Community Service. <b>City Hall</b> handles renames, marriage, and the Gun Safety Course. <b>NMC Gun Club</b> sells guns, ammo, melee weapons (no license needed), a shooting range, and carry licenses &mdash; you need the Gun Safety License from City Hall before you can buy a gun. <b>Bank</b> keeps your cash safe from robbery, lets you upgrade to hold more, and offers a credit card billed every 24 real-life hours.</p>
+          <p><b>Hustles</b> splits into Good Hustles (small steady legal cash, Neutral alliance or better) and Bad Hustles (drug running, dealing, and robbery &mdash; Bad alliance required, high risk of jail). Both job tracks use a promotion ladder: as your average skill climbs, each rank has its own pay band (the floor rises faster than the ceiling, so higher ranks pay more <i>and</i> more consistently) plus a shorter cooldown. Reaching Supervisor/Lieutenant unlocks a job-specific perk &mdash; Milos11 knocks 20% off Pete's Pies, Pete'sza Delivery grants a permanent +2 Speed, Krogue Wrestler Gear unlocks the exclusive Wrestling Gear Store, Getaway Driver cuts your bust chance, and The Fence knocks 15% off the Gun Club. <b>Combat</b> is turn-based: Punch (reliable), Heavy Strike (bigger damage, can whiff), Guard (blocks most damage, can riposte), and Weapon Attack (biggest damage if you're carrying a weapon) &mdash; Height and equipped weapons/gear boost your Attack, Speed lets you dodge outright, HP protects your cash if you lose, and a win has a chance to grant a small permanent Attack or HP boost. <b>Crime</b> is a set of fixed-payout crimes (Shoplifting up through Grand Theft Auto) where Attack and Speed lower your odds of getting caught; getting caught here (or anywhere) snaps your Alliance straight to Bad and escalates every future sentence until you spend cash on Community Service. <b>City Hall</b> handles renames, marriage, and the Gun Safety Course. <b>NMC Gun Club</b> sells guns, ammo, melee weapons (no license needed), a shooting range, and carry licenses &mdash; you need the Gun Safety License from City Hall before you can buy a gun. <b>Bank</b> keeps your cash safe from robbery, lets you upgrade to hold more, and offers a credit card billed every 24 real-life hours. <b>Morals Center</b> lets you pick a standing stance &mdash; Accept Ricardo, Renounce Ricardo, or Invoke Neutrality &mdash; that quietly nudges your Alliance every 10 seconds, even on other pages. <b>Milos Trading Network</b> is the player marketplace: list anything from your Inventory for sale, and once it sells the Floydbucks land in your account and the sale logs to your MTN history. <b>New Milos Penitentiary</b> shows who's currently locked up (and for what), plus a recent-arrests history &mdash; post bail or send commissary money for their books.</p>
         </div>
 
         <div class="wiki-entry">
           <h3>🎒 Character</h3>
-          <p>Split into <b>Licenses</b>, <b>Items</b>, and <b>Cosmetics</b>. Equip guns, melee weapons, ammo, and cosmetics on your 8-slot Equipment board. Carrying a gun without the right license or permit risks arrest &mdash; check the law banner at the top of New Milos City. Melee weapons (brass knuckles, knives) need no license and carry no arrest risk.</p>
+          <p><b>Inventory</b> is split into Licenses, Items, and Cosmetics. <b>Equipment</b> has an 8-slot board &mdash; guns and melee weapons in the holster/open-carry/melee slots, and exclusive Wrestling Gear (from the Krogue Wrestler Gear job) in the helmet/chest/pants/feet slots for extra combat stats. Carrying a gun without the right license or permit risks arrest &mdash; check the law banner at the top of New Milos City. Melee weapons (brass knuckles, knives) need no license and carry no arrest risk. <b>Skills</b> shows XP bars for your current jobs, weapon skills, and drug-dealer reputation. <b>Alignment</b> shows exactly where you sit on the Good&ndash;Bad spectrum plus your overall level/stat progress toward PEAK CIVILIAN.</p>
         </div>
 
         <div class="wiki-entry">
           <h3>⛓️ Jail</h3>
-          <p>Only reachable if you're arrested &mdash; all other pages grey out. <b>Serve Time</b> removes 1 year every 10 seconds. <b>Hire Lawyer</b> pays cash for immediate release. Repeat offenses raise your criminal record and lengthen future sentences &mdash; use Community Service (New Milos City &rarr; Crime) once you're free to pay it down.</p>
+          <p>Only reachable if you're arrested &mdash; all other pages grey out. <b>Serve Time</b> removes 1 year every 10 seconds. <b>Hire Lawyer</b> pays cash for immediate release. Doing time doesn't have to be dead time: <b>Yard Workout</b> is a free, repeatable Attack/Defense gain, <b>Yard Fight</b> is an instant-resolve scrap against another inmate for a stat boost (or a cash shakedown if you lose), and <b>Contraband</b> lets you smuggle in melee weapons and drugs at a markup so they're waiting in your Inventory when you're out. Repeat offenses raise your criminal record and lengthen future sentences &mdash; use Community Service (New Milos City &rarr; Crime) once you're free to pay it down. New Milos City &rarr; <b>New Milos Penitentiary</b> is the public side of all this: see who's currently locked up (and for what), post their bail, or send them money for their books.</p>
+        </div>
+      </div>
+
+      <div id="page-updates" class="page hidden">
+        <h2>📰 Updates</h2>
+        <p>What's changed, most recent first.</p>
+
+        <div class="update-entry">
+          <div class="update-entry-header"><h3>🔒 New Milos Penitentiary &amp; Yard Time</h3><span class="update-date">2026-07-13</span></div>
+          <ul>
+            <li>Added the <b>New Milos Penitentiary</b> tab in New Milos City: see everyone currently jailed (crime + time remaining), a recent-arrests history feed, and pay bail or send commissary money.</li>
+            <li>Jail is no longer dead time &mdash; added <b>Yard Workout</b> (free Attack/Defense gains), <b>Yard Fight</b> (instant-resolve scrap vs. an inmate for a stat boost or a cash shakedown), and a <b>Contraband</b> black market for smuggling in melee weapons and drugs at a markup.</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
+          <div class="update-entry-header"><h3>🎨 Visual overhaul</h3><span class="update-date">2026-07-13</span></div>
+          <ul>
+            <li>New font pairing (Bebas Neue headers, Inter body text), more breathing room throughout, and pill-style tabs across every section.</li>
+            <li>Emoji icons added to nav, tabs, section headers, and item/job/NPC names to serve as lightweight art.</li>
+            <li>Fixed hustle cards with uneven description lengths so their buttons line up flush across a row.</li>
+            <li>Widened New Milos City's layout so it isn't squished on larger screens.</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
+          <div class="update-entry-header"><h3>📈 Milos Trading Network</h3><span class="update-date">2026-07-13</span></div>
+          <ul>
+            <li>Added the player marketplace: list items from your Inventory for sale, buy other listings, and track it all in your MTN history. Built as its own module (js/mtn.js) so it can be ported to a real multiplayer backend later.</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
+          <div class="update-entry-header"><h3>⚖️ Economy &amp; systems pass</h3><span class="update-date">2026-07-13</span></div>
+          <ul>
+            <li>Getting caught for any crime now snaps your Alliance straight to Bad (or worse) instantly, instead of a gradual nudge.</li>
+            <li>Added the <b>Morals Center of NMC</b>: pick a standing stance (Accept Ricardo, Renounce Ricardo, Invoke Neutrality) that nudges your Alliance every 10 seconds, even on other pages.</li>
+            <li>GOOD&reg; Season 1 crate price raised from $5,000 to $10,000.</li>
+            <li>Rebalanced Milos Market pricing (Luke's Maxxerstore, Pete's Pies) so a pricier item is never a worse per-unit deal than a cheaper one.</li>
+            <li>Added Steroid cycles (Mild/Standard/Heavy) with tiered risk/reward, replacing the old on-off toggle.</li>
+            <li>Reworked Combat into a turn-based system: Punch, Heavy Strike, Guard, and Weapon Attack, with bigger payouts and a chance to earn a permanent stat boost on a win.</li>
+            <li>Added a <b>Character</b> tab (renamed from Inventory) with new Skills (XP bars) and Alignment (spectrum + journey progress) views.</li>
+            <li>Fixed the Looks &rarr; job training-speed bonus, which was being silently rounded away at low-to-mid Looks.</li>
+            <li>Overhauled job promotions with real per-rank pay bands and job-specific perks &mdash; including an exclusive Wrestling Gear Store for the Krogue Wrestler Gear job.</li>
+          </ul>
         </div>
       </div>
 
@@ -792,6 +872,7 @@
 <script src="js/milos.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/mtn.js"></script>
+<script src="js/penitentiary.js"></script>
 <script src="js/jail.js"></script>
 <script src="js/admin.js"></script>
 </body>

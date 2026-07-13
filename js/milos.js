@@ -50,6 +50,7 @@ function renderMilos() {
   renderCombat();
   buildMoralsCenterUI();
   buildMtnUI();
+  buildPenitentiaryUI();
   if (!pageMilos.classList.contains('hidden')) renderPlayerList();
 }
 
@@ -836,6 +837,7 @@ const milosSubpages = {
   bank: document.getElementById('milos-bank'),
   moralscenter: document.getElementById('milos-moralscenter'),
   mtn: document.getElementById('milos-mtn'),
+  penitentiary: document.getElementById('milos-penitentiary'),
 };
 
 milosTabBtns.forEach((btn) => {

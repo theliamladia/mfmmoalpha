@@ -108,6 +108,7 @@ function tickCooldownUI() {
   });
   tickMilosCooldownUI();
   tickBankCountdown();
+  tickJailActivityUI();
 }
 
 function tickBankCountdown() {

@@ -353,6 +353,19 @@ const CONCEALED_WAIT_MS = 10 * 60 * 1000;
 const JAIL_YEARS_WEAPON = 20;
 const RANGE_COOLDOWN_MS = 3000;
 
+// ---------- Jail activities: doing time doesn't have to be dead time ----------
+const JAIL_WORKOUT_COOLDOWN_MS = 6000;
+const JAIL_WORKOUT_GAIN_MIN = 0.1;
+const JAIL_WORKOUT_GAIN_MAX = 0.25;
+
+const JAIL_FIGHT_COOLDOWN_MS = 8000;
+const JAIL_FIGHT_STAT_GAIN_MIN = 0.1;
+const JAIL_FIGHT_STAT_GAIN_MAX = 0.3;
+const JAIL_FIGHT_LOSS_MIN = 5;
+const JAIL_FIGHT_LOSS_MAX = 20;
+
+const JAIL_CONTRABAND_MARKUP = 1.75; // smuggled-in prices cost more than buying it straight
+
 const GUN_SAFETY_QUESTIONS = [
   { q: 'What should you always assume about a firearm?', options: ['It\'s unloaded', 'It\'s loaded', 'It\'s a toy', 'It\'s safe'], correct: 1 },
   { q: 'Where should your finger be when you are not firing?', options: ['On the trigger', 'Near the trigger', 'Off the trigger', 'Doesn\'t matter'], correct: 2 },
@@ -477,6 +490,8 @@ function load() {
     if (loaded.cooldowns[key] === undefined) loaded.cooldowns[key] = 0;
   });
   if (loaded.cooldowns.communityService === undefined) loaded.cooldowns.communityService = 0;
+  if (loaded.cooldowns.jailWorkout === undefined) loaded.cooldowns.jailWorkout = 0;
+  if (loaded.cooldowns.jailFight === undefined) loaded.cooldowns.jailFight = 0;
   if (loaded.crimeRecord === undefined) loaded.crimeRecord = { streak: 0 };
   if (loaded.moralsCenter === undefined) loaded.moralsCenter = { choice: null, lastTickTs: Date.now() };
   if (loaded.mtnHistory === undefined) loaded.mtnHistory = [];
@@ -553,7 +568,7 @@ function newCharacter(firstName, lastName) {
       work: 0, slut: 0, crime: 0, combat: 0, rangeShoot: 0, rangeDraw: 0, rangeReload: 0, robbery: 0,
       jobWork: 0, jobSkill1: 0, jobSkill2: 0, jobSkill3: 0, jobSkill4: 0,
       badJobWork: 0, badJobSkill1: 0, badJobSkill2: 0, badJobSkill3: 0, badJobSkill4: 0,
-      communityService: 0,
+      communityService: 0, jailWorkout: 0, jailFight: 0,
       ...Object.fromEntries(DEALER_TIERS.map((d) => [`dealer_${d.id}`, 0])),
       ...Object.fromEntries(CRIME_TIERS.map((t) => [`crime_${t.id}`, 0])),
     },
@@ -626,6 +641,7 @@ const pageMilos = document.getElementById('page-milos');
 const pageInventory = document.getElementById('page-inventory');
 const pageJail = document.getElementById('page-jail');
 const pageWiki = document.getElementById('page-wiki');
+const pageUpdates = document.getElementById('page-updates');
 
 const activityLog = document.getElementById('activityLog');
 
@@ -648,6 +664,7 @@ function showGame() {
   buildMaxxGrid();
   buildTitleGrid();
   buildGunClubGrids();
+  buildJailContrabandGrid();
   renderAll();
 
   if (character.jail.inJail) {
@@ -659,6 +676,7 @@ function showGame() {
 function renderAll() {
   processBankBilling();
   processMoralsCenter();
+  syncPenitentiaryRecord();
   charNameEl.textContent = `${character.firstName} ${character.lastName}`;
   levelBadgeEl.textContent = `⭐ Lvl ${computeLevel()}`;
 
@@ -746,6 +764,7 @@ function switchPage(pageName) {
   pageInventory.classList.toggle('hidden', pageName !== 'inventory');
   pageJail.classList.toggle('hidden', pageName !== 'jail');
   pageWiki.classList.toggle('hidden', pageName !== 'wiki');
+  pageUpdates.classList.toggle('hidden', pageName !== 'updates');
 
   if (pageName === 'milos') {
     renderPlayerList();
