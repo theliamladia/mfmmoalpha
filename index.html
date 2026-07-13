@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>SpecialUNITS GUI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -50,44 +53,44 @@
           <span id="levelBadge" class="badge">Lvl 1</span>
         </div>
         <div class="stat-grid">
-          <span>HP <b id="statHealth"></b></span>
-          <span>ATK <b id="statAttack"></b></span>
-          <span>SPD <b id="statSpeed"></b></span>
-          <span>DEF <b id="statDefense"></b></span>
+          <span>❤️ HP <b id="statHealth"></b></span>
+          <span>⚔️ ATK <b id="statAttack"></b></span>
+          <span>💨 SPD <b id="statSpeed"></b></span>
+          <span>🛡️ DEF <b id="statDefense"></b></span>
         </div>
-        <div class="stat-line">LOOKS <b id="statLooks"></b> <i id="looksTier"></i></div>
-        <div class="stat-line">ALLIANCE <i id="statAlliance"></i></div>
-        <div class="stat-line">Height <b id="statHeight"></b> &nbsp; Weight <b id="statWeight"></b></div>
-        <div class="stat-line cash">Floydbucks: <b id="cash">0</b></div>
+        <div class="stat-line">💅 LOOKS <b id="statLooks"></b> <i id="looksTier"></i></div>
+        <div class="stat-line">⚖️ ALLIANCE <i id="statAlliance"></i></div>
+        <div class="stat-line">📏 Height <b id="statHeight"></b> &nbsp; ⚖️ Weight <b id="statWeight"></b></div>
+        <div class="stat-line cash">💵 Floydbucks: <b id="cash">0</b></div>
       </div>
 
-      <button class="nav-btn active" data-page="streets">Da Skreetz</button>
-      <button class="nav-btn" data-page="market">Milos Market</button>
-      <button class="nav-btn" data-page="casino">Midas Casino</button>
-      <button class="nav-btn" data-page="milos">New Milos City</button>
-      <button class="nav-btn" data-page="inventory">Character</button>
-      <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">Jail</button>
-      <button class="nav-btn" data-page="wiki">Wiki</button>
+      <button class="nav-btn active" data-page="streets">🛣️ Da Skreetz</button>
+      <button class="nav-btn" data-page="market">🏬 Milos Market</button>
+      <button class="nav-btn" data-page="casino">🎰 Midas Casino</button>
+      <button class="nav-btn" data-page="milos">🌆 New Milos City</button>
+      <button class="nav-btn" data-page="inventory">🎒 Character</button>
+      <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">⛓️ Jail</button>
+      <button class="nav-btn" data-page="wiki">📖 Wiki</button>
     </nav>
 
     <main id="content">
 
       <div id="page-streets" class="page">
-        <h2>Da Skreetz</h2>
+        <h2>🛣️ Da Skreetz</h2>
         <p>Each hustle pays out instantly, then needs 10 seconds to cool down.</p>
         <div class="hustle-grid">
           <div class="hustle-card">
-            <h3>Work</h3>
+            <h3>💼 Work</h3>
             <p>2-10 Floydbucks per click. Safe.</p>
             <button class="hustle-btn" data-hustle="work">Work</button>
           </div>
           <div class="hustle-card">
-            <h3>Slut</h3>
+            <h3>💋 Slut</h3>
             <p>5-60 Floydbucks per click. 30% chance to get robbed for the same amount. Nudges your Alliance toward Bad.</p>
             <button class="hustle-btn" data-hustle="slut">Slut</button>
           </div>
           <div class="hustle-card">
-            <h3>Crime</h3>
+            <h3>🔪 Crime</h3>
             <p>100-1000 Floydbucks per click. 30% chance to land in Jail. Nudges your Alliance toward Bad &mdash; and every time you're caught, your criminal record makes the next sentence longer (see New Milos City &rarr; Crime for Community Service).</p>
             <button class="hustle-btn" data-hustle="crime">Crime</button>
           </div>
@@ -97,12 +100,12 @@
       </div>
 
       <div id="page-market" class="page hidden">
-        <h2>Milos Market</h2>
+        <h2>🏬 Milos Market</h2>
         <div class="market-tabs">
-          <button class="market-tab-btn active" data-shop="gym">Plan-it Fitness</button>
-          <button class="market-tab-btn" data-shop="pizza">Pete's Pies</button>
-          <button class="market-tab-btn" data-shop="maxx">Luke's Maxxerstore</button>
-          <button class="market-tab-btn" data-shop="titles">Cosmetixxx</button>
+          <button class="market-tab-btn active" data-shop="gym">🏋️ Plan-it Fitness</button>
+          <button class="market-tab-btn" data-shop="pizza">🍕 Pete's Pies</button>
+          <button class="market-tab-btn" data-shop="maxx">💈 Luke's Maxxerstore</button>
+          <button class="market-tab-btn" data-shop="titles">🎖️ Cosmetixxx</button>
         </div>
 
         <div id="shop-gym" class="shop">
@@ -115,12 +118,12 @@
 
           <div class="hustle-grid">
             <div class="hustle-card">
-              <h3>Workout</h3>
+              <h3>🏋️ Workout</h3>
               <p>$20, burns 0.5 lbs &rarr; +0.5 Looks, +0.6 Speed. Requires 0.5 lbs of fuel.</p>
               <button id="btnWorkout">Workout ($20)</button>
             </div>
             <div class="hustle-card">
-              <h3>Steroids</h3>
+              <h3>💉 Steroids</h3>
               <p id="steroidTierDesc">No cycle active.</p>
               <div id="steroidTierButtons" class="admin-alliance-buttons"></div>
             </div>
@@ -181,25 +184,25 @@
       </div>
 
       <div id="page-casino" class="page hidden">
-        <h2>Midas Casino</h2>
-        <p class="chip-counter">Your Chips: <b id="casinoChipCounter">0</b></p>
+        <h2>🎰 Midas Casino</h2>
+        <p class="chip-counter">🪙 Your Chips: <b id="casinoChipCounter">0</b></p>
         <div class="market-tabs">
-          <button class="casino-tab-btn active" data-shop="cashier">Cashier</button>
-          <button class="casino-tab-btn" data-shop="blackjack">Blackjack</button>
-          <button class="casino-tab-btn" data-shop="slots">Slots</button>
+          <button class="casino-tab-btn active" data-shop="cashier">💵 Cashier</button>
+          <button class="casino-tab-btn" data-shop="blackjack">🃏 Blackjack</button>
+          <button class="casino-tab-btn" data-shop="slots">🎰 Slots</button>
         </div>
 
         <div id="shop-cashier" class="shop">
           <p>Floydbucks don't play at the tables &mdash; convert to Chips first. Rate: 1 Floydbuck = 1 Chip.</p>
           <div class="hustle-grid">
             <div class="hustle-card">
-              <h3>Buy Chips</h3>
+              <h3>🪙 Buy Chips</h3>
               <p>Convert Floydbucks into Chips.</p>
               <input type="number" id="buyChipsInput" min="1" value="100">
               <button id="btnBuyChips">Buy Chips</button>
             </div>
             <div class="hustle-card">
-              <h3>Cash Out</h3>
+              <h3>💵 Cash Out</h3>
               <p>Convert Chips back into Floydbucks.</p>
               <input type="number" id="cashOutInput" min="1" value="100">
               <button id="btnCashOut">Cash Out</button>
@@ -211,11 +214,11 @@
           <p>Dealer stands on 17. Blackjack pays 3:2.</p>
           <div class="bj-table">
             <div class="bj-dealer">
-              <h4>Dealer <span id="bjDealerTotal"></span></h4>
+              <h4>🤵 Dealer <span id="bjDealerTotal"></span></h4>
               <div id="bjDealerCards" class="card-row"></div>
             </div>
             <div class="bj-player">
-              <h4>You <span id="bjPlayerTotal"></span></h4>
+              <h4>🙂 You <span id="bjPlayerTotal"></span></h4>
               <div id="bjPlayerCards" class="card-row"></div>
             </div>
           </div>
@@ -237,7 +240,7 @@
           </div>
           <div class="hustle-grid">
             <div class="hustle-card">
-              <h3>Spin</h3>
+              <h3>🎰 Spin</h3>
               <p>Match 3 symbols for a payout. Two cherries refunds your bet.</p>
               <label>Bet <input type="number" id="slotBetInput" min="1" value="10"></label>
               <button id="btnSlotSpin">Spin</button>
@@ -254,54 +257,54 @@
 
         <div class="milos-columns">
           <div class="milos-main">
-            <h2>New Milos City</h2>
+            <h2>🌆 New Milos City</h2>
             <p>Two more ways to make money out here &mdash; but keep your head up, this part of town isn't safe.</p>
 
             <div class="market-tabs">
-              <button class="milos-tab-btn active" data-milos="hustles">Hustles</button>
-              <button class="milos-tab-btn" data-milos="combat">Combat</button>
-              <button class="milos-tab-btn" data-milos="crime">Crime</button>
-              <button class="milos-tab-btn" data-milos="cityhall">City Hall</button>
-              <button class="milos-tab-btn" data-milos="gunclub">NMC Gun Club</button>
-              <button class="milos-tab-btn" data-milos="bank">Bank</button>
-              <button class="milos-tab-btn" data-milos="moralscenter">Morals Center</button>
-              <button class="milos-tab-btn" data-milos="mtn">Milos Trading Network</button>
+              <button class="milos-tab-btn active" data-milos="hustles">💼 Hustles</button>
+              <button class="milos-tab-btn" data-milos="combat">🥊 Combat</button>
+              <button class="milos-tab-btn" data-milos="crime">🚨 Crime</button>
+              <button class="milos-tab-btn" data-milos="cityhall">🏛️ City Hall</button>
+              <button class="milos-tab-btn" data-milos="gunclub">🔫 NMC Gun Club</button>
+              <button class="milos-tab-btn" data-milos="bank">🏦 Bank</button>
+              <button class="milos-tab-btn" data-milos="moralscenter">⚖️ Morals Center</button>
+              <button class="milos-tab-btn" data-milos="mtn">📈 Milos Trading Network</button>
             </div>
 
             <div id="milos-hustles" class="milos-subpage">
               <div class="market-tabs">
-                <button class="hustle-tab-btn active" data-hustle="good">Good Hustles</button>
-                <button class="hustle-tab-btn" data-hustle="bad">Bad Hustles</button>
+                <button class="hustle-tab-btn active" data-hustle="good">✅ Good Hustles</button>
+                <button class="hustle-tab-btn" data-hustle="bad">☠️ Bad Hustles</button>
               </div>
 
               <div id="hustles-good" class="hustle-subpage">
-                <h3 class="gunclub-section-title">Good Hustles</h3>
+                <h3 class="gunclub-section-title">✅ Good Hustles</h3>
                 <p>Small, steady, and mostly legal. Neutral alliance or better &mdash; Bad alliance is not welcome. Apply to one job at a time; resign to try another.</p>
                 <div id="goodJobsContainer" class="hustle-grid"></div>
               </div>
 
               <div id="hustles-bad" class="hustle-subpage hidden">
-                <h3 class="gunclub-section-title bad-hustle-title">Bad Hustles</h3>
+                <h3 class="gunclub-section-title bad-hustle-title">☠️ Bad Hustles</h3>
                 <p>Real risk, real jail time. Bad alliance or worse required.</p>
 
-                <h3 class="gunclub-section-title bad-hustle-title">Illegal Jobs</h3>
+                <h3 class="gunclub-section-title bad-hustle-title">🕴️ Illegal Jobs</h3>
                 <p>Same deal as legit work &mdash; apply to one, train up 4 skills, resign to switch. Getting caught costs you more here.</p>
                 <div id="badJobsContainer" class="hustle-grid"></div>
 
-                <h3 class="gunclub-section-title bad-hustle-title">Drug Dealing</h3>
+                <h3 class="gunclub-section-title bad-hustle-title">💊 Drug Dealing</h3>
                 <p id="drugRankStatus"></p>
                 <div id="dealerContainer" class="hustle-grid"></div>
 
                 <div class="hustle-grid">
                   <div class="hustle-card">
-                    <h3>Sell Drugs</h3>
+                    <h3>💊 Sell Drugs</h3>
                     <p id="sellDrugsDesc">Sell drugs from your Inventory on the street. Risk and jail time scale with the drug and the amount.</p>
                     <select id="drugSellSelect"></select>
                     <input type="number" id="drugSellQty" min="1" value="1">
                     <button id="btnSellDrugs">Sell</button>
                   </div>
                   <div class="hustle-card">
-                    <h3>Attempt Robbery</h3>
+                    <h3>🥷 Attempt Robbery</h3>
                     <p>Rob a random person on the street. Your Speed (mostly) and Looks (a little) determine if they notice. If they fight back and win, that's a year in jail.</p>
                     <button id="btnRobbery">Attempt Robbery</button>
                   </div>
@@ -321,7 +324,7 @@
               <div id="combatArena" class="hidden">
                 <div class="combat-row">
                   <div class="combatant">
-                    <h4>You</h4>
+                    <h4>🙂 You</h4>
                     <div class="hp-bar-outer"><div id="playerHpBar" class="hp-bar-inner"></div></div>
                     <p><span id="playerHpText"></span> HP</p>
                   </div>
@@ -332,11 +335,11 @@
                   </div>
                 </div>
                 <div class="combat-controls">
-                  <button id="btnCombatPunch" data-combat-action="punch" title="Reliable, always hits.">Punch</button>
-                  <button id="btnCombatHeavy" data-combat-action="heavy" title="1.6x damage, 25% chance to whiff.">Heavy Strike</button>
-                  <button id="btnCombatGuard" data-combat-action="guard" title="Cuts the enemy's next hit by 70%; 20% chance to riposte.">Guard</button>
-                  <button id="btnCombatWeapon" data-combat-action="weapon" title="Uses your equipped weapon for extra damage; 10% chance to jam.">Weapon Attack</button>
-                  <button id="btnFlee">Flee</button>
+                  <button id="btnCombatPunch" data-combat-action="punch" title="Reliable, always hits.">👊 Punch</button>
+                  <button id="btnCombatHeavy" data-combat-action="heavy" title="1.6x damage, 25% chance to whiff.">💥 Heavy Strike</button>
+                  <button id="btnCombatGuard" data-combat-action="guard" title="Cuts the enemy's next hit by 70%; 20% chance to riposte.">🛡️ Guard</button>
+                  <button id="btnCombatWeapon" data-combat-action="weapon" title="Uses your equipped weapon for extra damage; 10% chance to jam.">🔫 Weapon Attack</button>
+                  <button id="btnFlee">🏃 Flee</button>
                 </div>
               </div>
 

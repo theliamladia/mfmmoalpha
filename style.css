@@ -1,16 +1,39 @@
 * { box-sizing: border-box; }
 
+:root {
+  --font-display: 'Bebas Neue', 'Arial Narrow', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
 body {
   margin: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #1b1d22;
+  font-family: var(--font-body);
+  background: #17181c;
   color: #e8e8ea;
+  line-height: 1.5;
+  letter-spacing: 0.1px;
 }
 
 .hidden { display: none !important; }
 
 .screen {
   min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 30px;
+  margin: 0 0 18px;
+}
+
+h3 {
+  font-size: 19px;
+  letter-spacing: 0.02em;
 }
 
 /* --- Character creation --- */
@@ -22,31 +45,36 @@ body {
 }
 
 .panel {
-  background: #24262e;
-  border: 1px solid #35373f;
-  border-radius: 10px;
-  padding: 28px 32px;
-  width: 420px;
+  background: linear-gradient(160deg, #262832, #1e2027);
+  border: 1px solid #383a44;
+  border-radius: 14px;
+  padding: 36px 40px;
+  width: 440px;
   max-width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .panel h1 {
-  margin: 0 0 4px;
-  font-size: 26px;
+  margin: 0 0 6px;
+  font-size: 42px;
+  letter-spacing: 0.04em;
   color: #f2c94c;
+  text-shadow: 0 0 24px rgba(242, 201, 76, 0.35);
 }
 
 .panel h2 {
-  margin: 0 0 20px;
-  font-size: 16px;
-  font-weight: normal;
+  margin: 0 0 22px;
+  font-size: 15px;
+  font-family: var(--font-body);
+  font-weight: 500;
   color: #9a9ca6;
 }
 
 .panel label {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   font-size: 13px;
+  font-weight: 600;
   color: #b9bbc4;
 }
 
@@ -54,13 +82,21 @@ body {
 .panel input[type="number"] {
   display: block;
   width: 100%;
-  margin-top: 4px;
-  padding: 8px 10px;
-  background: #1b1d22;
+  margin-top: 6px;
+  padding: 10px 12px;
+  background: #17181c;
   border: 1px solid #3d3f48;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #e8e8ea;
+  font-family: var(--font-body);
   font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+
+.panel input[type="text"]:focus,
+.panel input[type="number"]:focus {
+  outline: none;
+  border-color: #f2c94c;
 }
 
 .panel input[type="range"] {
@@ -69,8 +105,13 @@ body {
 
 .derived-preview {
   font-size: 13px;
+  line-height: 1.6;
   color: #9a9ca6;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  background: rgba(242, 201, 76, 0.06);
+  border: 1px solid rgba(242, 201, 76, 0.18);
+  border-radius: 8px;
 }
 
 .error {
@@ -82,16 +123,23 @@ body {
 button {
   cursor: pointer;
   border: none;
-  border-radius: 6px;
-  padding: 10px 16px;
+  border-radius: 7px;
+  padding: 10px 18px;
+  font-family: var(--font-body);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   background: #f2c94c;
-  color: #1b1d22;
+  color: #17181c;
+  transition: filter 0.12s ease, transform 0.12s ease;
 }
 
-button:hover {
-  filter: brightness(1.08);
+button:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 button:disabled {
@@ -101,8 +149,9 @@ button:disabled {
 
 #btnCreate {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   font-size: 15px;
+  letter-spacing: 0.02em;
 }
 
 /* --- Game screen --- */
@@ -110,14 +159,16 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 24px;
-  background: #24262e;
+  padding: 14px 28px;
+  background: #1e2027;
   border-bottom: 1px solid #35373f;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
 #charName {
-  font-weight: 700;
-  font-size: 16px;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  font-size: 22px;
   color: #f2c94c;
 }
 
@@ -565,11 +616,12 @@ button:disabled {
 .badge {
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 3px 10px;
+  border-radius: 12px;
   background: #3d3f48;
   color: #b9bbc4;
   white-space: nowrap;
+  letter-spacing: 0.03em;
 }
 
 .badge-default-rank {
@@ -607,8 +659,9 @@ button:disabled {
 #btnReset, #btnAdmin {
   background: #3d3f48;
   color: #e8e8ea;
-  padding: 6px 14px;
+  padding: 8px 16px;
   font-size: 13px;
+  border-radius: 20px;
 }
 
 #btnAdmin {
@@ -622,18 +675,18 @@ button:disabled {
 }
 
 #sidebar {
-  width: 220px;
+  width: 232px;
   flex-shrink: 0;
-  background: #202127;
+  background: #1a1c22;
   border-right: 1px solid #35373f;
   display: flex;
   flex-direction: column;
-  padding: 16px 0;
+  padding: 20px 0;
 }
 
 .sidebar-stats {
-  padding: 0 16px 14px;
-  margin-bottom: 10px;
+  padding: 0 18px 16px;
+  margin-bottom: 12px;
   border-bottom: 1px solid #35373f;
   font-size: 12px;
   color: #9a9ca6;
@@ -642,12 +695,12 @@ button:disabled {
 .stat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px 8px;
-  margin-bottom: 6px;
+  gap: 6px 8px;
+  margin-bottom: 8px;
 }
 
 .stat-line {
-  margin: 3px 0;
+  margin: 4px 0;
 }
 
 .sidebar-stats b {
@@ -659,23 +712,27 @@ button:disabled {
   color: #b9bbc4;
   text-align: left;
   border-radius: 0;
-  padding: 12px 20px;
-  font-weight: 500;
+  padding: 13px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: #2a2c34;
+  background: #24262e;
+  transform: none;
 }
 
 .nav-btn.active {
-  background: #2a2c34;
+  background: #24262e;
   color: #f2c94c;
   border-left: 3px solid #f2c94c;
 }
 
 #content {
   flex: 1;
-  padding: 28px 32px;
+  padding: 32px 40px;
 }
 
 .page h2 {
@@ -684,25 +741,31 @@ button:disabled {
 
 .hustle-grid {
   display: flex;
-  gap: 16px;
+  gap: 18px;
   flex-wrap: wrap;
-  margin: 16px 0;
+  margin: 18px 0;
 }
 
 .hustle-card {
   background: #24262e;
   border: 1px solid #35373f;
-  border-radius: 8px;
-  padding: 16px;
-  width: 220px;
+  border-radius: 10px;
+  padding: 18px;
+  width: 230px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.hustle-card:hover {
+  border-color: #45474f;
 }
 
 .hustle-card h3 {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
 
 .hustle-card p {
   font-size: 13px;
+  line-height: 1.55;
   color: #9a9ca6;
   min-height: 52px;
 }
@@ -740,14 +803,14 @@ button:disabled {
 }
 
 .log {
-  margin-top: 20px;
+  margin-top: 22px;
   max-width: 460px;
   max-height: 220px;
   overflow-y: auto;
-  background: #1b1d22;
+  background: #17181c;
   border: 1px solid #35373f;
-  border-radius: 8px;
-  padding: 10px 14px;
+  border-radius: 10px;
+  padding: 12px 16px;
   font-size: 13px;
 }
 
@@ -763,13 +826,16 @@ button:disabled {
 .market-tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
 }
 
 .market-tab-btn {
   background: #24262e;
   color: #b9bbc4;
   border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
 }
 
 .market-tab-btn.active {
@@ -781,6 +847,8 @@ button:disabled {
   background: #24262e;
   color: #b9bbc4;
   border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
 }
 
 .casino-tab-btn.active {
@@ -902,6 +970,8 @@ button:disabled {
   background: #24262e;
   color: #b9bbc4;
   border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
 }
 
 .milos-tab-btn.active {
@@ -913,6 +983,8 @@ button:disabled {
   background: #24262e;
   color: #b9bbc4;
   border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
 }
 
 .gunclub-tab-btn.active {
@@ -928,6 +1000,8 @@ button:disabled {
   background: #24262e;
   color: #b9bbc4;
   border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
 }
 
 .hustle-tab-btn.active {
@@ -1179,16 +1253,18 @@ button:disabled {
 }
 
 .modal-box {
-  background: #24262e;
-  border: 1px solid #35373f;
-  border-radius: 10px;
-  padding: 24px 28px;
+  background: linear-gradient(160deg, #262832, #1e2027);
+  border: 1px solid #383a44;
+  border-radius: 14px;
+  padding: 26px 30px;
   width: 380px;
   max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .modal-box h3 {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
+  font-size: 24px;
   color: #e05c5c;
 }
 
@@ -1351,6 +1427,21 @@ button:disabled {
   background: #24262e;
   color: #b9bbc4;
   border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
+}
+
+.inv-tab-btn {
+  background: #24262e;
+  color: #b9bbc4;
+  border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
+}
+
+.inv-tab-btn.active {
+  background: #f2c94c;
+  color: #1b1d22;
 }
 
 .invcat-tab-btn.active {
