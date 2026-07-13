@@ -1,7 +1,7 @@
 // ---------- API client for mfmmoserver ----------
 // Thin fetch wrapper. Only the Work hustle is server-authoritative so far -- everything else on
 // the client still runs locally until it's ported the same way this one was.
-const API_BASE = 'http://localhost:3001'; // TEMP: local test server, reverted before commit
+const API_BASE = 'https://api.mfmmo.com';
 const AUTH_TOKEN_KEY = 'specialUnitsGui.authToken';
 
 function getAuthToken() {
