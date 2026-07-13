@@ -1007,7 +1007,7 @@ button:disabled {
 
 /* --- New Milos City --- */
 #page-milos {
-  max-width: 960px;
+  max-width: 1400px;
 }
 
 .milos-columns {
@@ -1640,6 +1640,12 @@ button:disabled {
   justify-content: space-between;
   font-size: 11px;
   color: #6f7178;
+}
+
+/* --- Milos Trading Network --- */
+.mtn-create-card {
+  max-width: 420px;
+  width: 100%;
 }
 
 .item-subheading {

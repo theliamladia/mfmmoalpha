@@ -49,6 +49,7 @@ function renderMilos() {
   buildCrimeUI();
   renderCombat();
   buildMoralsCenterUI();
+  buildMtnUI();
   if (!pageMilos.classList.contains('hidden')) renderPlayerList();
 }
 
@@ -834,6 +835,7 @@ const milosSubpages = {
   gunclub: document.getElementById('milos-gunclub'),
   bank: document.getElementById('milos-bank'),
   moralscenter: document.getElementById('milos-moralscenter'),
+  mtn: document.getElementById('milos-mtn'),
 };
 
 milosTabBtns.forEach((btn) => {

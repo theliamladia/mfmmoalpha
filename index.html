@@ -265,6 +265,7 @@
               <button class="milos-tab-btn" data-milos="gunclub">NMC Gun Club</button>
               <button class="milos-tab-btn" data-milos="bank">Bank</button>
               <button class="milos-tab-btn" data-milos="moralscenter">Morals Center</button>
+              <button class="milos-tab-btn" data-milos="mtn">Milos Trading Network</button>
             </div>
 
             <div id="milos-hustles" class="milos-subpage">
@@ -483,6 +484,26 @@
               <p id="moralsCenterStatus"></p>
               <div class="hustle-grid" id="moralsCenterGrid"></div>
               <div id="moralsCenterLog" class="log"></div>
+            </div>
+
+            <div id="milos-mtn" class="milos-subpage hidden">
+              <p>List items from your Inventory for other players to buy. Once someone buys it, the Floydbucks land straight in your account and it's recorded in your MTN history below.</p>
+
+              <div class="hustle-card mtn-create-card">
+                <h3>Create Listing</h3>
+                <select id="mtnItemSelect"></select>
+                <input type="number" id="mtnQtyInput" min="1" value="1" placeholder="Quantity">
+                <input type="number" id="mtnPriceInput" min="1" placeholder="Price per unit ($)">
+                <button id="btnMtnList">List for Sale</button>
+              </div>
+
+              <h3 class="gunclub-section-title">Active Listings</h3>
+              <div class="hustle-grid" id="mtnListingsGrid"></div>
+
+              <h3 class="gunclub-section-title">Your MTN History</h3>
+              <div id="mtnHistoryList" class="wiki-entry-list"></div>
+
+              <div id="mtnLog" class="log"></div>
             </div>
 
             <div class="side-panel chat-box milos-chat-row">
@@ -767,6 +788,7 @@
 <script src="js/casino.js"></script>
 <script src="js/milos.js"></script>
 <script src="js/inventory.js"></script>
+<script src="js/mtn.js"></script>
 <script src="js/jail.js"></script>
 <script src="js/admin.js"></script>
 </body>

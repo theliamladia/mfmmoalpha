@@ -479,6 +479,7 @@ function load() {
   if (loaded.cooldowns.communityService === undefined) loaded.cooldowns.communityService = 0;
   if (loaded.crimeRecord === undefined) loaded.crimeRecord = { streak: 0 };
   if (loaded.moralsCenter === undefined) loaded.moralsCenter = { choice: null, lastTickTs: Date.now() };
+  if (loaded.mtnHistory === undefined) loaded.mtnHistory = [];
   return loaded;
 }
 
@@ -504,6 +505,11 @@ function allianceDebuffMinor() {
 // Getting caught is a hard alignment hit -- straight to Bad or worse, not a gradual nudge.
 function allianceForceBad() {
   character.alliance = clampStat(Math.max(character.alliance, GUZMAN_MIN_ALLIANCE));
+}
+
+// The stand-in "account id" until real multiplayer accounts exist -- MTN listings key off this.
+function characterFullName() {
+  return `${character.firstName} ${character.lastName}`;
 }
 
 function formatHeight(inches) {
@@ -567,6 +573,7 @@ function newCharacter(firstName, lastName) {
     drugDealer: { unitsSold: 0 },
     crimeRecord: { streak: 0 },
     moralsCenter: { choice: null, lastTickTs: Date.now() },
+    mtnHistory: [],
   };
 }
 
