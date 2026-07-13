@@ -1,7 +1,7 @@
 // ---------- API client for mfmmoserver ----------
 // Thin fetch wrapper. Only the Work hustle is server-authoritative so far -- everything else on
 // the client still runs locally until it's ported the same way this one was.
-const API_BASE = 'https://api.mfmmo.com';
+const API_BASE = 'http://localhost:3099';
 const AUTH_TOKEN_KEY = 'specialUnitsGui.authToken';
 
 function getAuthToken() {
@@ -51,4 +51,8 @@ function apiWork() {
 
 function apiOnlinePlayers() {
   return apiRequest('/players/online');
+}
+
+function apiSyncCharacter(characterToSync) {
+  return apiRequest('/character/sync', { method: 'POST', body: JSON.stringify({ character: characterToSync }) });
 }

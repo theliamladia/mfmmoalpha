@@ -434,8 +434,20 @@ function inventoryQty(itemId) {
   return existing ? existing.qty : 0;
 }
 
+let serverSyncTimer = null;
+
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(character));
+
+  // Everything except Work still runs client-side, so push the resulting character to the
+  // server (best-effort, debounced) after every save -- otherwise other players' views of you
+  // (like the online roster's title badge) go stale the moment you do anything but Work.
+  if (typeof getAuthToken === 'function' && getAuthToken()) {
+    clearTimeout(serverSyncTimer);
+    serverSyncTimer = setTimeout(() => {
+      apiSyncCharacter(character).catch(() => {});
+    }, 1000);
+  }
 }
 
 function load() {
