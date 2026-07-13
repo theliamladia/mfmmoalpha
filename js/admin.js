@@ -38,6 +38,8 @@ function submitAdminPassword() {
   if (adminPasswordInput.value === ADMIN_PASSWORD) {
     adminPasswordModal.classList.add('hidden');
     adminMenuModal.classList.remove('hidden');
+    refreshAdminPauseButton();
+    refreshAdminModifierButtons();
   } else {
     adminPasswordError.textContent = 'Incorrect password.';
     adminPasswordInput.value = '';
@@ -116,6 +118,76 @@ btnAdminGiveAdminTitle.addEventListener('click', () => {
   save();
   renderAll();
   alert('ADMIN title added to your Inventory (Cosmetics). Multiplayer gifting to another player will work the same way once trading is live.');
+});
+
+// ---------- Server Controls: pause ----------
+const btnAdminTogglePause = document.getElementById('btnAdminTogglePause');
+
+function refreshAdminPauseButton() {
+  if (!btnAdminTogglePause) return;
+  btnAdminTogglePause.textContent = isGamePaused() ? 'Resume Game' : 'Pause Game';
+  btnAdminTogglePause.classList.toggle('active-modifier', isGamePaused());
+}
+
+btnAdminTogglePause.addEventListener('click', () => {
+  doSetGamePause(!isGamePaused());
+  refreshAdminPauseButton();
+  renderServerBanners();
+  renderAll();
+});
+
+// ---------- Modifiers ----------
+const adminModifierButtons = document.querySelectorAll('[data-modifier]');
+
+function refreshAdminModifierButtons() {
+  const current = activeModifier() || '';
+  adminModifierButtons.forEach((btn) => {
+    btn.classList.toggle('active-modifier', btn.dataset.modifier === current);
+  });
+}
+
+adminModifierButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    doSetModifier(btn.dataset.modifier || null);
+    refreshAdminModifierButtons();
+    renderServerBanners();
+    renderAll();
+  });
+});
+
+// ---------- Inventory Checker ----------
+const adminInvCheckInput = document.getElementById('adminInvCheckInput');
+const btnAdminInvCheck = document.getElementById('btnAdminInvCheck');
+const adminInvCheckResult = document.getElementById('adminInvCheckResult');
+
+function renderInvCheckResult(result) {
+  if (!result.ok) {
+    adminInvCheckResult.innerHTML = `<p class="arrest-record-empty">${result.reason}</p>`;
+    return;
+  }
+  const items = result.inventory.map((stack) => {
+    const item = getItemDef(stack.id);
+    return `<div class="arrest-record-row"><span>${item ? item.name : stack.id}</span><span>x${stack.qty}</span></div>`;
+  }).join('') || '<p class="arrest-record-empty">No items.</p>';
+
+  const equipped = Object.entries(result.equipment)
+    .filter(([, itemId]) => itemId)
+    .map(([slot, itemId]) => {
+      const item = getItemDef(itemId);
+      return `<div class="arrest-record-row"><span>${slot}</span><span>${item ? item.name : itemId}</span></div>`;
+    }).join('') || '<p class="arrest-record-empty">Nothing equipped.</p>';
+
+  adminInvCheckResult.innerHTML = `
+    <p><b>${result.name}</b> &mdash; Inventory</p>
+    ${items}
+    <p><b>Equipped</b></p>
+    ${equipped}
+  `;
+}
+
+btnAdminInvCheck.addEventListener('click', () => {
+  const result = doCheckInventory(adminInvCheckInput.value);
+  renderInvCheckResult(result);
 });
 
 // ---------- init ----------

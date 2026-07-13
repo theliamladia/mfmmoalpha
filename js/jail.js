@@ -102,6 +102,7 @@ function startServing(resetElapsed = true) {
   jailStatus.classList.remove('hidden');
 
   serveInterval = setInterval(() => {
+    if (isGamePaused()) return;
     serveElapsedMs += 100;
     jailProgressEl.style.width = `${(serveElapsedMs / COOLDOWN_MS) * 100}%`;
     if (serveElapsedMs >= COOLDOWN_MS) {

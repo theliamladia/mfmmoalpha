@@ -99,6 +99,8 @@ const HUSTLE_EMOJI = { work: '💼', slut: '💋', crime: '🔪' };
 
 function tickCooldownUI() {
   if (!character) return;
+  renderServerBanners();
+  if (isGamePaused()) return;
   hustleButtons.forEach((btn) => {
     const type = btn.dataset.hustle;
     const remaining = getRemainingCooldown(type);

@@ -40,7 +40,7 @@ function renderMilos() {
   const meetsGuzman = character.alliance >= GUZMAN_MIN_ALLIANCE;
 
   btnSellDrugs.disabled = character.jail.inJail || !meetsGuzman || !drugSellSelect.value;
-  btnRobbery.disabled = character.jail.inJail || !meetsGuzman || getRemainingCooldown('robbery', ROBBERY_COOLDOWN_MS) > 0;
+  btnRobbery.disabled = character.jail.inJail || !meetsGuzman || isPeaceActive() || getRemainingCooldown('robbery', ROBBERY_COOLDOWN_MS) > 0;
 
   buildGoodJobsUI();
   buildBadJobsUI();
@@ -64,6 +64,9 @@ function tickMilosCooldownUI() {
   if (!meetsGuzman) {
     btnRobbery.disabled = true;
     btnRobbery.textContent = 'Requires Bad Alliance or Worse';
+  } else if (isPeaceActive()) {
+    btnRobbery.disabled = true;
+    btnRobbery.textContent = 'Disabled -- Peace & Prosperity';
   } else if (robberyRemaining > 0) {
     btnRobbery.disabled = true;
     btnRobbery.textContent = `Attempt Robbery (${Math.ceil(robberyRemaining / 1000)}s)`;
@@ -1154,7 +1157,7 @@ function enemyTurn() {
 const COMBAT_STAT_LABELS = { attack: 'Attack', health: 'HP' };
 
 function doWinCombat(npc) {
-  const reward = randInt(npc.minReward, npc.maxReward);
+  const reward = randInt(npc.minReward, npc.maxReward) * (isRiotActive() ? 2 : 1);
   character.cash += reward;
   const wasGoodFight = combatState.enemyKey === 'gangster' || combatState.enemyKey === 'thug';
   if (wasGoodFight) allianceBuff(); else allianceDebuff();
@@ -1174,7 +1177,7 @@ function doWinCombat(npc) {
 
 function winCombat(npc) {
   const result = doWinCombat(npc);
-  logTo(combatLog, `You knocked out the ${npc.name}! +${result.reward} Floydbucks.`, 'gain');
+  logTo(combatLog, `You knocked out the ${npc.name}! +${result.reward} Floydbucks${isRiotActive() ? ' (Riotlandia bonus)' : ''}.`, 'gain');
   if (result.statGain) {
     logTo(combatLog, `Combat experience: +${result.statGain.amount.toFixed(2)} ${COMBAT_STAT_LABELS[result.statGain.stat]}.`, 'gain');
   }
@@ -1282,7 +1285,7 @@ function renderLawBanner() {
 
 function doIllegalGearCheck() {
   const status = getIllegalGearStatus();
-  if (!status.any || Math.random() >= 0.5) return { caught: false };
+  if (!status.any || isRiotActive() || Math.random() >= 0.5) return { caught: false };
 
   const forfeited = [];
   if (status.holsterIllegal) {
@@ -1417,14 +1420,13 @@ function buildGunClubGrids() {
   if (!pistolGrid) return;
   const hasLicense = character.licenses.gunSafety;
   const lockedNote = hasLicense ? '' : '<p class="gun-license-note">Requires the Gun Safety License from City Hall.</p>';
-  const discounted = jobPerkActive('fence', true);
-  const discountNote = discounted ? ' – Inside Contacts' : '';
+  const discountNote = isRiotActive() ? ' – Riotlandia' : (jobPerkActive('fence', true) ? ' – Inside Contacts' : '');
   pistolGrid.innerHTML = PISTOL_ITEMS.map((item) => `
     <div class="hustle-card">
       <h3>${item.name}</h3>
       <p>${item.caliber} pistol. Can be holstered (concealed) or open carried.</p>
       ${lockedNote}
-      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${round2(item.cost * fenceDiscountFactor()).toFixed(2)})${discountNote}</button>
+      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${round2(item.cost * gunPriceFactor()).toFixed(2)})${discountNote}</button>
     </div>
   `).join('');
   rifleGrid.innerHTML = RIFLE_ITEMS.map((item) => `
@@ -1432,7 +1434,7 @@ function buildGunClubGrids() {
       <h3>${item.name}</h3>
       <p>${item.caliber} rifle. Cannot be holstered &mdash; open carry only.</p>
       ${lockedNote}
-      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${round2(item.cost * fenceDiscountFactor()).toFixed(2)})${discountNote}</button>
+      <button data-gun="${item.id}" ${hasLicense ? '' : 'disabled'}>Buy ($${round2(item.cost * gunPriceFactor()).toFixed(2)})${discountNote}</button>
     </div>
   `).join('');
 
@@ -1458,10 +1460,15 @@ function fenceDiscountFactor() {
   return jobPerkActive('fence', true) ? 0.85 : 1;
 }
 
+// Guns (and ammo) go to $0 during Riotlandia; melee keeps the normal Fence-only discount.
+function gunPriceFactor() {
+  return isRiotActive() ? 0 : fenceDiscountFactor();
+}
+
 function doBuyGun(itemId) {
   const item = GUN_ITEMS_BY_ID[itemId];
   if (!item) return { ok: false };
-  const cost = round2(item.cost * fenceDiscountFactor());
+  const cost = round2(item.cost * gunPriceFactor());
   if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
   character.cash -= cost;
   addToInventory(item.id, 1);
@@ -1506,12 +1513,12 @@ const ammoGrid = document.getElementById('ammoGrid');
 
 function buildAmmoGrid() {
   if (!ammoGrid) return;
-  const ammoDiscountNote = jobPerkActive('fence', true) ? ' – Inside Contacts' : '';
+  const ammoDiscountNote = isRiotActive() ? ' – Riotlandia' : (jobPerkActive('fence', true) ? ' – Inside Contacts' : '');
   ammoGrid.innerHTML = AMMO_ITEMS.map((item) => `
     <div class="hustle-card">
       <h3>${item.name}</h3>
       <p>${item.caliber} ammo.</p>
-      <button data-ammo="${item.id}">Buy ($${round2(item.cost * fenceDiscountFactor()).toFixed(2)})${ammoDiscountNote}</button>
+      <button data-ammo="${item.id}">Buy ($${round2(item.cost * gunPriceFactor()).toFixed(2)})${ammoDiscountNote}</button>
     </div>
   `).join('');
 
@@ -1531,7 +1538,7 @@ function buildAmmoGrid() {
 function doBuyAmmo(itemId) {
   const item = AMMO_ITEMS_BY_ID[itemId];
   if (!item) return { ok: false };
-  const cost = round2(item.cost * fenceDiscountFactor());
+  const cost = round2(item.cost * gunPriceFactor());
   if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
   character.cash -= cost;
   addToInventory(item.id, 1);

@@ -674,9 +674,12 @@ function showGame() {
 }
 
 function renderAll() {
-  processBankBilling();
-  processMoralsCenter();
-  syncPenitentiaryRecord();
+  renderServerBanners();
+  if (!isGamePaused()) {
+    processBankBilling();
+    processMoralsCenter();
+    syncPenitentiaryRecord();
+  }
   charNameEl.textContent = `${character.firstName} ${character.lastName}`;
   levelBadgeEl.textContent = `⭐ Lvl ${computeLevel()}`;
 

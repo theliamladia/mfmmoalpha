@@ -35,6 +35,8 @@
 
 <!-- MAIN GAME -->
 <section id="screen-game" class="screen hidden">
+  <div id="pauseBanner" class="server-banner pause-banner hidden">⏸️ GAME IS PAUSED</div>
+  <div id="modifierBanner" class="server-banner hidden"></div>
   <div class="topbar">
     <div id="charName"></div>
     <div class="topbar-actions">
@@ -820,6 +822,31 @@
         <button id="btnAdminGiveAdminTitle">Give ADMIN Title</button>
       </div>
 
+      <div class="admin-block">
+        <p>⏸️ Server Controls</p>
+        <div class="admin-button-row">
+          <button id="btnAdminTogglePause">Pause Game</button>
+        </div>
+      </div>
+
+      <div class="admin-block">
+        <p>🧪 Modifiers</p>
+        <div class="admin-button-row">
+          <button data-modifier="">None</button>
+          <button data-modifier="peace">☮️ Peace &amp; Prosperity</button>
+          <button data-modifier="riot">🔥 Riotlandia</button>
+        </div>
+      </div>
+
+      <div class="admin-block">
+        <p>🔍 Inventory Checker</p>
+        <div class="admin-row">
+          <input type="text" id="adminInvCheckInput" placeholder="Player username">
+          <button id="btnAdminInvCheck">Check</button>
+        </div>
+        <div id="adminInvCheckResult"></div>
+      </div>
+
       <button id="btnAdminClose" class="secondary-btn admin-close">Close</button>
     </div>
   </div>
@@ -866,6 +893,7 @@
 </section>
 
 <script src="js/core.js"></script>
+<script src="js/serverstate.js"></script>
 <script src="js/market.js"></script>
 <script src="js/bank.js"></script>
 <script src="js/casino.js"></script>

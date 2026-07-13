@@ -154,6 +154,40 @@ button:disabled {
   letter-spacing: 0.02em;
 }
 
+/* --- Server banners & pause --- */
+.server-banner {
+  text-align: center;
+  padding: 10px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+}
+
+.pause-banner {
+  background: #e05c5c;
+  color: #1b1d22;
+}
+
+.modifier-banner-peace {
+  background: #6fcf97;
+  color: #14251c;
+}
+
+.modifier-banner-riot {
+  background: #7a1414;
+  color: #ffd6d6;
+}
+
+.game-paused #sidebar .nav-btn,
+.game-paused #content button,
+.game-paused #content input,
+.game-paused #content select,
+.game-paused .topbar-actions #btnReset {
+  pointer-events: none;
+  opacity: 0.4;
+  filter: grayscale(0.6);
+}
+
 /* --- Game screen --- */
 .topbar {
   display: flex;
@@ -1380,6 +1414,34 @@ button:disabled {
   color: #e8e8ea;
   font-size: 12px;
   padding: 6px 10px;
+}
+
+.admin-button-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-button-row button {
+  background: #3d3f48;
+  color: #e8e8ea;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.admin-button-row button.active-modifier {
+  background: #f2c94c;
+  color: #1b1d22;
+}
+
+#adminInvCheckResult {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #b9bbc4;
+}
+
+#adminInvCheckResult .arrest-record-row {
+  margin-bottom: 6px;
 }
 
 .admin-misc {
