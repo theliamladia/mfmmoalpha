@@ -309,6 +309,99 @@ function apiOnlinePlayers() {
   return apiRequest('/players/online');
 }
 
+// Decodes the JWT payload client-side (no signature check -- purely for UI logic like "is it my
+// turn", never trusted for anything security-relevant; the server independently re-verifies the
+// token on every request).
+function getMyUserId() {
+  const token = getAuthToken();
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split('.')[1])).sub;
+  } catch {
+    return null;
+  }
+}
+
 function apiSyncCharacter(characterToSync) {
   return apiRequest('/character/sync', { method: 'POST', body: JSON.stringify({ character: characterToSync }) });
+}
+
+function apiMilosEnter() {
+  return apiRequest('/milos/enter', { method: 'POST' });
+}
+
+function apiMilosLeave() {
+  return apiRequest('/milos/leave', { method: 'POST' });
+}
+
+function apiPayPlayer(targetUsername, amount) {
+  return apiRequest('/players/pay', { method: 'POST', body: JSON.stringify({ targetUsername, amount }) });
+}
+
+function apiRobPlayer(targetUsername) {
+  return apiRequest('/players/rob', { method: 'POST', body: JSON.stringify({ targetUsername }) });
+}
+
+function apiDuelChallenge(targetUsername) {
+  return apiRequest('/duels/challenge', { method: 'POST', body: JSON.stringify({ targetUsername }) });
+}
+
+function apiDuelRespond(duelId, accept) {
+  return apiRequest('/duels/respond', { method: 'POST', body: JSON.stringify({ duelId, accept }) });
+}
+
+function apiDuelAction(duelId, action) {
+  return apiRequest('/duels/action', { method: 'POST', body: JSON.stringify({ duelId, action }) });
+}
+
+function apiDuelForfeit(duelId) {
+  return apiRequest('/duels/forfeit', { method: 'POST', body: JSON.stringify({ duelId }) });
+}
+
+function apiGetDuel(duelId) {
+  return apiRequest(`/duels/${duelId}`);
+}
+
+function apiCoinflipCreate(wager, side) {
+  return apiRequest('/coinflip/create', { method: 'POST', body: JSON.stringify({ wager, side }) });
+}
+
+function apiCoinflipLobbies() {
+  return apiRequest('/coinflip/lobbies');
+}
+
+function apiCoinflipJoin(lobbyId) {
+  return apiRequest('/coinflip/join', { method: 'POST', body: JSON.stringify({ lobbyId }) });
+}
+
+function apiCoinflipCancel(lobbyId) {
+  return apiRequest('/coinflip/cancel', { method: 'POST', body: JSON.stringify({ lobbyId }) });
+}
+
+function apiCasinoTableJoin(game) {
+  return apiRequest('/casino/table/join', { method: 'POST', body: JSON.stringify({ game }) });
+}
+
+function apiCasinoTableLeave(tableId) {
+  return apiRequest('/casino/table/leave', { method: 'POST', body: JSON.stringify({ tableId }) });
+}
+
+function apiCasinoTableGet(tableId) {
+  return apiRequest(`/casino/table/${tableId}`);
+}
+
+function apiTableBjBet(tableId, bet) {
+  return apiRequest('/casino/table/blackjack/bet', { method: 'POST', body: JSON.stringify({ tableId, bet }) });
+}
+
+function apiTableBjHit(tableId) {
+  return apiRequest('/casino/table/blackjack/hit', { method: 'POST', body: JSON.stringify({ tableId }) });
+}
+
+function apiTableBjStand(tableId) {
+  return apiRequest('/casino/table/blackjack/stand', { method: 'POST', body: JSON.stringify({ tableId }) });
+}
+
+function apiTableRouletteBet(tableId, bets) {
+  return apiRequest('/casino/table/roulette/bet', { method: 'POST', body: JSON.stringify({ tableId, bets }) });
 }

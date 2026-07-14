@@ -2107,3 +2107,92 @@ button:disabled {
     justify-content: center;
   }
 }
+
+/* ---------- Coinflip ---------- */
+.coinflip-create-card {
+  max-width: 320px;
+}
+
+.coinflip-side-btn.active {
+  background: #6fcf97;
+  color: #16181d;
+}
+
+.coinflip-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.coinflip-coin {
+  font-size: 48px;
+}
+
+.coinflip-coin.coinflip-spin {
+  animation: coinflipSpin 0.9s ease-out;
+}
+
+@keyframes coinflipSpin {
+  0% { transform: rotateY(0deg) scale(1); }
+  50% { transform: rotateY(900deg) scale(1.15); }
+  100% { transform: rotateY(1440deg) scale(1); }
+}
+
+/* ---------- Multiplayer casino tables ---------- */
+.table-seats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+.table-seat {
+  background: #262832;
+  border: 1px solid #383a44;
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 100px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.table-seat.table-seat-you {
+  border-color: #6fcf97;
+}
+
+.table-seat.table-seat-empty {
+  opacity: 0.5;
+}
+
+.roulette-wheel {
+  font-size: 40px;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.roulette-wheel.roulette-spin {
+  animation: coinflipSpin 1.2s ease-out;
+}
+
+.roulette-bet-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.roulette-bet-btn {
+  background: #262832;
+  border: 1px solid #383a44;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #e6e7eb;
+}
+
+.roulette-bet-btn.selected {
+  border-color: #6fcf97;
+  background: #303543;
+}

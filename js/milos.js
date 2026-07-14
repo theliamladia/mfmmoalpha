@@ -37,7 +37,7 @@ function renderPlayerList() {
   `;
 
   const otherRows = onlinePlayersCache.map((p) => `
-    <li class="player-row">
+    <li class="player-row" data-username="${p.username}">
       ${displayBadgeMarkupFor(p.character)}
       <span class="player-name">${p.character.firstName} ${p.character.lastName}</span>
       <div class="player-hover-card">
@@ -49,10 +49,14 @@ function renderPlayerList() {
   `).join('');
 
   playerListEl.innerHTML = youRow + otherRows;
+
+  playerListEl.querySelectorAll('.player-row[data-username]').forEach((row) => {
+    row.addEventListener('click', () => openPlayerActionModal(row.dataset.username));
+  });
 }
 
-// Presence is server-tracked (last_seen updates on every authenticated request); poll
-// periodically so the roster reflects who's actually logged in right now.
+// Presence is scoped to New Milos City specifically (see /milos/enter, /milos/leave) -- poll
+// periodically while this tab is open so the roster reflects who's actually looking at it right now.
 const ONLINE_POLL_MS = 15000;
 
 async function refreshOnlinePlayers() {
@@ -60,6 +64,7 @@ async function refreshOnlinePlayers() {
   try {
     const result = await apiOnlinePlayers();
     onlinePlayersCache = result.players.filter((p) => !p.you);
+    if (typeof handlePendingDuelChallenge === 'function') handlePendingDuelChallenge(result.pendingDuelChallenge);
   } catch {
     // Presence is best-effort -- keep showing the last known list if the poll fails.
   }
@@ -752,6 +757,7 @@ const milosSubpages = {
   moralscenter: document.getElementById('milos-moralscenter'),
   mtn: document.getElementById('milos-mtn'),
   penitentiary: document.getElementById('milos-penitentiary'),
+  coinflip: document.getElementById('milos-coinflip'),
 };
 
 milosTabBtns.forEach((btn) => {
@@ -760,6 +766,7 @@ milosTabBtns.forEach((btn) => {
     Object.entries(milosSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.milos));
     if (btn.dataset.milos === 'mtn') refreshMtnListings();
     if (btn.dataset.milos === 'penitentiary') refreshPenitentiaryRecords();
+    if (typeof setCoinflipTabVisible === 'function') setCoinflipTabVisible(btn.dataset.milos === 'coinflip');
   });
 });
 

@@ -752,6 +752,12 @@ function logMessage(text, cls) {
   logTo(activityLog, text, cls);
 }
 
+// Real presence in New Milos City: a heartbeat while the tab is active, plus a leave call the
+// moment you navigate away (and a sendBeacon fallback in clientAuth.js for tab close/crash).
+const MILOS_HEARTBEAT_MS = 10000;
+let milosHeartbeatInterval = null;
+let onMilosPage = false;
+
 function switchPage(pageName) {
   navBtns.forEach((btn) => btn.classList.toggle('active', btn.dataset.page === pageName));
   pageStreets.classList.toggle('hidden', pageName !== 'streets');
@@ -764,14 +770,35 @@ function switchPage(pageName) {
   pageUpdates.classList.toggle('hidden', pageName !== 'updates');
 
   if (pageName === 'milos') {
+    onMilosPage = true;
     renderPlayerList();
     if (!character.settings.hideMilosWarning) {
       milosWarningModal.classList.remove('hidden');
     }
+    apiMilosEnter().catch(() => {});
+    if (!milosHeartbeatInterval) {
+      milosHeartbeatInterval = setInterval(() => apiMilosEnter().catch(() => {}), MILOS_HEARTBEAT_MS);
+    }
   } else {
+    if (onMilosPage) apiMilosLeave().catch(() => {});
+    onMilosPage = false;
+    if (milosHeartbeatInterval) {
+      clearInterval(milosHeartbeatInterval);
+      milosHeartbeatInterval = null;
+    }
     playerListEl.innerHTML = '';
   }
 }
+
+// Catches tab close/refresh/crash, which a normal fetch-based leave call can't reliably survive.
+// sendBeacon can't set an Authorization header, so the token rides in the body instead -- see the
+// matching fallback in mfmmoserver's /milos/leave route.
+window.addEventListener('pagehide', () => {
+  if (!onMilosPage) return;
+  const token = getAuthToken();
+  if (!token) return;
+  navigator.sendBeacon(`${API_BASE}/milos/leave`, new Blob([JSON.stringify({ token })], { type: 'application/json' }));
+});
 
 navBtns.forEach((btn) => {
   btn.addEventListener('click', () => {

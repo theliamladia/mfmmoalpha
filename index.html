@@ -240,6 +240,7 @@
           <button class="casino-tab-btn active" data-shop="cashier">💵 Cashier</button>
           <button class="casino-tab-btn" data-shop="blackjack">🃏 Blackjack</button>
           <button class="casino-tab-btn" data-shop="slots">🎰 Slots</button>
+          <button class="casino-tab-btn" data-shop="tables">🎲 Tables</button>
         </div>
 
         <div id="shop-cashier" class="shop">
@@ -299,6 +300,61 @@
           <p id="slotMessage"></p>
           <div id="slotLog" class="log"></div>
         </div>
+
+        <div id="shop-tables" class="shop hidden">
+          <p>Play Blackjack or Roulette with real players at the same table. Dealer is CPU. 5 seats max, round starts on a rolling timer.</p>
+          <div id="tableGamePicker">
+            <div class="hustle-grid">
+              <div class="hustle-card">
+                <h3>🃏 Blackjack Table</h3>
+                <p>One shared dealer hand, your own bet and cards.</p>
+                <button id="btnJoinBjTable">Join Table</button>
+              </div>
+              <div class="hustle-card">
+                <h3>🎡 Roulette Table</h3>
+                <p>Straight, red/black, even/odd, high/low bets.</p>
+                <button id="btnJoinRouletteTable">Join Table</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="tableRoom" class="hidden">
+            <p id="tableCountdown"></p>
+            <div id="tableSeats" class="table-seats"></div>
+
+            <div id="tableBjArea" class="hidden">
+              <div class="bj-table">
+                <div class="bj-dealer">
+                  <h4>🤵 Dealer <span id="tableBjDealerTotal"></span></h4>
+                  <div id="tableBjDealerCards" class="card-row"></div>
+                </div>
+                <div class="bj-player">
+                  <h4>🙂 Your Hand <span id="tableBjPlayerTotal"></span></h4>
+                  <div id="tableBjPlayerCards" class="card-row"></div>
+                </div>
+              </div>
+              <div class="bj-controls">
+                <label>Bet <input type="number" id="tableBjBetInput" min="1" value="10"></label>
+                <button id="btnTableBjBet">Bet</button>
+                <button id="btnTableBjHit" disabled>Hit</button>
+                <button id="btnTableBjStand" disabled>Stand</button>
+              </div>
+            </div>
+
+            <div id="tableRouletteArea" class="hidden">
+              <div id="rouletteWheel" class="roulette-wheel">🎡 <span id="rouletteResultText"></span></div>
+              <div class="roulette-bet-grid" id="rouletteBetGrid"></div>
+              <div class="bj-controls">
+                <label>Bet Amount <input type="number" id="rouletteBetAmountInput" min="1" value="10"></label>
+                <button id="btnTableRouletteBet">Place Bets</button>
+              </div>
+            </div>
+
+            <button id="btnLeaveTable" class="secondary-btn">Leave Table</button>
+          </div>
+
+          <div id="tableLog" class="log"></div>
+        </div>
       </div>
 
       <div id="page-milos" class="page hidden">
@@ -320,6 +376,7 @@
               <button class="milos-tab-btn" data-milos="moralscenter">⚖️ Morals Center</button>
               <button class="milos-tab-btn" data-milos="mtn">📈 Milos Trading Network</button>
               <button class="milos-tab-btn" data-milos="penitentiary">🔒 New Milos Penitentiary</button>
+              <button class="milos-tab-btn" data-milos="coinflip">🪙 Coinflip</button>
             </div>
 
             <div id="milos-hustles" class="milos-subpage">
@@ -572,6 +629,30 @@
               <div id="penitentiaryLog" class="log"></div>
             </div>
 
+            <div id="milos-coinflip" class="milos-subpage hidden">
+              <p>Wager cash on a coin flip against another player. Winner takes both wagers.</p>
+
+              <div class="hustle-card coinflip-create-card">
+                <h3>🪙 Create Lobby</h3>
+                <input type="number" id="coinflipWagerInput" min="1" value="100" placeholder="Wager ($)">
+                <div class="market-tabs">
+                  <button class="coinflip-side-btn active" data-side="heads">Heads</button>
+                  <button class="coinflip-side-btn" data-side="tails">Tails</button>
+                </div>
+                <button id="btnCoinflipCreate">Create Lobby</button>
+              </div>
+
+              <h3 class="gunclub-section-title">🎲 Open Lobbies</h3>
+              <div class="hustle-grid" id="coinflipLobbiesGrid"></div>
+
+              <div id="coinflipAnimation" class="coinflip-animation hidden">
+                <div id="coinflipCoin" class="coinflip-coin">🪙</div>
+                <p id="coinflipResultText"></p>
+              </div>
+
+              <div id="coinflipLog" class="log"></div>
+            </div>
+
             <div class="side-panel chat-box milos-chat-row">
               <h3>💬 Chat</h3>
               <p class="chat-note">Live chat with everyone in New Milos City.</p>
@@ -763,6 +844,16 @@
         <p>What's changed, most recent first.</p>
 
         <div class="update-entry">
+          <div class="update-entry-header"><h3>🎲 Real Multiplayer: Casino Tables, PvP, and Coinflip</h3><span class="update-date">2026-07-14</span></div>
+          <ul>
+            <li>Added real multiplayer <b>Blackjack</b> and <b>Roulette</b> tables under Midas Casino &rarr; Tables: up to 5 real players seated together against one shared CPU dealer/wheel, with a rolling 30-second timer before each round starts. Blackjack deals every seated bettor their own hand against the same dealer draw; Roulette supports straight, red/black, even/odd, and high/low bets.</li>
+            <li>Added <b>Coinflip</b> (New Milos City &rarr; Coinflip): create a lobby with a cash wager and a called side, another player joins and takes the other side automatically, a flip animation plays, and the winner takes both wagers.</li>
+            <li>Clicking another player in the Players Online list now opens a menu with <b>Pay</b>, <b>Rob</b>, and <b>Fight</b>: Pay sends cash directly, Rob is a real player-vs-player version of the street robbery mechanic (same odds and jail risk, but against a real target), and Fight starts a real turn-based duel using the same combat system as street fights, just against another player instead of an NPC.</li>
+            <li>Players Online is now scoped to New Milos City specifically &mdash; it only shows players actively viewing that tab right now, not just anyone with the app open somewhere else.</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
           <div class="update-entry-header"><h3>🔒 New Milos Penitentiary &amp; Yard Time</h3><span class="update-date">2026-07-13</span></div>
           <ul>
             <li>Added the <b>New Milos Penitentiary</b> tab in New Milos City: see everyone currently jailed (crime + time remaining), a recent-arrests history feed, and pay bail or send commissary money.</li>
@@ -937,6 +1028,65 @@
       </div>
     </div>
   </div>
+
+  <div id="playerActionModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="playerActionTitle">Player</h3>
+      <div id="playerActionMenu" class="modal-actions">
+        <button id="btnPlayerActionPay">💵 Pay</button>
+        <button id="btnPlayerActionRob">🥷 Rob</button>
+        <button id="btnPlayerActionFight">⚔️ Fight</button>
+      </div>
+      <div id="playerActionPaySub" class="hidden">
+        <input type="number" id="playerActionPayAmount" min="1" placeholder="Amount ($)">
+        <div class="modal-actions">
+          <button id="btnPlayerActionPayBack" class="secondary-btn">Back</button>
+          <button id="btnPlayerActionPaySubmit">Send</button>
+        </div>
+      </div>
+      <p id="playerActionMessage"></p>
+      <button id="btnPlayerActionClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
+  <div id="duelChallengeModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>⚔️ Duel Challenge</h3>
+      <p id="duelChallengeText"></p>
+      <div class="modal-actions">
+        <button id="btnDuelChallengeDecline" class="secondary-btn">Decline</button>
+        <button id="btnDuelChallengeAccept">Accept</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="duelArenaModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>⚔️ Duel vs <span id="duelOpponentName"></span></h3>
+      <div class="combat-row">
+        <div class="combatant">
+          <h4>🙂 You</h4>
+          <div class="hp-bar-outer"><div id="duelYouHpBar" class="hp-bar-inner"></div></div>
+          <p><span id="duelYouHpText"></span> HP</p>
+        </div>
+        <div class="combatant">
+          <h4 id="duelOpponentLabel">Opponent</h4>
+          <div class="hp-bar-outer"><div id="duelOpponentHpBar" class="hp-bar-inner enemy"></div></div>
+          <p><span id="duelOpponentHpText"></span> HP</p>
+        </div>
+      </div>
+      <div class="combat-controls" id="duelControls">
+        <button id="btnDuelPunch" data-duel-action="punch">👊 Punch</button>
+        <button id="btnDuelHeavy" data-duel-action="heavy">💥 Heavy Strike</button>
+        <button id="btnDuelGuard" data-duel-action="guard">🛡️ Guard</button>
+        <button id="btnDuelWeapon" data-duel-action="weapon">🔫 Weapon Attack</button>
+        <button id="btnDuelForfeit">🏳️ Forfeit</button>
+      </div>
+      <p id="duelWaitingNote" class="hidden">Waiting for opponent's turn...</p>
+      <div id="duelLog" class="log"></div>
+      <button id="btnDuelClose" class="secondary-btn admin-close hidden">Close</button>
+    </div>
+  </div>
 </section>
 
 <script src="js/api.js"></script>
@@ -946,6 +1096,10 @@
 <script src="js/bank.js"></script>
 <script src="js/casino.js"></script>
 <script src="js/milos.js"></script>
+<script src="js/playerActions.js"></script>
+<script src="js/duels.js"></script>
+<script src="js/coinflip.js"></script>
+<script src="js/casinoTables.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/mtn.js"></script>
 <script src="js/penitentiary.js"></script>
