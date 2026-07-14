@@ -135,18 +135,16 @@ function stopServing() {
 btnServe.addEventListener('click', () => startServing());
 btnStopServe.addEventListener('click', stopServing);
 
-function doHireLawyer() {
-  const cost = character.jail.yearsRemaining * 150;
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks to hire a lawyer.' };
-  character.cash -= cost;
-  return { ok: true };
-}
-
-btnLawyer.addEventListener('click', () => {
-  const result = doHireLawyer();
-  if (!result.ok) { alert(result.reason); return; }
-  save();
-  releaseFromJail();
+// Hiring a lawyer is server-authoritative -- it pays and clears jail state in one call, so the
+// client just swaps in the returned character and reuses the same release UI as the timer path.
+btnLawyer.addEventListener('click', async () => {
+  try {
+    const result = await apiHireLawyer();
+    character = result.character;
+    releaseFromJail();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
 });
 
 // ---------- Yard Time ----------
@@ -155,47 +153,32 @@ const btnJailFight = document.getElementById('btnJailFight');
 const jailContrabandGrid = document.getElementById('jailContrabandGrid');
 const jailActivityLog = document.getElementById('jailActivityLog');
 
-function doJailWorkout() {
-  character.cooldowns.jailWorkout = Date.now();
-  const atkGain = round2(randFloat(JAIL_WORKOUT_GAIN_MIN, JAIL_WORKOUT_GAIN_MAX));
-  const defGain = round2(randFloat(JAIL_WORKOUT_GAIN_MIN, JAIL_WORKOUT_GAIN_MAX));
-  character.stats.attack = clampStat(character.stats.attack + atkGain);
-  character.stats.defense = clampStat(character.stats.defense + defGain);
-  return { message: `Yard workout: +${atkGain.toFixed(2)} Attack, +${defGain.toFixed(2)} Defense.`, cls: 'gain' };
-}
-
-btnJailWorkout.addEventListener('click', () => {
+// Yard Workout, Yard Fight, and Contraband are all server-authoritative -- same shape as the
+// hustles/gym/market: send the request, swap in whatever character comes back.
+btnJailWorkout.addEventListener('click', async () => {
   if (getRemainingCooldown('jailWorkout', JAIL_WORKOUT_COOLDOWN_MS) > 0) return;
-  const result = doJailWorkout();
-  logTo(jailActivityLog, result.message, result.cls);
-  save();
-  renderAll();
+  try {
+    const result = await apiJailWorkout();
+    character = result.character;
+    logTo(jailActivityLog, result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
 });
 
-function doJailFight() {
-  character.cooldowns.jailFight = Date.now();
-  const myPower = character.stats.attack + character.stats.defense + gearStatBonus('attack') + gearStatBonus('defense');
-  const inmatePower = 20;
-  const winChance = Math.max(0.2, Math.min(0.85, 0.5 + (myPower - inmatePower) * 0.01));
-
-  if (Math.random() < winChance) {
-    const stat = Math.random() < 0.5 ? 'attack' : 'defense';
-    const amount = round2(randFloat(JAIL_FIGHT_STAT_GAIN_MIN, JAIL_FIGHT_STAT_GAIN_MAX));
-    character.stats[stat] = clampStat(character.stats[stat] + amount);
-    const label = stat === 'attack' ? 'Attack' : 'Defense';
-    return { won: true, message: `You won the yard fight! +${amount.toFixed(2)} ${label}.`, cls: 'gain' };
-  }
-  const lost = Math.min(character.cash, randInt(JAIL_FIGHT_LOSS_MIN, JAIL_FIGHT_LOSS_MAX));
-  character.cash -= lost;
-  return { won: false, message: `You lost the yard fight and got shaken down for $${lost}.`, cls: 'loss' };
-}
-
-btnJailFight.addEventListener('click', () => {
+btnJailFight.addEventListener('click', async () => {
   if (getRemainingCooldown('jailFight', JAIL_FIGHT_COOLDOWN_MS) > 0) return;
-  const result = doJailFight();
-  logTo(jailActivityLog, result.message, result.cls);
-  save();
-  renderAll();
+  try {
+    const result = await apiJailFight();
+    character = result.character;
+    logTo(jailActivityLog, result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
 });
 
 function jailContrabandItems() {
@@ -217,24 +200,18 @@ function buildJailContrabandGrid() {
   `).join('');
 
   jailContrabandGrid.querySelectorAll('[data-contraband]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const result = doBuyContraband(btn.dataset.contraband);
-      if (!result.ok) { alert(result.reason); return; }
-      logTo(jailActivityLog, result.message, result.cls);
-      save();
-      renderAll();
+    btn.addEventListener('click', async () => {
+      try {
+        const result = await apiBuyContraband(btn.dataset.contraband);
+        character = result.character;
+        logTo(jailActivityLog, result.message, result.cls);
+        save();
+        renderAll();
+      } catch (err) {
+        if (err.reason) alert(err.reason);
+      }
     });
   });
-}
-
-function doBuyContraband(itemId) {
-  const item = jailContrabandItems().find((i) => i.id === itemId);
-  if (!item) return { ok: false };
-  const cost = jailContrabandCost(item);
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash = round2(character.cash - cost);
-  addToInventory(item.id, 1);
-  return { ok: true, message: `Smuggled in ${item.name} for $${cost.toFixed(2)}.`, cls: 'gain' };
 }
 
 function tickJailActivityUI() {

@@ -236,24 +236,6 @@ function crimeFailChance(tier) {
   return Math.max(CRIME_RISK_MIN, tier.baseRisk - reduction);
 }
 
-function crimeStreakYears() {
-  return character.crimeRecord.streak;
-}
-
-function bumpCrimeStreak() {
-  character.crimeRecord.streak = Math.min(CRIME_STREAK_MAX, character.crimeRecord.streak + 1);
-}
-
-function doCommunityService() {
-  if (character.crimeRecord.streak <= 0) return { ok: false, reason: 'Your record is already clean.' };
-  const cost = COMMUNITY_SERVICE_BASE_COST * (1 + character.crimeRecord.streak);
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash = round2(character.cash - cost);
-  character.crimeRecord.streak = Math.max(0, character.crimeRecord.streak - COMMUNITY_SERVICE_STREAK_REDUCTION);
-  character.cooldowns.communityService = Date.now();
-  return { ok: true, message: `Completed community service for $${cost.toLocaleString()}. Your criminal record improved.`, cls: 'gain' };
-}
-
 const BANK_TIERS = [
   { name: '🏦 New Milos Discovery', cardName: 'NMB Discovery', maxBalance: 5000, upgradeCost: 0 },
   { name: '🏦 New Milos Bank Card', cardName: 'NMB Advantage Standard', maxBalance: 25000, upgradeCost: 10000 },

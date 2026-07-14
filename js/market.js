@@ -38,63 +38,21 @@ function getRemainingCooldown(action, durationMs = COOLDOWN_MS) {
   return remaining > 0 ? remaining : 0;
 }
 
-function doHustle(type) {
-  const entries = [];
-  if (type === 'work') {
-    const gain = randInt(2, 10);
-    character.cash += gain;
-    allianceBuff();
-    entries.push({ message: `Worked a shift: +${gain} Floydbucks.`, cls: 'gain' });
-  } else if (type === 'slut') {
-    const gain = randInt(5, 60);
-    character.cash += gain;
-    allianceDebuffMinor();
-    entries.push({ message: `Turned a trick: +${gain} Floydbucks.`, cls: 'gain' });
-    if (Math.random() < 0.3) {
-      character.cash = Math.max(0, character.cash - gain);
-      entries.push({ message: `You got robbed! -${gain} Floydbucks.`, cls: 'loss' });
-    }
-  } else if (type === 'crime') {
-    if (Math.random() < 0.3) {
-      const years = 1 + crimeStreakYears();
-      bumpCrimeStreak();
-      allianceForceBad();
-      character.jail.inJail = true;
-      character.jail.crime = 'Crime';
-      character.jail.yearsRemaining = years;
-      character.jail.serving = false;
-      const streakNote = years > 1 ? ` Repeat offender: +${years - 1} year(s) added to your usual sentence.` : '';
-      entries.push({ message: `Busted committing a crime! Sentenced to ${years} year(s).${streakNote}`, cls: 'loss' });
-      return { entries, jailed: true };
-    }
-    const gain = randInt(100, 1000);
-    character.cash += gain;
-    allianceDebuff();
-    entries.push({ message: `Pulled off a crime: +${gain} Floydbucks.`, cls: 'gain' });
-  }
-  character.cooldowns[type] = Date.now();
-  return { entries, jailed: false };
-}
+// Work, Slut, and Crime are server-authoritative -- the client just sends the request and
+// renders whatever character/messages come back, same shape as the old local doHustle().
+const HUSTLE_API = { work: apiWork, slut: apiSlut, crime: apiCrime };
 
-function runHustle(type) {
-  const result = doHustle(type);
-  result.entries.forEach((e) => logMessage(e.message, e.cls));
-  save();
-  if (result.jailed) {
-    goToJail(true);
-    return;
-  }
-  renderAll();
-}
-
-// Work is server-authoritative (the first ported slice); Slut and Crime are still local-only.
-async function runWorkViaServer(btn) {
+async function runHustleViaServer(type, btn) {
   btn.disabled = true;
   try {
-    const result = await apiWork();
+    const result = await HUSTLE_API[type]();
     character = result.character;
-    logMessage(result.message, result.cls);
+    (result.messages || [{ message: result.message, cls: result.cls }]).forEach((e) => logMessage(e.message, e.cls));
     save();
+    if (result.jailed) {
+      goToJail(true);
+      return;
+    }
     renderAll();
   } catch (err) {
     logMessage(err.reason || 'Could not reach the server.', 'loss');
@@ -105,11 +63,7 @@ hustleButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
     const type = btn.dataset.hustle;
     if (getRemainingCooldown(type) > 0) return;
-    if (type === 'work') {
-      runWorkViaServer(btn);
-      return;
-    }
-    runHustle(type);
+    runHustleViaServer(type, btn);
   });
 });
 
@@ -185,65 +139,50 @@ function renderGym() {
   }).join('');
 
   steroidTierButtons.querySelectorAll('[data-steroid-tier]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      doSetSteroidTier(btn.dataset.steroidTier === 'none' ? null : btn.dataset.steroidTier);
-      save();
-      renderAll();
-    });
+    btn.addEventListener('click', () => runSteroidTierViaServer(btn.dataset.steroidTier === 'none' ? null : btn.dataset.steroidTier));
   });
 }
 
-function doWorkout() {
-  const tier = currentSteroidTier();
-  const cost = GYM_COST * (tier ? tier.mult : 1);
-  if (character.weightGained < GYM_BURN_LBS) return { ok: false };
-  if (character.cash < cost) return { ok: false };
-
-  character.cash -= cost;
-  character.weightGained = Math.max(0, character.weightGained - GYM_BURN_LBS);
-
-  if (character.gym.roidJailClicksRemaining > 0) {
-    character.gym.roidJailClicksRemaining -= 1;
-    return { ok: true, message: 'Roid jail workout: paid, burned fuel, got nothing. Ouch.', cls: 'loss' };
+// Gym actions (Workout, steroid tier, Roid Escape) are server-authoritative -- same shape as the
+// hustles: send the request, swap in whatever character comes back.
+async function runWorkoutViaServer() {
+  try {
+    const result = await apiWorkout();
+    character = result.character;
+    logTo(gymLog, result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    logTo(gymLog, err.reason || 'Could not reach the server.', 'loss');
   }
-  if (tier && Math.random() < tier.jailChance) {
-    character.gym.roidJailClicksRemaining = tier.jailClicks;
-    return { ok: true, message: `${tier.name} backfired! Thrown into Roid Jail for ${tier.jailClicks} clicks.`, cls: 'loss' };
+}
+
+btnWorkout.addEventListener('click', runWorkoutViaServer);
+
+async function runSteroidTierViaServer(tierId) {
+  try {
+    const result = await apiSetSteroidTier(tierId);
+    character = result.character;
+    save();
+    renderAll();
+  } catch (err) {
+    logTo(gymLog, err.reason || 'Could not reach the server.', 'loss');
   }
-  const mult = tier ? tier.mult : 1;
-  const looksGain = GYM_LOOKS_GAIN * mult;
-  const speedGain = GYM_SPEED_GAIN * mult;
-  character.stats.looks = clampStat(character.stats.looks + looksGain);
-  character.stats.speed = clampStat(character.stats.speed + speedGain);
-  return { ok: true, message: `Workout complete: +${round1(looksGain)} Looks, +${round1(speedGain)} Speed.`, cls: 'gain' };
 }
 
-btnWorkout.addEventListener('click', () => {
-  const result = doWorkout();
-  if (!result.ok) return;
-  logTo(gymLog, result.message, result.cls);
-  save();
-  renderAll();
-});
-
-function doSetSteroidTier(tierId) {
-  character.gym.steroidTier = tierId;
+async function runRoidEscapeViaServer() {
+  try {
+    const result = await apiRoidEscape();
+    character = result.character;
+    logTo(gymLog, result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    alert(err.reason || 'Could not reach the server.');
+  }
 }
 
-function doRoidEscape() {
-  if (character.cash < ROID_ESCAPE_COST) return { ok: false, reason: 'Not enough Floydbucks to bribe your way out of Roid Jail.' };
-  character.cash -= ROID_ESCAPE_COST;
-  character.gym.roidJailClicksRemaining = 0;
-  return { ok: true, message: `Paid $${ROID_ESCAPE_COST} to escape Roid Jail early.`, cls: 'gain' };
-}
-
-btnRoidEscape.addEventListener('click', () => {
-  const result = doRoidEscape();
-  if (!result.ok) { alert(result.reason); return; }
-  logTo(gymLog, result.message, result.cls);
-  save();
-  renderAll();
-});
+btnRoidEscape.addEventListener('click', runRoidEscapeViaServer);
 
 // ---------- Pete'sza ----------
 const foodGrid = document.getElementById('foodGrid');
@@ -266,30 +205,21 @@ function buildFoodGrid() {
   });
 
   foodGrid.querySelectorAll('button[data-food]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const item = FOOD_ITEMS.find((f) => f.id === btn.dataset.food);
-      buyFood(item);
-    });
+    btn.addEventListener('click', () => buyFood(btn.dataset.food));
   });
 }
 
-function doBuyFood(item) {
-  const cost = round2(item.cost * (jobPerkActive('milos11', false) ? 0.8 : 1));
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= cost;
-  const lbs = item.calories / CALORIES_PER_LB;
-  character.weightGained += lbs;
-  character.stats.defense = clampStat(character.stats.defense + lbs * DEFENSE_PER_LB);
-  character.stats.speed = clampStat(character.stats.speed - lbs * SPEED_LOSS_PER_LB);
-  return { ok: true, message: `Ate a ${item.name}: +${round1(lbs)} lbs, +${round1(lbs * DEFENSE_PER_LB)} Defense, -${round1(lbs * SPEED_LOSS_PER_LB)} Speed.`, cls: 'loss' };
-}
-
-function buyFood(item) {
-  const result = doBuyFood(item);
-  if (!result.ok) { alert(result.reason); return; }
-  logTo(pizzaLog, result.message, result.cls);
-  save();
-  renderAll();
+// Pete'sza is server-authoritative -- same request/response shape as the hustles and gym.
+async function buyFood(itemId) {
+  try {
+    const result = await apiBuyFood(itemId);
+    character = result.character;
+    logTo(pizzaLog, result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    alert(err.reason || 'Could not reach the server.');
+  }
 }
 
 // ---------- Luke's Maxxerstore ----------
@@ -310,28 +240,21 @@ function buildMaxxGrid() {
   });
 
   maxxGrid.querySelectorAll('button[data-maxx]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const item = MAXX_ITEMS.find((m) => m.id === btn.dataset.maxx);
-      buyMaxx(item);
-    });
+    btn.addEventListener('click', () => buyMaxx(btn.dataset.maxx));
   });
 }
 
-function doBuyMaxx(item) {
-  if (character.cash < item.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= item.cost;
-  if (item.looks) character.stats.looks = clampStat(character.stats.looks + item.looks);
-  if (item.speed) character.stats.speed = clampStat(character.stats.speed + item.speed);
-  if (item.height) character.height += item.height;
-  return { ok: true, message: `Purchased ${item.name}: ${item.desc}.`, cls: 'gain' };
-}
-
-function buyMaxx(item) {
-  const result = doBuyMaxx(item);
-  if (!result.ok) { alert(result.reason); return; }
-  logTo(maxxLog, result.message, result.cls);
-  save();
-  renderAll();
+// Luke's Maxxerstore is server-authoritative -- same request/response shape as Pete'sza.
+async function buyMaxx(itemId) {
+  try {
+    const result = await apiBuyMaxx(itemId);
+    character = result.character;
+    logTo(maxxLog, result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    alert(err.reason || 'Could not reach the server.');
+  }
 }
 
 // ---------- Title Store ----------

@@ -1,5 +1,8 @@
 // ---------- admin ----------
 const ADMIN_PASSWORD = 'fishdoc15!';
+// Kept after a successful unlock so pause/modifier/inventory-checker calls (which now hit a real
+// shared server, not just this browser) can re-prove admin access on each request.
+let adminPasswordForRequests = null;
 
 const btnAdmin = document.getElementById('btnAdmin');
 const adminPasswordModal = document.getElementById('adminPasswordModal');
@@ -36,6 +39,7 @@ btnAdminPasswordCancel.addEventListener('click', () => {
 
 function submitAdminPassword() {
   if (adminPasswordInput.value === ADMIN_PASSWORD) {
+    adminPasswordForRequests = adminPasswordInput.value;
     adminPasswordModal.classList.add('hidden');
     adminMenuModal.classList.remove('hidden');
     refreshAdminPauseButton();
@@ -129,11 +133,16 @@ function refreshAdminPauseButton() {
   btnAdminTogglePause.classList.toggle('active-modifier', isGamePaused());
 }
 
-btnAdminTogglePause.addEventListener('click', () => {
-  doSetGamePause(!isGamePaused());
-  refreshAdminPauseButton();
-  renderServerBanners();
-  renderAll();
+btnAdminTogglePause.addEventListener('click', async () => {
+  try {
+    const result = await apiAdminSetPause(!isGamePaused(), adminPasswordForRequests);
+    serverStateCache = result.state;
+    refreshAdminPauseButton();
+    renderServerBanners();
+    renderAll();
+  } catch (err) {
+    alert(err.reason || 'Could not reach the server.');
+  }
 });
 
 // ---------- Modifiers ----------
@@ -147,11 +156,16 @@ function refreshAdminModifierButtons() {
 }
 
 adminModifierButtons.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    doSetModifier(btn.dataset.modifier || null);
-    refreshAdminModifierButtons();
-    renderServerBanners();
-    renderAll();
+  btn.addEventListener('click', async () => {
+    try {
+      const result = await apiAdminSetModifier(btn.dataset.modifier || null, adminPasswordForRequests);
+      serverStateCache = result.state;
+      refreshAdminModifierButtons();
+      renderServerBanners();
+      renderAll();
+    } catch (err) {
+      alert(err.reason || 'Could not reach the server.');
+    }
   });
 });
 
@@ -185,8 +199,12 @@ function renderInvCheckResult(result) {
   `;
 }
 
-btnAdminInvCheck.addEventListener('click', () => {
-  const result = doCheckInventory(adminInvCheckInput.value);
-  renderInvCheckResult(result);
+btnAdminInvCheck.addEventListener('click', async () => {
+  try {
+    const result = await apiAdminInventory(adminInvCheckInput.value, adminPasswordForRequests);
+    renderInvCheckResult(result);
+  } catch (err) {
+    renderInvCheckResult(err);
+  }
 });
 

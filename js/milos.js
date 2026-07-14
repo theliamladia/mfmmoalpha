@@ -161,41 +161,6 @@ function goodJobSkillTrainMult() {
   return 1 + Math.sqrt(character.stats.looks / 100) * LOOKS_TRAIN_BONUS_MAX;
 }
 
-function doApplyGoodJob(jobId) {
-  if (character.jobs.currentJob) return { ok: false, reason: 'Resign from your current job first.' };
-  const job = GOOD_JOBS.find((j) => j.id === jobId);
-  if (!job) return { ok: false };
-  character.jobs.currentJob = jobId;
-  character.jobs.skills = { skill1: 0, skill2: 0, skill3: 0, skill4: 0 };
-  return { ok: true, message: `Hired at ${job.name}. Starting at base rank.`, cls: 'gain' };
-}
-
-function doResignGoodJob() {
-  const job = GOOD_JOBS.find((j) => j.id === character.jobs.currentJob);
-  character.jobs.currentJob = null;
-  character.jobs.skills = { skill1: 0, skill2: 0, skill3: 0, skill4: 0 };
-  return { message: job ? `Resigned from ${job.name}.` : 'Resigned.', cls: '' };
-}
-
-function doGoodJobWork(skillKey, cooldownKey) {
-  const job = GOOD_JOBS.find((j) => j.id === character.jobs.currentJob);
-  const rank = goodJobRank();
-  const gain = round2(randFloat(rank.payMin, rank.payMax));
-  character.cash = round2(character.cash + gain);
-  const skillGain = randFloat(JOB_SKILL_TRAIN_MIN, JOB_SKILL_TRAIN_MAX) * goodJobSkillTrainMult();
-  character.jobs.skills[skillKey] = clampStat(character.jobs.skills[skillKey] + skillGain);
-  character.cooldowns[cooldownKey] = Date.now();
-  allianceBuff();
-
-  const perkMessages = [];
-  if (job.id === 'pizza' && !character.jobs.pizzaPerkGranted && jobPerkActive('pizza', false)) {
-    character.stats.speed = clampStat(character.stats.speed + 2);
-    character.jobs.pizzaPerkGranted = true;
-    perkMessages.push(`Perk unlocked -- ${JOB_PERKS.pizza.name}: permanent +2 Speed!`);
-  }
-  return { gain, skillGain, jobName: job.name, perkMessages };
-}
-
 function buildGoodJobsUI() {
   if (!goodJobsContainer) return;
   if (!meetsGoodJobAlliance()) {
@@ -213,12 +178,16 @@ function buildGoodJobsUI() {
       </div>
     `).join('');
     goodJobsContainer.querySelectorAll('[data-apply-good]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const result = doApplyGoodJob(btn.dataset.applyGood);
-        if (!result.ok) { alert(result.reason); return; }
-        logTo(milosLog, result.message, result.cls);
-        save();
-        renderAll();
+      btn.addEventListener('click', async () => {
+        try {
+          const result = await apiApplyGoodJob(btn.dataset.applyGood);
+          character = result.character;
+          logTo(milosLog, result.message, result.cls);
+          save();
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
       });
     });
     return;
@@ -260,32 +229,45 @@ function buildGoodJobsUI() {
     btn.addEventListener('click', () => {
       const cooldownKey = btn.dataset.cooldown;
       if (getRemainingCooldown(cooldownKey, goodJobRank().cooldownMs) > 0) return;
-      attemptMilosAction(() => {
-        const result = doGoodJobWork(btn.dataset.workGood, cooldownKey);
-        logTo(milosLog, `${result.jobName}: +$${result.gain.toFixed(2)}.`, 'gain');
-        result.perkMessages.forEach((msg) => logTo(milosLog, msg, 'gain'));
-        save();
-        renderAll();
+      attemptMilosAction(async () => {
+        try {
+          const result = await apiGoodJobWork(btn.dataset.workGood);
+          character = result.character;
+          result.messages.forEach((m) => logTo(milosLog, m.message, m.cls));
+          save();
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
       });
     });
   });
 
   goodJobsContainer.querySelectorAll('[data-buy-gear]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const result = doBuyGear(btn.dataset.buyGear);
-      if (!result.ok) { alert(result.reason); return; }
-      logTo(milosLog, result.message, result.cls);
-      save();
-      renderAll();
+    btn.addEventListener('click', async () => {
+      try {
+        const result = await apiBuyGear(btn.dataset.buyGear);
+        character = result.character;
+        logTo(milosLog, result.message, result.cls);
+        save();
+        renderAll();
+      } catch (err) {
+        if (err.reason) alert(err.reason);
+      }
     });
   });
 
-  document.getElementById('btnResignGood').addEventListener('click', () => {
+  document.getElementById('btnResignGood').addEventListener('click', async () => {
     if (!confirm('Resign? You will lose all skill progress at this job.')) return;
-    const result = doResignGoodJob();
-    logTo(milosLog, result.message, result.cls);
-    save();
-    renderAll();
+    try {
+      const result = await apiResignGoodJob();
+      character = result.character;
+      logTo(milosLog, result.message, result.cls);
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   });
 }
 
@@ -307,15 +289,6 @@ function buildWrestlingGearStoreHtml() {
       }).join('')}
     </div>
   `;
-}
-
-function doBuyGear(itemId) {
-  const item = WRESTLING_GEAR_ITEMS_BY_ID[itemId];
-  if (!item) return { ok: false };
-  if (character.cash < item.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= item.cost;
-  addToInventory(item.id, 1);
-  return { ok: true, message: `Purchased ${item.name}. Equip it in Character &gt; Equipment.`, cls: 'gain' };
 }
 
 function tickGoodJobsUI() {
@@ -353,42 +326,6 @@ function badJobBustChance() {
   return Math.max(BAD_JOB_BUST_MIN, base - evasion - perkReduction);
 }
 
-function doApplyBadJob(jobId) {
-  if (character.badJobs.currentJob) return { ok: false, reason: 'Resign from your current job first.' };
-  const job = BAD_JOBS.find((j) => j.id === jobId);
-  if (!job) return { ok: false };
-  character.badJobs.currentJob = jobId;
-  character.badJobs.skills = { skill1: 0, skill2: 0, skill3: 0, skill4: 0 };
-  return { ok: true, message: `You're in with ${job.name}. Starting at base rank.`, cls: 'gain' };
-}
-
-function doResignBadJob() {
-  const job = BAD_JOBS.find((j) => j.id === character.badJobs.currentJob);
-  character.badJobs.currentJob = null;
-  character.badJobs.skills = { skill1: 0, skill2: 0, skill3: 0, skill4: 0 };
-  return { message: job ? `Cut ties with ${job.name}.` : 'Resigned.', cls: '' };
-}
-
-function doBadJobWork(skillKey, cooldownKey) {
-  const job = BAD_JOBS.find((j) => j.id === character.badJobs.currentJob);
-  character.cooldowns[cooldownKey] = Date.now();
-  if (Math.random() < badJobBustChance()) {
-    allianceForceBad();
-    character.jail.inJail = true;
-    character.jail.crime = job.name;
-    character.jail.yearsRemaining = BAD_JOB_JAIL_YEARS;
-    character.jail.serving = false;
-    return { jailed: true, message: `Busted working for ${job.name}! Sentenced to ${BAD_JOB_JAIL_YEARS} year.`, cls: 'loss' };
-  }
-  const rank = badJobRank();
-  const gain = round2(randFloat(rank.payMin, rank.payMax));
-  character.cash = round2(character.cash + gain);
-  const skillGain = randFloat(JOB_SKILL_TRAIN_MIN, JOB_SKILL_TRAIN_MAX) * badJobSkillTrainMult();
-  character.badJobs.skills[skillKey] = clampStat(character.badJobs.skills[skillKey] + skillGain);
-  allianceDebuff();
-  return { jailed: false, gain, skillGain, jobName: job.name };
-}
-
 function buildBadJobsUI() {
   if (!badJobsContainer) return;
   if (!meetsBadJobAlliance()) {
@@ -406,12 +343,16 @@ function buildBadJobsUI() {
       </div>
     `).join('');
     badJobsContainer.querySelectorAll('[data-apply-bad]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const result = doApplyBadJob(btn.dataset.applyBad);
-        if (!result.ok) { alert(result.reason); return; }
-        logTo(milosLog, result.message, result.cls);
-        save();
-        renderAll();
+      btn.addEventListener('click', async () => {
+        try {
+          const result = await apiApplyBadJob(btn.dataset.applyBad);
+          character = result.character;
+          logTo(milosLog, result.message, result.cls);
+          save();
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
       });
     });
     return;
@@ -451,27 +392,35 @@ function buildBadJobsUI() {
     btn.addEventListener('click', () => {
       const cooldownKey = btn.dataset.cooldown;
       if (getRemainingCooldown(cooldownKey, badJobRank().cooldownMs) > 0) return;
-      attemptMilosAction(() => {
-        const result = doBadJobWork(btn.dataset.workBad, cooldownKey);
-        if (result.jailed) {
+      attemptMilosAction(async () => {
+        try {
+          const result = await apiBadJobWork(btn.dataset.workBad);
+          character = result.character;
           logTo(milosLog, result.message, result.cls);
           save();
-          goToJail(true);
-          return;
+          if (result.jailed) {
+            goToJail(true);
+            return;
+          }
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
         }
-        logTo(milosLog, `${result.jobName}: +$${result.gain.toFixed(2)}.`, 'gain');
-        save();
-        renderAll();
       });
     });
   });
 
-  document.getElementById('btnResignBad').addEventListener('click', () => {
+  document.getElementById('btnResignBad').addEventListener('click', async () => {
     if (!confirm('Resign? You will lose all skill progress at this job.')) return;
-    const result = doResignBadJob();
-    logTo(milosLog, result.message, result.cls);
-    save();
-    renderAll();
+    try {
+      const result = await apiResignBadJob();
+      character = result.character;
+      logTo(milosLog, result.message, result.cls);
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   });
 }
 
@@ -491,30 +440,6 @@ function unlockedDealers() {
 
 function nextLockedDealer() {
   return DEALER_TIERS.find((d) => character.drugDealer.unitsSold < d.unlockUnits) || null;
-}
-
-function doDealerQuickDeal(dealerId) {
-  const dealer = DEALER_TIERS.find((d) => d.id === dealerId);
-  if (!dealer) return { ok: false };
-  character.cooldowns[`dealer_${dealerId}`] = Date.now();
-  if (Math.random() < DEALER_QUICK_SUCCESS_CHANCE) {
-    const gain = round2(randFloat(DEALER_QUICK_MIN, DEALER_QUICK_MAX));
-    character.cash = round2(character.cash + gain);
-    return { ok: true, message: `Quick deal with ${dealer.name}: +$${gain.toFixed(2)}.`, cls: 'gain' };
-  }
-  allianceDebuff();
-  return { ok: true, message: `${dealer.name} stiffed you. No payout.`, cls: 'loss' };
-}
-
-function doBuyFromDealer(dealerId, qty) {
-  const dealer = DEALER_TIERS.find((d) => d.id === dealerId);
-  if (!dealer) return { ok: false };
-  const drug = DRUG_ITEMS_BY_ID[dealer.drugId];
-  const cost = drug.wholesaleCost * qty;
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash = round2(character.cash - cost);
-  addToInventory(drug.id, qty);
-  return { ok: true, message: `Bought ${qty}x ${drug.name} from ${dealer.name} for $${cost.toLocaleString()}.`, cls: 'gain' };
 }
 
 function buildDealerUI() {
@@ -550,11 +475,16 @@ function buildDealerUI() {
     btn.addEventListener('click', () => {
       const dealerId = btn.dataset.dealerQuick;
       if (getRemainingCooldown(`dealer_${dealerId}`, DEALER_QUICK_COOLDOWN_MS) > 0) return;
-      attemptMilosAction(() => {
-        const result = doDealerQuickDeal(dealerId);
-        logTo(milosLog, result.message, result.cls);
-        save();
-        renderAll();
+      attemptMilosAction(async () => {
+        try {
+          const result = await apiDealerQuickDeal(dealerId);
+          character = result.character;
+          logTo(milosLog, result.message, result.cls);
+          save();
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
       });
     });
   });
@@ -562,14 +492,18 @@ function buildDealerUI() {
   dealerContainer.querySelectorAll('[data-dealer-buy]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const dealerId = btn.dataset.dealerBuy;
-      attemptMilosAction(() => {
+      attemptMilosAction(async () => {
         const qtyInput = dealerContainer.querySelector(`[data-dealer-qty="${dealerId}"]`);
         const qty = Math.max(1, Math.floor(+qtyInput.value) || 1);
-        const result = doBuyFromDealer(dealerId, qty);
-        if (!result.ok) { alert(result.reason); return; }
-        logTo(milosLog, result.message, result.cls);
-        save();
-        renderAll();
+        try {
+          const result = await apiBuyFromDealer(dealerId, qty);
+          character = result.character;
+          logTo(milosLog, result.message, result.cls);
+          save();
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
       });
     });
   });
@@ -597,28 +531,6 @@ function buildDrugSellSelect() {
 
 drugSellSelect.addEventListener('change', renderMilos);
 
-function doSellDrugs(drugId, qty) {
-  const drug = DRUG_ITEMS_BY_ID[drugId];
-  if (!drug) return { ok: false };
-  const riskChance = Math.min(0.9, drug.riskBase + (qty - 1) * drug.riskPerUnit);
-  if (Math.random() < riskChance) {
-    const years = Math.max(1, Math.round(drug.jailYearsPerUnit * qty));
-    removeFromInventory(drugId, qty);
-    allianceForceBad();
-    character.jail.inJail = true;
-    character.jail.crime = `Selling ${drug.name}`;
-    character.jail.yearsRemaining = years;
-    character.jail.serving = false;
-    return { ok: true, jailed: true, message: `Busted selling ${qty}x ${drug.name}! Sentenced to ${years} year(s).`, cls: 'loss' };
-  }
-  const unitPrice = randFloat(drug.sellMin, drug.sellMax);
-  const total = round2(unitPrice * qty);
-  character.cash = round2(character.cash + total);
-  removeFromInventory(drugId, qty);
-  character.drugDealer.unitsSold += qty;
-  return { ok: true, jailed: false, message: `Sold ${qty}x ${drug.name} for $${total.toFixed(2)}.`, cls: 'gain' };
-}
-
 btnSellDrugs.addEventListener('click', () => {
   if (character.alliance < GUZMAN_MIN_ALLIANCE) return;
   const drugId = drugSellSelect.value;
@@ -627,68 +539,47 @@ btnSellDrugs.addEventListener('click', () => {
   const qty = Math.min(owned, Math.max(1, Math.floor(+drugSellQty.value) || 1));
   if (qty < 1) return;
 
-  attemptMilosAction(() => {
+  attemptMilosAction(async () => {
     const unlockedBefore = unlockedDealers().length;
-    const result = doSellDrugs(drugId, qty);
-    if (!result.ok) return;
-    logTo(milosLog, result.message, result.cls);
-    if (!result.jailed && unlockedDealers().length > unlockedBefore) {
-      const newDealer = unlockedDealers()[unlockedDealers().length - 1];
-      logTo(milosLog, `Word's out on the street &mdash; ${newDealer.name} is willing to talk to you now.`, 'gain');
+    try {
+      const result = await apiSellDrugs(drugId, qty);
+      character = result.character;
+      logTo(milosLog, result.message, result.cls);
+      if (!result.jailed && unlockedDealers().length > unlockedBefore) {
+        const newDealer = unlockedDealers()[unlockedDealers().length - 1];
+        logTo(milosLog, `Word's out on the street &mdash; ${newDealer.name} is willing to talk to you now.`, 'gain');
+      }
+      save();
+      if (result.jailed) {
+        goToJail(true);
+        return;
+      }
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
     }
-    save();
-    if (result.jailed) {
-      goToJail(true);
-      return;
-    }
-    renderAll();
   });
 });
 
 // ---------- Bad Hustles: robbery ----------
-function doRobbery() {
-  character.cooldowns.robbery = Date.now();
-  const speed = character.stats.speed;
-  const looks = character.stats.looks;
-  const findOutChance = Math.max(0.1, Math.min(0.55, 0.55 - (speed / 100) * 0.35 - (looks / 100) * 0.10));
-
-  if (Math.random() >= findOutChance) {
-    const gain = round2(randFloat(ROBBERY_MIN, ROBBERY_MAX));
-    character.cash = round2(character.cash + gain);
-    allianceDebuff();
-    return { jailed: false, message: `Robbed a stranger for $${gain.toFixed(2)} and got away clean.`, cls: 'gain' };
-  }
-
-  const citizen = NPC_TYPES.citizen;
-  const winChance = Math.max(0.15, Math.min(0.85, 0.5 + (character.stats.attack - citizen.attack) * 0.015));
-  if (Math.random() < winChance) {
-    const gain = round2(randFloat(ROBBERY_MIN, ROBBERY_MAX) * 0.5);
-    character.cash = round2(character.cash + gain);
-    allianceDebuff();
-    return { jailed: false, message: `They noticed and fought back! You won the scuffle and got away with $${gain.toFixed(2)}.`, cls: 'gain' };
-  }
-
-  allianceForceBad();
-  character.jail.inJail = true;
-  character.jail.crime = 'Attempted Robbery';
-  character.jail.yearsRemaining = ROBBERY_JAIL_YEARS;
-  character.jail.serving = false;
-  return { jailed: true, message: `They noticed, fought back, and beat you! Sentenced to ${ROBBERY_JAIL_YEARS} year.`, cls: 'loss' };
-}
-
 btnRobbery.addEventListener('click', () => {
   if (character.alliance < GUZMAN_MIN_ALLIANCE) return;
   if (getRemainingCooldown('robbery', ROBBERY_COOLDOWN_MS) > 0) return;
 
-  attemptMilosAction(() => {
-    const result = doRobbery();
-    logTo(milosLog, result.message, result.cls);
-    save();
-    if (result.jailed) {
-      goToJail(true);
-      return;
+  attemptMilosAction(async () => {
+    try {
+      const result = await apiRobbery();
+      character = result.character;
+      logTo(milosLog, result.message, result.cls);
+      save();
+      if (result.jailed) {
+        goToJail(true);
+        return;
+      }
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
     }
-    renderAll();
   });
 });
 
@@ -697,28 +588,6 @@ const crimeContainer = document.getElementById('crimeContainer');
 const crimeLog = document.getElementById('crimeLog');
 const crimeRecordStatus = document.getElementById('crimeRecordStatus');
 const btnCommunityService = document.getElementById('btnCommunityService');
-
-function doAttemptCrime(tierId) {
-  const tier = CRIME_TIERS.find((t) => t.id === tierId);
-  if (!tier) return { ok: false };
-  character.cooldowns[`crime_${tier.id}`] = Date.now();
-  const risk = crimeFailChance(tier);
-  if (Math.random() < risk) {
-    const years = tier.jailYears + crimeStreakYears();
-    bumpCrimeStreak();
-    allianceForceBad();
-    character.jail.inJail = true;
-    character.jail.crime = tier.name;
-    character.jail.yearsRemaining = years;
-    character.jail.serving = false;
-    const streakNote = years > tier.jailYears ? ` (${tier.jailYears} base + ${years - tier.jailYears} repeat-offender)` : '';
-    return { ok: true, jailed: true, message: `Busted committing ${tier.name}! Sentenced to ${years} year(s)${streakNote}.`, cls: 'loss' };
-  }
-  const gain = round2(randFloat(tier.minReward, tier.maxReward));
-  character.cash = round2(character.cash + gain);
-  allianceDebuff();
-  return { ok: true, jailed: false, message: `Pulled off ${tier.name}: +$${gain.toFixed(2)}.`, cls: 'gain' };
-}
 
 function renderCrimeRecordStatus() {
   if (!crimeRecordStatus) return;
@@ -750,16 +619,20 @@ function buildCrimeUI() {
     btn.addEventListener('click', () => {
       const tierId = btn.dataset.crime;
       if (getRemainingCooldown(`crime_${tierId}`, CRIME_COOLDOWN_MS) > 0) return;
-      attemptMilosAction(() => {
-        const result = doAttemptCrime(tierId);
-        if (!result.ok) return;
-        logTo(crimeLog, result.message, result.cls);
-        save();
-        if (result.jailed) {
-          goToJail(true);
-          return;
+      attemptMilosAction(async () => {
+        try {
+          const result = await apiAttemptCrime(tierId);
+          character = result.character;
+          logTo(crimeLog, result.message, result.cls);
+          save();
+          if (result.jailed) {
+            goToJail(true);
+            return;
+          }
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
         }
-        renderAll();
       });
     });
   });
@@ -783,13 +656,17 @@ function tickCrimeUI() {
     : `Community Service ($${cost.toLocaleString()})`;
 }
 
-btnCommunityService.addEventListener('click', () => {
+btnCommunityService.addEventListener('click', async () => {
   if (getRemainingCooldown('communityService', COMMUNITY_SERVICE_COOLDOWN_MS) > 0) return;
-  const result = doCommunityService();
-  if (!result.ok) { alert(result.reason); return; }
-  logTo(crimeLog, result.message, result.cls);
-  save();
-  renderAll();
+  try {
+    const result = await apiCommunityService();
+    character = result.character;
+    logTo(crimeLog, result.message, result.cls);
+    save();
+    renderAll();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
 });
 
 // ---------- Morals Center of NMC ----------
@@ -881,6 +758,8 @@ milosTabBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     milosTabBtns.forEach((b) => b.classList.toggle('active', b === btn));
     Object.entries(milosSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.milos));
+    if (btn.dataset.milos === 'mtn') refreshMtnListings();
+    if (btn.dataset.milos === 'penitentiary') refreshPenitentiaryRecords();
   });
 });
 
@@ -964,37 +843,22 @@ const combatActionBtns = [btnCombatPunch, btnCombatHeavy, btnCombatGuard, btnCom
 const btnFlee = document.getElementById('btnFlee');
 const combatLog = document.getElementById('combatLog');
 
-const HEAVY_STRIKE_MULT = 1.6;
-const HEAVY_STRIKE_MISS_CHANCE = 0.25;
-const WEAPON_ATTACK_MULT = 1.5;
-const WEAPON_ATTACK_JAM_CHANCE = 0.10;
-const GUARD_DAMAGE_REDUCTION = 0.7;
-const GUARD_RIPOSTE_CHANCE = 0.2;
-const COMBAT_STAT_GAIN_CHANCE = 0.4;
-const COMBAT_STAT_GAIN_MIN = 0.1;
-const COMBAT_STAT_GAIN_MAX = 0.3;
-
-let combatState = { active: false, enemyKey: null, enemyHp: 0, enemyMaxHp: 0, playerHp: 0, playerMaxHp: 0, turn: null, guarding: false };
-
-function pickOpponentPool() {
-  if (character.alliance <= COMBAT_GOOD_MAX_ALLIANCE) return ['gangster', 'thug'];
-  if (character.alliance >= GUZMAN_MIN_ALLIANCE) return ['citizen', 'cop'];
-  return ['citizen', 'cop', 'thug', 'gangster'];
-}
-
+// Combat is server-authoritative. `character.combat` (synced from the server on every action)
+// replaces the old local-only combatState.
 function renderCombat() {
   if (!btnFindFight) return;
-  combatIdleEl.classList.toggle('hidden', combatState.active);
-  combatArenaEl.classList.toggle('hidden', !combatState.active);
+  const combat = character.combat;
+  combatIdleEl.classList.toggle('hidden', combat.active);
+  combatArenaEl.classList.toggle('hidden', !combat.active);
 
-  if (combatState.active) {
-    const npc = NPC_TYPES[combatState.enemyKey];
+  if (combat.active) {
+    const npc = NPC_TYPES[combat.enemyKey];
     enemyNameEl.textContent = npc.name;
-    playerHpText.textContent = `${combatState.playerHp}/${combatState.playerMaxHp}`;
-    enemyHpText.textContent = `${combatState.enemyHp}/${combatState.enemyMaxHp}`;
-    playerHpBar.style.width = `${(combatState.playerHp / combatState.playerMaxHp) * 100}%`;
-    enemyHpBar.style.width = `${(combatState.enemyHp / combatState.enemyMaxHp) * 100}%`;
-    const isPlayerTurn = combatState.turn === 'player';
+    playerHpText.textContent = `${combat.playerHp}/${combat.playerMaxHp}`;
+    enemyHpText.textContent = `${combat.enemyHp}/${combat.enemyMaxHp}`;
+    playerHpBar.style.width = `${(combat.playerHp / combat.playerMaxHp) * 100}%`;
+    enemyHpBar.style.width = `${(combat.enemyHp / combat.enemyMaxHp) * 100}%`;
+    const isPlayerTurn = combat.turn === 'player';
     btnCombatPunch.disabled = !isPlayerTurn;
     btnCombatHeavy.disabled = !isPlayerTurn;
     btnCombatGuard.disabled = !isPlayerTurn;
@@ -1002,19 +866,10 @@ function renderCombat() {
   }
 
   const remaining = getRemainingCooldown('combat', COMBAT_COOLDOWN_MS);
-  btnFindFight.disabled = combatState.active || character.jail.inJail || remaining > 0;
-  btnFindFight.textContent = !combatState.active && remaining > 0
+  btnFindFight.disabled = combat.active || character.jail.inJail || remaining > 0;
+  btnFindFight.textContent = !combat.active && remaining > 0
     ? `🥊 Find a Fight (${Math.ceil(remaining / 1000)}s)`
     : '🥊 Find a Fight';
-}
-
-// Height gives a reach/frame advantage in a fight: extra max HP and a small attack bonus.
-function heightHpBonus() {
-  return Math.round(Math.max(0, character.height - 65) * 0.4);
-}
-
-function heightAtkBonus() {
-  return Math.round(Math.max(0, character.height - 65) * 0.05 * 10) / 10;
 }
 
 // Equipped guns and melee weapons add flat Attack in a fight; melee is the cost-effective option.
@@ -1035,91 +890,24 @@ function gearStatBonus(stat) {
   }, 0);
 }
 
-// Bare-handed Attack, before any weapon assist -- shared by every player action below.
-function baseCombatAttack() {
-  return character.stats.attack + heightAtkBonus() + gearStatBonus('attack');
-}
-
-function combatDefense() {
-  return character.stats.defense + gearStatBonus('defense');
-}
-
-// Speed gives a chance to dodge an enemy attack outright.
-function speedDodgeChance() {
-  const effectiveSpeed = character.stats.speed + gearStatBonus('speed');
-  return Math.min(0.45, (effectiveSpeed / 100) * 0.35);
-}
-
-function doStartFight() {
-  const pool = pickOpponentPool();
-  const key = pool[randInt(0, pool.length - 1)];
-  const npc = NPC_TYPES[key];
-  const maxHp = character.stats.health + heightHpBonus() + gearStatBonus('health');
-  combatState = {
-    active: true,
-    enemyKey: key,
-    enemyHp: npc.hp,
-    enemyMaxHp: npc.hp,
-    playerHp: maxHp,
-    playerMaxHp: maxHp,
-    turn: 'player',
-    guarding: false,
-  };
-  return { npc };
-}
-
 btnFindFight.addEventListener('click', () => {
-  if (combatState.active || character.jail.inJail) return;
+  if (character.combat.active || character.jail.inJail) return;
   if (getRemainingCooldown('combat', COMBAT_COOLDOWN_MS) > 0) return;
 
-  attemptMilosAction(() => {
-    const { npc } = doStartFight();
-    logTo(combatLog, `A ${npc.name} steps out of the shadows.`, '');
-    renderCombat();
+  attemptMilosAction(async () => {
+    try {
+      const result = await apiStartFight();
+      character = result.character;
+      logTo(combatLog, result.message, result.cls);
+      save();
+      renderCombat();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   });
 });
 
-// Every player action returns the same shape: { action, npc, dmg, missed, riposted, enemyDefeated }.
-function doPlayerAction(action) {
-  const npc = NPC_TYPES[combatState.enemyKey];
-  const base = baseCombatAttack();
-  const weaponBonus = equippedWeaponAtkBonus();
-
-  if (action === 'guard') {
-    combatState.guarding = true;
-    if (Math.random() < GUARD_RIPOSTE_CHANCE) {
-      const dmg = Math.max(1, Math.round(base * 0.5 - npc.defense * 0.4 + randInt(-2, 2)));
-      combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
-      return { action, npc, dmg, missed: false, riposted: true, enemyDefeated: combatState.enemyHp <= 0 };
-    }
-    return { action, npc, dmg: 0, missed: false, riposted: false, enemyDefeated: false };
-  }
-
-  if (action === 'heavy') {
-    if (Math.random() < HEAVY_STRIKE_MISS_CHANCE) {
-      return { action, npc, dmg: 0, missed: true, riposted: false, enemyDefeated: false };
-    }
-    const dmg = Math.max(1, Math.round(base * HEAVY_STRIKE_MULT + weaponBonus * 0.5 - npc.defense * 0.4 + randInt(-3, 3)));
-    combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
-    return { action, npc, dmg, missed: false, riposted: false, enemyDefeated: combatState.enemyHp <= 0 };
-  }
-
-  if (action === 'weapon') {
-    if (weaponBonus <= 0) return { action, npc, dmg: 0, missed: true, riposted: false, enemyDefeated: false };
-    if (Math.random() < WEAPON_ATTACK_JAM_CHANCE) {
-      return { action, npc, dmg: 0, missed: true, riposted: false, jammed: true, enemyDefeated: false };
-    }
-    const dmg = Math.max(1, Math.round(base + weaponBonus * WEAPON_ATTACK_MULT - npc.defense * 0.4 + randInt(-3, 3)));
-    combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
-    return { action, npc, dmg, missed: false, riposted: false, enemyDefeated: combatState.enemyHp <= 0 };
-  }
-
-  // punch: reliable, no miss chance, modest weapon assist
-  const dmg = Math.max(1, Math.round(base + weaponBonus * 0.5 - npc.defense * 0.4 + randInt(-3, 3)));
-  combatState.enemyHp = Math.max(0, combatState.enemyHp - dmg);
-  return { action, npc, dmg, missed: false, riposted: false, enemyDefeated: combatState.enemyHp <= 0 };
-}
-
+// Formats the player-action half of a /combat/action response into a log line.
 function combatActionLogMessage(result) {
   const name = result.npc.name;
   if (result.action === 'guard') {
@@ -1137,118 +925,66 @@ function combatActionLogMessage(result) {
   return `You punch the ${name} for ${result.dmg}.`;
 }
 
-function handleCombatAction(action) {
-  if (!combatState.active || combatState.turn !== 'player') return;
-  const result = doPlayerAction(action);
-  logTo(combatLog, combatActionLogMessage(result), result.missed ? 'loss' : 'gain');
+// Formats the enemy-action half of a /combat/action response into a log line.
+function enemyActionLogMessage(result) {
+  if (result.dodged) return `You dodge the ${result.npc.name}'s attack!`;
+  if (result.guarded) return `Your guard soaks most of it -- the ${result.npc.name} only hits you for ${result.dmg}.`;
+  return `The ${result.npc.name} hits you for ${result.dmg}.`;
+}
 
-  if (result.enemyDefeated) {
-    winCombat(result.npc);
-    return;
+const COMBAT_STAT_LABELS = { attack: 'Attack', health: 'HP' };
+
+async function handleCombatAction(action) {
+  if (!character.combat.active || character.combat.turn !== 'player') return;
+  try {
+    const result = await apiCombatAction(action);
+    character = result.character;
+    logTo(combatLog, combatActionLogMessage(result.playerResult), result.playerResult.missed ? 'loss' : 'gain');
+
+    if (result.resolved === 'won') {
+      const npc = result.playerResult.npc;
+      logTo(combatLog, `You knocked out the ${npc.name}! +${result.winResult.reward} Floydbucks.`, 'gain');
+      if (result.winResult.statGain) {
+        logTo(combatLog, `Combat experience: +${result.winResult.statGain.amount.toFixed(2)} ${COMBAT_STAT_LABELS[result.winResult.statGain.stat]}.`, 'gain');
+      }
+      save();
+      renderAll();
+      renderCombat();
+      return;
+    }
+
+    logTo(combatLog, enemyActionLogMessage(result.enemyResult), result.enemyResult.dodged || result.enemyResult.guarded ? 'gain' : 'loss');
+
+    if (result.resolved === 'lost') {
+      logTo(combatLog, `The ${result.enemyResult.npc.name} beat you down and took ${result.loseResult.lost} Floydbucks.`, 'loss');
+      save();
+      renderAll();
+      renderCombat();
+      return;
+    }
+
+    save();
+    renderCombat();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
   }
-  combatState.turn = 'enemy';
-  renderCombat();
-  setTimeout(enemyTurn, 600);
 }
 
 combatActionBtns.forEach((btn) => {
   btn.addEventListener('click', () => handleCombatAction(btn.dataset.combatAction));
 });
 
-function doEnemyAttack() {
-  const npc = NPC_TYPES[combatState.enemyKey];
-  const wasGuarding = combatState.guarding;
-  combatState.guarding = false;
-
-  if (Math.random() < speedDodgeChance()) {
-    return { dmg: 0, npc, dodged: true, guarded: false, playerDefeated: false };
+btnFlee.addEventListener('click', async () => {
+  if (!character.combat.active) return;
+  try {
+    const result = await apiFlee();
+    character = result.character;
+    logTo(combatLog, 'You fled the fight.', '');
+    save();
+    renderCombat();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
   }
-  let dmg = Math.max(1, Math.round(npc.attack - combatDefense() * 0.4 + randInt(-3, 3)));
-  if (wasGuarding) dmg = Math.max(0, Math.round(dmg * (1 - GUARD_DAMAGE_REDUCTION)));
-  combatState.playerHp = Math.max(0, combatState.playerHp - dmg);
-  return { dmg, npc, dodged: false, guarded: wasGuarding, playerDefeated: combatState.playerHp <= 0 };
-}
-
-function enemyTurn() {
-  if (!combatState.active) return;
-  const result = doEnemyAttack();
-  if (result.dodged) {
-    logTo(combatLog, `You dodge the ${result.npc.name}'s attack!`, 'gain');
-  } else if (result.guarded) {
-    logTo(combatLog, `Your guard soaks most of it -- the ${result.npc.name} only hits you for ${result.dmg}.`, 'gain');
-  } else {
-    logTo(combatLog, `The ${result.npc.name} hits you for ${result.dmg}.`, 'loss');
-  }
-
-  if (result.playerDefeated) {
-    loseCombat(result.npc);
-    return;
-  }
-  combatState.turn = 'player';
-  renderCombat();
-}
-
-const COMBAT_STAT_LABELS = { attack: 'Attack', health: 'HP' };
-
-function doWinCombat(npc) {
-  const reward = randInt(npc.minReward, npc.maxReward) * (isRiotActive() ? 2 : 1);
-  character.cash += reward;
-  const wasGoodFight = combatState.enemyKey === 'gangster' || combatState.enemyKey === 'thug';
-  if (wasGoodFight) allianceBuff(); else allianceDebuff();
-  combatState.active = false;
-  combatState.turn = null;
-  character.cooldowns.combat = Date.now();
-
-  let statGain = null;
-  if (Math.random() < COMBAT_STAT_GAIN_CHANCE) {
-    const stat = Math.random() < 0.5 ? 'attack' : 'health';
-    const amount = round2(randFloat(COMBAT_STAT_GAIN_MIN, COMBAT_STAT_GAIN_MAX));
-    character.stats[stat] = clampStat(character.stats[stat] + amount);
-    statGain = { stat, amount };
-  }
-  return { reward, statGain };
-}
-
-function winCombat(npc) {
-  const result = doWinCombat(npc);
-  logTo(combatLog, `You knocked out the ${npc.name}! +${result.reward} Floydbucks${isRiotActive() ? ' (Riotlandia bonus)' : ''}.`, 'gain');
-  if (result.statGain) {
-    logTo(combatLog, `Combat experience: +${result.statGain.amount.toFixed(2)} ${COMBAT_STAT_LABELS[result.statGain.stat]}.`, 'gain');
-  }
-  save();
-  renderAll();
-  renderCombat();
-}
-
-function doLoseCombat() {
-  const toughness = Math.min(0.5, character.stats.health / 200); // high HP means you protect more of your cash
-  const lost = Math.min(character.cash, Math.round(randInt(10, 40) * (1 - toughness)));
-  character.cash -= lost;
-  combatState.active = false;
-  combatState.turn = null;
-  character.cooldowns.combat = Date.now();
-  return { lost };
-}
-
-function loseCombat(npc) {
-  const result = doLoseCombat();
-  logTo(combatLog, `The ${npc.name} beat you down and took ${result.lost} Floydbucks.`, 'loss');
-  save();
-  renderAll();
-  renderCombat();
-}
-
-function doFlee() {
-  combatState.active = false;
-  combatState.turn = null;
-  character.cooldowns.combat = Date.now();
-}
-
-btnFlee.addEventListener('click', () => {
-  if (!combatState.active) return;
-  doFlee();
-  logTo(combatLog, 'You fled the fight.', '');
-  renderCombat();
 });
 
 btnChatSend.addEventListener('click', sendChatMessage);
@@ -1344,7 +1080,7 @@ function doIllegalGearCheck() {
   character.jail.crime = 'Illegal Firearm Possession';
   character.jail.yearsRemaining = JAIL_YEARS_WEAPON;
   character.jail.serving = false;
-  combatState.active = false;
+  character.combat.active = false;
   return { caught: true, message: `Caught illegally armed! Forfeited: ${forfeited.join(', ')}. Sentenced to ${JAIL_YEARS_WEAPON} years.`, cls: 'loss' };
 }
 
@@ -1385,60 +1121,51 @@ function renderCityHall() {
     : 'Required for a Concealed Carry Permit. 10 questions, 70% to pass.';
 }
 
-function doCityHallRename(first, last) {
-  if (!first || !last) return { ok: false, reason: 'Enter both a first and last name.' };
-  if (first.length > 10 || last.length > 10) return { ok: false, reason: 'Names must be 10 characters or fewer.' };
-  if (character.cash < RENAME_COST) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= RENAME_COST;
-  character.firstName = first;
-  character.lastName = last;
-  return { ok: true, message: `Name legally changed to ${first} ${last}.`, cls: 'gain' };
-}
-
 btnCityHallRename.addEventListener('click', () => {
-  attemptMilosAction(() => {
-    const result = doCityHallRename(cityHallFirstNameInput.value.trim(), cityHallLastNameInput.value.trim());
-    if (!result.ok) { alert(result.reason); return; }
-    logTo(cityHallLog, result.message, result.cls);
-    cityHallFirstNameInput.value = '';
-    cityHallLastNameInput.value = '';
-    save();
-    renderAll();
+  attemptMilosAction(async () => {
+    try {
+      const result = await apiCityHallRename(cityHallFirstNameInput.value.trim(), cityHallLastNameInput.value.trim());
+      character = result.character;
+      logTo(cityHallLog, result.message, result.cls);
+      cityHallFirstNameInput.value = '';
+      cityHallLastNameInput.value = '';
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   }, cityHallLog);
 });
-
-function doMarriagePropose(name) {
-  if (!name) return { ok: false };
-  character.marriage.proposedTo = name;
-  return { ok: true, message: `Proposal sent to ${name}. They'll see it in their City Hall once multiplayer is live.`, cls: 'gain' };
-}
 
 btnMarriagePropose.addEventListener('click', () => {
-  attemptMilosAction(() => {
-    const result = doMarriagePropose(marriageProposeInput.value.trim());
-    if (!result.ok) return;
-    logTo(cityHallLog, result.message, result.cls);
-    marriageProposeInput.value = '';
-    save();
-    renderAll();
+  attemptMilosAction(async () => {
+    const name = marriageProposeInput.value.trim();
+    if (!name) return;
+    try {
+      const result = await apiMarriagePropose(name);
+      character = result.character;
+      logTo(cityHallLog, result.message, result.cls);
+      marriageProposeInput.value = '';
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   }, cityHallLog);
 });
-
-function doGunSafetyResult(passed) {
-  if (passed) {
-    character.licenses.gunSafety = true;
-    return { message: 'Gun Safety Course passed! License granted.', cls: 'gain' };
-  }
-  return { message: 'Gun Safety Course failed. You can try again anytime.', cls: 'loss' };
-}
 
 btnStartGunSafety.addEventListener('click', () => {
   attemptMilosAction(() => {
-    openQuiz('Gun Safety Course', GUN_SAFETY_QUESTIONS, 0.7, (passed) => {
-      const result = doGunSafetyResult(passed);
-      logTo(cityHallLog, result.message, result.cls);
-      save();
-      renderAll();
+    openQuiz('Gun Safety Course', GUN_SAFETY_QUESTIONS, 0.7, async (passed) => {
+      try {
+        const result = await apiGunSafetyResult(passed);
+        character = result.character;
+        logTo(cityHallLog, result.message, result.cls);
+        save();
+        renderAll();
+      } catch (err) {
+        if (err.reason) alert(err.reason);
+      }
     });
   }, cityHallLog);
 });
@@ -1475,13 +1202,16 @@ function buildGunClubGrids() {
   [...pistolGrid.querySelectorAll('button[data-gun]'), ...rifleGrid.querySelectorAll('button[data-gun]')].forEach((btn) => {
     btn.addEventListener('click', () => {
       if (!character.licenses.gunSafety) return;
-      const item = GUN_ITEMS_BY_ID[btn.dataset.gun];
-      attemptMilosAction(() => {
-        const result = doBuyGun(item.id);
-        if (!result.ok) { alert(result.reason); return; }
-        logTo(gunClubLog, result.message, result.cls);
-        save();
-        renderAll();
+      attemptMilosAction(async () => {
+        try {
+          const result = await apiBuyGun(btn.dataset.gun);
+          character = result.character;
+          logTo(gunClubLog, result.message, result.cls);
+          save();
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
       }, gunClubLog);
     });
   });
@@ -1499,16 +1229,6 @@ function gunPriceFactor() {
   return isRiotActive() ? 0 : fenceDiscountFactor();
 }
 
-function doBuyGun(itemId) {
-  const item = GUN_ITEMS_BY_ID[itemId];
-  if (!item) return { ok: false };
-  const cost = round2(item.cost * gunPriceFactor());
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= cost;
-  addToInventory(item.id, 1);
-  return { ok: true, message: `Purchased a ${item.name} for $${cost.toFixed(2)}. It's in your Inventory &mdash; equip it to carry it.`, cls: 'gain' };
-}
-
 const meleeGrid = document.getElementById('meleeGrid');
 
 function buildMeleeGrid() {
@@ -1523,24 +1243,18 @@ function buildMeleeGrid() {
   `).join('');
 
   meleeGrid.querySelectorAll('button[data-melee]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const result = doBuyMelee(btn.dataset.melee);
-      if (!result.ok) { alert(result.reason); return; }
-      logTo(gunClubLog, result.message, result.cls);
-      save();
-      renderAll();
+    btn.addEventListener('click', async () => {
+      try {
+        const result = await apiBuyMelee(btn.dataset.melee);
+        character = result.character;
+        logTo(gunClubLog, result.message, result.cls);
+        save();
+        renderAll();
+      } catch (err) {
+        if (err.reason) alert(err.reason);
+      }
     });
   });
-}
-
-function doBuyMelee(itemId) {
-  const item = MELEE_ITEMS_BY_ID[itemId];
-  if (!item) return { ok: false };
-  const cost = round2(item.cost * fenceDiscountFactor());
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= cost;
-  addToInventory(item.id, 1);
-  return { ok: true, message: `Purchased a ${item.name} for $${cost.toFixed(2)}. It's in your Inventory &mdash; equip it to carry it.`, cls: 'gain' };
 }
 
 const ammoGrid = document.getElementById('ammoGrid');
@@ -1558,25 +1272,19 @@ function buildAmmoGrid() {
 
   ammoGrid.querySelectorAll('button[data-ammo]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      attemptMilosAction(() => {
-        const result = doBuyAmmo(btn.dataset.ammo);
-        if (!result.ok) { alert(result.reason); return; }
-        logTo(gunClubLog, result.message, result.cls);
-        save();
-        renderAll();
+      attemptMilosAction(async () => {
+        try {
+          const result = await apiBuyAmmo(btn.dataset.ammo);
+          character = result.character;
+          logTo(gunClubLog, result.message, result.cls);
+          save();
+          renderAll();
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
       }, gunClubLog);
     });
   });
-}
-
-function doBuyAmmo(itemId) {
-  const item = AMMO_ITEMS_BY_ID[itemId];
-  if (!item) return { ok: false };
-  const cost = round2(item.cost * gunPriceFactor());
-  if (character.cash < cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= cost;
-  addToInventory(item.id, 1);
-  return { ok: true, message: `Purchased a ${item.name} for $${cost.toFixed(2)}.`, cls: 'gain' };
 }
 
 function renderGunClub() {
@@ -1594,23 +1302,17 @@ function renderGunClub() {
   }
 }
 
-function doApplyConcealedPermit() {
-  if (!character.licenses.gunSafety) return { ok: false, reason: 'Take the Gun Safety Course at City Hall first.' };
-  if (character.licenses.concealedPermit) return { ok: false };
-  if (character.licenses.concealedPendingUntil > Date.now()) return { ok: false };
-  if (character.cash < CONCEALED_APPLY_COST) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= CONCEALED_APPLY_COST;
-  character.licenses.concealedPendingUntil = Date.now() + CONCEALED_WAIT_MS;
-  return { ok: true, message: `Applied for a Concealed Carry Permit for $${CONCEALED_APPLY_COST.toLocaleString()}. Approval in 10 minutes.`, cls: 'gain' };
-}
-
 btnConcealedFreeWait.addEventListener('click', () => {
-  attemptMilosAction(() => {
-    const result = doApplyConcealedPermit();
-    if (!result.ok) { if (result.reason) alert(result.reason); return; }
-    logTo(gunClubLog, result.message, result.cls);
-    save();
-    renderAll();
+  attemptMilosAction(async () => {
+    try {
+      const result = await apiApplyConcealedPermit();
+      character = result.character;
+      logTo(gunClubLog, result.message, result.cls);
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   }, gunClubLog);
 });
 
@@ -1656,58 +1358,54 @@ function renderGunRange() {
   btnRangeReload.textContent = reloadRemaining > 0 ? `Reload Mag (${Math.ceil(reloadRemaining / 1000)}s)` : 'Reload Mag';
 }
 
-function doRangeShoot(weaponId) {
-  const weaponName = getItemDef(weaponId)?.name || 'weapon';
-  const score = Math.round((Math.random() * 0.09 + 0.01) * 100) / 100;
-  character.weaponSkills.shooting = clampStat(character.weaponSkills.shooting + score);
-  character.cooldowns.rangeShoot = Date.now();
-  const flavor = score >= 0.09 ? 'Bullseye!' : score >= 0.05 ? 'Solid hit.' : 'Grazed it.';
-  return { message: `Fired the ${weaponName}: +${score.toFixed(2)} SHOOTING. ${flavor}`, cls: 'gain' };
-}
-
 btnRangeShoot.addEventListener('click', () => {
   if (!rangeWeaponSelect.value) return;
   if (getRemainingCooldown('rangeShoot', RANGE_COOLDOWN_MS) > 0) return;
 
-  attemptMilosAction(() => {
-    const result = doRangeShoot(rangeWeaponSelect.value);
-    logTo(rangeLog, result.message, result.cls);
-    save();
-    renderAll();
+  attemptMilosAction(async () => {
+    try {
+      const result = await apiRangeShoot(rangeWeaponSelect.value);
+      character = result.character;
+      logTo(rangeLog, result.message, result.cls);
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   }, rangeLog);
 });
-
-function doRangeDraw() {
-  character.weaponSkills.draw = clampStat(character.weaponSkills.draw + 0.01);
-  character.cooldowns.rangeDraw = Date.now();
-}
 
 btnRangeDraw.addEventListener('click', () => {
   if (!rangeWeaponSelect.value) return;
   if (getRemainingCooldown('rangeDraw', RANGE_COOLDOWN_MS) > 0) return;
 
-  attemptMilosAction(() => {
-    doRangeDraw();
-    logTo(rangeLog, '+0.01 DRAW.', 'gain');
-    save();
-    renderAll();
+  attemptMilosAction(async () => {
+    try {
+      const result = await apiRangeDraw();
+      character = result.character;
+      logTo(rangeLog, result.message, result.cls);
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   }, rangeLog);
 });
-
-function doRangeReload() {
-  character.weaponSkills.magReload = clampStat(character.weaponSkills.magReload + 0.01);
-  character.cooldowns.rangeReload = Date.now();
-}
 
 btnRangeReload.addEventListener('click', () => {
   if (!rangeWeaponSelect.value) return;
   if (getRemainingCooldown('rangeReload', RANGE_COOLDOWN_MS) > 0) return;
 
-  attemptMilosAction(() => {
-    doRangeReload();
-    logTo(rangeLog, '+0.01 MAG RELOAD.', 'gain');
-    save();
-    renderAll();
+  attemptMilosAction(async () => {
+    try {
+      const result = await apiRangeReload();
+      character = result.character;
+      logTo(rangeLog, result.message, result.cls);
+      save();
+      renderAll();
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
   }, rangeLog);
 });
 

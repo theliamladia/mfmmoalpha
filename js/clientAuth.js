@@ -30,12 +30,24 @@ authTabBtns.forEach((btn) => {
   });
 });
 
+// Accounts registered before a field existed server-side (e.g. blackjack, added when Casino was
+// ported) won't have it in their stored character_json. Patch defaults in on the one chokepoint
+// every character passes through on the way into the game; save() then syncs it back.
+function migrateServerCharacter(c) {
+  if (!c.blackjack) c.blackjack = { phase: 'betting', playerCards: [], dealerCards: [], bet: 0 };
+  if (!c.combat) {
+    c.combat = { active: false, enemyKey: null, enemyHp: 0, enemyMaxHp: 0, playerHp: 0, playerMaxHp: 0, turn: null, guarding: false };
+  }
+  return c;
+}
+
 function enterGameWithCharacter(serverCharacter) {
-  character = serverCharacter;
+  character = migrateServerCharacter(serverCharacter);
   save();
   screenAuth.classList.add('hidden');
   showGame();
   refreshOnlinePlayers();
+  refreshServerState();
 }
 
 btnLogin.addEventListener('click', async () => {

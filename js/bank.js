@@ -110,122 +110,40 @@ function renderBank() {
   }
 }
 
-function doBankDeposit(amount) {
-  const bank = character.bank;
-  const tier = BANK_TIERS[bank.tier];
-  if (amount <= 0) return { ok: false };
-  if (amount > character.cash) return { ok: false, reason: 'Not enough Floydbucks on hand.' };
-  const room = tier.maxBalance - bank.balance;
-  if (room <= 0) return { ok: false, reason: 'Your account is already at its max balance. Upgrade to deposit more.' };
-  const deposited = Math.min(amount, room);
-  character.cash = round2(character.cash - deposited);
-  bank.balance = round2(bank.balance + deposited);
-  return { ok: true, message: `Deposited $${deposited.toFixed(2)}.`, cls: 'gain' };
+// Bank actions are server-authoritative -- same request/response shape as the hustles/gym/market.
+async function runBankAction(apiFn, onSuccess) {
+  try {
+    const result = await apiFn();
+    character = result.character;
+    (result.messages || [{ message: result.message, cls: result.cls }]).forEach((e) => logTo(bankLog, e.message, e.cls));
+    if (onSuccess) onSuccess();
+    save();
+    renderAll();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
 }
 
 btnBankDeposit.addEventListener('click', () => {
   const amount = Math.max(0, +bankDepositAmount.value || 0);
-  const result = doBankDeposit(amount);
-  if (!result.ok) { if (result.reason) alert(result.reason); return; }
-  logTo(bankLog, result.message, result.cls);
-  bankDepositAmount.value = '';
-  save();
-  renderAll();
+  runBankAction(() => apiBankDeposit(amount), () => { bankDepositAmount.value = ''; });
 });
-
-function doBankWithdraw(amount) {
-  const bank = character.bank;
-  if (amount <= 0) return { ok: false };
-  if (amount > bank.balance) return { ok: false, reason: 'Not enough in your bank balance.' };
-  bank.balance = round2(bank.balance - amount);
-  character.cash = round2(character.cash + amount);
-  return { ok: true, message: `Withdrew $${amount.toFixed(2)}.`, cls: 'gain' };
-}
 
 btnBankWithdraw.addEventListener('click', () => {
   const amount = Math.max(0, +bankDepositAmount.value || 0);
-  const result = doBankWithdraw(amount);
-  if (!result.ok) { if (result.reason) alert(result.reason); return; }
-  logTo(bankLog, result.message, result.cls);
-  bankDepositAmount.value = '';
-  save();
-  renderAll();
+  runBankAction(() => apiBankWithdraw(amount), () => { bankDepositAmount.value = ''; });
 });
 
-function doBankUpgrade() {
-  const bank = character.bank;
-  const nextTier = BANK_TIERS[bank.tier + 1];
-  if (!nextTier) return { ok: false };
-  if (character.cash < nextTier.upgradeCost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash = round2(character.cash - nextTier.upgradeCost);
-  bank.tier += 1;
-  const entries = [{ message: `Upgraded to ${nextTier.name}!`, cls: 'gain' }];
-  if (nextTier === BANK_TIERS[BANK_TIERS.length - 1]) {
-    addToInventory(CAESAR_TI_TITLE.id, 1);
-    entries.push({ message: `${CAESAR_TI_TITLE.name} title added to your Inventory.`, cls: 'gain' });
-  }
-  return { ok: true, entries };
-}
+btnBankUpgrade.addEventListener('click', () => runBankAction(apiBankUpgrade));
 
-btnBankUpgrade.addEventListener('click', () => {
-  const result = doBankUpgrade();
-  if (!result.ok) { if (result.reason) alert(result.reason); return; }
-  result.entries.forEach((e) => logTo(bankLog, e.message, e.cls));
-  save();
-  renderAll();
-});
-
-function doBankApplyCredit() {
-  const bank = character.bank;
-  if (bank.balance <= 0) return { ok: false, reason: 'You need a bank balance to qualify for a credit card.' };
-  bank.hasCreditCard = true;
-  return { ok: true, message: `Credit card approved with a $${bankCreditLimit().toLocaleString()} limit.`, cls: 'gain' };
-}
-
-btnBankApplyCredit.addEventListener('click', () => {
-  const result = doBankApplyCredit();
-  if (!result.ok) { if (result.reason) alert(result.reason); return; }
-  logTo(bankLog, result.message, result.cls);
-  save();
-  renderAll();
-});
-
-function doBankCashAdvance(amount) {
-  const bank = character.bank;
-  const available = bankCreditLimit() - bank.creditBalance;
-  const clamped = Math.max(0, Math.min(available, amount));
-  if (clamped <= 0) return { ok: false };
-  bank.creditBalance = round2(bank.creditBalance + clamped);
-  character.cash = round2(character.cash + clamped);
-  return { ok: true, message: `Cash advance: +$${clamped.toFixed(2)}. Owed $${bank.creditBalance.toFixed(2)}.`, cls: 'gain' };
-}
+btnBankApplyCredit.addEventListener('click', () => runBankAction(apiBankApplyCredit));
 
 btnBankCashAdvance.addEventListener('click', () => {
   const amount = Math.max(0, +bankAdvanceAmount.value || 0);
-  const result = doBankCashAdvance(amount);
-  if (!result.ok) { if (result.reason) alert(result.reason); return; }
-  logTo(bankLog, result.message, result.cls);
-  bankAdvanceAmount.value = '';
-  save();
-  renderAll();
+  runBankAction(() => apiBankCashAdvance(amount), () => { bankAdvanceAmount.value = ''; });
 });
 
-function doBankPayCredit() {
-  const bank = character.bank;
-  const amount = Math.min(bank.creditBalance, character.cash);
-  if (amount <= 0) return { ok: false, reason: 'Not enough Floydbucks on hand.' };
-  character.cash = round2(character.cash - amount);
-  bank.creditBalance = round2(bank.creditBalance - amount);
-  return { ok: true, message: `Paid off $${amount.toFixed(2)} of your credit card balance.`, cls: 'gain' };
-}
-
-btnBankPayCredit.addEventListener('click', () => {
-  const result = doBankPayCredit();
-  if (!result.ok) { if (result.reason) alert(result.reason); return; }
-  logTo(bankLog, result.message, result.cls);
-  save();
-  renderAll();
-});
+btnBankPayCredit.addEventListener('click', () => runBankAction(apiBankPayCredit));
 
 function renderRankBadge() {
   const display = getDisplayTitle();
