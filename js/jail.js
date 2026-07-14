@@ -226,9 +226,17 @@ function tickJailActivityUI() {
 }
 
 // ---------- reset ----------
-document.getElementById('btnReset').addEventListener('click', () => {
+// Resets the character server-side (same account/login, fresh stats/cash/everything) -- wiping
+// localStorage alone no longer does anything, since the server is the actual source of truth.
+document.getElementById('btnReset').addEventListener('click', async () => {
   if (!confirm('This will permanently delete your character. Continue?')) return;
   if (serveInterval) clearInterval(serveInterval);
+  try {
+    await apiResetCharacter();
+  } catch (err) {
+    alert(err.reason || 'Could not reach the server.');
+    return;
+  }
   localStorage.removeItem(STORAGE_KEY);
   location.reload();
 });

@@ -293,6 +293,10 @@ function apiAdminInventory(username, adminPassword) {
   return apiRequest('/admin/inventory', { method: 'POST', body: JSON.stringify({ username, adminPassword }) });
 }
 
+function apiResetCharacter() {
+  return apiRequest('/character/reset', { method: 'POST' });
+}
+
 function apiOnlinePlayers() {
   return apiRequest('/players/online');
 }
