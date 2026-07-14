@@ -297,6 +297,14 @@ function apiResetCharacter() {
   return apiRequest('/character/reset', { method: 'POST' });
 }
 
+function apiChatMessages() {
+  return apiRequest('/chat/messages');
+}
+
+function apiChatSend(titleText, message) {
+  return apiRequest('/chat/send', { method: 'POST', body: JSON.stringify({ titleText, message }) });
+}
+
 function apiOnlinePlayers() {
   return apiRequest('/players/online');
 }

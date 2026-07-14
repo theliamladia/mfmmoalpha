@@ -1916,3 +1916,194 @@ button:disabled {
   color: #f2c94c;
   min-height: 18px;
 }
+
+/* ============================================================
+   Mobile / responsive
+   ============================================================ */
+
+/* Prevents iOS Safari from auto-zooming the page when a text input is
+   focused -- it does this for any focused input under 16px. */
+@media (max-width: 900px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Tablet and below: sidebar becomes a horizontal nav bar instead of a
+   left column, and the two-column New Milos City layout stacks. */
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 14px 14px 10px;
+    border-right: none;
+    border-bottom: 1px solid #35373f;
+    gap: 6px;
+  }
+
+  .sidebar-stats {
+    flex: 1 0 100%;
+    padding: 0 0 14px;
+    margin-bottom: 10px;
+  }
+
+  .nav-btn {
+    flex: 0 0 auto;
+    border-radius: 20px;
+    padding: 9px 14px;
+    border-left: none !important;
+  }
+
+  .nav-btn.active {
+    background: #2f323c;
+  }
+
+  #content {
+    padding: 20px 16px;
+  }
+
+  .topbar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  #charName {
+    font-size: 19px;
+  }
+
+  .milos-columns {
+    flex-direction: column;
+  }
+
+  .milos-side {
+    width: 100%;
+  }
+
+  .milos-players-panel #playerListEl {
+    max-height: none;
+  }
+
+  .milos-chat-row .chat-messages {
+    max-height: 220px;
+    min-height: 160px;
+  }
+
+  .combat-row {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .combatant {
+    width: auto;
+    flex: 1 1 200px;
+    min-width: 0;
+  }
+
+  .job-skill-row {
+    flex-wrap: wrap;
+  }
+
+  .job-skill-row span {
+    white-space: normal;
+  }
+
+  .job-skill-row button {
+    flex: 1 1 100%;
+  }
+
+  .modal-box {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .admin-box {
+    width: 100%;
+  }
+
+  .admin-row {
+    flex-wrap: wrap;
+  }
+
+  .arrest-record-row {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+}
+
+/* Phone: tighten everything further and drop to single-column cards. */
+@media (max-width: 520px) {
+  #content {
+    padding: 16px 12px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .hustle-grid {
+    gap: 12px;
+  }
+
+  .hustle-card {
+    width: 100%;
+  }
+
+  .equipment-board {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(5, 74px);
+    gap: 8px;
+    padding: 18px 8px;
+  }
+
+  .equip-slot.equip-slot-opencarry {
+    width: 100%;
+  }
+
+  .feature-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .feature-banner-actions {
+    flex-direction: column;
+  }
+
+  .log,
+  .status-box {
+    max-width: 100%;
+  }
+
+  .stat-grid {
+    font-size: 12px;
+  }
+
+  .modal-box {
+    padding: 20px 18px;
+    width: 100%;
+  }
+
+  .quiz-box {
+    width: 100%;
+  }
+
+  .bj-controls,
+  .combat-controls {
+    flex-wrap: wrap;
+  }
+
+  .slot-reels {
+    justify-content: center;
+  }
+}

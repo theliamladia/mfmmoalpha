@@ -48,6 +48,7 @@ function enterGameWithCharacter(serverCharacter) {
   showGame();
   refreshOnlinePlayers();
   refreshServerState();
+  refreshChatMessages();
 }
 
 btnLogin.addEventListener('click', async () => {

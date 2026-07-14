@@ -987,22 +987,61 @@ btnFlee.addEventListener('click', async () => {
   }
 });
 
+// New Milos City chat is server-backed and shared -- poll for new messages while the game is
+// open, and render each as "[TITLE] Name: message", where TITLE is the same graphic shown in the
+// status bar (equipped title, or your rank as a fallback).
+let chatMessagesCache = [];
+let lastRenderedChatId = null;
+
+function currentDisplayTitleText() {
+  const display = getDisplayTitle();
+  return display ? display.name : computeRank();
+}
+
+function renderChatMessages() {
+  const lastId = chatMessagesCache.length ? chatMessagesCache[chatMessagesCache.length - 1].id : null;
+  if (lastId === lastRenderedChatId) return;
+  lastRenderedChatId = lastId;
+
+  chatMessagesEl.innerHTML = '';
+  chatMessagesCache.forEach((msg) => {
+    const p = document.createElement('p');
+    p.textContent = `[${msg.titleText}] ${msg.senderName}: ${msg.message}`;
+    chatMessagesEl.appendChild(p);
+  });
+  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+}
+
+async function refreshChatMessages() {
+  if (!getAuthToken || !getAuthToken()) return;
+  try {
+    chatMessagesCache = (await apiChatMessages()).messages;
+  } catch {
+    // Best-effort -- keep showing the last known messages if the poll fails.
+  }
+  renderChatMessages();
+}
+
+const CHAT_POLL_MS = 4000;
+setInterval(refreshChatMessages, CHAT_POLL_MS);
+
+async function sendChatMessage() {
+  const text = chatInputEl.value.trim();
+  if (!text) return;
+  chatInputEl.value = '';
+  try {
+    const result = await apiChatSend(currentDisplayTitleText(), text);
+    chatMessagesCache = result.messages;
+    renderChatMessages();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
+}
+
 btnChatSend.addEventListener('click', sendChatMessage);
 chatInputEl.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') sendChatMessage();
 });
-
-function sendChatMessage() {
-  const text = chatInputEl.value.trim();
-  if (!text) return;
-  const p = document.createElement('p');
-  const fullName = `${character.firstName} ${character.lastName}`;
-  const label = `${fullName}(You) ${allianceLabel(character.alliance)}, Lv. ${computeLevel()}`;
-  p.textContent = `${label}: ${text}`;
-  chatMessagesEl.appendChild(p);
-  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-  chatInputEl.value = '';
-}
 
 function doSetHideMilosWarning() {
   character.settings.hideMilosWarning = true;
