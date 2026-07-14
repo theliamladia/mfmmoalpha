@@ -405,3 +405,11 @@ function apiTableBjStand(tableId) {
 function apiTableRouletteBet(tableId, bets) {
   return apiRequest('/casino/table/roulette/bet', { method: 'POST', body: JSON.stringify({ tableId, bets }) });
 }
+
+function apiPaymentNotifications() {
+  return apiRequest('/notifications/payments');
+}
+
+function apiMarkPaymentNotificationsSeen() {
+  return apiRequest('/notifications/payments/seen', { method: 'POST' });
+}

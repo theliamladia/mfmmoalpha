@@ -87,6 +87,13 @@
   <div class="topbar">
     <div id="charName"></div>
     <div class="topbar-actions">
+      <div class="notif-bell-wrap">
+        <button id="btnNotifBell" title="Notifications">🔔<span id="notifBellBadge" class="notif-bell-badge hidden"></span></button>
+        <div id="notifDropdown" class="notif-dropdown hidden">
+          <h4>Notifications</h4>
+          <div id="notifList" class="notif-list"><p class="notif-empty">No notifications yet.</p></div>
+        </div>
+      </div>
       <button id="btnAdmin" title="Admin">Admin</button>
       <button id="btnReset" title="Delete character and start over">Reset</button>
     </div>
@@ -844,6 +851,13 @@
         <p>What's changed, most recent first.</p>
 
         <div class="update-entry">
+          <div class="update-entry-header"><h3>🔔 Notifications Bell</h3><span class="update-date">2026-07-14</span></div>
+          <ul>
+            <li>Added a notification bell to the top bar, next to Admin. It shows a red badge whenever you've received a payment from another player, and clicking it opens a dropdown with your recent payment history (who paid you, how much, and when).</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
           <div class="update-entry-header"><h3>🎲 Real Multiplayer: Casino Tables, PvP, and Coinflip</h3><span class="update-date">2026-07-14</span></div>
           <ul>
             <li>Added real multiplayer <b>Blackjack</b> and <b>Roulette</b> tables under Midas Casino &rarr; Tables: up to 5 real players seated together against one shared CPU dealer/wheel, with a rolling 30-second timer before each round starts. Blackjack deals every seated bettor their own hand against the same dealer draw; Roulette supports straight, red/black, even/odd, and high/low bets.</li>
@@ -1100,6 +1114,7 @@
 <script src="js/duels.js"></script>
 <script src="js/coinflip.js"></script>
 <script src="js/casinoTables.js"></script>
+<script src="js/notifications.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/mtn.js"></script>
 <script src="js/penitentiary.js"></script>
