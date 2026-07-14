@@ -266,7 +266,11 @@ const btnTitleChevron = document.getElementById('btnTitleChevron');
 const titleDropdown = document.getElementById('titleDropdown');
 
 function allTitleDefs() {
-  return [PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE, ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES];
+  return [
+    PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE,
+    LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE,
+    ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES,
+  ];
 }
 
 // Titles tracked as inventory stacks: tradeable, "owned" only while at least one copy remains.

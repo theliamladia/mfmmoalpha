@@ -413,3 +413,7 @@ function apiPaymentNotifications() {
 function apiMarkPaymentNotificationsSeen() {
   return apiRequest('/notifications/payments/seen', { method: 'POST' });
 }
+
+function apiLeaderboard() {
+  return apiRequest('/leaderboard');
+}

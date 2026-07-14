@@ -2272,3 +2272,99 @@ button:disabled {
   color: #8a8c96;
   font-size: 11px;
 }
+
+/* ---------- Leaderboard titles ---------- */
+.title-looksmaxxer {
+  background-image: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGIzeDE1c3UwdWlrb2M2NW5lOHFkbjg4Z3FzdXp5bzloamx2ZHU4bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3vR9fGVYld0bRccw/giphy.gif');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #f2c94c;
+}
+
+.title-looksmaxxer .title-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  color: #f2e94c;
+  text-shadow: 0 0 4px #00000080;
+}
+
+.title-networth {
+  background-image: url('https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDVmcXkwbTE0YjkzbDFxNDlibjJjcGNzY3k2NGU3NHl1aXY1aGZ5eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13ln9K5TWkNTLa/giphy.gif');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #2ecc71;
+}
+
+.title-networth .title-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  color: #3fe085;
+  text-shadow: 0 0 4px #00000080;
+}
+
+.title-highestlevel {
+  background-image: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2JlNXhncG8yYWI3cDhxenh4dmxrY3dkN2JsZmplbWZva2d0MWFyeiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7aCXpnE2y0YCCoJa/giphy.gif');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #56ccf2;
+  padding: 4px 10px;
+}
+
+.title-highestlevel .title-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* ---------- Leaderboard page ---------- */
+.leaderboard-refresh-note {
+  color: #8a8c96;
+  font-size: 12px;
+  margin-top: -6px;
+}
+
+.leaderboard-subpage .title-preview {
+  margin: 14px 0;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leaderboard-empty {
+  color: #8a8c96;
+  font-size: 13px;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  background: #262832;
+  border: 1px solid #383a44;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.leaderboard-row-first {
+  border-color: #f2c94c;
+  background: linear-gradient(90deg, #2e2a1a, #262832);
+}
+
+.leaderboard-rank {
+  font-weight: 700;
+  color: #b9bbc4;
+}
+
+.leaderboard-name {
+  color: #e6e7eb;
+  font-weight: 600;
+}
+
+.leaderboard-value {
+  color: #6fcf97;
+  font-weight: 700;
+}

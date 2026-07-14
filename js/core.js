@@ -284,6 +284,13 @@ const CAESAR_TI_TITLE = { id: 'caesarTi', name: 'CAESAR Ti', cssClass: 'title-ca
 
 const ADMIN_TITLE = { id: 'adminTitle', name: 'ADMIN', cssClass: 'title-admin', how: 'Granted by an admin.' };
 
+// Leaderboard titles: server-assigned, one holder at a time per category, rechecked daily. Ids
+// must match LEADERBOARD_TITLES in mfmmoserver/gameLogic.js exactly -- the server grants/revokes
+// these directly onto titles.owned/equipped, same as it does for combat/jail/etc.
+const LOOKSMAXXER_TITLE = { id: 'looksmaxxer', name: 'LOOKSMAXXER', cssClass: 'title-looksmaxxer', how: '#1 on the Looks leaderboard. Lost automatically if someone overtakes you.' };
+const NETWORTH_TITLE = { id: 'highestNetWorth', name: 'HIGHEST NET WORTH', cssClass: 'title-networth', how: '#1 on the Money leaderboard (cash + bank + chips - credit owed). Lost automatically if someone overtakes you.' };
+const HIGHEST_LEVEL_TITLE = { id: 'highestLevel', name: 'HIGHEST LEVEL', cssClass: 'title-highestlevel', how: '#1 on the Level leaderboard. Lost automatically if someone overtakes you.' };
+
 const BETA_SPIN_COST = 5000;
 const BETA_SPIN_TITLES = [
   { id: 'betaSpin2026', name: 'Beta 2026', cssClass: 'title-beta2026', weight: 50, how: 'Won from an OPEN BETA spin in Cosmetixxx (common).' },
@@ -634,6 +641,7 @@ const pageCasino = document.getElementById('page-casino');
 const pageMilos = document.getElementById('page-milos');
 const pageInventory = document.getElementById('page-inventory');
 const pageJail = document.getElementById('page-jail');
+const pageLeaderboard = document.getElementById('page-leaderboard');
 const pageWiki = document.getElementById('page-wiki');
 const pageUpdates = document.getElementById('page-updates');
 
@@ -766,8 +774,11 @@ function switchPage(pageName) {
   pageMilos.classList.toggle('hidden', pageName !== 'milos');
   pageInventory.classList.toggle('hidden', pageName !== 'inventory');
   pageJail.classList.toggle('hidden', pageName !== 'jail');
+  pageLeaderboard.classList.toggle('hidden', pageName !== 'leaderboard');
   pageWiki.classList.toggle('hidden', pageName !== 'wiki');
   pageUpdates.classList.toggle('hidden', pageName !== 'updates');
+
+  if (typeof setLeaderboardTabVisible === 'function') setLeaderboardTabVisible(pageName === 'leaderboard');
 
   if (pageName === 'milos') {
     onMilosPage = true;

@@ -6,7 +6,7 @@
 <title>SpecialUNITS GUI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -126,6 +126,7 @@
       <button class="nav-btn" data-page="milos">🌆 New Milos City</button>
       <button class="nav-btn" data-page="inventory">🎒 Character</button>
       <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">⛓️ Jail</button>
+      <button class="nav-btn" data-page="leaderboard">🏆 Leaderboard</button>
       <button class="nav-btn" data-page="wiki">📖 Wiki</button>
       <button class="nav-btn" data-page="updates">📰 Updates</button>
     </nav>
@@ -811,6 +812,31 @@
         <div id="arrestRecordList" class="wiki-entry-list"></div>
       </div>
 
+      <div id="page-leaderboard" class="page hidden">
+        <h2>🏆 Leaderboard</h2>
+        <p>Top 10 in each category. The #1 spot earns a real title, re-checked once a day &mdash; lose the lead and you lose the title.</p>
+        <p id="leaderboardRefreshNote" class="leaderboard-refresh-note"></p>
+
+        <div class="market-tabs">
+          <button class="leaderboard-tab-btn active" data-leaderboard="looks">💅 Looks</button>
+          <button class="leaderboard-tab-btn" data-leaderboard="networth">💰 Money</button>
+          <button class="leaderboard-tab-btn" data-leaderboard="level">⭐ Level</button>
+        </div>
+
+        <div id="leaderboard-looks" class="leaderboard-subpage">
+          <div class="title-preview"><span class="title-badge title-looksmaxxer"><span class="title-text">LOOKSMAXXER</span></span></div>
+          <div id="leaderboardLooksList" class="leaderboard-list"></div>
+        </div>
+        <div id="leaderboard-networth" class="leaderboard-subpage hidden">
+          <div class="title-preview"><span class="title-badge title-networth"><span class="title-text">HIGHEST NET WORTH</span></span></div>
+          <div id="leaderboardNetworthList" class="leaderboard-list"></div>
+        </div>
+        <div id="leaderboard-level" class="leaderboard-subpage hidden">
+          <div class="title-preview"><span class="title-badge title-highestlevel"><span class="title-text">HIGHEST LEVEL</span></span></div>
+          <div id="leaderboardLevelList" class="leaderboard-list"></div>
+        </div>
+      </div>
+
       <div id="page-wiki" class="page hidden">
         <h2>📖 Wiki</h2>
         <p>A quick rundown of every page and how to use it.</p>
@@ -849,6 +875,13 @@
       <div id="page-updates" class="page hidden">
         <h2>📰 Updates</h2>
         <p>What's changed, most recent first.</p>
+
+        <div class="update-entry">
+          <div class="update-entry-header"><h3>🏆 Leaderboard</h3><span class="update-date">2026-07-14</span></div>
+          <ul>
+            <li>Added a <b>Leaderboard</b> tab with three rankings: Looks, Money (net worth: cash + bank + chips, minus any credit owed), and Level. The #1 player in each category is checked once a day and automatically awarded a real title &mdash; <b>LOOKSMAXXER</b> (Looks), <b>HIGHEST NET WORTH</b> (Money), and <b>HIGHEST LEVEL</b> (Level) &mdash; equipped straight to their profile. Lose the lead and the title is taken back automatically the next time the leaderboard refreshes.</li>
+          </ul>
+        </div>
 
         <div class="update-entry">
           <div class="update-entry-header"><h3>🔔 Notifications Bell</h3><span class="update-date">2026-07-14</span></div>
@@ -1115,6 +1148,7 @@
 <script src="js/coinflip.js"></script>
 <script src="js/casinoTables.js"></script>
 <script src="js/notifications.js"></script>
+<script src="js/leaderboard.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/mtn.js"></script>
 <script src="js/penitentiary.js"></script>
