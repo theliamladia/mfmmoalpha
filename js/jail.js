@@ -194,7 +194,7 @@ function buildJailContrabandGrid() {
   jailContrabandGrid.innerHTML = jailContrabandItems().map((item) => `
     <div class="hustle-card">
       <h3>${item.name}</h3>
-      <p>${item.type === 'drug' ? 'Smuggled product.' : `+${item.atkBonus} Attack in a fight.`}</p>
+      <p>${item.type === 'drug' ? 'Smuggled product, ready to sell the moment you\'re out.' : `+${item.atkBonus} Attack on your next Yard Fight only.`}</p>
       <button data-contraband="${item.id}">Buy ($${jailContrabandCost(item).toFixed(2)})</button>
     </div>
   `).join('');
@@ -223,6 +223,13 @@ function tickJailActivityUI() {
   const fightRemaining = getRemainingCooldown('jailFight', JAIL_FIGHT_COOLDOWN_MS);
   btnJailFight.disabled = fightRemaining > 0;
   btnJailFight.textContent = fightRemaining > 0 ? `Start a Fight (${Math.ceil(fightRemaining / 1000)}s)` : 'Start a Fight';
+
+  const contrabandBonus = character.jail.contrabandAtkBonus || 0;
+  const bonusLine = document.getElementById('jailContrabandBonusLine');
+  if (bonusLine) {
+    bonusLine.classList.toggle('hidden', contrabandBonus <= 0);
+    if (contrabandBonus > 0) bonusLine.innerHTML = `🔪 Smuggled weapon ready: <b>+${contrabandBonus} Attack</b> on your next fight.`;
+  }
 }
 
 // ---------- reset ----------

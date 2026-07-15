@@ -38,6 +38,8 @@ function migrateServerCharacter(c) {
   if (!c.combat) {
     c.combat = { active: false, enemyKey: null, enemyHp: 0, enemyMaxHp: 0, playerHp: 0, playerMaxHp: 0, turn: null, guarding: false };
   }
+  if (!c.maxxPurchased) c.maxxPurchased = [];
+  if (c.jail && c.jail.contrabandAtkBonus === undefined) c.jail.contrabandAtkBonus = 0;
   return c;
 }
 

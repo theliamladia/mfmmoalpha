@@ -124,7 +124,6 @@
       <button class="nav-btn" data-page="market">🏬 Milos Market</button>
       <button class="nav-btn" data-page="casino">🎰 Midas Casino</button>
       <button class="nav-btn" data-page="milos">🌆 New Milos City</button>
-      <button class="nav-btn" data-page="inventory">🎒 Character</button>
       <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">⛓️ Jail</button>
       <button class="nav-btn" data-page="leaderboard">🏆 Leaderboard</button>
       <button class="nav-btn" data-page="wiki">📖 Wiki</button>
@@ -417,6 +416,7 @@
                     <p id="sellDrugsDesc">Sell drugs from your Inventory on the street. Risk and jail time scale with the drug and the amount.</p>
                     <select id="drugSellSelect"></select>
                     <input type="number" id="drugSellQty" min="1" value="1">
+                    <p id="drugSellOddsLine" class="job-payout-line"></p>
                     <button id="btnSellDrugs">Sell</button>
                   </div>
                   <div class="hustle-card">
@@ -681,86 +681,6 @@
         </div>
       </div>
 
-      <div id="page-inventory" class="page hidden">
-        <h2>🎒 Character</h2>
-        <div class="market-tabs">
-          <button class="inv-tab-btn active" data-inv="items">🎒 Inventory</button>
-          <button class="inv-tab-btn" data-inv="equipment">🛡️ Equipment</button>
-          <button class="inv-tab-btn" data-inv="skills">📊 Skills</button>
-          <button class="inv-tab-btn" data-inv="alignment">⚖️ Alignment</button>
-        </div>
-
-        <div id="inv-items" class="inv-subpage">
-          <p>Everything you own. Trade with a player online by typing their username.</p>
-
-          <div class="market-tabs">
-            <button class="invcat-tab-btn active" data-invcat="licenses">📜 Licenses</button>
-            <button class="invcat-tab-btn" data-invcat="items">📦 Items</button>
-            <button class="invcat-tab-btn" data-invcat="cosmetics">🎖️ Cosmetics</button>
-          </div>
-
-          <div id="invcat-licenses" class="invcat-subpage">
-            <div class="hustle-grid" id="licensesGrid"></div>
-          </div>
-          <div id="invcat-items" class="invcat-subpage hidden">
-            <div class="hustle-grid" id="itemsGrid"></div>
-          </div>
-          <div id="invcat-cosmetics" class="invcat-subpage hidden">
-            <div class="hustle-grid" id="cosmeticsGrid"></div>
-          </div>
-
-          <div class="hustle-card trade-card">
-            <h3>🤝 Trade</h3>
-            <select id="tradeItemSelect"></select>
-            <input type="text" id="tradeUsernameInput" placeholder="Player username">
-            <button id="btnTradeSend">Send Trade</button>
-          </div>
-          <div id="inventoryLog" class="log"></div>
-        </div>
-
-        <div id="inv-equipment" class="inv-subpage hidden">
-          <p>Owning a weapon is legal. Equipping it without the right license is what gets you in trouble in New Milos City.</p>
-          <div class="equipment-board">
-            <div class="equip-slot" data-slot="helmet"><span class="equip-slot-label">HELMET</span><span class="equip-slot-item"></span></div>
-            <div class="equip-slot" data-slot="chest"><span class="equip-slot-label">CHEST</span><span class="equip-slot-item"></span></div>
-            <div class="equip-slot" data-slot="pants"><span class="equip-slot-label">PANTS</span><span class="equip-slot-item"></span></div>
-            <div class="equip-slot" data-slot="feet"><span class="equip-slot-label">FEET</span><span class="equip-slot-item"></span></div>
-            <div class="equip-slot" data-slot="holsterL"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
-            <div class="equip-slot" data-slot="holsterR"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
-            <div class="equip-slot equip-slot-opencarry" data-slot="openCarry"><span class="equip-slot-label">OPEN CARRY</span><span class="equip-slot-item"></span></div>
-            <div class="equip-slot" data-slot="melee"><span class="equip-slot-label">MELEE</span><span class="equip-slot-item"></span></div>
-          </div>
-        </div>
-
-        <div id="inv-skills" class="inv-subpage hidden">
-          <p>XP toward every trainable skill in New Milos City.</p>
-          <div id="skillsJobSection"></div>
-          <div id="skillsBadJobSection"></div>
-          <div id="skillsWeaponSection"></div>
-          <div id="skillsDealerSection"></div>
-        </div>
-
-        <div id="inv-alignment" class="inv-subpage hidden">
-          <p>Where you sit on the Good &harr; Bad spectrum, and how far along your MMO journey you are.</p>
-          <div class="hustle-card alignment-card">
-            <h3>⚖️ Alliance</h3>
-            <div class="alignment-bar-outer">
-              <div id="alignmentMarker" class="alignment-marker"></div>
-            </div>
-            <div class="alignment-tier-labels">
-              <span>😇 Holy Good</span><span>🙂 Good</span><span>😐 Neutral</span><span>😈 Bad</span><span>💀 Dirty Bad</span>
-            </div>
-            <p id="alignmentStatusText"></p>
-          </div>
-          <div class="hustle-card alignment-card">
-            <h3>🗺️ MMO Journey</h3>
-            <p id="journeyLevelText"></p>
-            <div class="progress-outer"><div id="journeyStatBar" class="progress-inner"></div></div>
-            <p id="journeyStatText"></p>
-          </div>
-        </div>
-      </div>
-
       <div id="page-jail" class="page hidden">
         <h2>⛓️ Jail</h2>
         <p>You were arrested for <b id="jailCrime">Crime</b>.</p>
@@ -798,12 +718,13 @@
           <div class="hustle-card">
             <h3>🔪 Yard Fight</h3>
             <p>Test yourself against another inmate. Win for a stat boost &mdash; lose and they shake you down for cash.</p>
+            <p id="jailContrabandBonusLine" class="job-payout-line hidden"></p>
             <button id="btnJailFight">Start a Fight</button>
           </div>
         </div>
 
         <h3 class="gunclub-section-title">🕴️ Contraband</h3>
-        <p>Smuggled-in goods cost more than buying them straight, but they're waiting in your Inventory the moment you're out.</p>
+        <p>Melee weapons smuggled in give a one-time Attack boost to your very next Yard Fight (used up after that fight). Drugs are waiting in your Inventory to sell the moment you're out. Smuggled-in goods cost a bit more than buying them straight.</p>
         <div class="hustle-grid" id="jailContrabandGrid"></div>
 
         <div id="jailActivityLog" class="log"></div>
@@ -877,6 +798,18 @@
         <p>What's changed, most recent first.</p>
 
         <div class="update-entry">
+          <div class="update-entry-header"><h3>⚖️ Balance &amp; UI Pass</h3><span class="update-date">2026-07-15</span></div>
+          <ul>
+            <li><b>Character panel is now always visible</b> on the right side of every page except New Milos City (which keeps that space for Players Online) &mdash; no more switching pages to check your Inventory, Equipment, Skills, or Alignment.</li>
+            <li><b>Alignment rebalance:</b> repeat Bad Job and PvP Robbery busts now escalate your sentence the same way Crime already did, instead of resetting every time. In exchange, Good-track players who reach Regional Manager <i>and</i> keep their alliance actually Good (not just Neutral) now earn a permanent 👔 <b>CEO Bonus</b>: +60% Good Hustle pay.</li>
+            <li><b>Luke's Maxxerstore items are now one-time purchases</b> (you don't get a second Jawline Filler) &mdash; closes a loophole where re-buying a cheap item repeatedly could out-value a pricier one for less money.</li>
+            <li><b>Looks training bonus reworked:</b> the training-speed bonus from Looks now starts at 0% at your starting stat instead of handing new characters roughly +38% before they've invested a cent &mdash; same diminishing-returns curve, same cap at 100 Looks, just re-based on actual investment.</li>
+            <li><b>Sell Drugs now shows your odds of getting caught</b> before you commit, same as Crime and Bad Jobs already did.</li>
+            <li><b>Contraband overhaul:</b> smuggling markup lowered from 1.75x to 1.2x, and melee weapons bought as contraband now grant a real one-time Attack bonus on your very next Yard Fight instead of just sitting in your Inventory until release.</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
           <div class="update-entry-header"><h3>🏆 Leaderboard</h3><span class="update-date">2026-07-14</span></div>
           <ul>
             <li>Added a <b>Leaderboard</b> tab with three rankings: Looks, Money (net worth: cash + bank + chips, minus any credit owed), and Level. The #1 player in each category is checked once a day and automatically awarded a real title &mdash; <b>LOOKSMAXXER</b> (Looks), <b>HIGHEST NET WORTH</b> (Money), and <b>HIGHEST LEVEL</b> (Level) &mdash; equipped straight to their profile. Lose the lead and the title is taken back automatically the next time the leaderboard refreshes.</li>
@@ -942,6 +875,86 @@
       </div>
 
     </main>
+
+    <aside id="characterSidePanel">
+      <h2>🎒 Character</h2>
+      <div class="market-tabs">
+        <button class="inv-tab-btn active" data-inv="items">🎒 Inventory</button>
+        <button class="inv-tab-btn" data-inv="equipment">🛡️ Equipment</button>
+        <button class="inv-tab-btn" data-inv="skills">📊 Skills</button>
+        <button class="inv-tab-btn" data-inv="alignment">⚖️ Alignment</button>
+      </div>
+
+      <div id="inv-items" class="inv-subpage">
+        <p>Everything you own. Trade with a player online by typing their username.</p>
+
+        <div class="market-tabs">
+          <button class="invcat-tab-btn active" data-invcat="licenses">📜 Licenses</button>
+          <button class="invcat-tab-btn" data-invcat="items">📦 Items</button>
+          <button class="invcat-tab-btn" data-invcat="cosmetics">🎖️ Cosmetics</button>
+        </div>
+
+        <div id="invcat-licenses" class="invcat-subpage">
+          <div class="hustle-grid" id="licensesGrid"></div>
+        </div>
+        <div id="invcat-items" class="invcat-subpage hidden">
+          <div class="hustle-grid" id="itemsGrid"></div>
+        </div>
+        <div id="invcat-cosmetics" class="invcat-subpage hidden">
+          <div class="hustle-grid" id="cosmeticsGrid"></div>
+        </div>
+
+        <div class="hustle-card trade-card">
+          <h3>🤝 Trade</h3>
+          <select id="tradeItemSelect"></select>
+          <input type="text" id="tradeUsernameInput" placeholder="Player username">
+          <button id="btnTradeSend">Send Trade</button>
+        </div>
+        <div id="inventoryLog" class="log"></div>
+      </div>
+
+      <div id="inv-equipment" class="inv-subpage hidden">
+        <p>Owning a weapon is legal. Equipping it without the right license is what gets you in trouble in New Milos City.</p>
+        <div class="equipment-board">
+          <div class="equip-slot" data-slot="helmet"><span class="equip-slot-label">HELMET</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot" data-slot="chest"><span class="equip-slot-label">CHEST</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot" data-slot="pants"><span class="equip-slot-label">PANTS</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot" data-slot="feet"><span class="equip-slot-label">FEET</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot" data-slot="holsterL"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot" data-slot="holsterR"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot equip-slot-opencarry" data-slot="openCarry"><span class="equip-slot-label">OPEN CARRY</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot" data-slot="melee"><span class="equip-slot-label">MELEE</span><span class="equip-slot-item"></span></div>
+        </div>
+      </div>
+
+      <div id="inv-skills" class="inv-subpage hidden">
+        <p>XP toward every trainable skill in New Milos City.</p>
+        <div id="skillsJobSection"></div>
+        <div id="skillsBadJobSection"></div>
+        <div id="skillsWeaponSection"></div>
+        <div id="skillsDealerSection"></div>
+      </div>
+
+      <div id="inv-alignment" class="inv-subpage hidden">
+        <p>Where you sit on the Good &harr; Bad spectrum, and how far along your MMO journey you are.</p>
+        <div class="hustle-card alignment-card">
+          <h3>⚖️ Alliance</h3>
+          <div class="alignment-bar-outer">
+            <div id="alignmentMarker" class="alignment-marker"></div>
+          </div>
+          <div class="alignment-tier-labels">
+            <span>😇 Holy Good</span><span>🙂 Good</span><span>😐 Neutral</span><span>😈 Bad</span><span>💀 Dirty Bad</span>
+          </div>
+          <p id="alignmentStatusText"></p>
+        </div>
+        <div class="hustle-card alignment-card">
+          <h3>🗺️ MMO Journey</h3>
+          <p id="journeyLevelText"></p>
+          <div class="progress-outer"><div id="journeyStatBar" class="progress-inner"></div></div>
+          <p id="journeyStatText"></p>
+        </div>
+      </div>
+    </aside>
   </div>
 
   <div id="milosWarningModal" class="modal-overlay hidden">

@@ -228,15 +228,20 @@ async function buyFood(itemId) {
 const maxxGrid = document.getElementById('maxxGrid');
 const maxxLog = document.getElementById('maxxLog');
 
+// Each Maxx item is a one-time procedure -- owned once purchased, same "Owned" pattern as the
+// Title Store (js/market.js buildTitleGrid), so re-buying a cheap item can never out-value a
+// pricier one.
 function buildMaxxGrid() {
   maxxGrid.innerHTML = '';
+  const purchased = character.maxxPurchased || [];
   MAXX_ITEMS.forEach((item) => {
+    const owned = purchased.includes(item.id);
     const card = document.createElement('div');
     card.className = 'hustle-card';
     card.innerHTML = `
       <h3>${item.name}</h3>
       <p>${item.desc}</p>
-      <button data-maxx="${item.id}">Buy ($${item.cost})</button>
+      <button data-maxx="${item.id}" ${owned ? 'disabled' : ''}>${owned ? 'Owned' : `Buy ($${item.cost})`}</button>
     `;
     maxxGrid.appendChild(card);
   });

@@ -62,6 +62,12 @@ const COMBAT_GOOD_MAX_ALLIANCE = 39; // Combat: Good alignment (not Neutral) fig
 const JOB_SKILL_TRAIN_MIN = 0.02;
 const JOB_SKILL_TRAIN_MAX = 0.06;
 const LOOKS_TRAIN_BONUS_MAX = 1.2; // high Looks trains job skills up to 2.2x faster (charisma/presence helps you get noticed and promoted)
+// Re-based so the starting Looks stat (10) grants exactly 0% bonus instead of a head start built
+// into everyone's starting stats -- must match mfmmoserver/gameLogic.js's LOOKS_TRAIN_BASE/_K exactly.
+const LOOKS_TRAIN_BASE = 10;
+const LOOKS_TRAIN_K = LOOKS_TRAIN_BONUS_MAX / (1 - Math.sqrt(LOOKS_TRAIN_BASE / 100));
+const GOOD_CEO_MULTIPLIER = 1.6;
+const GOOD_CEO_MIN_AVG = 95;
 
 // Job "promotions": average of the 4 job skills decides your rank. Each promotion is a real raise
 // (its own pay band, floor rising faster than ceiling so income gets steadier, not just bigger) AND
@@ -353,7 +359,7 @@ const JAIL_FIGHT_STAT_GAIN_MAX = 0.3;
 const JAIL_FIGHT_LOSS_MIN = 5;
 const JAIL_FIGHT_LOSS_MAX = 20;
 
-const JAIL_CONTRABAND_MARKUP = 1.75; // smuggled-in prices cost more than buying it straight
+const JAIL_CONTRABAND_MARKUP = 1.2; // smuggled-in prices cost more than buying it straight -- a believable risk premium, not a punitive one
 
 const GUN_SAFETY_QUESTIONS = [
   { q: 'What should you always assume about a firearm?', options: ['It\'s unloaded', 'It\'s loaded', 'It\'s a toy', 'It\'s safe'], correct: 1 },
@@ -639,9 +645,9 @@ const pageStreets = document.getElementById('page-streets');
 const pageMarket = document.getElementById('page-market');
 const pageCasino = document.getElementById('page-casino');
 const pageMilos = document.getElementById('page-milos');
-const pageInventory = document.getElementById('page-inventory');
 const pageJail = document.getElementById('page-jail');
 const pageLeaderboard = document.getElementById('page-leaderboard');
+const characterSidePanel = document.getElementById('characterSidePanel');
 const pageWiki = document.getElementById('page-wiki');
 const pageUpdates = document.getElementById('page-updates');
 
@@ -772,11 +778,14 @@ function switchPage(pageName) {
   pageMarket.classList.toggle('hidden', pageName !== 'market');
   pageCasino.classList.toggle('hidden', pageName !== 'casino');
   pageMilos.classList.toggle('hidden', pageName !== 'milos');
-  pageInventory.classList.toggle('hidden', pageName !== 'inventory');
   pageJail.classList.toggle('hidden', pageName !== 'jail');
   pageLeaderboard.classList.toggle('hidden', pageName !== 'leaderboard');
   pageWiki.classList.toggle('hidden', pageName !== 'wiki');
   pageUpdates.classList.toggle('hidden', pageName !== 'updates');
+
+  // Always visible except on Milos, which already uses that column for Players Online -- showing
+  // both there would cram three columns into the same row.
+  characterSidePanel.classList.toggle('hidden', pageName === 'milos');
 
   if (typeof setLeaderboardTabVisible === 'function') setLeaderboardTabVisible(pageName === 'leaderboard');
 

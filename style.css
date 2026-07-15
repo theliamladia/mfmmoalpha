@@ -769,6 +769,64 @@ button:disabled {
 #content {
   flex: 1;
   padding: 32px 40px;
+  min-width: 0;
+}
+
+/* Persistent Character panel -- always visible (except on Milos, which already uses this column
+   for Players Online) so the empty right-hand space on every other page gets used. Condensed via
+   scoped overrides below rather than restructuring the underlying markup. */
+#characterSidePanel {
+  width: 300px;
+  flex-shrink: 0;
+  align-self: flex-start;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 72px);
+  overflow-y: auto;
+  background: #1e2027;
+  border: 1px solid #35373f;
+  border-radius: 12px;
+  padding: 18px;
+  margin: 20px 24px 20px 0;
+}
+
+#characterSidePanel h2 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+#characterSidePanel .hustle-grid {
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+#characterSidePanel .hustle-card {
+  padding: 12px;
+}
+
+#characterSidePanel .equipment-board {
+  grid-template-columns: repeat(3, 74px);
+  grid-template-rows: repeat(5, 60px);
+  gap: 8px;
+  padding: 16px 0;
+}
+
+#characterSidePanel .equip-slot-opencarry {
+  width: 172px;
+}
+
+#characterSidePanel .equip-slot-label {
+  font-size: 8px;
+}
+
+#characterSidePanel .equip-slot-item {
+  font-size: 10px;
+}
+
+#characterSidePanel .market-tabs {
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .page h2 {
@@ -1989,6 +2047,18 @@ button:disabled {
 
   .milos-side {
     width: 100%;
+  }
+
+  #characterSidePanel {
+    width: 100%;
+    position: static;
+    max-height: none;
+    margin: 0 16px 20px;
+  }
+
+  #characterSidePanel .equipment-board {
+    grid-template-columns: repeat(3, 1fr);
+    justify-content: stretch;
   }
 
   .milos-players-panel #playerListEl {

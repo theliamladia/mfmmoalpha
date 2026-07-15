@@ -1,6 +1,7 @@
 // ---------- New Milos City ----------
 const drugSellSelect = document.getElementById('drugSellSelect');
 const drugSellQty = document.getElementById('drugSellQty');
+const drugSellOddsLine = document.getElementById('drugSellOddsLine');
 const btnSellDrugs = document.getElementById('btnSellDrugs');
 const btnRobbery = document.getElementById('btnRobbery');
 const milosLog = document.getElementById('milosLog');
@@ -85,6 +86,7 @@ function renderMilos() {
   buildBadJobsUI();
   buildDealerUI();
   buildDrugSellSelect();
+  renderDrugSellOdds();
   buildCrimeUI();
   renderCombat();
   buildMoralsCenterUI();
@@ -161,9 +163,14 @@ function jobPerkActive(jobId, isBad) {
   return character.jobs.currentJob === jobId && goodJobSkillAvg() >= JOB_PERK_MIN_AVG;
 }
 
-// sqrt curve so early Looks gains matter, not just Looks near the cap
+// sqrt curve so early Looks gains matter, not just Looks near the cap -- re-based (see
+// LOOKS_TRAIN_BASE/LOOKS_TRAIN_K in core.js) so the starting Looks stat itself grants 0% bonus.
+function looksTrainMult() {
+  return 1 + Math.max(0, Math.sqrt(character.stats.looks / 100) - Math.sqrt(LOOKS_TRAIN_BASE / 100)) * LOOKS_TRAIN_K;
+}
+
 function goodJobSkillTrainMult() {
-  return 1 + Math.sqrt(character.stats.looks / 100) * LOOKS_TRAIN_BONUS_MAX;
+  return looksTrainMult();
 }
 
 function buildGoodJobsUI() {
@@ -211,12 +218,17 @@ function buildGoodJobsUI() {
   const perkLine = perk
     ? `<p class="job-payout-line">${perkUnlocked ? '✓' : '\u{1F512}'} <b>${perk.name}</b> (unlocks at Supervisor): ${perk.desc}</p>`
     : '';
+  const ceoActive = avg >= GOOD_CEO_MIN_AVG && character.alliance <= COMBAT_GOOD_MAX_ALLIANCE;
+  const ceoLine = avg >= GOOD_CEO_MIN_AVG
+    ? `<p class="job-payout-line">${ceoActive ? '✓' : '\u{1F512}'} <b>👔 CEO Bonus</b> (Regional Manager + Good alliance): +${Math.round((GOOD_CEO_MULTIPLIER - 1) * 100)}% pay${ceoActive ? ' (active)' : ' -- stay Good to activate'}.</p>`
+    : '';
   goodJobsContainer.innerHTML = `
     <div class="hustle-card job-card">
       <h3>${job.name} &mdash; <span class="job-rank-title">${rank.title}</span></h3>
-      <p>Pay per click: <b>$${rank.payMin.toFixed(2)}&ndash;$${rank.payMax.toFixed(2)}</b>, cooldown <b>${(rank.cooldownMs / 1000).toFixed(1)}s</b>. ${nextLine}</p>
+      <p>Pay per click: <b>$${(rank.payMin * (ceoActive ? GOOD_CEO_MULTIPLIER : 1)).toFixed(2)}&ndash;$${(rank.payMax * (ceoActive ? GOOD_CEO_MULTIPLIER : 1)).toFixed(2)}</b>, cooldown <b>${(rank.cooldownMs / 1000).toFixed(1)}s</b>. ${nextLine}</p>
       <p class="job-payout-line">Looks Training Bonus: +${Math.round((goodJobSkillTrainMult() - 1) * 100)}% skill gain per click (from ${round1(character.stats.looks)} Looks).</p>
       ${perkLine}
+      ${ceoLine}
       <p>Each button below pays out and trains that skill. Higher Looks trains skills faster. Promotions raise both your pay and your cooldown speed &mdash; the grind gets a lot better at the top.</p>
       ${job.skills.map((sk, i) => `
         <div class="job-skill-row">
@@ -320,7 +332,7 @@ function badJobRank() {
 }
 
 function badJobSkillTrainMult() {
-  return 1 + Math.sqrt(character.stats.looks / 100) * LOOKS_TRAIN_BONUS_MAX;
+  return looksTrainMult();
 }
 
 function badJobBustChance() {
@@ -534,7 +546,23 @@ function buildDrugSellSelect() {
   if (ownedDrugs.some((s) => s.id === prevValue)) drugSellSelect.value = prevValue;
 }
 
-drugSellSelect.addEventListener('change', renderMilos);
+// Mirrors the server's doSellDrugs() risk formula exactly, same as crimeFailChance()/
+// badJobBustChance() are already mirrored for their own odds displays.
+function sellDrugsRiskChance(drug, qty) {
+  return Math.min(0.9, drug.riskBase + (qty - 1) * drug.riskPerUnit);
+}
+
+function renderDrugSellOdds() {
+  if (!drugSellOddsLine) return;
+  const drug = DRUG_ITEMS_BY_ID[drugSellSelect.value];
+  if (!drug) { drugSellOddsLine.textContent = ''; return; }
+  const qty = Math.max(1, Math.floor(+drugSellQty.value) || 1);
+  const risk = sellDrugsRiskChance(drug, qty);
+  drugSellOddsLine.innerHTML = `Odds of getting caught: <b>${Math.round(risk * 100)}%</b> (scales with quantity).`;
+}
+
+drugSellSelect.addEventListener('change', () => { renderMilos(); renderDrugSellOdds(); });
+drugSellQty.addEventListener('input', renderDrugSellOdds);
 
 btnSellDrugs.addEventListener('click', () => {
   if (character.alliance < GUZMAN_MIN_ALLIANCE) return;
