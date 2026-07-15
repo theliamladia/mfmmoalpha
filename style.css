@@ -786,8 +786,30 @@ button:disabled {
   background: #1e2027;
   border: 1px solid #35373f;
   border-radius: 12px;
-  padding: 18px;
+  padding: 18px 12px 18px 18px;
   margin: 20px 24px 20px 0;
+  /* Default OS scrollbars render flush against the rounded border with no breathing room, making
+     the panel look sliced in half. Thin + themed + inset so it reads as part of the design. */
+  scrollbar-width: thin;
+  scrollbar-color: #45474f #1e2027;
+}
+
+#characterSidePanel::-webkit-scrollbar {
+  width: 8px;
+}
+
+#characterSidePanel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#characterSidePanel::-webkit-scrollbar-thumb {
+  background: #45474f;
+  border-radius: 8px;
+  border: 2px solid #1e2027;
+}
+
+#characterSidePanel::-webkit-scrollbar-thumb:hover {
+  background: #56585f;
 }
 
 #characterSidePanel h2 {
