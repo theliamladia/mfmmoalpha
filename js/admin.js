@@ -72,7 +72,7 @@ btnAdminAddChips.addEventListener('click', () => {
 });
 
 btnAdminAddWeight.addEventListener('click', () => {
-  character.weightGained = Math.max(0, character.weightGained + (+adminWeightInput.value || 0));
+  character.fatGained = Math.max(0, character.fatGained + (+adminWeightInput.value || 0));
   save();
   renderAll();
 });

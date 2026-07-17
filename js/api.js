@@ -69,6 +69,14 @@ function apiRoidEscape() {
   return apiRequest('/gym/roid-escape', { method: 'POST' });
 }
 
+function apiBodyExercise(bodyPart, exerciseKey) {
+  return apiRequest('/gym/exercise', { method: 'POST', body: JSON.stringify({ bodyPart, exerciseKey }) });
+}
+
+function apiStretchHeight() {
+  return apiRequest('/gym/stretch-height', { method: 'POST' });
+}
+
 function apiBuyFood(itemId) {
   return apiRequest('/market/food', { method: 'POST', body: JSON.stringify({ itemId }) });
 }
@@ -227,6 +235,10 @@ function apiCityHallRename(first, last) {
 
 function apiMarriagePropose(name) {
   return apiRequest('/cityhall/propose', { method: 'POST', body: JSON.stringify({ name }) });
+}
+
+function apiMarriageRespond(proposalId, accept) {
+  return apiRequest('/cityhall/respond', { method: 'POST', body: JSON.stringify({ proposalId, accept }) });
 }
 
 function apiGunSafetyResult(passed) {

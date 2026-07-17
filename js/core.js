@@ -13,13 +13,30 @@ const COOLDOWN_MS = 10000;
 const STAT_CAP = 100;
 
 const CALORIES_PER_LB = 3500;
-const DEFENSE_PER_LB = 1;
+const DEFENSE_PER_LB = 0.5;
 const SPEED_LOSS_PER_LB = 1;
 
 const GYM_BURN_LBS = 0.5;
 const GYM_COST = 20;
-const GYM_LOOKS_GAIN = 0.5;
 const GYM_SPEED_GAIN = 0.6; // > SPEED_LOSS_PER_LB * GYM_BURN_LBS (0.5), so a full cycle nets +speed
+
+// Looks is a derived stat: 90% Body (5 body parts x 4 exercises each, 0-100) + 10% Face (Maxx items).
+const BODY_PARTS = ['chest', 'arms', 'legs', 'abs', 'back'];
+const BODY_PART_LABELS = { chest: '🫁 Chest', arms: '💪 Arms', legs: '🦵 Legs', abs: '🍫 Abs', back: '🔙 Back' };
+const BODY_EXERCISE_KEYS = ['ex1', 'ex2', 'ex3', 'ex4'];
+const BODY_EXERCISE_LABELS = {
+  chest: ['Bench Press', 'Push-ups', 'Dips', 'Flyes'],
+  arms: ['Curls', 'Tricep Extensions', 'Hammer Curls', 'Skull Crushers'],
+  legs: ['Squats', 'Lunges', 'Leg Press', 'Calf Raises'],
+  abs: ['Crunches', 'Planks', 'Leg Raises', 'Russian Twists'],
+  back: ['Deadlifts', 'Pull-ups', 'Rows', 'Lat Pulldowns'],
+};
+const BODY_EXERCISE_COOLDOWN_MS = 8000;
+const MAXX_COMPLETE_MULTIPLIER = 1.25;
+const MUSCLE_GAIN_RATIO = 0.3;
+const STRETCH_HEIGHT_COOLDOWN_MS = 30000;
+const STRETCH_HEIGHT_MUSCLE_PCT = 0.3;
+const STRETCH_HEIGHT_GAIN_IN = 1;
 // Steroid cycles: bigger multiplier on cost/gains trades off against worse roid-jail odds and length.
 const STEROID_TIERS = [
   { id: 'mild', name: '💊 Mild Cycle', mult: 1.75, jailChance: 0.2, jailClicks: 3 },
@@ -234,7 +251,7 @@ const CRIME_STAT_MITIGATION = 0.5; // max reduction to a tier's baseRisk from At
 const CRIME_STREAK_MAX = 12; // cap on how much a record can escalate a sentence
 const COMMUNITY_SERVICE_COOLDOWN_MS = 60000;
 const COMMUNITY_SERVICE_BASE_COST = 750; // scales with current streak
-const COMMUNITY_SERVICE_STREAK_REDUCTION = 2;
+const COMMUNITY_SERVICE_STREAK_REDUCTION = 4;
 
 function crimeFailChance(tier) {
   const statScore = (character.stats.speed + character.stats.attack) / 200; // 0..1 at 100/100
@@ -259,6 +276,11 @@ const NPC_TYPES = {
   cop: { name: '👮 Cop', hp: 50, attack: 14, defense: 9, minReward: 90, maxReward: 220 },
   thug: { name: '🥷 Thug', hp: 30, attack: 8, defense: 4, minReward: 65, maxReward: 160 },
   gangster: { name: '🕴️ Gangster', hp: 45, attack: 12, defense: 7, minReward: 130, maxReward: 300 },
+  goon: { name: '🥊 Goon', hp: 32, attack: 9, defense: 5, minReward: 70, maxReward: 170 },
+  gangbanger: { name: '🔫 Gangbanger', hp: 48, attack: 13, defense: 7, minReward: 140, maxReward: 320 },
+  vagabond: { name: '🎒 Vagabond', hp: 18, attack: 4, defense: 2, minReward: 25, maxReward: 80 },
+  miscreant: { name: '🃏 Miscreant', hp: 35, attack: 9, defense: 5, minReward: 60, maxReward: 150 },
+  milos: { name: '👹 Milos', hp: 100000, attack: 50, defense: 40, minReward: 100000, maxReward: 500000 },
 };
 
 // Cost-per-calorie rises with size -- a bigger pie is never a better deal than a slice, just less clicking.
@@ -266,15 +288,18 @@ const FOOD_ITEMS = [
   { id: 'pizza', name: '🍕 Pizza Slice', cost: 1, calories: 285 },
   { id: 'calzone', name: '🥟 Calzone', cost: 3, calories: 650 },
   { id: 'pizzamax', name: '🍕 Pizzamax (Whole Pie)', cost: 10, calories: 2000 },
+  { id: 'dinuguan', name: '🍲 Dinuguan', cost: 15, calories: 900 },
+  { id: 'halohalo', name: '🍧 Halo Halo', cost: 20, calories: 1000 },
+  { id: 'primerib', name: '🥩 Prime Rib', cost: 30, calories: 1200 },
 ];
 
 // Cost-per-Looks-point rises with tier so a pricier item is never a worse deal than a cheaper one.
 const MAXX_ITEMS = [
-  { id: 'mewing', name: '💋 Mewing Course', cost: 500, looks: 1, desc: '+1 Looks' },
-  { id: 'bonesmash', name: '🔨 Bone Smashing Kit', cost: 1600, looks: 2, desc: '+2 Looks' },
-  { id: 'hairline', name: '💇 Hair Transplant', cost: 3200, looks: 3, desc: '+3 Looks' },
-  { id: 'jaw', name: '💉 Jawline Filler', cost: 5200, looks: 4, desc: '+4 Looks' },
-  { id: 'canthal', name: '👁️ Canthal Tilt Surgery', cost: 10000, looks: 6, desc: '+6 Looks' },
+  { id: 'mewing', name: '💋 Mewing Course', cost: 750, looks: 1, desc: '+1 Face Looks' },
+  { id: 'bonesmash', name: '🔨 Bone Smashing Kit', cost: 2400, looks: 1, desc: '+1 Face Looks' },
+  { id: 'hairline', name: '💇 Hair Transplant', cost: 4800, looks: 2, desc: '+2 Face Looks' },
+  { id: 'jaw', name: '💉 Jawline Filler', cost: 7800, looks: 2, desc: '+2 Face Looks' },
+  { id: 'canthal', name: '👁️ Canthal Tilt Surgery', cost: 15000, looks: 4, desc: '+4 Face Looks' },
   { id: 'limblength', name: '🦴 Limb Lengthening Surgery', cost: 12000, height: 1, speed: 1, desc: '+1" Height, +1 Speed' },
 ];
 
@@ -289,6 +314,9 @@ const PEAK_TITLE = { id: 'peakCivilian', name: 'PEAK CIVILIAN', cssClass: 'title
 const CAESAR_TI_TITLE = { id: 'caesarTi', name: 'CAESAR Ti', cssClass: 'title-caesarti', how: 'Unlock the New Milos Caesar Titanum bank tier.' };
 
 const ADMIN_TITLE = { id: 'adminTitle', name: 'ADMIN', cssClass: 'title-admin', how: 'Granted by an admin.' };
+
+const FAT_FUCK_TITLE = { id: 'fatFuck', name: 'FAT FUCK', cssClass: 'title-fatfuck', how: 'Eat 10,000 food items at Pete\'sza.' };
+const LOOSE_TITLE = { id: 'looseTitle', name: 'LOOSE', cssClass: 'title-loose', how: 'Slut out 500 times.' };
 
 // Leaderboard titles: server-assigned, one holder at a time per category, rechecked daily. Ids
 // must match LEADERBOARD_TITLES in mfmmoserver/gameLogic.js exactly -- the server grants/revokes
@@ -313,6 +341,8 @@ const GOOD_SEASON1_TITLES = [
   { id: 'gs1RareFull', name: 'GOOD® Season 1', cssClass: 'title-gs1-rare', weight: 8, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
   { id: 'gs1RareGewd', name: 'Gewd', cssClass: 'title-gewd-rare', weight: 8, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
   { id: 'gs1Mythic', name: 'I\'m SOWWY', cssClass: 'title-sowwy-mythic', weight: 4, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (mythic!).' },
+  { id: 'gs1Common2', name: 'G Wagon®', cssClass: 'title-gwagon-common', weight: 20, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
+  { id: 'gs1RareBless', name: 'GOD IS GOOD®', cssClass: 'title-godisgood-rare', weight: 6, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
 ];
 
 const RENAME_COST = 10000;
@@ -350,12 +380,16 @@ const RANGE_COOLDOWN_MS = 3000;
 
 // ---------- Jail activities: doing time doesn't have to be dead time ----------
 const JAIL_WORKOUT_COOLDOWN_MS = 6000;
-const JAIL_WORKOUT_GAIN_MIN = 0.1;
-const JAIL_WORKOUT_GAIN_MAX = 0.25;
+const JAIL_WORKOUT_ATK_GAIN_MIN = 0.1;
+const JAIL_WORKOUT_ATK_GAIN_MAX = 0.25;
+const JAIL_WORKOUT_DEF_GAIN_MIN = 0.05;
+const JAIL_WORKOUT_DEF_GAIN_MAX = 0.15;
 
 const JAIL_FIGHT_COOLDOWN_MS = 8000;
-const JAIL_FIGHT_STAT_GAIN_MIN = 0.1;
-const JAIL_FIGHT_STAT_GAIN_MAX = 0.3;
+const JAIL_FIGHT_ATK_GAIN_MIN = 0.1;
+const JAIL_FIGHT_ATK_GAIN_MAX = 0.3;
+const JAIL_FIGHT_DEF_GAIN_MIN = 0.05;
+const JAIL_FIGHT_DEF_GAIN_MAX = 0.15;
 const JAIL_FIGHT_LOSS_MIN = 5;
 const JAIL_FIGHT_LOSS_MAX = 20;
 
@@ -393,7 +427,7 @@ function round2(v) {
 }
 
 function clampStat(v) {
-  return Math.max(0, Math.min(STAT_CAP, v));
+  return Math.max(0, Math.min(STAT_CAP, Math.round(v * 100) / 100));
 }
 
 function round1(v) {
@@ -580,7 +614,8 @@ function newCharacter(firstName, lastName) {
     lastName,
     stats: { health: 10, attack: 10, speed: 10, defense: 10, looks: 10 },
     height: 65,
-    weightGained: 0,
+    fatGained: 0,
+    muscleGained: 0,
     cash: 0,
     chips: 0,
     alliance: 50,
@@ -592,11 +627,15 @@ function newCharacter(firstName, lastName) {
       ...Object.fromEntries(DEALER_TIERS.map((d) => [`dealer_${d.id}`, 0])),
       ...Object.fromEntries(CRIME_TIERS.map((t) => [`crime_${t.id}`, 0])),
     },
-    gym: { steroidTier: null, roidJailClicksRemaining: 0 },
+    gym: {
+      steroidTier: null,
+      roidJailClicksRemaining: 0,
+      bodyExercises: Object.fromEntries(BODY_PARTS.map((part) => [part, { ex1: 0, ex2: 0, ex3: 0, ex4: 0 }])),
+    },
     jail: { inJail: false, crime: null, yearsRemaining: 0, serving: false },
     settings: { hideMilosWarning: false },
     titles: { owned: [], equipped: null },
-    marriage: { proposedTo: null, spouseName: null },
+    marriage: { proposedTo: null, spouseName: null, spouseUserId: null },
     licenses: { gunSafety: false, concealedPermit: false, concealedPendingUntil: 0 },
     inventory: [],
     equipment: { helmet: null, chest: null, pants: null, feet: null, holsterL: null, holsterR: null, openCarry: null, melee: null },
@@ -712,7 +751,7 @@ function renderAll() {
   statLooksEl.textContent = round1(s.looks);
   looksTierEl.textContent = `(${looksTier(s.looks)})`;
   statHeightEl.textContent = formatHeight(character.height);
-  statWeightEl.textContent = `${round1(150 + character.weightGained)} lbs`;
+  statWeightEl.textContent = `${round1(150 + character.fatGained + character.muscleGained)} lbs`;
   cashEl.textContent = character.cash.toFixed(2);
   casinoChipCounterEl.textContent = Math.floor(character.chips);
   statAllianceEl.textContent = allianceLabel(character.alliance);
@@ -733,6 +772,7 @@ function renderAll() {
 
   renderArrestRecord();
   renderGym();
+  renderBody();
   buildFoodGrid();
   renderBank();
   renderMilos();

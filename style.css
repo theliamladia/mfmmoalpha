@@ -20,6 +20,16 @@ body {
   min-height: 100vh;
 }
 
+/* Login/register and character-creation screens are just a centered card -- #screen-game is
+   excluded since its own layout (topbar + sidebar + content) needs full-width block flow, not
+   flex-centering as a single item. */
+#screen-auth,
+#screen-create {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-display);
   letter-spacing: 0.03em;
@@ -440,6 +450,30 @@ button:disabled {
 
 .title-sowwy-mythic .title-text {
   animation: rgbBluePulseText 2.5s linear infinite;
+}
+
+.title-gwagon-common {
+  background: #1c1c1c;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.title-godisgood-rare {
+  animation: rgbBluePulseBg 2.5s linear infinite;
+  color: #fff;
+  font-weight: 700;
+}
+
+.title-fatfuck {
+  background: #6b3f1d;
+  color: #ffcf8b;
+  font-weight: 700;
+}
+
+.title-loose {
+  background: #ff1a8c;
+  color: #fff;
+  font-weight: 700;
 }
 
 /* --- Feature banner --- */
@@ -961,6 +995,26 @@ button:disabled {
 }
 
 .market-tab-btn.active {
+  background: #f2c94c;
+  color: #1b1d22;
+}
+
+.body-part-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+.body-part-tabs button {
+  background: #24262e;
+  color: #b9bbc4;
+  border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 9px 16px;
+}
+
+.body-part-tabs button.active-hustle {
   background: #f2c94c;
   color: #1b1d22;
 }
@@ -2459,4 +2513,27 @@ button:disabled {
 .leaderboard-value {
   color: #6fcf97;
   font-weight: 700;
+}
+
+/* ---------- Hustle toast (Da Skreetz) ---------- */
+.hustle-toast {
+  margin: 4px 0 18px;
+  padding: 12px 16px;
+  background: #262832;
+  border: 1px solid #383a44;
+  border-left: 4px solid #f2c94c;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #e8e8ea;
+}
+
+.hustle-toast.gain {
+  border-left-color: #6fcf97;
+  color: #6fcf97;
+}
+
+.hustle-toast.loss {
+  border-left-color: #e05c5c;
+  color: #e05c5c;
 }

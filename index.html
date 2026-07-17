@@ -153,6 +153,7 @@
           </div>
         </div>
 
+        <p id="hustleToast" class="hustle-toast hidden"></p>
         <div id="activityLog" class="log"></div>
       </div>
 
@@ -160,6 +161,7 @@
         <h2>🏬 Milos Market</h2>
         <div class="market-tabs">
           <button class="market-tab-btn active" data-shop="gym">🏋️ Plan-it Fitness</button>
+          <button class="market-tab-btn" data-shop="body">🏆 Body</button>
           <button class="market-tab-btn" data-shop="pizza">🍕 Pete's Pies</button>
           <button class="market-tab-btn" data-shop="maxx">💈 Luke's Maxxerstore</button>
           <button class="market-tab-btn" data-shop="titles">🎖️ Cosmetixxx</button>
@@ -176,7 +178,7 @@
           <div class="hustle-grid">
             <div class="hustle-card">
               <h3>🏋️ Workout</h3>
-              <p>$20, burns 0.5 lbs &rarr; +0.5 Looks, +0.6 Speed. Requires 0.5 lbs of fuel.</p>
+              <p>$20, burns 0.5 lbs Fat &rarr; +0.6 Speed, +0.15 lbs Muscle, +0.1 Defense. Requires 0.5 lbs of Fat. Train the Body tab for Looks.</p>
               <button id="btnWorkout">Workout ($20)</button>
             </div>
             <div class="hustle-card">
@@ -184,9 +186,21 @@
               <p id="steroidTierDesc">No cycle active.</p>
               <div id="steroidTierButtons" class="admin-alliance-buttons"></div>
             </div>
+            <div class="hustle-card">
+              <h3>📏 Stretch for Height</h3>
+              <p>Costs 30% of your current Muscle &rarr; +1" Height. Build up Muscle from Workouts first.</p>
+              <button id="btnStretchHeight">Stretch</button>
+            </div>
           </div>
 
           <div id="gymLog" class="log"></div>
+        </div>
+
+        <div id="shop-body" class="shop hidden">
+          <p>Looks = 90% Body (train each part below) + 10% Face (Luke's Maxxerstore). Free to train, just a cooldown per exercise.</p>
+          <div class="body-part-tabs" id="bodyPartTabs"></div>
+          <div id="bodyExerciseGrid" class="hustle-grid"></div>
+          <div id="bodyLog" class="log"></div>
         </div>
 
         <div id="shop-pizza" class="shop hidden">
@@ -1134,6 +1148,17 @@
       <div class="modal-actions">
         <button id="btnDuelChallengeDecline" class="secondary-btn">Decline</button>
         <button id="btnDuelChallengeAccept">Accept</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="marriageProposalModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>💍 Marriage Proposal</h3>
+      <p id="marriageProposalText"></p>
+      <div class="modal-actions">
+        <button id="btnMarriageProposalDecline" class="secondary-btn">Decline</button>
+        <button id="btnMarriageProposalAccept">Accept</button>
       </div>
     </div>
   </div>

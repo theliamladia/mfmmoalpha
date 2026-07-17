@@ -32,7 +32,7 @@ function renderPlayerList() {
       <div class="player-hover-card">
         <p><b>${fullName}</b></p>
         <p>Height: ${formatHeight(character.height)}</p>
-        <p>Weight: ${round1(150 + character.weightGained)} lbs</p>
+        <p>Weight: ${round1(150 + character.fatGained + character.muscleGained)} lbs</p>
       </div>
     </li>
   `;
@@ -44,7 +44,7 @@ function renderPlayerList() {
       <div class="player-hover-card">
         <p><b>${p.character.firstName} ${p.character.lastName}</b></p>
         <p>Height: ${formatHeight(p.character.height)}</p>
-        <p>Weight: ${round1(150 + p.character.weightGained)} lbs</p>
+        <p>Weight: ${round1(150 + p.character.fatGained + p.character.muscleGained)} lbs</p>
       </div>
     </li>
   `).join('');
@@ -66,6 +66,7 @@ async function refreshOnlinePlayers() {
     const result = await apiOnlinePlayers();
     onlinePlayersCache = result.players.filter((p) => !p.you);
     if (typeof handlePendingDuelChallenge === 'function') handlePendingDuelChallenge(result.pendingDuelChallenge);
+    if (typeof handlePendingMarriageProposal === 'function') handlePendingMarriageProposal(result.pendingMarriageProposal);
   } catch {
     // Presence is best-effort -- keep showing the last known list if the poll fails.
   }
@@ -889,8 +890,8 @@ function renderCombat() {
   if (combat.active) {
     const npc = NPC_TYPES[combat.enemyKey];
     enemyNameEl.textContent = npc.name;
-    playerHpText.textContent = `${combat.playerHp}/${combat.playerMaxHp}`;
-    enemyHpText.textContent = `${combat.enemyHp}/${combat.enemyMaxHp}`;
+    playerHpText.textContent = `${round1(combat.playerHp)}/${round1(combat.playerMaxHp)}`;
+    enemyHpText.textContent = `${round1(combat.enemyHp)}/${round1(combat.enemyMaxHp)}`;
     playerHpBar.style.width = `${(combat.playerHp / combat.playerMaxHp) * 100}%`;
     enemyHpBar.style.width = `${(combat.enemyHp / combat.enemyMaxHp) * 100}%`;
     const isPlayerTurn = combat.turn === 'player';
@@ -1226,6 +1227,49 @@ btnMarriagePropose.addEventListener('click', () => {
       if (err.reason) alert(err.reason);
     }
   }, cityHallLog);
+});
+
+// Real marriage handshake -- mirrors the duel challenge modal exactly (see js/duels.js).
+const marriageProposalModal = document.getElementById('marriageProposalModal');
+const marriageProposalText = document.getElementById('marriageProposalText');
+const btnMarriageProposalAccept = document.getElementById('btnMarriageProposalAccept');
+const btnMarriageProposalDecline = document.getElementById('btnMarriageProposalDecline');
+let pendingMarriageProposalSeenId = null;
+
+function handlePendingMarriageProposal(pending) {
+  if (!pending) {
+    pendingMarriageProposalSeenId = null;
+    return;
+  }
+  if (pending.id === pendingMarriageProposalSeenId) return;
+  pendingMarriageProposalSeenId = pending.id;
+  marriageProposalText.textContent = `${pending.proposerName} has proposed marriage to you.`;
+  marriageProposalModal.classList.remove('hidden');
+  marriageProposalModal.dataset.proposalId = pending.id;
+}
+
+btnMarriageProposalAccept.addEventListener('click', async () => {
+  const proposalId = Number(marriageProposalModal.dataset.proposalId);
+  marriageProposalModal.classList.add('hidden');
+  try {
+    const result = await apiMarriageRespond(proposalId, true);
+    if (result.character) character = result.character;
+    logTo(cityHallLog, 'Marriage proposal accepted!', 'gain');
+    save();
+    renderAll();
+  } catch (err) {
+    logTo(cityHallLog, err.reason || 'Could not accept proposal.', 'loss');
+  }
+});
+
+btnMarriageProposalDecline.addEventListener('click', async () => {
+  const proposalId = Number(marriageProposalModal.dataset.proposalId);
+  marriageProposalModal.classList.add('hidden');
+  try {
+    await apiMarriageRespond(proposalId, false);
+  } catch {
+    // Best-effort -- the proposal will simply expire/no-op on the proposer's side.
+  }
 });
 
 btnStartGunSafety.addEventListener('click', () => {
