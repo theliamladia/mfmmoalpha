@@ -167,7 +167,8 @@ function jobPerkActive(jobId, isBad) {
 // sqrt curve so early Looks gains matter, not just Looks near the cap -- re-based (see
 // LOOKS_TRAIN_BASE/LOOKS_TRAIN_K in core.js) so the starting Looks stat itself grants 0% bonus.
 function looksTrainMult() {
-  return 1 + Math.max(0, Math.sqrt(character.stats.looks / 100) - Math.sqrt(LOOKS_TRAIN_BASE / 100)) * LOOKS_TRAIN_K;
+  const looks = Math.min(character.stats.looks, STAT_CAP);
+  return 1 + Math.max(0, Math.sqrt(looks / 100) - Math.sqrt(LOOKS_TRAIN_BASE / 100)) * LOOKS_TRAIN_K;
 }
 
 function goodJobSkillTrainMult() {

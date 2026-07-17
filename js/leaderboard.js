@@ -7,11 +7,13 @@ const leaderboardSubpages = {
   looks: document.getElementById('leaderboard-looks'),
   networth: document.getElementById('leaderboard-networth'),
   level: document.getElementById('leaderboard-level'),
+  height: document.getElementById('leaderboard-height'),
 };
 const leaderboardListEls = {
   looks: document.getElementById('leaderboardLooksList'),
   networth: document.getElementById('leaderboardNetworthList'),
   level: document.getElementById('leaderboardLevelList'),
+  height: document.getElementById('leaderboardHeightList'),
 };
 const leaderboardRefreshNote = document.getElementById('leaderboardRefreshNote');
 
@@ -30,6 +32,7 @@ const LEADERBOARD_VALUE_FORMAT = {
   looks: (v) => round1(v),
   networth: (v) => `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   level: (v) => v,
+  height: (v) => formatHeight(v),
 };
 
 function renderLeaderboardCategory(category, entries) {
@@ -62,6 +65,7 @@ async function refreshLeaderboard() {
     renderLeaderboardCategory('looks', result.looks);
     renderLeaderboardCategory('networth', result.networth);
     renderLeaderboardCategory('level', result.level);
+    renderLeaderboardCategory('height', result.height);
     leaderboardRefreshNote.textContent = `Next title check in ${formatCountdown(result.nextRefreshAt - Date.now())}.`;
   } catch {
     // Best-effort, same as the other polled views.

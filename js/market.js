@@ -116,6 +116,7 @@ setInterval(tickCooldownUI, 250);
 
 // ---------- Jim's Gym ----------
 const gymFuelEl = document.getElementById('gymFuel');
+const gymMuscleEl = document.getElementById('gymMuscle');
 const roidJailBanner = document.getElementById('roidJailBanner');
 const roidClicksLeftEl = document.getElementById('roidClicksLeft');
 const btnWorkout = document.getElementById('btnWorkout');
@@ -130,6 +131,7 @@ function currentSteroidTier() {
 
 function renderGym() {
   gymFuelEl.textContent = round1(character.fatGained);
+  gymMuscleEl.textContent = round1(character.muscleGained);
   const inRoidJail = character.gym.roidJailClicksRemaining > 0;
   roidJailBanner.classList.toggle('hidden', !inRoidJail);
   roidClicksLeftEl.textContent = character.gym.roidJailClicksRemaining;
@@ -155,11 +157,11 @@ function renderGym() {
   });
 
   const stretchRemaining = getRemainingCooldown('stretchHeight', STRETCH_HEIGHT_COOLDOWN_MS);
-  const hasMuscle = character.muscleGained > 0;
+  const hasMuscle = character.muscleGained >= STRETCH_HEIGHT_MUSCLE_COST;
   btnStretchHeight.disabled = stretchRemaining > 0 || !hasMuscle;
   btnStretchHeight.textContent = stretchRemaining > 0
     ? `Stretch (${Math.ceil(stretchRemaining / 1000)}s)`
-    : hasMuscle ? 'Stretch' : 'Need Muscle first';
+    : hasMuscle ? 'Stretch' : `Need ${STRETCH_HEIGHT_MUSCLE_COST} lbs Muscle`;
 }
 
 // Gym actions (Workout, steroid tier, Roid Escape) are server-authoritative -- same shape as the
@@ -233,7 +235,7 @@ function renderBodyPartTabs() {
   bodyPartTabs.innerHTML = BODY_PARTS.map((part) => {
     const avg = bodyPartAvgClient(character.gym.bodyExercises[part]);
     const active = part === activeBodyPart;
-    return `<button data-body-part="${part}" class="${active ? 'active-hustle' : ''}">${BODY_PART_LABELS[part]} (${avg.toFixed(0)}/100)</button>`;
+    return `<button data-body-part="${part}" class="${active ? 'active-hustle' : ''}">${BODY_PART_LABELS[part]} (${avg.toFixed(0)})</button>`;
   }).join('');
   bodyPartTabs.querySelectorAll('[data-body-part]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -252,7 +254,7 @@ function renderBodyExerciseGrid() {
     return `
       <div class="hustle-card job-card">
         <h3>${BODY_EXERCISE_LABELS[part][i]}</h3>
-        <p>${exercises[key].toFixed(2)}/100</p>
+        <p>${exercises[key].toFixed(2)}</p>
         <button data-body-exercise="${key}" data-cooldown="${cooldownKey}" ${remaining > 0 ? 'disabled' : ''}>
           ${remaining > 0 ? `Train (${Math.ceil(remaining / 1000)}s)` : 'Train'}
         </button>
@@ -377,7 +379,7 @@ const titleDropdown = document.getElementById('titleDropdown');
 function allTitleDefsFor(char) {
   return [
     PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE, FAT_FUCK_TITLE, LOOSE_TITLE,
-    LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE,
+    LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE, HEIGHTMAXXED_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];

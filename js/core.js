@@ -35,7 +35,7 @@ const BODY_EXERCISE_COOLDOWN_MS = 8000;
 const MAXX_COMPLETE_MULTIPLIER = 1.25;
 const MUSCLE_GAIN_RATIO = 0.3;
 const STRETCH_HEIGHT_COOLDOWN_MS = 30000;
-const STRETCH_HEIGHT_MUSCLE_PCT = 0.3;
+const STRETCH_HEIGHT_MUSCLE_COST = 60;
 const STRETCH_HEIGHT_GAIN_IN = 1;
 // Steroid cycles: bigger multiplier on cost/gains trades off against worse roid-jail odds and length.
 const STEROID_TIERS = [
@@ -324,6 +324,7 @@ const LOOSE_TITLE = { id: 'looseTitle', name: 'LOOSE', cssClass: 'title-loose', 
 const LOOKSMAXXER_TITLE = { id: 'looksmaxxer', name: 'LOOKSMAXXER', cssClass: 'title-looksmaxxer', how: '#1 on the Looks leaderboard. Lost automatically if someone overtakes you.' };
 const NETWORTH_TITLE = { id: 'highestNetWorth', name: 'HIGHEST NET WORTH', cssClass: 'title-networth', how: '#1 on the Money leaderboard (cash + bank + chips - credit owed). Lost automatically if someone overtakes you.' };
 const HIGHEST_LEVEL_TITLE = { id: 'highestLevel', name: 'HIGHEST LEVEL', cssClass: 'title-highestlevel', how: '#1 on the Level leaderboard. Lost automatically if someone overtakes you.' };
+const HEIGHTMAXXED_TITLE = { id: 'heightmaxxed', name: 'HeightMAXXED', cssClass: 'title-heightmaxxed', how: '#1 on the Height leaderboard. Lost automatically if someone overtakes you.' };
 
 const BETA_SPIN_COST = 5000;
 const BETA_SPIN_TITLES = [

@@ -2463,6 +2463,17 @@ button:disabled {
   text-shadow: 1px 1px 0 #000;
 }
 
+.title-heightmaxxed {
+  background: #c0392b;
+  border: 1px solid #c0392b;
+}
+
+.title-heightmaxxed .title-text {
+  font-weight: 700;
+  color: #2f80ed;
+  text-shadow: 0 0 4px #00000080;
+}
+
 /* ---------- Leaderboard page ---------- */
 .leaderboard-refresh-note {
   color: #8a8c96;

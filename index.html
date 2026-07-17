@@ -168,7 +168,7 @@
         </div>
 
         <div id="shop-gym" class="shop">
-          <p>Fuel from eating: <b id="gymFuel">0</b> lbs available to burn.</p>
+          <p>Fat: <b id="gymFuel">0</b> lbs (fuel for workouts). Muscle: <b id="gymMuscle">0</b> lbs.</p>
 
           <div id="roidJailBanner" class="roid-banner hidden">
             <p>&#9760; ROID JAIL &mdash; <span id="roidClicksLeft">0</span> click(s) of zero gains remaining.</p>
@@ -188,7 +188,7 @@
             </div>
             <div class="hustle-card">
               <h3>📏 Stretch for Height</h3>
-              <p>Costs 30% of your current Muscle &rarr; +1" Height. Build up Muscle from Workouts first.</p>
+              <p>Costs a fixed 60 lbs of Muscle &rarr; +1" Height. Build up Muscle from Workouts first.</p>
               <button id="btnStretchHeight">Stretch</button>
             </div>
           </div>
@@ -756,6 +756,7 @@
           <button class="leaderboard-tab-btn active" data-leaderboard="looks">💅 Looks</button>
           <button class="leaderboard-tab-btn" data-leaderboard="networth">💰 Money</button>
           <button class="leaderboard-tab-btn" data-leaderboard="level">⭐ Level</button>
+          <button class="leaderboard-tab-btn" data-leaderboard="height">📏 Height</button>
         </div>
 
         <div id="leaderboard-looks" class="leaderboard-subpage">
@@ -769,6 +770,10 @@
         <div id="leaderboard-level" class="leaderboard-subpage hidden">
           <div class="title-preview"><span class="title-badge title-highestlevel"><span class="title-text">HIGHEST LEVEL</span></span></div>
           <div id="leaderboardLevelList" class="leaderboard-list"></div>
+        </div>
+        <div id="leaderboard-height" class="leaderboard-subpage hidden">
+          <div class="title-preview"><span class="title-badge title-heightmaxxed"><span class="title-text">HeightMAXXED</span></span></div>
+          <div id="leaderboardHeightList" class="leaderboard-list"></div>
         </div>
       </div>
 
