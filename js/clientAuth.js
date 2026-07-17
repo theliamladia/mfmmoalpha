@@ -40,6 +40,7 @@ function migrateServerCharacter(c) {
   }
   if (!c.maxxPurchased) c.maxxPurchased = [];
   if (c.jail && c.jail.contrabandAtkBonus === undefined) c.jail.contrabandAtkBonus = 0;
+  if (c.titles && !c.titles.customTitles) c.titles.customTitles = [];
   return c;
 }
 

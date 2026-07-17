@@ -1045,6 +1045,24 @@
         <div id="adminInvCheckResult"></div>
       </div>
 
+      <div class="admin-block">
+        <p>🎨 Title Maker</p>
+        <div class="admin-row">
+          <input type="text" id="titleMakerLabel" placeholder="Title label" maxlength="30">
+        </div>
+        <div class="admin-row">
+          <label>Background <input type="color" id="titleMakerBgColor" value="#1e2027"></label>
+          <label>Border <input type="color" id="titleMakerBorderColor" value="#f2c94c"></label>
+          <label>Text <input type="color" id="titleMakerTextColor" value="#ffffff"></label>
+        </div>
+        <div class="admin-row">
+          <input type="text" id="titleMakerGifUrl" placeholder="Background GIF/image URL (https://..., optional -- overrides Background color)">
+        </div>
+        <p class="title-preview">Preview: <span id="titleMakerPreview"></span></p>
+        <p id="titleMakerError" class="error"></p>
+        <button id="btnTitleMakerCreate">Create &amp; Add to Inventory</button>
+      </div>
+
       <button id="btnAdminClose" class="secondary-btn admin-close">Close</button>
     </div>
   </div>

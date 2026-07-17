@@ -407,8 +407,21 @@ function getItemDef(itemId) {
   if (DRUG_ITEMS_BY_ID[itemId]) return DRUG_ITEMS_BY_ID[itemId];
   if (WRESTLING_GEAR_ITEMS_BY_ID[itemId]) return WRESTLING_GEAR_ITEMS_BY_ID[itemId];
   const title = allTitleDefs().find((t) => t.id === itemId);
-  if (title) return { id: title.id, name: title.name, type: 'title', cssClass: title.cssClass };
+  // Spread the full def (not just id/name/cssClass) so custom titles keep their background/
+  // border/text color fields when rendered from an inventory stack (js/inventory.js Cosmetics tab).
+  if (title) return { ...title, type: 'title' };
   return null;
+}
+
+// Used for any admin/user-supplied free text that ends up in innerHTML (e.g. a custom title's
+// label) so it can't break out of the markup it's interpolated into.
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function addToInventory(itemId, qty) {

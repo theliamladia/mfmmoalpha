@@ -270,12 +270,20 @@ const titleLog = document.getElementById('titleLog');
 const btnTitleChevron = document.getElementById('btnTitleChevron');
 const titleDropdown = document.getElementById('titleDropdown');
 
-function allTitleDefs() {
+// `char` defaults to the current player but any character object works -- needed so a custom
+// title created by (and living inside) one player's save can still be looked up correctly when a
+// different client renders THAT player's badge (see displayBadgeMarkupFor below).
+function allTitleDefsFor(char) {
   return [
     PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE,
     LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES,
+    ...((char.titles && char.titles.customTitles) || []),
   ];
+}
+
+function allTitleDefs() {
+  return allTitleDefsFor(character);
 }
 
 // Titles tracked as inventory stacks: tradeable, "owned" only while at least one copy remains.
@@ -283,14 +291,23 @@ const CRATE_TITLE_IDS = new Set([...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES].ma
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
 CRATE_TITLE_IDS.add(ADMIN_TITLE.id);
 
-// Crate titles are "owned" only while at least one copy sits in inventory (tradeable, can drop to 0).
-// Purchased/earned titles (Cosmetixxx buys, PEAK CIVILIAN) stay in the permanent titles.owned list.
+// Crate titles (and custom titles, same inventory-stack pattern) are "owned" only while at least
+// one copy sits in inventory (tradeable, can drop to 0). Purchased/earned titles (Cosmetixxx buys,
+// PEAK CIVILIAN) stay in the permanent titles.owned list. Checking both covers either case without
+// needing to know in advance which kind a given id is.
 function isTitleOwned(titleId) {
-  if (CRATE_TITLE_IDS.has(titleId)) return inventoryQty(titleId) > 0;
-  return character.titles.owned.includes(titleId);
+  return character.titles.owned.includes(titleId) || inventoryQty(titleId) > 0;
 }
 
 function titleBadgeMarkup(title) {
+  if (title.custom) {
+    const bg = title.isGif
+      ? `background-image:url('${title.background}');background-size:cover;background-position:center;`
+      : `background:${title.background};`;
+    const border = title.borderColor ? `border:2px solid ${title.borderColor};` : '';
+    const textColor = title.textColor ? `color:${title.textColor};` : '';
+    return `<span class="title-badge" style="${bg}${border}"><span class="title-text" style="${textColor}">${escapeHtml(title.name)}</span></span>`;
+  }
   return `<span class="title-badge ${title.cssClass}"><span class="title-text">${title.name}</span></span>`;
 }
 
@@ -332,10 +349,11 @@ function displayBadgeMarkupFor(otherChar) {
   const equippedId = otherChar.titles && otherChar.titles.equipped;
   let title = null;
   if (equippedId) {
-    const owned = CRATE_TITLE_IDS.has(equippedId)
-      ? (otherChar.inventory || []).some((stack) => stack.id === equippedId && stack.qty > 0)
-      : (otherChar.titles.owned || []).includes(equippedId);
-    if (owned) title = allTitleDefs().find((t) => t.id === equippedId) || null;
+    const owned = (otherChar.titles.owned || []).includes(equippedId)
+      || (otherChar.inventory || []).some((stack) => stack.id === equippedId && stack.qty > 0);
+    // Look up the def from THIS character's own customTitles, not the viewer's allTitleDefs(),
+    // since a custom title's full definition only ever lives inside its creator's save.
+    if (owned) title = allTitleDefsFor(otherChar).find((t) => t.id === equippedId) || null;
   }
   if (title) return titleHoverMarkup(title);
 

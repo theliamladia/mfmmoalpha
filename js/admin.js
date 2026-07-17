@@ -208,3 +208,81 @@ btnAdminInvCheck.addEventListener('click', async () => {
   }
 });
 
+// ---------- Title Maker ----------
+// Client-side only, like the rest of this admin menu (Give ADMIN Title, stat editors) -- creates a
+// full title definition (not just a name) and stores it directly on this character's own save
+// (character.titles.customTitles), then adds it to Inventory the same way Give ADMIN Title does.
+// Storing the full def alongside the owner's own data (rather than in some separate catalog) is
+// what lets OTHER players' clients render it correctly when they see it equipped -- see
+// allTitleDefsFor()/displayBadgeMarkupFor() in js/market.js.
+const titleMakerLabel = document.getElementById('titleMakerLabel');
+const titleMakerBgColor = document.getElementById('titleMakerBgColor');
+const titleMakerBorderColor = document.getElementById('titleMakerBorderColor');
+const titleMakerTextColor = document.getElementById('titleMakerTextColor');
+const titleMakerGifUrl = document.getElementById('titleMakerGifUrl');
+const titleMakerPreview = document.getElementById('titleMakerPreview');
+const titleMakerError = document.getElementById('titleMakerError');
+const btnTitleMakerCreate = document.getElementById('btnTitleMakerCreate');
+
+// https:// only (blocks javascript: etc.) and no characters that could break out of the CSS
+// url('...') or the surrounding HTML attribute it's embedded in.
+const GIF_URL_RE = /^https:\/\/[^\s"'<>()]+$/i;
+
+function buildTitleMakerPreviewDef() {
+  const gifUrl = titleMakerGifUrl.value.trim();
+  return {
+    id: 'preview',
+    name: titleMakerLabel.value.trim() || 'Preview',
+    custom: true,
+    background: gifUrl || titleMakerBgColor.value,
+    isGif: !!gifUrl,
+    borderColor: titleMakerBorderColor.value,
+    textColor: titleMakerTextColor.value,
+    how: 'Custom title created by an admin.',
+  };
+}
+
+function refreshTitleMakerPreview() {
+  titleMakerPreview.innerHTML = titleBadgeMarkup(buildTitleMakerPreviewDef());
+}
+
+[titleMakerLabel, titleMakerBgColor, titleMakerBorderColor, titleMakerTextColor, titleMakerGifUrl].forEach((el) => {
+  el.addEventListener('input', refreshTitleMakerPreview);
+});
+refreshTitleMakerPreview();
+
+btnTitleMakerCreate.addEventListener('click', () => {
+  titleMakerError.textContent = '';
+  const label = titleMakerLabel.value.trim();
+  if (!label) { titleMakerError.textContent = 'Enter a title label.'; return; }
+
+  const gifUrl = titleMakerGifUrl.value.trim();
+  if (gifUrl && !GIF_URL_RE.test(gifUrl)) {
+    titleMakerError.textContent = 'GIF/image URL must start with https:// and contain no quotes, parentheses, or spaces.';
+    return;
+  }
+
+  const def = {
+    id: `custom_${Date.now()}`,
+    name: escapeHtml(label),
+    custom: true,
+    background: gifUrl || titleMakerBgColor.value,
+    isGif: !!gifUrl,
+    borderColor: titleMakerBorderColor.value,
+    textColor: titleMakerTextColor.value,
+    how: 'Custom title created by an admin.',
+  };
+
+  if (!character.titles.customTitles) character.titles.customTitles = [];
+  character.titles.customTitles.push(def);
+  addToInventory(def.id, 1);
+  save();
+  apiSyncCharacter(character);
+  renderAll();
+
+  titleMakerLabel.value = '';
+  titleMakerGifUrl.value = '';
+  refreshTitleMakerPreview();
+  alert(`"${label}" added to your Inventory (Cosmetics).`);
+});
+
