@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Crates Teaser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0e12;
+    --panel: #16171d;
+    --text: #e8e8ee;
+    --muted: #8a8c96;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 24px 100px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-wrap {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-title {
+    text-align: center;
+    font-size: 28px;
+    color: var(--muted);
+    margin-bottom: 60px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  /* ---------- Crate intro block ---------- */
+  .crate-intro {
+    text-align: center;
+    margin: 0 auto 40px;
+    max-width: 720px;
+  }
+  .crate-intro h1 {
+    font-size: 34px;
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+  }
+  .crate-intro .price {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2ecc71;
+    background: #0f2018;
+    border: 1px solid #1d4a30;
+    border-radius: 999px;
+    padding: 6px 18px;
+    margin-bottom: 16px;
+  }
+  .crate-intro p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .crate-block {
+    width: 100%;
+    margin-bottom: 90px;
+  }
+
+  .rarity-section {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+  .rarity-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .rarity-title h2 {
+    font-size: 18px;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .rarity-title .pct {
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 3px 12px;
+  }
+  .rarity-title .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 150px));
+    justify-content: center;
+    gap: 18px;
+  }
+
+  /* Each slot: the big crate-reel preview on top, the actual in-game equipped badge below it. */
+  .crate-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-frame {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 12px;
+    padding: 4px;
+    background: var(--panel);
+  }
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 9px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+  }
+  /* Invisible label -- only the background art reads (Anima Crate's own convention). */
+  .invisible-label {
+    color: transparent;
+    user-select: none;
+    font-size: 10px;
+    line-height: 1;
+  }
+  .card-inner .invisible-label {
+    padding-bottom: 4px;
+  }
+  /* Visible name label, used where the crate calls for the character/item name to actually show. */
+  .visible-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 13px;
+    padding-bottom: 6px;
+    text-align: center;
+  }
+  .card-inner .visible-label {
+    -webkit-text-stroke: 0.4px rgba(0,0,0,0.5);
+  }
+
+  /* ---------- Anima Crate rarity borders ---------- */
+  .border-common { border: 3px solid #ffffff; }
+  .border-rare { border: 3px solid #2f80ed; }
+  .border-mega-rare { border: 3px solid #f2c230; }
+  .border-mega-hyper {
+    background: linear-gradient(270deg, #ff0033, #ff9900, #fff200, #33ff33, #00e5ff, #3355ff, #cc33ff, #ff0033);
+    background-size: 400% 400%;
+    animation: rainbowShift 5s linear infinite;
+    border: none;
+  }
+  @keyframes rainbowShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+  /* Animated RGB name text -- Mega Hyper Rare is the one Anima tier that breaks the invisible-name
+     convention and shows the character's actual name, cycling through the same rainbow the border uses. */
+  .rgb-name-text {
+    background: linear-gradient(270deg, #ff0033, #ff9900, #fff200, #33ff33, #00e5ff, #3355ff, #cc33ff, #ff0033);
+    background-size: 400% 400%;
+    animation: rainbowShift 3s linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+  }
+
+  /* ---------- Equipped-title preview (mirrors the real game's .title-badge exactly) ---------- */
+  .equip-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .player-name {
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  /* Base .title-badge rule, copied from mfmmoalpha/style.css so this preview matches 1:1. */
+  .title-badge {
+    display: inline-block;
+    padding: 6px 24px;
+    min-width: 5ch;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: nowrap;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #000;
+  }
+  .badge-common { border: 1px solid #ffffff; }
+  .badge-rare { border: 1px solid #2f80ed; }
+  .badge-mega-rare { border: 1px solid #f2c230; }
+  .badge-mega-hyper { border: none; }
+  .badge-mega-hyper-ring {
+    display: inline-block;
+    padding: 2px;
+    border-radius: 8px;
+    background: linear-gradient(270deg, #ff0033, #ff9900, #fff200, #33ff33, #00e5ff, #3355ff, #cc33ff, #ff0033);
+    background-size: 400% 400%;
+    animation: rainbowShift 5s linear infinite;
+  }
+
+  /* ---------- Counterfinish Crate: glow border + visible colored-text helpers ---------- */
+  .border-flat { border: 3px solid; }
+  .badge-flat { border: 1px solid; }
+
+  .glow { box-shadow: 0 0 16px 2px var(--glow-color, transparent); }
+  .glow-badge { box-shadow: 0 0 10px 1px var(--glow-color, transparent); }
+
+  .col-safari { --c: #6fae74; color: #6fae74; }
+  .col-tronic-border { border-color: #050505 !important; box-shadow: 0 0 0 1px #3a3a3a; }
+  .col-lore-text { color: #111; }
+  .col-lore-border { border-color: #d4af37 !important; --glow-color: #d4af37; }
+  .col-howl { --c: #e0342b; }
+  .col-fade-text { color: #ff8c00; }
+  .hyper-font {
+    font-family: 'Monsieur La Doulaise', cursive;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 22px;
+  }
+  .text-black-bold { color: #000; font-weight: 700; }
+  .text-steel-bold {
+    color: #c9cbd2;
+    font-weight: 700;
+    text-shadow: 0 1px 0 #05050a, 0 -1px 0 rgba(255,255,255,0.35);
+  }
+  .col-sapphire { --c: #2f80ed; color: #4da6ff; }
+  .col-ruby { --c: #e0342b; color: #ff5c5c; }
+  .col-emerald { --c: #2ecc71; color: #4ee08a; }
+  .text-glow-white { color: #fff; text-shadow: 0 0 6px #fff, 0 0 14px #fff; }
+
+  .text-glow { text-shadow: 0 0 6px var(--c, transparent), 0 0 14px var(--c, transparent); }
+  .border-glow-col { border-color: var(--c, currentColor) !important; box-shadow: 0 0 16px 2px var(--c, transparent); }
+  .badge-glow-col { border-color: var(--c, currentColor) !important; box-shadow: 0 0 10px 1px var(--c, transparent); }
+
+  /* Fade's split purple/orange glow. */
+  .border-fade {
+    border: 3px solid transparent;
+    border-image: linear-gradient(90deg, #9b30ff 50%, #ff8c00 50%) 1;
+    box-shadow: -8px 0 16px -6px #9b30ff, 8px 0 16px -6px #ff8c00;
+  }
+  .badge-fade {
+    border: 1px solid transparent;
+    border-image: linear-gradient(90deg, #9b30ff 50%, #ff8c00 50%) 1;
+    box-shadow: -4px 0 10px -4px #9b30ff, 4px 0 10px -4px #ff8c00;
+  }
+
+  /* ---------- Hyper Gem: demo of the name-style change elsewhere in the UI ---------- */
+  .name-demo {
+    margin-top: 4px;
+    width: 100%;
+    background: var(--panel);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  .name-demo .demo-label {
+    color: var(--muted);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .name-demo .demo-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 0;
+    font-size: 12px;
+  }
+  .name-demo .demo-row .title-badge {
+    font-size: 9px;
+    line-height: 1.4;
+  }
+  .name-demo .demo-row .hyper-font {
+    font-size: 15px;
+  }
+  .name-demo .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2ecc71;
+    flex-shrink: 0;
+  }
+
+  .market-alert {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #7a1414;
+    border: 1px solid #b02323;
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: center;
+    color: #ffe5e5;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+  }
+
+  .legend {
+    max-width: 720px;
+    margin: 0 auto 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <h1 class="page-title">🔮 New Crates &mdash; Teaser</h1>
+
+  <!-- ================= ANIMA CRATE ================= -->
+  <div class="crate-block">
+    <div class="crate-intro">
+      <h1>🔮 Anima Crate</h1>
+      <span class="price">$4,500</span>
+      <p>A crate of pulls straight from the anime multiverse. The one exception is the top prize: land a Mega Hyper Rare and the name breaks through, blazing in an animated RGB shimmer.</p>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:#ffffff;"></span>
+        <h2>Common</h2>
+        <span class="pct">95%</span>
+      </div>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-common">
+            <div class="card-inner" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLpnD9k1n_vt_dE3YeT307r9cqKC5_0jYbOAQmtjUG1zqVEyGWsCZ3Rsc&s=10');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-common" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLpnD9k1n_vt_dE3YeT307r9cqKC5_0jYbOAQmtjUG1zqVEyGWsCZ3Rsc&s=10');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-common">
+            <div class="card-inner" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4kqzEJ1f-X1j8ZkaGvzKJfQwf_AVhoyGrTK6MH99F8CiKewAixpfGYjg&s=10');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-common" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4kqzEJ1f-X1j8ZkaGvzKJfQwf_AVhoyGrTK6MH99F8CiKewAixpfGYjg&s=10');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-common">
+            <div class="card-inner" style="background-image:url('https://cdn.wallpapersafari.com/68/79/ImMueJ.jpg');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-common" style="background-image:url('https://cdn.wallpapersafari.com/68/79/ImMueJ.jpg');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:#2f80ed;"></span>
+        <h2>Anima Rare</h2>
+        <span class="pct">4.5%</span>
+      </div>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-rare">
+            <div class="card-inner" style="background-image:url('https://media.tenor.com/dXShFmDOCTYAAAAd/yujiro-hanma-baki.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-rare" style="background-image:url('https://media.tenor.com/dXShFmDOCTYAAAAd/yujiro-hanma-baki.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-rare">
+            <div class="card-inner" style="background-image:url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2M1YWo0Zm8yYzZpdTczeGlpMHBkNmQzYWdqM3l3NGJpZGl2NWFxeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pVWuLuV1JESZJdebkI/giphy.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-rare" style="background-image:url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2M1YWo0Zm8yYzZpdTczeGlpMHBkNmQzYWdqM3l3NGJpZGl2NWFxeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pVWuLuV1JESZJdebkI/giphy.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-rare">
+            <div class="card-inner" style="background-image:url('https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjl5dTJreXU4cms1MXh3dnZzejVyeDV4N3ZhMTR1bTYwOW5hdzJkcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TDUdFHAc6Q99qa9Crg/giphy.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-rare" style="background-image:url('https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjl5dTJreXU4cms1MXh3dnZzejVyeDV4N3ZhMTR1bTYwOW5hdzJkcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TDUdFHAc6Q99qa9Crg/giphy.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:#f2c230;"></span>
+        <h2>Anima Mega Rare</h2>
+        <span class="pct">0.3%</span>
+      </div>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-mega-rare">
+            <div class="card-inner" style="background-image:url('https://media.tenor.com/zbZ3fR5i5hcAAAAC/sao-kirito.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-mega-rare" style="background-image:url('https://media.tenor.com/zbZ3fR5i5hcAAAAC/sao-kirito.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-mega-rare">
+            <div class="card-inner" style="background-image:url('https://media1.tenor.com/m/ike6N7DwCa0AAAAC/%D8%B1%D9%8A%D8%A7%D9%84-%D9%85%D8%AF%D8%B1%D9%8A%D8%AF.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-mega-rare" style="background-image:url('https://media1.tenor.com/m/ike6N7DwCa0AAAAC/%D8%B1%D9%8A%D8%A7%D9%84-%D9%85%D8%AF%D8%B1%D9%8A%D8%AF.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-mega-rare">
+            <div class="card-inner" style="background-image:url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWVkdDRyYWRrYjA2ZmhxZ2lqb3EyZmhpczZ3N2NyM2psZ3Q0cG81NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3xCWpDBCsYeNa/giphy.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-mega-rare" style="background-image:url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWVkdDRyYWRrYjA2ZmhxZ2lqb3EyZmhpczZ3N2NyM2psZ3Q0cG81NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3xCWpDBCsYeNa/giphy.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-mega-rare">
+            <div class="card-inner" style="background-image:url('https://media.tenor.com/EBz2RssGy9EAAAAi/luffy-power-light.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-mega-rare" style="background-image:url('https://media.tenor.com/EBz2RssGy9EAAAAi/luffy-power-light.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:conic-gradient(from 0deg, red, orange, yellow, green, blue, violet, red);"></span>
+        <h2>Anima Mega Hyper Rare</h2>
+        <span class="pct">0.1%</span>
+      </div>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-mega-hyper">
+            <div class="card-inner" style="background-image:url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3U2cDEyM3c1djFueXI4N2w3cjJqaTA5OGZhYmpkYzlzcGQzOGhkeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IEZy0MXCCxBShZaloq/giphy.gif');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="badge-mega-hyper-ring">
+              <span class="title-badge badge-mega-hyper" style="background-image:url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3U2cDEyM3c1djFueXI4N2w3cjJqaTA5OGZhYmpkYzlzcGQzOGhkeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IEZy0MXCCxBShZaloq/giphy.gif');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+            </span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-mega-hyper">
+            <div class="card-inner" style="background-image:url('https://64.media.tumblr.com/519d48bdb9c8b6b4962d9331b862e859/2de001ae1ad3b407-59/s640x960/7e5aa39d5af3247cbbb884f9930a60d9ab9d295c.gifv');">
+              <span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="badge-mega-hyper-ring">
+              <span class="title-badge badge-mega-hyper" style="background-image:url('https://64.media.tumblr.com/519d48bdb9c8b6b4962d9331b862e859/2de001ae1ad3b407-59/s640x960/7e5aa39d5af3247cbbb884f9930a60d9ab9d295c.gifv');"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:conic-gradient(from 0deg, red, orange, yellow, green, blue, violet, red);"></span>
+        <h2>Hyper Rare Bonus &mdash; Name Style Change</h2>
+        <span class="pct">bonus</span>
+      </div>
+      <p style="color:var(--muted); font-size:13px; max-width:640px; margin:0 auto 24px;">Landing a Mega Hyper Rare doesn't just win a badge &mdash; your name itself picks up the animated RGB shimmer everywhere it's shown.</p>
+
+      <div style="max-width:220px; margin:0 auto; display:flex; flex-direction:column; gap:10px;">
+        <div class="name-demo">
+          <div class="demo-label">Players Online</div>
+          <div class="demo-row">
+            <span class="dot"></span>
+            <span class="badge-mega-hyper-ring">
+              <span class="title-badge badge-mega-hyper" style="background-image:url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3U2cDEyM3c1djFueXI4N2w3cjJqaTA5OGZhYmpkYzlzcGQzOGhkeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IEZy0MXCCxBShZaloq/giphy.gif'); min-width:0; padding:2px 10px;"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+            </span>
+            <span class="rgb-name-text">Krog Ershh</span>
+          </div>
+        </div>
+        <div class="name-demo">
+          <div class="demo-label">Players Online</div>
+          <div class="demo-row">
+            <span class="dot"></span>
+            <span class="badge-mega-hyper-ring">
+              <span class="title-badge badge-mega-hyper" style="background-image:url('https://64.media.tumblr.com/519d48bdb9c8b6b4962d9331b862e859/2de001ae1ad3b407-59/s640x960/7e5aa39d5af3247cbbb884f9930a60d9ab9d295c.gifv'); min-width:0; padding:2px 10px;"><span class="invisible-label">&#8206; &#8206; &#8206; &#8206; &#8206;</span></span>
+            </span>
+            <span class="rgb-name-text">Krog Ershh</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COUNTERFINISH CRATE ================= -->
+  <div class="crate-block">
+    <div class="crate-intro">
+      <h1>⚙️ Counterfinish Crate</h1>
+      <span class="price">$3,000</span>
+      <p>A crate of skins and finishes, not characters &mdash; every pull is a colored, glowing name tag with its own material swatch. Pull a Hyper Gem and the effect doesn't stop at the badge: your name recolors everywhere it appears, in the header and in the online players list.</p>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:#6fae74;"></span>
+        <h2>Common</h2>
+        <span class="pct">60%</span>
+      </div>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-flat" style="border-color:#8fc797;">
+            <div class="card-inner" style="background-image:url('https://static.pattern.wiki/img/f6bf9c9384c795756acf41fafadf887704a3c8ae');">
+              <span class="visible-label col-safari">Safari</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-flat" style="border-color:#8fc797; background-image:url('https://static.pattern.wiki/img/f6bf9c9384c795756acf41fafadf887704a3c8ae');"><span class="visible-label col-safari">Safari</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-flat" style="border-color:#d4af37;">
+            <div class="card-inner" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq4VV3Wv-Dr9mnVtkhCQRSPU6YIwi0ZSrTD1YclGu9R3e4mHhJzCupIc9o&s=10');">
+              <span class="visible-label text-black-bold">Tiger</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-flat" style="border-color:#d4af37; background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq4VV3Wv-Dr9mnVtkhCQRSPU6YIwi0ZSrTD1YclGu9R3e4mHhJzCupIc9o&s=10');"><span class="visible-label text-black-bold">Tiger</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-flat col-tronic-border">
+            <div class="card-inner" style="background-image:url('https://thumbs.dreamstime.com/b/image-red-metal-background-texture-showcasing-brushed-steel-plate-iron-shiny-reflections-363238309.jpg');">
+              <span class="visible-label text-steel-bold">Tronic</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-flat col-tronic-border" style="background-image:url('https://thumbs.dreamstime.com/b/image-red-metal-background-texture-showcasing-brushed-steel-plate-iron-shiny-reflections-363238309.jpg');"><span class="visible-label text-steel-bold">Tronic</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-flat" style="border-color:#9b30ff;">
+            <div class="card-inner" style="background-image:url('https://knify.gg/medias/2024/02/swatch-freehand.webp');">
+              <span class="visible-label text-black-bold">Free</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-flat" style="border-color:#9b30ff; background-image:url('https://knify.gg/medias/2024/02/swatch-freehand.webp');"><span class="visible-label text-black-bold">Free</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:#d4af37;"></span>
+        <h2>Rare</h2>
+        <span class="pct">45%</span>
+      </div>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-lore-border">
+            <div class="card-inner" style="background-image:url('https://images.stockcake.com/public/d/3/e/d3ee6013-d135-49d2-b919-c1dd3b8e7c43_medium/ornate-golden-texture-stockcake.jpg');">
+              <span class="visible-label col-lore-text">Lore</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-lore-border" style="background-image:url('https://images.stockcake.com/public/d/3/e/d3ee6013-d135-49d2-b919-c1dd3b8e7c43_medium/ornate-golden-texture-stockcake.jpg');"><span class="visible-label col-lore-text">Lore</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-howl">
+            <div class="card-inner" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0jsvqAAddVLwsq8Hu2gVzuOAcmwYl1PkhlqLS1xS6ajwzrooKZ8wjJZbH&s=10');">
+              <span class="visible-label text-glow" style="--c:#ffe066; color:#ffe066;">Howl</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-howl" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0jsvqAAddVLwsq8Hu2gVzuOAcmwYl1PkhlqLS1xS6ajwzrooKZ8wjJZbH&s=10');"><span class="visible-label text-glow" style="--c:#ffe066; color:#ffe066;">Howl</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-fade">
+            <div class="card-inner" style="background-image:url('https://i.pinimg.com/736x/55/2b/17/552b17605548a0072c76e9e57d63fe3c.jpg');">
+              <span class="visible-label col-fade-text" style="text-shadow:0 0 6px #9b30ff, 0 0 10px #ff8c00;">Fade</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-fade" style="background-image:url('https://i.pinimg.com/736x/55/2b/17/552b17605548a0072c76e9e57d63fe3c.jpg');"><span class="visible-label col-fade-text" style="text-shadow:0 0 6px #9b30ff, 0 0 10px #ff8c00;">Fade</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:#4da6ff;"></span>
+        <h2>Gem</h2>
+        <span class="pct">4.5%</span>
+      </div>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-sapphire">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1eyncuBFZSghsJoFtjfz20X7JMzTckgFd');">
+              <span class="visible-label col-sapphire text-glow">Sapphire</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-sapphire" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1eyncuBFZSghsJoFtjfz20X7JMzTckgFd');"><span class="visible-label col-sapphire text-glow">Sapphire</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-ruby">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1oTFEjs6q33UEpkEvo1NTNVZrCLCUpf3m');">
+              <span class="visible-label col-ruby text-glow">Ruby</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-ruby" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1oTFEjs6q33UEpkEvo1NTNVZrCLCUpf3m');"><span class="visible-label col-ruby text-glow">Ruby</span></span>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-emerald">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1qEv-GgJxwgBOlmiZDTqiF5at-3jLqQ0w');">
+              <span class="visible-label col-emerald text-glow">emerald</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-emerald" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1qEv-GgJxwgBOlmiZDTqiF5at-3jLqQ0w');"><span class="visible-label col-emerald text-glow">emerald</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:conic-gradient(from 0deg, #4da6ff, #ff5c5c, #4ee08a, #4da6ff);"></span>
+        <h2>Hyper Gem</h2>
+        <span class="pct">0.5%</span>
+      </div>
+      <p style="color:var(--muted); font-size:13px; max-width:640px; margin:0 auto 24px;">These three also change your name style everywhere it's displayed &mdash; the top-right header and the Players Online list both pick up the glow.</p>
+      <div class="card-grid">
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-sapphire">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1eyncuBFZSghsJoFtjfz20X7JMzTckgFd');">
+              <span class="visible-label text-glow-white">Hyper</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-sapphire" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1eyncuBFZSghsJoFtjfz20X7JMzTckgFd');"><span class="visible-label text-glow-white">Hyper</span></span>
+          </div>
+          <div class="name-demo">
+            <div class="demo-label">Players Online</div>
+            <div class="demo-row">
+              <span class="dot"></span>
+              <span class="title-badge badge-glow-col col-sapphire" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1eyncuBFZSghsJoFtjfz20X7JMzTckgFd'); min-width:0; padding:2px 8px;"><span class="visible-label text-glow-white" style="font-size:9px; padding-bottom:0;">Hyper</span></span>
+              <span class="col-sapphire text-glow hyper-font">Krog Ershh</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-ruby">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1oTFEjs6q33UEpkEvo1NTNVZrCLCUpf3m');">
+              <span class="visible-label text-glow-white">Hyper</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-ruby" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1oTFEjs6q33UEpkEvo1NTNVZrCLCUpf3m');"><span class="visible-label text-glow-white">Hyper</span></span>
+          </div>
+          <div class="name-demo">
+            <div class="demo-label">Players Online</div>
+            <div class="demo-row">
+              <span class="dot"></span>
+              <span class="title-badge badge-glow-col col-ruby" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1oTFEjs6q33UEpkEvo1NTNVZrCLCUpf3m'); min-width:0; padding:2px 8px;"><span class="visible-label text-glow-white" style="font-size:9px; padding-bottom:0;">Hyper</span></span>
+              <span class="col-ruby text-glow hyper-font">Krog Ershh</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="crate-item">
+          <div class="card-frame border-glow-col col-emerald">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1qEv-GgJxwgBOlmiZDTqiF5at-3jLqQ0w');">
+              <span class="visible-label text-glow-white">Hyper</span>
+            </div>
+          </div>
+          <div class="equip-row">
+            <span class="player-name">Preview</span>
+            <span class="title-badge badge-glow-col col-emerald" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1qEv-GgJxwgBOlmiZDTqiF5at-3jLqQ0w');"><span class="visible-label text-glow-white">Hyper</span></span>
+          </div>
+          <div class="name-demo">
+            <div class="demo-label">Players Online</div>
+            <div class="demo-row">
+              <span class="dot"></span>
+              <span class="title-badge badge-glow-col col-emerald" style="background-image:url('https://lh3.googleusercontent.com/u/0/d/1qEv-GgJxwgBOlmiZDTqiF5at-3jLqQ0w'); min-width:0; padding:2px 8px;"><span class="visible-label text-glow-white" style="font-size:9px; padding-bottom:0;">Hyper</span></span>
+              <span class="col-emerald text-glow hyper-font">Krog Ershh</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="market-alert">GOOD S1 Crates and Open Beta Crates WILL BE GOING OFF MARKET on WEDNESDAY, JUL 22.</div>
+
+</div>
+
+</body>
+</html>
