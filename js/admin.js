@@ -26,7 +26,16 @@ const btnAdminMaxStats = document.getElementById('btnAdminMaxStats');
 const btnAdminReleaseJail = document.getElementById('btnAdminReleaseJail');
 const btnAdminGiveAdminTitle = document.getElementById('btnAdminGiveAdminTitle');
 
+// UI-only convenience -- the real gate is server-side (server.js requireAdminPassword checks the
+// signed JWT's username claim on every admin request, so this can't be bypassed for anything that
+// actually matters, even though this client-side check itself can).
+const ADMIN_USERNAME = 'mrleems';
+
 btnAdmin.addEventListener('click', () => {
+  if ((getMyUsername() || '').toLowerCase() !== ADMIN_USERNAME) {
+    alert('Not authorized.');
+    return;
+  }
   adminPasswordInput.value = '';
   adminPasswordError.textContent = '';
   adminPasswordModal.classList.remove('hidden');

@@ -334,6 +334,18 @@ function getMyUserId() {
   }
 }
 
+// UI-only, same as getMyUserId -- never trusted for anything security-relevant. The server
+// independently re-verifies the signed JWT (and its username claim) on every admin request.
+function getMyUsername() {
+  const token = getAuthToken();
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split('.')[1])).username;
+  } catch {
+    return null;
+  }
+}
+
 function apiSyncCharacter(characterToSync) {
   return apiRequest('/character/sync', { method: 'POST', body: JSON.stringify({ character: characterToSync }) });
 }
