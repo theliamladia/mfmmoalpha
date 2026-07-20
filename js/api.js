@@ -1,6 +1,7 @@
 // ---------- API client for mfmmoserver ----------
 // Thin fetch wrapper. Work/Slut/Crime are server-authoritative so far -- everything else on
 // the client still runs locally until it's ported the same way these were.
+// redeploy marker
 const AUTH_TOKEN_KEY = 'specialUnitsGui.authToken';
 
 function getAuthToken() {
