@@ -1,5 +1,5 @@
 // ---------- admin ----------
-const ADMIN_PASSWORD = 'fishdoc15!';
+const ADMIN_PASSWORD = 'VACnetCrack90s!(@#';
 // Kept after a successful unlock so pause/modifier/inventory-checker calls (which now hit a real
 // shared server, not just this browser) can re-prove admin access on each request.
 let adminPasswordForRequests = null;
