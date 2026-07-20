@@ -1,7 +1,6 @@
 // ---------- API client for mfmmoserver ----------
 // Thin fetch wrapper. Work/Slut/Crime are server-authoritative so far -- everything else on
 // the client still runs locally until it's ported the same way these were.
-const API_BASE = 'https://api.mfmmo.com';
 const AUTH_TOKEN_KEY = 'specialUnitsGui.authToken';
 
 function getAuthToken() {
@@ -293,16 +292,16 @@ function apiAdminState() {
   return apiRequest('/admin/state');
 }
 
-function apiAdminSetPause(paused, adminPassword) {
-  return apiRequest('/admin/pause', { method: 'POST', body: JSON.stringify({ paused, adminPassword }) });
+function apiAdminSetPause(paused) {
+  return apiRequest('/admin/pause', { method: 'POST', body: JSON.stringify({ paused }) });
 }
 
-function apiAdminSetModifier(modifier, adminPassword) {
-  return apiRequest('/admin/modifier', { method: 'POST', body: JSON.stringify({ modifier, adminPassword }) });
+function apiAdminSetModifier(modifier) {
+  return apiRequest('/admin/modifier', { method: 'POST', body: JSON.stringify({ modifier }) });
 }
 
-function apiAdminInventory(username, adminPassword) {
-  return apiRequest('/admin/inventory', { method: 'POST', body: JSON.stringify({ username, adminPassword }) });
+function apiAdminInventory(username) {
+  return apiRequest('/admin/inventory', { method: 'POST', body: JSON.stringify({ username }) });
 }
 
 function apiResetCharacter() {

@@ -1,18 +1,9 @@
 // ---------- admin ----------
-const ADMIN_PASSWORD = 'VACnetCrack90s!(@#';
-// Kept after a successful unlock so pause/modifier/inventory-checker calls (which now hit a real
-// shared server, not just this browser) can re-prove admin access on each request.
-let adminPasswordForRequests = null;
-
 const btnAdmin = document.getElementById('btnAdmin');
-const adminPasswordModal = document.getElementById('adminPasswordModal');
-const adminPasswordInput = document.getElementById('adminPasswordInput');
-const adminPasswordError = document.getElementById('adminPasswordError');
-const btnAdminPasswordSubmit = document.getElementById('btnAdminPasswordSubmit');
-const btnAdminPasswordCancel = document.getElementById('btnAdminPasswordCancel');
 
 const adminMenuModal = document.getElementById('adminMenuModal');
 const btnAdminClose = document.getElementById('btnAdminClose');
+const btnAdminCloseX = document.getElementById('btnAdminCloseX');
 const adminCashInput = document.getElementById('adminCashInput');
 const adminChipsInput = document.getElementById('adminChipsInput');
 const adminWeightInput = document.getElementById('adminWeightInput');
@@ -36,35 +27,16 @@ btnAdmin.addEventListener('click', () => {
     alert('Not authorized.');
     return;
   }
-  adminPasswordInput.value = '';
-  adminPasswordError.textContent = '';
-  adminPasswordModal.classList.remove('hidden');
-  adminPasswordInput.focus();
-});
-
-btnAdminPasswordCancel.addEventListener('click', () => {
-  adminPasswordModal.classList.add('hidden');
-});
-
-function submitAdminPassword() {
-  if (adminPasswordInput.value === ADMIN_PASSWORD) {
-    adminPasswordForRequests = adminPasswordInput.value;
-    adminPasswordModal.classList.add('hidden');
-    adminMenuModal.classList.remove('hidden');
-    refreshAdminPauseButton();
-    refreshAdminModifierButtons();
-  } else {
-    adminPasswordError.textContent = 'Incorrect password.';
-    adminPasswordInput.value = '';
-  }
-}
-
-btnAdminPasswordSubmit.addEventListener('click', submitAdminPassword);
-adminPasswordInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') submitAdminPassword();
+  adminMenuModal.classList.remove('hidden');
+  refreshAdminPauseButton();
+  refreshAdminModifierButtons();
 });
 
 btnAdminClose.addEventListener('click', () => {
+  adminMenuModal.classList.add('hidden');
+});
+
+btnAdminCloseX.addEventListener('click', () => {
   adminMenuModal.classList.add('hidden');
 });
 
@@ -144,7 +116,7 @@ function refreshAdminPauseButton() {
 
 btnAdminTogglePause.addEventListener('click', async () => {
   try {
-    const result = await apiAdminSetPause(!isGamePaused(), adminPasswordForRequests);
+    const result = await apiAdminSetPause(!isGamePaused());
     serverStateCache = result.state;
     refreshAdminPauseButton();
     renderServerBanners();
@@ -167,7 +139,7 @@ function refreshAdminModifierButtons() {
 adminModifierButtons.forEach((btn) => {
   btn.addEventListener('click', async () => {
     try {
-      const result = await apiAdminSetModifier(btn.dataset.modifier || null, adminPasswordForRequests);
+      const result = await apiAdminSetModifier(btn.dataset.modifier || null);
       serverStateCache = result.state;
       refreshAdminModifierButtons();
       renderServerBanners();
@@ -210,7 +182,7 @@ function renderInvCheckResult(result) {
 
 btnAdminInvCheck.addEventListener('click', async () => {
   try {
-    const result = await apiAdminInventory(adminInvCheckInput.value, adminPasswordForRequests);
+    const result = await apiAdminInventory(adminInvCheckInput.value);
     renderInvCheckResult(result);
   } catch (err) {
     renderInvCheckResult(err);

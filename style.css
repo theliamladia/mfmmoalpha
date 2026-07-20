@@ -1480,15 +1480,6 @@ button:disabled {
 }
 
 /* --- Admin --- */
-#adminPasswordInput {
-  width: 100%;
-  padding: 8px 10px;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
-  border-radius: 6px;
-  color: #e8e8ea;
-  margin-top: 6px;
-}
 
 .modal-actions {
   display: flex;
@@ -1506,11 +1497,31 @@ button:disabled {
 }
 
 .admin-box {
-  width: 440px;
+  width: 640px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
 }
 
 .admin-box h3 {
   color: #f2c94c;
+}
+
+.admin-close-x {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  background: #3d3f48;
+  color: #e8e8ea;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .admin-row {
