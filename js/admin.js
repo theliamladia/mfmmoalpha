@@ -30,6 +30,7 @@ btnAdmin.addEventListener('click', () => {
   adminMenuModal.classList.remove('hidden');
   refreshAdminPauseButton();
   refreshAdminModifierButtons();
+  refreshAdminMaintenanceButton();
 });
 
 btnAdminClose.addEventListener('click', () => {
@@ -120,6 +121,27 @@ btnAdminTogglePause.addEventListener('click', async () => {
     serverStateCache = result.state;
     refreshAdminPauseButton();
     renderServerBanners();
+    renderAll();
+  } catch (err) {
+    alert(err.reason || 'Could not reach the server.');
+  }
+});
+
+// ---------- Server Controls: maintenance mode ----------
+const btnAdminToggleMaintenance = document.getElementById('btnAdminToggleMaintenance');
+
+function refreshAdminMaintenanceButton() {
+  if (!btnAdminToggleMaintenance) return;
+  btnAdminToggleMaintenance.textContent = isMaintenanceOn() ? 'End Maintenance' : 'Start Maintenance';
+  btnAdminToggleMaintenance.classList.toggle('active-modifier', isMaintenanceOn());
+}
+
+btnAdminToggleMaintenance.addEventListener('click', async () => {
+  try {
+    const result = await apiAdminSetMaintenance(!isMaintenanceOn());
+    serverStateCache = result.state;
+    refreshAdminMaintenanceButton();
+    renderMaintenanceGate();
     renderAll();
   } catch (err) {
     alert(err.reason || 'Could not reach the server.');

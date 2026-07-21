@@ -301,6 +301,10 @@ function apiAdminSetModifier(modifier) {
   return apiRequest('/admin/modifier', { method: 'POST', body: JSON.stringify({ modifier }) });
 }
 
+function apiAdminSetMaintenance(maintenance) {
+  return apiRequest('/admin/maintenance', { method: 'POST', body: JSON.stringify({ maintenance }) });
+}
+
 function apiAdminInventory(username) {
   return apiRequest('/admin/inventory', { method: 'POST', body: JSON.stringify({ username }) });
 }
