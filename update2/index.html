@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Drugs &amp; Rugs — Update Teaser</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0e12;
+    --panel: #16171d;
+    --panel2: #1c1e26;
+    --text: #e8e8ee;
+    --muted: #8a8c96;
+    --green: #2ecc71;
+    --red: #e0342b;
+    --gold: #f2c230;
+    --purple: #9b30ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 24px 100px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-wrap { width: 100%; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    text-align: center;
+    margin-bottom: 50px;
+    max-width: 780px;
+  }
+  .hero .kicker {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: #241d0a;
+    border: 1px solid #4a3c14;
+    border-radius: 999px;
+    padding: 5px 16px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 48px;
+    margin: 0 0 12px;
+    line-height: 1.1;
+    background: linear-gradient(90deg, #6fae74, #f2c230, #e0342b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ---------- Section shells ---------- */
+  .section {
+    width: 100%;
+    margin-bottom: 70px;
+  }
+  .section-head {
+    text-align: center;
+    margin-bottom: 34px;
+  }
+  .section-head h2 {
+    font-size: 30px;
+    margin: 0 0 8px;
+  }
+  .section-head .sub {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .badge-new {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #0f2018;
+    border: 1px solid #1d4a30;
+    color: var(--green);
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* ---------- Quick-hit grid (balance/bugs) ---------- */
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .quick-card {
+    background: var(--panel);
+    border: 1px solid #24262f;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .quick-card .emoji { font-size: 26px; margin-bottom: 8px; display: block; }
+  .quick-card h3 { margin: 0 0 6px; font-size: 15px; }
+  .quick-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .quick-card .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-top: 10px;
+  }
+  .tag-up { background: #0f2018; color: var(--green); border: 1px solid #1d4a30; }
+  .tag-down { background: #2a1010; color: #ff8080; border: 1px solid #5a1e1e; }
+  .tag-fix { background: #1a1f2a; color: #6fb3ff; border: 1px solid #26344a; }
+
+  /* ---------- Feature preview cards ---------- */
+  .feature-card {
+    background: linear-gradient(180deg, var(--panel2), var(--panel));
+    border: 1px solid #262834;
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 26px;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    top: -60%;
+    right: -20%;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow, #2ecc71) 0%, transparent 70%);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .feature-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .feature-title { display: flex; align-items: center; gap: 12px; }
+  .feature-title .icon { font-size: 34px; }
+  .feature-title h3 { margin: 0; font-size: 24px; }
+  .feature-title .subtitle { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .price-pill {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 999px;
+  }
+  .price-pill.buy { background: #0f2018; border: 1px solid #1d4a30; color: var(--green); }
+  .price-pill.free { background: #10202a; border: 1px solid #1c4a5a; color: #6fd3ff; }
+
+  .feature-desc { color: var(--text); font-size: 14.5px; line-height: 1.7; margin-bottom: 22px; opacity: 0.9; }
+
+  /* ---------- Timeline (Farms) ---------- */
+  .timeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 22px 0;
+    flex-wrap: wrap;
+  }
+  .timeline-step {
+    flex: 1;
+    min-width: 140px;
+    background: #12141a;
+    border: 1px solid #24262f;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 0 6px 6px 0;
+    text-align: center;
+  }
+  .timeline-step .step-emoji { font-size: 22px; margin-bottom: 6px; display: block; }
+  .timeline-step .step-time { font-weight: 700; color: var(--gold); font-size: 14px; }
+  .timeline-step .step-label { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  .stat-row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px; }
+  .stat-chip {
+    background: #12141a;
+    border: 1px solid #24262f;
+    border-radius: 10px;
+    padding: 12px 18px;
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+  }
+  .stat-chip .val { font-size: 20px; font-weight: 700; }
+  .stat-chip .lbl { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .stat-chip.risk .val { color: #ff8080; }
+  .stat-chip.reward .val { color: var(--green); }
+  .stat-chip.gold .val { color: var(--gold); }
+
+  .risk-note {
+    margin-top: 16px;
+    background: #2a1010;
+    border: 1px solid #5a1e1e;
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #ffb3b3;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ---------- Floydcoin ticker ---------- */
+  .ticker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #0c1a12;
+    border: 1px solid #1d4a30;
+    border-radius: 12px;
+    padding: 14px 22px;
+    margin-bottom: 20px;
+  }
+  .ticker .coin { font-size: 28px; }
+  .ticker .price { font-size: 26px; font-weight: 800; color: var(--green); }
+  .ticker .sym { color: var(--muted); font-size: 13px; }
+
+  .rig-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .rig-card {
+    flex: 1;
+    min-width: 160px;
+    background: #12141a;
+    border: 1px solid #24262f;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .rig-card .rig-emoji { font-size: 24px; }
+  .rig-card h4 { margin: 8px 0 4px; font-size: 14px; }
+  .rig-card p { margin: 0; color: var(--muted); font-size: 12px; }
+
+  /* ---------- Altcoins — the centerpiece ---------- */
+  .altcoin-card {
+    background: linear-gradient(160deg, #241422, #16171d 60%);
+    border: 1px solid #3a1f38;
+  }
+  .altcoin-card::before { --glow: var(--purple); }
+  .altcoin-warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2a1010;
+    border: 1px solid #5a1e1e;
+    color: #ff8080;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .curve-box {
+    background: #12141a;
+    border: 1px solid #24262f;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 18px 0;
+  }
+  .curve-bar-wrap {
+    position: relative;
+    height: 46px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #0c0d11;
+    margin: 14px 0 6px;
+  }
+  .curve-bar {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: linear-gradient(90deg, #2ecc71, #f2c230 60%, #e0342b);
+    width: 100%;
+  }
+  .curve-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .curve-labels b { color: var(--text); }
+
+  .choice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  @media (max-width: 640px) { .choice-row { grid-template-columns: 1fr; } }
+  .choice-card {
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid;
+  }
+  .choice-rug { background: #2a1010; border-color: #5a1e1e; }
+  .choice-buyout { background: #0f2018; border-color: #1d4a30; }
+  .choice-card h4 { margin: 0 0 6px; font-size: 15px; }
+  .choice-rug h4 { color: #ff8080; }
+  .choice-buyout h4 { color: var(--green); }
+  .choice-card p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+  .example-box {
+    margin-top: 22px;
+    background: #12141a;
+    border: 1px dashed #3a3c46;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .example-box .ex-title { font-size: 13px; color: var(--gold); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .example-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .example-grid { grid-template-columns: 1fr; } }
+  .example-outcome {
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .example-outcome.fair { background: #10202a; border: 1px solid #1c4a5a; }
+  .example-outcome.rug { background: #2a1010; border: 1px solid #5a1e1e; }
+  .example-outcome .oc-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .example-outcome.fair .oc-title { color: #6fd3ff; }
+  .example-outcome.rug .oc-title { color: #ff8080; }
+  .example-outcome .oc-val { font-size: 22px; font-weight: 800; }
+  .example-outcome .oc-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  /* ---------- Body armor ---------- */
+  .armor-flex { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .armor-icon-box {
+    font-size: 46px;
+    background: #12141a;
+    border: 1px solid #24262f;
+    border-radius: 14px;
+    padding: 20px 26px;
+  }
+
+  /* ---------- Footer alert ---------- */
+  .market-alert {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 10px;
+    background: #7a1414;
+    border: 1px solid #b02323;
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: center;
+    color: #ffe5e5;
+    font-weight: 700;
+    font-size: 14.5px;
+    letter-spacing: 0.3px;
+  }
+  .footer-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12.5px;
+    max-width: 640px;
+    margin: 18px auto 0;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <div class="hero">
+    <span class="kicker">🚧 Update Preview</span>
+    <h1>🌿 Drugs &amp; Rugs 💸</h1>
+    <p>Grow it, ship it, sell it — or mint it, hype it, and rug the whole table. This update brings a real passive-income underworld to Milos: weed &amp; coke farms, a live crypto rig, and player-minted altcoins with a built-in betrayal mechanic. Plus a full balance pass, two bug fixes, and body armor for the duel scene.</p>
+  </div>
+
+  <!-- ================= BALANCE + FIXES ================= -->
+  <div class="section">
+    <div class="section-head">
+      <h2>⚖️ Balance &amp; Fixes</h2>
+      <div class="sub">The game's been a little too generous. A few numbers are moving, and two long-standing bugs are getting squashed.</div>
+    </div>
+    <div class="quick-grid">
+      <div class="quick-card">
+        <span class="emoji">🔫</span>
+        <h3>Crime Pay &minus;20%</h3>
+        <p>Street crime payouts are coming down across the board. Tiered crimes (Shoplifting → Grand Theft Auto) all take the cut.</p>
+        <span class="tag tag-down">Nerf</span>
+      </div>
+      <div class="quick-card">
+        <span class="emoji">💼</span>
+        <h3>Good Hustle Pay +10%</h3>
+        <p>Playing it straight pays a little better now — an incentive to stay on the Good side of the ladder.</p>
+        <span class="tag tag-up">Buff</span>
+      </div>
+      <div class="quick-card">
+        <span class="emoji">💪</span>
+        <h3>Looks — Under Review</h3>
+        <p>Looks training already got a full curve rework last patch. If it's still too easy, expect another tightening pass.</p>
+        <span class="tag tag-down">Watching</span>
+      </div>
+      <div class="quick-card">
+        <span class="emoji">🔒</span>
+        <h3>Jail Now Actually Stops You</h3>
+        <p>Work, Slut, and Crime could previously slip through while incarcerated. Not anymore — the jailhouse door is finally locked.</p>
+        <span class="tag tag-fix">Bug Fix</span>
+      </div>
+      <div class="quick-card">
+        <span class="emoji">⛓️</span>
+        <h3>Bail Race Condition</h3>
+        <p>Posting bail while your sentence was still "processing" could fail to land. Root-caused and fixed.</p>
+        <span class="tag tag-fix">Bug Fix</span>
+      </div>
+      <div class="quick-card">
+        <span class="emoji">📦</span>
+        <h3>Crates Archived</h3>
+        <p>Open Beta &amp; GOOD® Season 1 crates move to a view-only Archived Crates tab — owned titles stay yours, no new pulls.</p>
+        <span class="tag tag-fix">Change</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= BODY ARMOR ================= -->
+  <div class="section">
+    <div class="section-head">
+      <h2>🛡️ Body Armor <span class="badge-new">NEW</span></h2>
+      <div class="sub">A serious investment for a serious duelist. Now stocked at NMC Gun Club.</div>
+    </div>
+    <div class="feature-card" style="--glow:#6fb3ff;">
+      <div class="armor-flex">
+        <div class="armor-icon-box">🛡️</div>
+        <div style="flex:1; min-width:220px;">
+          <p class="feature-desc" style="margin-bottom:0;">Equip it before a duel and it soaks up the damage that would've been yours — but it's a one-time deal. The armor is consumed the moment your next PvP duel wraps up, win or lose. Priced to sit alongside the top-tier guns at NMC, not the cheap stuff.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MILOS OUTLOOK FARMS ================= -->
+  <div class="section">
+    <div class="section-head">
+      <h2>🌾 Milos Outlook Farms <span class="badge-new">NEW</span></h2>
+      <div class="sub">Passive income, if you're patient — and willing to gamble that nobody finds your plot.</div>
+    </div>
+
+    <div class="feature-card" style="--glow:#6fae74;">
+      <div class="feature-top">
+        <div class="feature-title">
+          <span class="icon">🌱</span>
+          <div>
+            <h3>Till. Plant. Ship. Repeat.</h3>
+            <div class="subtitle">Unlocked once you've cleared a drug dealer's sell-through 10x over</div>
+          </div>
+        </div>
+        <span class="price-pill buy">Plot + seeds required</span>
+      </div>
+
+      <p class="feature-desc">Buy a plot, till the ground, water it, fertilize it, and plant weed or (once unlocked) coke seeds. Walk away, come back, collect. Every grow runs through three stages before it pays out:</p>
+
+      <div class="timeline">
+        <div class="timeline-step">
+          <span class="step-emoji">🌾</span>
+          <div class="step-time">1 hour</div>
+          <div class="step-label">Grow</div>
+        </div>
+        <div class="timeline-step">
+          <span class="step-emoji">📦</span>
+          <div class="step-time">5 min</div>
+          <div class="step-label">Prepare &amp; Package</div>
+        </div>
+        <div class="timeline-step">
+          <span class="step-emoji">🚚</span>
+          <div class="step-time">1 hour</div>
+          <div class="step-label">Ship to Distributor</div>
+        </div>
+        <div class="timeline-step">
+          <span class="step-emoji">💰</span>
+          <div class="step-time">10x payout</div>
+          <div class="step-label">Sold</div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-chip reward">
+          <div class="val">10x</div>
+          <div class="lbl">Street-Sale Payout</div>
+        </div>
+        <div class="stat-chip risk">
+          <div class="val">30% → 5%</div>
+          <div class="lbl">Confiscation Risk (upgradeable)</div>
+        </div>
+        <div class="stat-chip gold">
+          <div class="val">1hr window</div>
+          <div class="lbl">Shipment Interception Risk</div>
+        </div>
+      </div>
+
+      <div class="risk-note">⚠️ Confiscation risk is revealed <b>at planting time</b> — you know the odds before you commit. And while your shipment's in transit, anyone who successfully robs you in NMC has a small, speed-dependent chance to sniff out your plot's location and jack the whole shipment. Nothing about this is a guaranteed payday.</div>
+    </div>
+  </div>
+
+  <!-- ================= FLOYDCOIN ================= -->
+  <div class="section">
+    <div class="section-head">
+      <h2>📈 Floydcoin <span class="badge-new">NEW</span></h2>
+      <div class="sub">Milos's own crypto. Mine it passively, upgrade your rig, or get robbed for it.</div>
+    </div>
+
+    <div class="feature-card" style="--glow:#f2c230;">
+      <div class="feature-top">
+        <div class="feature-title">
+          <span class="icon">🖥️</span>
+          <div>
+            <h3>MyCrypto Setup</h3>
+            <div class="subtitle">A new tab at NMC — everyone starts mining for free</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticker">
+        <span class="coin">🪙</span>
+        <span class="price">$10,000</span>
+        <span class="sym">FC / floydcoin — starting price</span>
+      </div>
+
+      <p class="feature-desc">Your cheap bastard Uncle Lou never gave you a dime while he was alive — but he left you the one thing he actually loved: his ancient, wheezing <b>"MyShitter900"</b> mining rig, held together with duct tape and spite. It's yours now, no purchase required, and somehow it still mines <b>0.05 FC/day</b>. Rest in peace, Uncle Lou. From there, it's a straight upgrade grind:</p>
+
+      <div class="rig-row">
+        <div class="rig-card">
+          <span class="rig-emoji">🧠</span>
+          <h4>RAM Tier</h4>
+          <p>Faster accrual, cheapest upgrade line</p>
+        </div>
+        <div class="rig-card">
+          <span class="rig-emoji">⚙️</span>
+          <h4>CPU Tier</h4>
+          <p>Mid-tier output boost</p>
+        </div>
+        <div class="rig-card">
+          <span class="rig-emoji">🎮</span>
+          <h4>GPU Tier</h4>
+          <p>The real mining horsepower</p>
+        </div>
+      </div>
+
+      <div class="risk-note" style="margin-top:20px;">⚠️ Getting robbed in NMC carries a small, speed-dependent chance the robber also drains some FC straight out of your wallet. Keep your speed up if you're stacking coin.</div>
+    </div>
+  </div>
+
+  <!-- ================= ALTCOINS — CENTERPIECE ================= -->
+  <div class="section">
+    <div class="section-head">
+      <h2>🎢 Altcoins <span class="badge-new">NEW</span></h2>
+      <div class="sub">Mint your own coin. Pump it. Then decide: cash out fair, or rug everyone who trusted you.</div>
+    </div>
+
+    <div class="feature-card altcoin-card">
+      <span class="altcoin-warning">🚨 High risk of betrayal — proceed with eyes open</span>
+
+      <div class="feature-top">
+        <div class="feature-title">
+          <span class="icon">🪙</span>
+          <div>
+            <h3>Mint Your Own Altcoin</h3>
+            <div class="subtitle">One at a time, name it whatever you want</div>
+          </div>
+        </div>
+        <span class="price-pill buy">10 FC mint</span>
+      </div>
+
+      <p class="feature-desc">Any player can mint an altcoin for <b>10 FC</b>, creating a <b>1,000-coin</b> total supply under a custom name of your choosing. From there, the market decides what it's worth.</p>
+
+      <div class="curve-box">
+        <div class="curve-labels"><span>Coin price as supply sells out</span><span><b>0.10 FC</b> → <b>0.15 FC</b></span></div>
+        <div class="curve-bar-wrap"><div class="curve-bar"></div></div>
+        <div class="curve-labels"><span>🟢 Early buy-in</span><span>🟡 Mid-run</span><span>🔴 Full sellout</span></div>
+      </div>
+
+      <p class="feature-desc" style="margin-bottom:6px;"><b>Anyone can see how many coins are left in a run.</b> Nobody — not even the minter — can see who else holds coins or what they paid. Whoever holds the largest stake at any moment controls the coin's fate:</p>
+
+      <div class="choice-row">
+        <div class="choice-card choice-rug">
+          <h4>💥 Rug It</h4>
+          <p>Dump your holding at any time (or the instant the coin fully sells out) and the price craters to ~5&ndash;10% of its peak. Everyone still holding eats the loss. You walk away with the whole pool.</p>
+        </div>
+        <div class="choice-card choice-buyout">
+          <h4>🤝 Full Buyout</h4>
+          <p>Only available right at 1,000/1,000 sold — liquidate the entire coin back to Floydcoin and pay every holder pro-rata at the final price. The honest ending. Nobody gets left holding the bag.</p>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <div class="ex-title">📊 Worked Example — "KroogCoin"</div>
+        <p style="margin:0 0 12px; font-size:13px; color:var(--muted);">Minted for 10 FC. Owner immediately buys 501 of the 1,000 coins at mint. The other 499 sell out to the rest of the server.</p>
+        <div class="example-grid">
+          <div class="example-outcome fair">
+            <div class="oc-title">🤝 Plays It Fair</div>
+            <div class="oc-val">+2.5 FC</div>
+            <div class="oc-sub">~4% return on his stake — sells his own position at the normal declining-price curve</div>
+          </div>
+          <div class="example-outcome rug">
+            <div class="oc-title">💥 Rugs Everyone</div>
+            <div class="oc-val">+58.6 FC</div>
+            <div class="oc-sub">~88% return — <b>~23x bigger payday</b> than playing fair, at the direct expense of the other 499-coin holders</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="risk-note" style="margin-top:20px;">⚠️ The math will (almost) always tempt you to rug. That's the point. Buy into someone else's coin knowing exactly what you're signing up for.</div>
+    </div>
+  </div>
+
+  <div class="market-alert">🌿💸 DRUGS &amp; RUGS drops soon — start stacking Floydcoin now, the early rigs get the cheapest upgrades.</div>
+  <div class="footer-note">Numbers shown reflect the current design pass and may shift slightly before launch. Owned titles, existing balances, and current jail sentences are unaffected by this update.</div>
+
+</div>
+
+</body>
+</html>
