@@ -11,6 +11,18 @@
 </head>
 <body>
 
+<!-- MAINTENANCE MODE TAKEOVER -- covers the whole page for everyone except mrleems while active.
+     Server-side (server.js isMaintenanceBlocked) is the real gate; this is the client-side reflection
+     of it, kept in sync by the same poll that already drives the pause/modifier banners. -->
+<div id="maintenanceOverlay" class="maintenance-overlay hidden">
+  <div class="maintenance-box">
+    <div class="maintenance-emoji">🚧🔧🚧</div>
+    <h1>MAINTENANCE MODE</h1>
+    <p>GAME IS BEING UPDATED</p>
+    <p class="maintenance-sub">PLEASE FORWARD ALL COMPLAINTS TO NICK Q.</p>
+  </div>
+</div>
+
 <!-- LOGIN / REGISTER -->
 <section id="screen-auth" class="screen hidden">
   <div class="panel">
@@ -1031,6 +1043,7 @@
         <p>⏸️ Server Controls</p>
         <div class="admin-button-row">
           <button id="btnAdminTogglePause">Pause Game</button>
+          <button id="btnAdminToggleMaintenance">Start Maintenance</button>
         </div>
       </div>
 

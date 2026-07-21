@@ -2,7 +2,7 @@
 // Admin-controlled, server-wide state (pause + modifiers) -- a real shared value on the server now,
 // not per-browser localStorage. Every client polls it so pausing (or setting a modifier) actually
 // affects everyone, not just the browser that clicked the button.
-let serverStateCache = { paused: false, modifier: null };
+let serverStateCache = { paused: false, modifier: null, maintenance: false };
 
 async function refreshServerState() {
   if (!getAuthToken || !getAuthToken()) return;
@@ -12,10 +12,18 @@ async function refreshServerState() {
     // Best-effort -- keep the last known state if the poll fails.
   }
   renderServerBanners();
+  renderMaintenanceGate();
 }
 
 function isGamePaused() {
   return serverStateCache.paused;
+}
+
+// Server-side, mrleems is the only account maintenance mode doesn't block (see isMaintenanceBlocked
+// in server.js). This client-side check just decides whether to show the full-screen takeover --
+// it's a UI convenience, not the actual gate.
+function isMaintenanceOn() {
+  return !!serverStateCache.maintenance;
 }
 
 function activeModifier() {
@@ -52,4 +60,13 @@ function renderServerBanners() {
   modifierBanner.classList.toggle('hidden', !modifier);
   modifierBanner.className = `server-banner ${modifier ? modifier.cls : ''}${modifier ? '' : ' hidden'}`;
   modifierBanner.textContent = modifier ? modifier.text : '';
+}
+
+// ---------- Maintenance takeover ----------
+const maintenanceOverlay = document.getElementById('maintenanceOverlay');
+
+function renderMaintenanceGate() {
+  if (!maintenanceOverlay) return;
+  const blocked = isMaintenanceOn() && (getMyUsername() || '').toLowerCase() !== 'mrleems';
+  maintenanceOverlay.classList.toggle('hidden', !blocked);
 }
