@@ -808,6 +808,8 @@ button:disabled {
   flex-direction: column;
   gap: 10px;
   margin: 16px 0;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 .crate-odds-row {
@@ -1712,6 +1714,8 @@ button:disabled {
   padding: 26px 30px;
   width: 380px;
   max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
@@ -2443,11 +2447,6 @@ button:disabled {
 
   .job-skill-row button {
     flex: 1 1 100%;
-  }
-
-  .modal-box {
-    max-height: 85vh;
-    overflow-y: auto;
   }
 
   .admin-box {
