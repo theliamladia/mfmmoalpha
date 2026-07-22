@@ -49,13 +49,31 @@ function buildMtnListingsGrid() {
       const name = item ? itemLabel(item) : listing.itemId;
       const total = round2(listing.pricePerUnit * listing.qty);
       const isMine = listing.sellerName === myName;
+      const buttonHtml = isMine
+        ? `<button data-mtn-cancel="${listing.id}" class="secondary-btn">Cancel Listing</button>`
+        : `<button data-mtn-buy="${listing.id}">Buy</button>`;
+
+      // Titles get the full badge treatment (preview, name, how-obtained) since the plain id/name
+      // alone doesn't tell a buyer anything -- physical items (guns/ammo/drugs/gear) keep the
+      // simpler layout, since they have no badge or "how" flavor text to show.
+      if (item && item.type === 'title') {
+        return `
+          <div class="hustle-card">
+            <div class="title-preview">${titleBadgeMarkup(item)}</div>
+            <p class="title-info-rank">${name}</p>
+            ${item.how ? `<p class="title-info-how">${item.how}</p>` : ''}
+            <p><b>$${total.toFixed(2)}</b></p>
+            <p>Seller: ${listing.sellerName}</p>
+            ${buttonHtml}
+          </div>
+        `;
+      }
+
       return `
         <div class="hustle-card">
           <h3>${name}</h3>
           <p>Qty ${listing.qty} &times; $${listing.pricePerUnit.toFixed(2)} = <b>$${total.toFixed(2)}</b><br>Seller: ${listing.sellerName}</p>
-          ${isMine
-            ? `<button data-mtn-cancel="${listing.id}" class="secondary-btn">Cancel Listing</button>`
-            : `<button data-mtn-buy="${listing.id}">Buy</button>`}
+          ${buttonHtml}
         </div>
       `;
     }).join('')
