@@ -77,16 +77,33 @@ function buildInventoryGrid() {
   cosmeticsGrid.innerHTML = titleStacks.length
     ? titleStacks.map((stack) => {
       const item = getItemDef(stack.id);
+      const { level } = parsePrestigeId(stack.id);
+      // Only crate/store titles carry a `rarity` -- leaderboard/achievement/custom titles have
+      // none and so get neither button (selling/prestiging those wouldn't make sense).
+      const sellPrice = item.rarity ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
+      // Base (unprestiged) stacks need 6 so one copy survives the prestige; already-prestiged
+      // stacks fully convert at 5, since there's no reason to keep the lower prestige rank around.
+      const prestigeThreshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
+      const canPrestige = item.rarity && stack.qty >= prestigeThreshold;
       return `
         <div class="hustle-card">
           <h3>${itemLabel(item)}</h3>
           <p class="item-subheading">Title</p>
           <div class="title-preview">${titleBadgeMarkup(item)}</div>
           <p>&times; ${stack.qty}</p>
+          ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
+          ${canPrestige ? `<button data-prestige-title="${stack.id}">Prestige Title</button>` : ''}
         </div>
       `;
     }).join('')
     : '<p class="equip-picker-empty">No titles yet. Win them from a crate in Cosmetixxx.</p>';
+
+  cosmeticsGrid.querySelectorAll('[data-sell-title]').forEach((btn) => {
+    btn.addEventListener('click', () => sellTitle(btn.dataset.sellTitle));
+  });
+  cosmeticsGrid.querySelectorAll('[data-prestige-title]').forEach((btn) => {
+    btn.addEventListener('click', () => prestigeTitle(btn.dataset.prestigeTitle));
+  });
 
   tradeItemSelect.innerHTML = character.inventory.length
     ? character.inventory.map((stack) => {
@@ -96,6 +113,39 @@ function buildInventoryGrid() {
       return `<option value="${stack.id}">${label} (x${stack.qty})</option>`;
     }).join('')
     : '<option value="">No items to trade</option>';
+}
+
+// Titles are entirely client-side/trust-based (same as buying a crate spin or equipping a title),
+// so Sell/Prestige are plain local mutations + the usual debounced sync, no server route needed.
+function sellTitle(stackId) {
+  const item = getItemDef(stackId);
+  if (!item || !item.rarity) return;
+  const price = TITLE_SELL_PRICE_BY_RARITY[item.rarity];
+  if (!confirm(`Sell 1x ${itemLabel(item)} for $${price.toLocaleString()}? This cannot be undone.`)) return;
+
+  removeFromInventory(stackId, 1);
+  character.cash = round2(character.cash + price);
+  logTo(inventoryLog, `Sold ${itemLabel(item)} for $${price.toLocaleString()}.`, 'gain');
+  save();
+  renderAll();
+}
+
+function prestigeTitle(stackId) {
+  const item = getItemDef(stackId);
+  if (!item || !item.rarity) return;
+  const { baseId, level } = parsePrestigeId(stackId);
+  const threshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
+  if (inventoryQty(stackId) < threshold) return;
+
+  const nextId = `${baseId}_p${level + 1}`;
+  const nextDef = getItemDef(nextId);
+  if (!confirm(`Prestige ${itemLabel(item)}? This consumes ${PRESTIGE_COST}x and grants 1x ${itemLabel(nextDef)}. This cannot be undone.`)) return;
+
+  removeFromInventory(stackId, PRESTIGE_COST);
+  addToInventory(nextId, 1);
+  logTo(inventoryLog, `Prestiged into ${itemLabel(nextDef)}!`, 'gain');
+  save();
+  renderAll();
 }
 
 btnTradeSend.addEventListener('click', () => {

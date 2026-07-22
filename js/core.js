@@ -324,22 +324,22 @@ const HEIGHTMAXXED_TITLE = { id: 'heightmaxxed', name: 'HeightMAXXED', cssClass:
 
 const BETA_SPIN_COST = 5000;
 const BETA_SPIN_TITLES = [
-  { id: 'betaSpin2026', name: 'Beta 2026', cssClass: 'title-beta2026', weight: 50, how: 'Won from an OPEN BETA spin in Cosmetixxx (common).' },
-  { id: 'betaSpin2k26', name: 'Beta 2k26', cssClass: 'title-beta2k26', weight: 30, how: 'Won from an OPEN BETA spin in Cosmetixxx (uncommon).' },
-  { id: 'betaSpinTester', name: 'Beta Tester', cssClass: 'title-betatester', weight: 15, how: 'Won from an OPEN BETA spin in Cosmetixxx (rare).' },
-  { id: 'betaSpinOpen', name: 'OPEN BETA', cssClass: 'title-openbeta', weight: 5, how: 'Won from an OPEN BETA spin in Cosmetixxx (exclusive!).' },
+  { id: 'betaSpin2026', name: 'Beta 2026', cssClass: 'title-beta2026', weight: 50, rarity: 'common', how: 'Won from an OPEN BETA spin in Cosmetixxx (common).' },
+  { id: 'betaSpin2k26', name: 'Beta 2k26', cssClass: 'title-beta2k26', weight: 30, rarity: 'uncommon', how: 'Won from an OPEN BETA spin in Cosmetixxx (uncommon).' },
+  { id: 'betaSpinTester', name: 'Beta Tester', cssClass: 'title-betatester', weight: 15, rarity: 'rare', how: 'Won from an OPEN BETA spin in Cosmetixxx (rare).' },
+  { id: 'betaSpinOpen', name: 'OPEN BETA', cssClass: 'title-openbeta', weight: 5, rarity: 'mythic', how: 'Won from an OPEN BETA spin in Cosmetixxx (exclusive!).' },
 ];
 
 const GOOD_SEASON1_COST = 10000;
 const GOOD_SEASON1_TITLES = [
-  { id: 'gs1CommonA', name: 'GS1®', cssClass: 'title-gs1-common', weight: 30, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
-  { id: 'gs1CommonB', name: 'G®', cssClass: 'title-g-common', weight: 25, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
-  { id: 'gs1Uncommon', name: 'G®1', cssClass: 'title-g1-uncommon', weight: 25, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (uncommon).' },
-  { id: 'gs1RareFull', name: 'GOOD® Season 1', cssClass: 'title-gs1-rare', weight: 8, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
-  { id: 'gs1RareGewd', name: 'Gewd', cssClass: 'title-gewd-rare', weight: 8, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
-  { id: 'gs1Mythic', name: 'I\'m SOWWY', cssClass: 'title-sowwy-mythic', weight: 4, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (mythic!).' },
-  { id: 'gs1Common2', name: 'G Wagon®', cssClass: 'title-gwagon-common', weight: 20, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
-  { id: 'gs1RareBless', name: 'GOD IS GOOD®', cssClass: 'title-godisgood-rare', weight: 6, how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
+  { id: 'gs1CommonA', name: 'GS1®', cssClass: 'title-gs1-common', weight: 30, rarity: 'common', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
+  { id: 'gs1CommonB', name: 'G®', cssClass: 'title-g-common', weight: 25, rarity: 'common', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
+  { id: 'gs1Uncommon', name: 'G®1', cssClass: 'title-g1-uncommon', weight: 25, rarity: 'uncommon', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (uncommon).' },
+  { id: 'gs1RareFull', name: 'GOOD® Season 1', cssClass: 'title-gs1-rare', weight: 8, rarity: 'rare', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
+  { id: 'gs1RareGewd', name: 'Gewd', cssClass: 'title-gewd-rare', weight: 8, rarity: 'rare', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
+  { id: 'gs1Mythic', name: 'I\'m SOWWY', cssClass: 'title-sowwy-mythic', weight: 4, rarity: 'mythic', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (mythic!).' },
+  { id: 'gs1Common2', name: 'G Wagon®', cssClass: 'title-gwagon-common', weight: 20, rarity: 'common', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (common).' },
+  { id: 'gs1RareBless', name: 'GOD IS GOOD®', cssClass: 'title-godisgood-rare', weight: 6, rarity: 'rare', how: 'Won from a GOOD® Season 1 spin in Cosmetixxx (super rare).' },
 ];
 
 // Anima Crate: every item's real name is hidden (invisible LTR-mark characters over the splash
@@ -353,40 +353,40 @@ const ANIMA_HIDDEN_NAME = '<span style="color:transparent;">&#8206; &#8206; &#82
 // the "you won X" crate-result toast. See itemLabel() below.
 const ANIMA_CRATE_COST = 4500;
 const ANIMA_CRATE_TITLES = [
-  { id: 'animaCommonGoku', name: ANIMA_HIDDEN_NAME, displayName: 'Goku', cssClass: 'title-anima-common-goku', weight: 31.67, how: 'Won from an Anima Crate spin (common).' },
-  { id: 'animaCommonZoro', name: ANIMA_HIDDEN_NAME, displayName: 'Zoro', cssClass: 'title-anima-common-zoro', weight: 31.67, how: 'Won from an Anima Crate spin (common).' },
-  { id: 'animaCommonHatsune', name: ANIMA_HIDDEN_NAME, displayName: 'Hatsune', cssClass: 'title-anima-common-hatsune', weight: 31.66, how: 'Won from an Anima Crate spin (common).' },
-  { id: 'animaRareYujiro', name: ANIMA_HIDDEN_NAME, displayName: 'Yujiro', cssClass: 'title-anima-rare-yujiro', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
-  { id: 'animaRareCreator', name: ANIMA_HIDDEN_NAME, displayName: 'The Creator', cssClass: 'title-anima-rare-creator', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
-  { id: 'animaRareJinwoo', name: ANIMA_HIDDEN_NAME, displayName: 'Jinwoo Mog', cssClass: 'title-anima-rare-jinwoo', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
-  { id: 'animaMegaKirito', name: ANIMA_HIDDEN_NAME, displayName: 'Kirito', cssClass: 'title-anima-mega-kirito', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
-  { id: 'animaMegaItachi', name: ANIMA_HIDDEN_NAME, displayName: 'Itachi', cssClass: 'title-anima-mega-itachi', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
-  { id: 'animaMegaGodGoku', name: ANIMA_HIDDEN_NAME, displayName: 'God Goku', cssClass: 'title-anima-mega-godgoku', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
-  { id: 'animaMegaLuffy', name: ANIMA_HIDDEN_NAME, displayName: 'Luffy', cssClass: 'title-anima-mega-luffy', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaCommonGoku', name: ANIMA_HIDDEN_NAME, displayName: 'Goku', cssClass: 'title-anima-common-goku', weight: 31.67, rarity: 'common', how: 'Won from an Anima Crate spin (common).' },
+  { id: 'animaCommonZoro', name: ANIMA_HIDDEN_NAME, displayName: 'Zoro', cssClass: 'title-anima-common-zoro', weight: 31.67, rarity: 'common', how: 'Won from an Anima Crate spin (common).' },
+  { id: 'animaCommonHatsune', name: ANIMA_HIDDEN_NAME, displayName: 'Hatsune', cssClass: 'title-anima-common-hatsune', weight: 31.66, rarity: 'common', how: 'Won from an Anima Crate spin (common).' },
+  { id: 'animaRareYujiro', name: ANIMA_HIDDEN_NAME, displayName: 'Yujiro', cssClass: 'title-anima-rare-yujiro', weight: 1.5, rarity: 'uncommon', how: 'Won from an Anima Crate spin (Anima Rare).' },
+  { id: 'animaRareCreator', name: ANIMA_HIDDEN_NAME, displayName: 'The Creator', cssClass: 'title-anima-rare-creator', weight: 1.5, rarity: 'uncommon', how: 'Won from an Anima Crate spin (Anima Rare).' },
+  { id: 'animaRareJinwoo', name: ANIMA_HIDDEN_NAME, displayName: 'Jinwoo Mog', cssClass: 'title-anima-rare-jinwoo', weight: 1.5, rarity: 'uncommon', how: 'Won from an Anima Crate spin (Anima Rare).' },
+  { id: 'animaMegaKirito', name: ANIMA_HIDDEN_NAME, displayName: 'Kirito', cssClass: 'title-anima-mega-kirito', weight: 0.075, rarity: 'rare', how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaMegaItachi', name: ANIMA_HIDDEN_NAME, displayName: 'Itachi', cssClass: 'title-anima-mega-itachi', weight: 0.075, rarity: 'rare', how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaMegaGodGoku', name: ANIMA_HIDDEN_NAME, displayName: 'God Goku', cssClass: 'title-anima-mega-godgoku', weight: 0.075, rarity: 'rare', how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaMegaLuffy', name: ANIMA_HIDDEN_NAME, displayName: 'Luffy', cssClass: 'title-anima-mega-luffy', weight: 0.075, rarity: 'rare', how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
   // Once equipped, also recolors the player's actual display name with a rainbow gradient
   // everywhere it renders -- see js/nameStyle.js.
-  { id: 'animaHyperGear5', name: ANIMA_HIDDEN_NAME, displayName: 'Gear 5 Luffy', cssClass: 'title-anima-hyper-gear5', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
-  { id: 'animaHyperMakima', name: ANIMA_HIDDEN_NAME, displayName: 'Makima', cssClass: 'title-anima-hyper-makima', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
+  { id: 'animaHyperGear5', name: ANIMA_HIDDEN_NAME, displayName: 'Gear 5 Luffy', cssClass: 'title-anima-hyper-gear5', weight: 0.05, rarity: 'mythic', how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
+  { id: 'animaHyperMakima', name: ANIMA_HIDDEN_NAME, displayName: 'Makima', cssClass: 'title-anima-hyper-makima', weight: 0.05, rarity: 'mythic', how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
 ];
 
 // Counterfinish Crate: skins/finishes, not characters -- item label text is always visible.
 const COUNTERFINISH_CRATE_COST = 3000;
 const COUNTERFINISH_CRATE_TITLES = [
-  { id: 'cfSafari', name: 'Safari', cssClass: 'title-cf-safari', weight: 15, how: 'Won from a Counterfinish Crate spin (common).' },
-  { id: 'cfTiger', name: 'Tiger', cssClass: 'title-cf-tiger', weight: 15, how: 'Won from a Counterfinish Crate spin (common).' },
-  { id: 'cfTronic', name: 'Tronic', cssClass: 'title-cf-tronic', weight: 15, how: 'Won from a Counterfinish Crate spin (common).' },
-  { id: 'cfFree', name: 'Free', cssClass: 'title-cf-free', weight: 15, how: 'Won from a Counterfinish Crate spin (common).' },
-  { id: 'cfLore', name: 'Lore', cssClass: 'title-cf-lore', weight: 15, how: 'Won from a Counterfinish Crate spin (rare).' },
-  { id: 'cfHowl', name: 'Howl', cssClass: 'title-cf-howl', weight: 15, how: 'Won from a Counterfinish Crate spin (rare).' },
-  { id: 'cfFade', name: 'Fade', cssClass: 'title-cf-fade', weight: 15, how: 'Won from a Counterfinish Crate spin (rare).' },
-  { id: 'cfSapphire', name: 'Sapphire', cssClass: 'title-cf-sapphire', weight: 1.5, how: 'Won from a Counterfinish Crate spin (Gem).' },
-  { id: 'cfRuby', name: 'Ruby', cssClass: 'title-cf-ruby', weight: 1.5, how: 'Won from a Counterfinish Crate spin (Gem).' },
-  { id: 'cfEmerald', name: 'Emerald', cssClass: 'title-cf-emerald', weight: 1.5, how: 'Won from a Counterfinish Crate spin (Gem).' },
+  { id: 'cfSafari', name: 'Safari', cssClass: 'title-cf-safari', weight: 15, rarity: 'common', how: 'Won from a Counterfinish Crate spin (common).' },
+  { id: 'cfTiger', name: 'Tiger', cssClass: 'title-cf-tiger', weight: 15, rarity: 'common', how: 'Won from a Counterfinish Crate spin (common).' },
+  { id: 'cfTronic', name: 'Tronic', cssClass: 'title-cf-tronic', weight: 15, rarity: 'common', how: 'Won from a Counterfinish Crate spin (common).' },
+  { id: 'cfFree', name: 'Free', cssClass: 'title-cf-free', weight: 15, rarity: 'common', how: 'Won from a Counterfinish Crate spin (common).' },
+  { id: 'cfLore', name: 'Lore', cssClass: 'title-cf-lore', weight: 15, rarity: 'uncommon', how: 'Won from a Counterfinish Crate spin (rare).' },
+  { id: 'cfHowl', name: 'Howl', cssClass: 'title-cf-howl', weight: 15, rarity: 'uncommon', how: 'Won from a Counterfinish Crate spin (rare).' },
+  { id: 'cfFade', name: 'Fade', cssClass: 'title-cf-fade', weight: 15, rarity: 'uncommon', how: 'Won from a Counterfinish Crate spin (rare).' },
+  { id: 'cfSapphire', name: 'Sapphire', cssClass: 'title-cf-sapphire', weight: 1.5, rarity: 'rare', how: 'Won from a Counterfinish Crate spin (Gem).' },
+  { id: 'cfRuby', name: 'Ruby', cssClass: 'title-cf-ruby', weight: 1.5, rarity: 'rare', how: 'Won from a Counterfinish Crate spin (Gem).' },
+  { id: 'cfEmerald', name: 'Emerald', cssClass: 'title-cf-emerald', weight: 1.5, rarity: 'rare', how: 'Won from a Counterfinish Crate spin (Gem).' },
   // Hyper Gems: item label always reads "HYPER" (neutral white glow) -- the gem-colored,
   // cursive-font name recolor is a separate equipped perk, see js/nameStyle.js.
-  { id: 'cfHyperSapphire', name: 'HYPER', cssClass: 'title-cf-hyper-sapphire', weight: 0.17, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Sapphire blue with a cursive font while equipped.' },
-  { id: 'cfHyperRuby', name: 'HYPER', cssClass: 'title-cf-hyper-ruby', weight: 0.17, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Ruby red with a cursive font while equipped.' },
-  { id: 'cfHyperEmerald', name: 'HYPER', cssClass: 'title-cf-hyper-emerald', weight: 0.16, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Emerald green with a cursive font while equipped.' },
+  { id: 'cfHyperSapphire', name: 'HYPER', cssClass: 'title-cf-hyper-sapphire', weight: 0.17, rarity: 'mythic', how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Sapphire blue with a cursive font while equipped.' },
+  { id: 'cfHyperRuby', name: 'HYPER', cssClass: 'title-cf-hyper-ruby', weight: 0.17, rarity: 'mythic', how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Ruby red with a cursive font while equipped.' },
+  { id: 'cfHyperEmerald', name: 'HYPER', cssClass: 'title-cf-hyper-emerald', weight: 0.16, rarity: 'mythic', how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Emerald green with a cursive font while equipped.' },
 ];
 
 const RENAME_COST = 10000;
@@ -495,6 +495,40 @@ function itemLabel(item) {
   return item.displayName || item.name;
 }
 
+// Sell prices by rarity tier -- only titles tagged with a `rarity` (the crate/store title
+// catalogs) are sellable; leaderboard/achievement/custom titles have no rarity and aren't.
+const TITLE_SELL_PRICE_BY_RARITY = { common: 1000, uncommon: 2000, rare: 2500, mythic: 10000 };
+
+// Prestige stacks are synthesized on the fly rather than hardcoded per-title (any crate title can
+// be prestiged) -- id shape is `${baseTitleId}_p${level}`, e.g. betaSpin2026_p1 = "Beta 2026 I".
+const PRESTIGE_ID_RE = /^(.+)_p(\d+)$/;
+const PRESTIGE_COST = 5;
+
+function toRoman(num) {
+  const table = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+  ];
+  let n = num;
+  let result = '';
+  table.forEach(([value, symbol]) => {
+    while (n >= value) {
+      result += symbol;
+      n -= value;
+    }
+  });
+  return result;
+}
+
+// `id` is either a plain title id (level 0, no numeral yet) or a `${baseId}_p${level}` prestige
+// stack. Returns { baseId, level } for both cases so callers don't need two code paths.
+function parsePrestigeId(id) {
+  const match = PRESTIGE_ID_RE.exec(id);
+  if (match) return { baseId: match[1], level: Number(match[2]) };
+  return { baseId: id, level: 0 };
+}
+
 function getItemDef(itemId) {
   if (GUN_ITEMS_BY_ID[itemId]) return GUN_ITEMS_BY_ID[itemId];
   if (MELEE_ITEMS_BY_ID[itemId]) return MELEE_ITEMS_BY_ID[itemId];
@@ -502,6 +536,30 @@ function getItemDef(itemId) {
   if (DRUG_ITEMS_BY_ID[itemId]) return DRUG_ITEMS_BY_ID[itemId];
   if (WRESTLING_GEAR_ITEMS_BY_ID[itemId]) return WRESTLING_GEAR_ITEMS_BY_ID[itemId];
   if (ARMOR_ITEMS_BY_ID[itemId]) return ARMOR_ITEMS_BY_ID[itemId];
+
+  const prestigeMatch = PRESTIGE_ID_RE.exec(itemId);
+  if (prestigeMatch) {
+    const [, baseId, levelStr] = prestigeMatch;
+    const baseTitle = allTitleDefs().find((t) => t.id === baseId);
+    if (!baseTitle) return null;
+    const level = Number(levelStr);
+    const roman = toRoman(level);
+    // Hidden-name titles (Anima Crate) keep the badge itself blank even when prestiged -- only
+    // itemLabel()'s plain-text contexts (Inventory, MTN, Trade) reveal "<real name> <numeral>" via
+    // displayName, same as the base title already does. Visible-name titles just get the numeral
+    // appended to the badge text directly, no separate displayName needed.
+    return {
+      ...baseTitle,
+      id: itemId,
+      name: baseTitle.displayName ? baseTitle.name : `${baseTitle.name} ${roman}`,
+      displayName: baseTitle.displayName ? `${baseTitle.displayName} ${roman}` : undefined,
+      how: `${baseTitle.how} (Prestige ${roman}.)`,
+      type: 'title',
+      prestigeLevel: level,
+      prestigeBaseId: baseId,
+    };
+  }
+
   const title = allTitleDefs().find((t) => t.id === itemId);
   // Spread the full def (not just id/name/cssClass) so custom titles keep their background/
   // border/text color fields when rendered from an inventory stack (js/inventory.js Cosmetics tab).
