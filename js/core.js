@@ -539,6 +539,7 @@ function inventoryQty(itemId) {
 }
 
 let serverSyncTimer = null;
+let serverSyncPending = false;
 
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(character));
@@ -548,11 +549,35 @@ function save() {
   // (like the online roster's title badge) go stale the moment you do anything but Work.
   if (typeof getAuthToken === 'function' && getAuthToken()) {
     clearTimeout(serverSyncTimer);
+    serverSyncPending = true;
     serverSyncTimer = setTimeout(() => {
+      serverSyncPending = false;
       apiSyncCharacter(character).catch(() => {});
     }, 1000);
   }
 }
+
+// The 1s debounce above means anything saved right before the tab closes or backgrounds (a crate
+// win, a title purchase) never reaches the server -- a real report of this: a player's crate title
+// vanished because it never made it past their own browser. A normal fetch can't be trusted to
+// finish once the page starts unloading, so flush with sendBeacon instead (same fallback shape as
+// /milos/leave: it can't set an Authorization header, so the token rides in the body).
+function flushCharacterSyncBeacon() {
+  if (!serverSyncPending) return;
+  clearTimeout(serverSyncTimer);
+  serverSyncPending = false;
+  const token = typeof getAuthToken === 'function' ? getAuthToken() : null;
+  if (!token || typeof character === 'undefined' || !character) return;
+  navigator.sendBeacon(
+    `${API_BASE}/character/sync`,
+    new Blob([JSON.stringify({ character, token })], { type: 'application/json' })
+  );
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') flushCharacterSyncBeacon();
+});
+window.addEventListener('pagehide', flushCharacterSyncBeacon);
 
 function load() {
   const raw = localStorage.getItem(STORAGE_KEY);
