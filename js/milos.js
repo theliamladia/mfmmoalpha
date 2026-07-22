@@ -788,6 +788,9 @@ const milosSubpages = {
   mtn: document.getElementById('milos-mtn'),
   penitentiary: document.getElementById('milos-penitentiary'),
   coinflip: document.getElementById('milos-coinflip'),
+  farms: document.getElementById('milos-farms'),
+  crypto: document.getElementById('milos-crypto'),
+  altcoins: document.getElementById('milos-altcoins'),
 };
 
 milosTabBtns.forEach((btn) => {
@@ -797,6 +800,9 @@ milosTabBtns.forEach((btn) => {
     if (btn.dataset.milos === 'mtn') refreshMtnListings();
     if (btn.dataset.milos === 'penitentiary') refreshPenitentiaryRecords();
     if (typeof setCoinflipTabVisible === 'function') setCoinflipTabVisible(btn.dataset.milos === 'coinflip');
+    if (btn.dataset.milos === 'farms' && typeof refreshFarms === 'function') refreshFarms();
+    if (btn.dataset.milos === 'crypto' && typeof refreshCrypto === 'function') refreshCrypto();
+    if (btn.dataset.milos === 'altcoins' && typeof refreshAltcoins === 'function') refreshAltcoins();
   });
 });
 
@@ -1337,6 +1343,7 @@ function buildGunClubGrids() {
 
   buildAmmoGrid();
   buildMeleeGrid();
+  buildArmorGrid();
 }
 
 function fenceDiscountFactor() {
@@ -1365,6 +1372,33 @@ function buildMeleeGrid() {
     btn.addEventListener('click', async () => {
       try {
         const result = await apiBuyMelee(btn.dataset.melee);
+        character = result.character;
+        logTo(gunClubLog, result.message, result.cls);
+        save();
+        renderAll();
+      } catch (err) {
+        if (err.reason) alert(err.reason);
+      }
+    });
+  });
+}
+
+const armorGrid = document.getElementById('armorGrid');
+
+function buildArmorGrid() {
+  if (!armorGrid) return;
+  armorGrid.innerHTML = ARMOR_ITEMS.map((item) => `
+    <div class="hustle-card">
+      <h3>${item.name}</h3>
+      <p>${item.desc}</p>
+      <button data-armor="${item.id}">Buy ($${item.cost.toLocaleString()})</button>
+    </div>
+  `).join('');
+
+  armorGrid.querySelectorAll('button[data-armor]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        const result = await apiBuyArmor(btn.dataset.armor);
         character = result.character;
         logTo(gunClubLog, result.message, result.cls);
         save();

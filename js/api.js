@@ -145,6 +145,10 @@ function apiBuyAmmo(itemId) {
   return apiRequest('/gunclub/ammo', { method: 'POST', body: JSON.stringify({ itemId }) });
 }
 
+function apiBuyArmor(itemId) {
+  return apiRequest('/gunclub/armor', { method: 'POST', body: JSON.stringify({ itemId }) });
+}
+
 function apiApplyConcealedPermit() {
   return apiRequest('/gunclub/concealed-permit', { method: 'POST' });
 }
@@ -444,4 +448,58 @@ function apiMarkPaymentNotificationsSeen() {
 
 function apiLeaderboard() {
   return apiRequest('/leaderboard');
+}
+
+// ---------- Milos Outlook Farms ----------
+function apiFarmsState() {
+  return apiRequest('/farms/state');
+}
+function apiFarmsBuyPlot() {
+  return apiRequest('/farms/plot/buy', { method: 'POST' });
+}
+function apiFarmsPrepPlot(plotId) {
+  return apiRequest('/farms/plot/prep', { method: 'POST', body: JSON.stringify({ plotId }) });
+}
+function apiFarmsPlantSeed(plotId, drugId) {
+  return apiRequest('/farms/plot/plant', { method: 'POST', body: JSON.stringify({ plotId, drugId }) });
+}
+function apiFarmsCollect(plotId) {
+  return apiRequest('/farms/plot/collect', { method: 'POST', body: JSON.stringify({ plotId }) });
+}
+function apiFarmsBuySecurity() {
+  return apiRequest('/farms/security/buy', { method: 'POST' });
+}
+
+// ---------- Floydcoin (crypto) ----------
+function apiCryptoState() {
+  return apiRequest('/crypto/state');
+}
+function apiCryptoUpgrade(track) {
+  return apiRequest('/crypto/upgrade', { method: 'POST', body: JSON.stringify({ track }) });
+}
+function apiCryptoCollect() {
+  return apiRequest('/crypto/collect', { method: 'POST' });
+}
+function apiCryptoSell(amount) {
+  return apiRequest('/crypto/sell', { method: 'POST', body: JSON.stringify({ amount }) });
+}
+
+// ---------- Altcoins ----------
+function apiAltcoinsList() {
+  return apiRequest('/altcoins/list');
+}
+function apiAltcoinsMine() {
+  return apiRequest('/altcoins/mine');
+}
+function apiAltcoinMint(name) {
+  return apiRequest('/altcoins/mint', { method: 'POST', body: JSON.stringify({ name }) });
+}
+function apiAltcoinBuy(altcoinId, qty) {
+  return apiRequest('/altcoins/buy', { method: 'POST', body: JSON.stringify({ altcoinId, qty }) });
+}
+function apiAltcoinDump(altcoinId) {
+  return apiRequest('/altcoins/dump', { method: 'POST', body: JSON.stringify({ altcoinId }) });
+}
+function apiAltcoinBuyout(altcoinId) {
+  return apiRequest('/altcoins/buyout', { method: 'POST', body: JSON.stringify({ altcoinId }) });
 }

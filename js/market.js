@@ -512,12 +512,9 @@ const CRATE_GOOD_SEASON1 = { name: 'GOOD® Season 1', icon: '\u{1F3C6}', cost: G
 const CRATE_ANIMA = { name: 'ANIMA CRATE', icon: '\u{1F3AE}', cost: ANIMA_CRATE_COST, titles: ANIMA_CRATE_TITLES };
 const CRATE_COUNTERFINISH = { name: 'COUNTERFINISH CRATE', icon: '\u{1F3A8}', cost: COUNTERFINISH_CRATE_COST, titles: COUNTERFINISH_CRATE_TITLES };
 
-const btnBetaSpin = document.getElementById('btnBetaSpin');
+// OPEN BETA and GOOD® Season 1 are archived -- view-only odds, no spin button/message element.
 const betaSpinMessage = document.getElementById('betaSpinMessage');
 const btnViewCrate = document.getElementById('btnViewCrate');
-
-const btnGoodSeasonSpin = document.getElementById('btnGoodSeasonSpin');
-const goodSeasonSpinMessage = document.getElementById('goodSeasonSpinMessage');
 const btnViewGoodSeasonCrate = document.getElementById('btnViewGoodSeasonCrate');
 
 const btnAnimaSpin = document.getElementById('btnAnimaSpin');
@@ -686,8 +683,6 @@ function spinCrate(crate, buttons, messageEl) {
   });
 }
 
-btnBetaSpin.addEventListener('click', () => spinCrate(CRATE_OPEN_BETA, [btnBetaSpin, btnViewCrate], betaSpinMessage));
-btnGoodSeasonSpin.addEventListener('click', () => spinCrate(CRATE_GOOD_SEASON1, [btnGoodSeasonSpin, btnViewGoodSeasonCrate], goodSeasonSpinMessage));
 btnAnimaSpin.addEventListener('click', () => spinCrate(CRATE_ANIMA, [btnAnimaSpin, btnViewAnimaCrate], animaSpinMessage));
 btnCounterfinishSpin.addEventListener('click', () => spinCrate(CRATE_COUNTERFINISH, [btnCounterfinishSpin, btnViewCounterfinishCrate], counterfinishSpinMessage));
 

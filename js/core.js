@@ -93,13 +93,16 @@ const GOOD_CEO_MIN_AVG = 95;
 // eventually beat just clicking Work in Da Skreetz. Ranks past Trainee/Rookie also unlock a
 // job-specific perk (see JOB_PERKS below) once you reach them.
 const JOB_PERK_MIN_AVG = 55; // Supervisor/Lieutenant and up
+// Pay ranges are 10% above their original values (Drugs & Rugs balance pass -- Good Hustle pay up).
+// Must match JOB_RANKS in mfmmoserver/gameLogic.js exactly -- this copy only drives the client's
+// pay-range preview, the server computes the actual payout.
 const JOB_RANKS = [
-  { minAvg: 0, title: 'Trainee', payMin: 0.10, payMax: 0.50, cooldownMs: 2000 },
-  { minAvg: 15, title: 'Associate', payMin: 0.20, payMax: 0.75, cooldownMs: 1800 },
-  { minAvg: 35, title: 'Senior Associate', payMin: 0.40, payMax: 1.10, cooldownMs: 1600 },
-  { minAvg: 55, title: 'Supervisor', payMin: 0.70, payMax: 1.80, cooldownMs: 1400 },
-  { minAvg: 75, title: 'Manager', payMin: 1.15, payMax: 2.75, cooldownMs: 1200 },
-  { minAvg: 95, title: 'Regional Manager', payMin: 1.80, payMax: 4.00, cooldownMs: 1000 },
+  { minAvg: 0, title: 'Trainee', payMin: 0.11, payMax: 0.55, cooldownMs: 2000 },
+  { minAvg: 15, title: 'Associate', payMin: 0.22, payMax: 0.83, cooldownMs: 1800 },
+  { minAvg: 35, title: 'Senior Associate', payMin: 0.44, payMax: 1.21, cooldownMs: 1600 },
+  { minAvg: 55, title: 'Supervisor', payMin: 0.77, payMax: 1.98, cooldownMs: 1400 },
+  { minAvg: 75, title: 'Manager', payMin: 1.27, payMax: 3.03, cooldownMs: 1200 },
+  { minAvg: 95, title: 'Regional Manager', payMin: 1.98, payMax: 4.40, cooldownMs: 1000 },
 ];
 const BAD_JOB_RANKS = [
   { minAvg: 0, title: 'Rookie', payMin: 5, payMax: 25, cooldownMs: 2000 },
@@ -220,9 +223,9 @@ DRUG_ITEMS.forEach((d) => { DRUG_ITEMS_BY_ID[d.id] = d; });
 // the street raises your drug dealing rank and introduces higher-end dealers with better product.
 const DEALER_TIERS = [
   { id: 'guzman', name: '🕴️ Guzman Nestor', drugId: 'drugWeed', unlockUnits: 0 },
-  { id: 'esteban', name: '🕴️ Esteban Vico', drugId: 'drugPills', unlockUnits: 40 },
-  { id: 'ramon', name: '🕴️ Ramon Castillo', drugId: 'drugMeth', unlockUnits: 100 },
-  { id: 'dmitri', name: '🕴️ Dmitri Kovash', drugId: 'drugCoke', unlockUnits: 200 },
+  { id: 'esteban', name: '🕴️ Esteban Vico', drugId: 'drugPills', unlockUnits: 400 },
+  { id: 'ramon', name: '🕴️ Ramon Castillo', drugId: 'drugMeth', unlockUnits: 1000 },
+  { id: 'dmitri', name: '🕴️ Dmitri Kovash', drugId: 'drugCoke', unlockUnits: 2000 },
 ];
 const DEALER_QUICK_MIN = 3;
 const DEALER_QUICK_MAX = 12;
@@ -239,11 +242,14 @@ const ROBBERY_JAIL_YEARS = 1;
 // tiers), your "streak" goes up, and every future sentence gets longer as a result (repeat
 // offenders get thrown the book). Community Service is the release valve — pay down your streak
 // before you get caught again.
+// Reward ranges are 20% below their original values (Drugs & Rugs balance pass -- crime pay down).
+// Must match CRIME_TIERS_BY_ID in mfmmoserver/gameLogic.js exactly -- this copy only drives the
+// client's reward-range preview, the server computes the actual payout.
 const CRIME_TIERS = [
-  { id: 'shoplift', name: '🛍️ Shoplifting', desc: 'Slip something into your jacket at a corner store.', minReward: 80, maxReward: 200, jailYears: 1, baseRisk: 0.35 },
-  { id: 'pettytheft', name: '👛 Petty Theft', desc: 'Pick a pocket or snatch a purse off a table.', minReward: 350, maxReward: 650, jailYears: 1, baseRisk: 0.45 },
-  { id: 'burglary', name: '🏚️ Burglary', desc: "Break into a house while nobody's home.", minReward: 1200, maxReward: 2200, jailYears: 4, baseRisk: 0.5 },
-  { id: 'grandtheft', name: '🚗 Grand Theft Auto', desc: 'Boost a car off the street and flip it.', minReward: 4000, maxReward: 6000, jailYears: 10, baseRisk: 0.6 },
+  { id: 'shoplift', name: '🛍️ Shoplifting', desc: 'Slip something into your jacket at a corner store.', minReward: 64, maxReward: 160, jailYears: 1, baseRisk: 0.35 },
+  { id: 'pettytheft', name: '👛 Petty Theft', desc: 'Pick a pocket or snatch a purse off a table.', minReward: 280, maxReward: 520, jailYears: 1, baseRisk: 0.45 },
+  { id: 'burglary', name: '🏚️ Burglary', desc: "Break into a house while nobody's home.", minReward: 960, maxReward: 1760, jailYears: 4, baseRisk: 0.5 },
+  { id: 'grandtheft', name: '🚗 Grand Theft Auto', desc: 'Boost a car off the street and flip it.', minReward: 3200, maxReward: 4800, jailYears: 10, baseRisk: 0.6 },
 ];
 const CRIME_COOLDOWN_MS = 12000;
 const CRIME_RISK_MIN = 0.05;
@@ -421,6 +427,14 @@ const AMMO_ITEMS = [
 const AMMO_ITEMS_BY_ID = {};
 AMMO_ITEMS.forEach((item) => { AMMO_ITEMS_BY_ID[item.id] = item; });
 
+// Priced well above the priciest rifle so it reads as a serious one-time investment, not a normal
+// gear buy -- consumed after the wearer's next PvP duel (win or lose), enforced server-side.
+const ARMOR_ITEMS = [
+  { id: 'bodyArmor', name: '🦺 Body Armor', type: 'gear', slot: 'armor', cost: 8000, statBonuses: { defense: 15 }, desc: '+15 Defense in a fight. Consumed after your next duel, win or lose.' },
+];
+const ARMOR_ITEMS_BY_ID = {};
+ARMOR_ITEMS.forEach((item) => { ARMOR_ITEMS_BY_ID[item.id] = item; });
+
 const CONCEALED_APPLY_COST = 2000;
 const CONCEALED_WAIT_MS = 10 * 60 * 1000;
 const JAIL_YEARS_WEAPON = 20;
@@ -497,6 +511,7 @@ function getItemDef(itemId) {
   if (AMMO_ITEMS_BY_ID[itemId]) return AMMO_ITEMS_BY_ID[itemId];
   if (DRUG_ITEMS_BY_ID[itemId]) return DRUG_ITEMS_BY_ID[itemId];
   if (WRESTLING_GEAR_ITEMS_BY_ID[itemId]) return WRESTLING_GEAR_ITEMS_BY_ID[itemId];
+  if (ARMOR_ITEMS_BY_ID[itemId]) return ARMOR_ITEMS_BY_ID[itemId];
   const title = allTitleDefs().find((t) => t.id === itemId);
   // Spread the full def (not just id/name/cssClass) so custom titles keep their background/
   // border/text color fields when rendered from an inventory stack (js/inventory.js Cosmetics tab).
@@ -695,7 +710,7 @@ function newCharacter(firstName, lastName) {
     marriage: { proposedTo: null, spouseName: null, spouseUserId: null },
     licenses: { gunSafety: false, concealedPermit: false, concealedPendingUntil: 0 },
     inventory: [],
-    equipment: { helmet: null, chest: null, pants: null, feet: null, holsterL: null, holsterR: null, openCarry: null, melee: null },
+    equipment: { helmet: null, chest: null, pants: null, feet: null, holsterL: null, holsterR: null, openCarry: null, melee: null, armor: null },
     weaponSkills: { shooting: 0, draw: 0, magReload: 0 },
     bank: { tier: 0, balance: 0, hasCreditCard: false, creditBalance: 0, lastBillTs: Date.now() },
     arrestRecord: [],

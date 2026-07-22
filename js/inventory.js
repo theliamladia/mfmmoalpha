@@ -111,7 +111,7 @@ function slotAcceptsItem(slot, item) {
   if (slot === 'holsterL' || slot === 'holsterR') return item.type === 'pistol';
   if (slot === 'openCarry') return item.type === 'pistol' || item.type === 'rifle';
   if (slot === 'melee') return item.type === 'melee';
-  if (slot === 'helmet' || slot === 'chest' || slot === 'pants' || slot === 'feet') return item.type === 'gear' && item.slot === slot;
+  if (slot === 'helmet' || slot === 'chest' || slot === 'pants' || slot === 'feet' || slot === 'armor') return item.type === 'gear' && item.slot === slot;
   return false;
 }
 

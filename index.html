@@ -228,29 +228,6 @@
         </div>
 
         <div id="shop-titles" class="shop hidden">
-          <div class="feature-banner">
-            <div class="feature-banner-text">
-              <h3>&#128230; OPEN BETA CRATE</h3>
-              <p>Buy a spin for the exclusive <span class="title-badge title-openbeta"><span class="title-text">OPEN BETA</span></span> title.</p>
-            </div>
-            <div class="feature-banner-actions">
-              <button id="btnViewCrate" class="secondary-btn">View Crate</button>
-              <button id="btnBetaSpin">Spin ($5,000)</button>
-            </div>
-          </div>
-
-          <div class="feature-banner rgb-blue-banner">
-            <div class="feature-banner-text">
-              <h3>&#127942; GOOD® Season 1</h3>
-              <p>GOOD® Season 1 Limited Banners &mdash; buy a spin for exclusive Season 1 flex titles.</p>
-            </div>
-            <div class="feature-banner-actions">
-              <button id="btnViewGoodSeasonCrate" class="secondary-btn">View Crate</button>
-              <button id="btnGoodSeasonSpin">Spin ($10,000)</button>
-            </div>
-          </div>
-          <p id="goodSeasonSpinMessage"></p>
-
           <div class="feature-banner anima-banner">
             <div class="feature-banner-text">
               <h3>&#127918; ANIMA CRATE</h3>
@@ -282,6 +259,29 @@
             </div>
           </div>
           <p id="betaSpinMessage"></p>
+
+          <h3 class="archived-crates-heading">&#128465;&#65039; Archived Crates</h3>
+          <p>No longer purchasable &mdash; view-only odds. Titles you already own stay exactly as they are and remain tradeable.</p>
+
+          <div class="feature-banner archived-banner">
+            <div class="feature-banner-text">
+              <h3>&#128230; OPEN BETA CRATE</h3>
+              <p>Archived. Was a spin for the exclusive <span class="title-badge title-openbeta"><span class="title-text">OPEN BETA</span></span> title.</p>
+            </div>
+            <div class="feature-banner-actions">
+              <button id="btnViewCrate" class="secondary-btn">View Crate</button>
+            </div>
+          </div>
+
+          <div class="feature-banner archived-banner">
+            <div class="feature-banner-text">
+              <h3>&#127942; GOOD® Season 1</h3>
+              <p>Archived. Was a spin for exclusive GOOD&reg; Season 1 flex titles.</p>
+            </div>
+            <div class="feature-banner-actions">
+              <button id="btnViewGoodSeasonCrate" class="secondary-btn">View Crate</button>
+            </div>
+          </div>
 
           <p>Flex your bank account. Buy a title, then switch which one you display with the chevron next to your name.</p>
           <div class="hustle-grid" id="titleGrid"></div>
@@ -434,6 +434,9 @@
               <button class="milos-tab-btn" data-milos="mtn">📈 Milos Trading Network</button>
               <button class="milos-tab-btn" data-milos="penitentiary">🔒 New Milos Penitentiary</button>
               <button class="milos-tab-btn" data-milos="coinflip">🪙 Coinflip</button>
+              <button class="milos-tab-btn" data-milos="farms">🌿 Milos Outlook Farms</button>
+              <button class="milos-tab-btn" data-milos="crypto">💻 MyCrypto Setup</button>
+              <button class="milos-tab-btn" data-milos="altcoins">🪙 Altcoins</button>
             </div>
 
             <div id="milos-hustles" class="milos-subpage">
@@ -570,6 +573,9 @@
                 <h3 class="gunclub-section-title">🔪 Melee Weapons</h3>
                 <p>No license needed, legal to carry, and cheap &mdash; a solid alternative if you can't afford (or aren't licensed for) a gun yet.</p>
                 <div class="hustle-grid" id="meleeGrid"></div>
+                <h3 class="gunclub-section-title">🦺 Body Armor</h3>
+                <p>A serious investment &mdash; consumed the instant your next duel ends, win or lose.</p>
+                <div class="hustle-grid" id="armorGrid"></div>
               </div>
 
               <div id="gunclub-ammo" class="gunclub-subpage hidden">
@@ -709,6 +715,57 @@
               </div>
 
               <div id="coinflipLog" class="log"></div>
+            </div>
+
+            <div id="milos-farms" class="milos-subpage hidden">
+              <p>Grow and ship product for 10x the street rate &mdash; but the confiscation risk is rolled (and revealed) the moment you plant, and an in-transit shipment can be intercepted if someone robs you while it's on the road.</p>
+              <p id="farmsLockedNote" class="hidden">Unlocks once Esteban does &mdash; keep selling to Guzman.</p>
+              <div id="farmsUnlockedContent" class="hidden">
+                <div class="hustle-card">
+                  <h3>🔒 Security</h3>
+                  <p id="farmsSecurityDesc"></p>
+                  <button id="btnFarmsBuySecurity">Upgrade Security</button>
+                </div>
+                <h3 class="gunclub-section-title">🌿 Your Plots</h3>
+                <div class="hustle-grid" id="farmsPlotsGrid"></div>
+                <button id="btnFarmsBuyPlot">Buy a Plot ($50,000)</button>
+              </div>
+              <div id="farmsLog" class="log"></div>
+            </div>
+
+            <div id="milos-crypto" class="milos-subpage hidden">
+              <p class="chip-counter">💻 Floydcoin price: <b>$10,000.00</b>/FC &mdash; Your wallet: <b id="cryptoFcBalance">0</b> FC</p>
+              <p>Your free rig ("MyShitter900") mines passively, no purchase required. Upgrades raise the rate; collect once a day or so.</p>
+              <div class="hustle-grid" id="cryptoUpgradeGrid"></div>
+              <div class="hustle-card">
+                <h3>⛏️ Collect</h3>
+                <p id="cryptoRateDesc"></p>
+                <button id="btnCryptoCollect">Collect FC</button>
+              </div>
+              <div class="hustle-card">
+                <h3>💵 Sell FC</h3>
+                <input type="number" id="cryptoSellInput" min="1" value="1" placeholder="FC amount">
+                <button id="btnCryptoSell">Sell for Floydbucks</button>
+              </div>
+              <div id="cryptoLog" class="log"></div>
+            </div>
+
+            <div id="milos-altcoins" class="milos-subpage hidden">
+              <p>Mint a coin, watch it climb from 0.10 to 0.15 FC/coin as it sells out. Whoever holds the plurality can dump the entire pool at any time and crater the price &mdash; or wait for a full sellout and offer everyone a fair, pro-rata Full Buyout instead. No one can see who holds a coin or their cost basis, only how many are left.</p>
+
+              <div class="hustle-card">
+                <h3>🪙 Mint a Coin</h3>
+                <input type="text" id="altcoinMintNameInput" maxlength="24" placeholder="Coin name">
+                <button id="btnAltcoinMint">Mint (10 FC)</button>
+              </div>
+
+              <h3 class="gunclub-section-title">📈 Active Coins</h3>
+              <div class="hustle-grid" id="altcoinListGrid"></div>
+
+              <h3 class="gunclub-section-title">👛 My Holdings</h3>
+              <div class="hustle-grid" id="altcoinHoldingsGrid"></div>
+
+              <div id="altcoinLog" class="log"></div>
             </div>
 
             <div class="side-panel chat-box milos-chat-row">
@@ -853,6 +910,16 @@
         <p>What's changed, most recent first.</p>
 
         <div class="update-entry">
+          <div class="update-entry-header"><h3>🌿 New Crates &amp; Drugs &amp; Rugs Economy</h3><span class="update-date">2026-07-22</span></div>
+          <ul>
+            <li><b>Two new Cosmetixxx crates:</b> Anima Crate ($4,500, anime-pull gacha with hidden item names and a rainbow-name Mega Hyper Rare) and Counterfinish Crate ($3,000, skins/finishes with a gem-colored cursive-name Hyper Gem perk). <a class="update-learn-more" href="https://mfmmo.com/update1" target="_blank" rel="noopener">Learn More &rarr;</a></li>
+            <li><b>OPEN BETA</b> and <b>GOOD&reg; Season 1</b> crates are now archived &mdash; view-only odds in Cosmetixxx, no longer purchasable. Titles you already own are unaffected and stay tradeable.</li>
+            <li><b>Drugs &amp; Rugs economy:</b> Milos Outlook Farms (weed/coke plots with a real confiscation and shipment-interception risk), Floydcoin crypto rigs, and Altcoins &mdash; mintable rug-pull coins where the majority holder can dump for a huge payout, or cash everyone out fairly at full sellout. <a class="update-learn-more" href="https://mfmmo.com/update2" target="_blank" rel="noopener">Learn More &rarr;</a></li>
+            <li>Crime pay down 20%, Good Hustle pay up 10%. Jail now actually blocks Work/Slut/Crime instead of letting them slip through. Added expensive Body Armor at the NMC Gun Club, consumed after your next duel.</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
           <div class="update-entry-header"><h3>⚖️ Balance &amp; UI Pass</h3><span class="update-date">2026-07-15</span></div>
           <ul>
             <li><b>Character panel is now always visible</b> on the right side of every page except New Milos City (which keeps that space for Players Online) &mdash; no more switching pages to check your Inventory, Equipment, Skills, or Alignment.</li>
@@ -979,6 +1046,7 @@
           <div class="equip-slot" data-slot="holsterR"><span class="equip-slot-label">HOLSTER</span><span class="equip-slot-item"></span></div>
           <div class="equip-slot equip-slot-opencarry" data-slot="openCarry"><span class="equip-slot-label">OPEN CARRY</span><span class="equip-slot-item"></span></div>
           <div class="equip-slot" data-slot="melee"><span class="equip-slot-label">MELEE</span><span class="equip-slot-item"></span></div>
+          <div class="equip-slot" data-slot="armor"><span class="equip-slot-label">ARMOR</span><span class="equip-slot-item"></span></div>
         </div>
       </div>
 
@@ -1229,6 +1297,9 @@
 <script src="js/bank.js"></script>
 <script src="js/casino.js"></script>
 <script src="js/milos.js"></script>
+<script src="js/farms.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/altcoins.js"></script>
 <script src="js/playerActions.js"></script>
 <script src="js/duels.js"></script>
 <script src="js/coinflip.js"></script>

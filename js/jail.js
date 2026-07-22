@@ -137,13 +137,27 @@ btnStopServe.addEventListener('click', stopServing);
 
 // Hiring a lawyer is server-authoritative -- it pays and clears jail state in one call, so the
 // client just swaps in the returned character and reuses the same release UI as the timer path.
+//
+// Bug fix: the local serve-time interval used to keep ticking (and could fire its own natural
+// release + save()) for the entire round-trip of this request, since it was only ever cleared
+// inside releaseFromJail() -- called AFTER the await resolved. If the sentence happened to finish
+// naturally during that window, the timer's own release fired first and synced an "released but
+// never paid" character to the server; whichever save() actually reached the server last decided
+// what stuck, so bail could silently not land. Clearing the interval synchronously before the
+// request goes out closes that window entirely: once you click Hire Lawyer, the timer can no
+// longer independently release/save while the payment is in flight.
 btnLawyer.addEventListener('click', async () => {
+  if (serveInterval) clearInterval(serveInterval);
+  serveInterval = null;
   try {
     const result = await apiHireLawyer();
     character = result.character;
     releaseFromJail();
   } catch (err) {
     if (err.reason) alert(err.reason);
+    // The request failed (or was rejected server-side) -- resume the local ticker from where it
+    // left off instead of leaving the player stuck with a frozen progress bar and no way to serve.
+    if (character.jail && character.jail.inJail) startServing(false);
   }
 });
 

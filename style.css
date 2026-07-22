@@ -796,6 +796,21 @@ button:disabled {
   color: #f0e6c9;
 }
 
+.archived-crates-heading {
+  margin: 20px 0 4px;
+  color: #9a9ca6;
+}
+
+.feature-banner.archived-banner {
+  background: #1c1c1c;
+  border-color: #35373f;
+  opacity: 0.75;
+}
+
+.archived-banner .feature-banner-text h3 {
+  color: #9a9ca6;
+}
+
 #betaSpinMessage {
   margin-bottom: 14px;
   font-weight: 600;
@@ -2044,6 +2059,24 @@ button:disabled {
 
 .update-entry li:last-child {
   margin-bottom: 0;
+}
+
+.update-learn-more {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #f2c94c;
+  color: #17181c;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: filter 0.12s ease;
+}
+
+.update-learn-more:hover {
+  filter: brightness(1.1);
 }
 
 .bank-countdown {
