@@ -79,7 +79,7 @@ function buildInventoryGrid() {
       const item = getItemDef(stack.id);
       return `
         <div class="hustle-card">
-          <h3>${item.name}</h3>
+          <h3>${itemLabel(item)}</h3>
           <p class="item-subheading">Title</p>
           <div class="title-preview">${titleBadgeMarkup(item)}</div>
           <p>&times; ${stack.qty}</p>
@@ -92,7 +92,7 @@ function buildInventoryGrid() {
     ? character.inventory.map((stack) => {
       const item = getItemDef(stack.id);
       if (!item) return '';
-      const label = item.type === 'title' ? `${item.name} (Title)` : item.name;
+      const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
       return `<option value="${stack.id}">${label} (x${stack.qty})</option>`;
     }).join('')
     : '<option value="">No items to trade</option>';
@@ -103,7 +103,7 @@ btnTradeSend.addEventListener('click', () => {
   const username = tradeUsernameInput.value.trim();
   if (!itemId || !username) return;
   const item = getItemDef(itemId);
-  logTo(inventoryLog, `Trade offer for ${item ? item.name : itemId} sent to ${username}. They'll see it once multiplayer is live.`, 'gain');
+  logTo(inventoryLog, `Trade offer for ${item ? itemLabel(item) : itemId} sent to ${username}. They'll see it once multiplayer is live.`, 'gain');
   tradeUsernameInput.value = '';
 });
 

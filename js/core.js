@@ -351,22 +351,26 @@ const GOOD_SEASON1_TITLES = [
 // marks it as special, the badge label itself stays blank like every other tier.
 const ANIMA_HIDDEN_NAME = '<span style="color:transparent;">&#8206; &#8206; &#8206; &#8206; &#8206;</span>';
 
+// displayName is the real character name -- never shown on the badge itself (that stays blank
+// per the mystery-pull convention), only used for plain-text listings where a blank label would
+// be confusing: the Inventory/Cosmetics tab, the Trade dropdown, MTN listings, admin lookups, and
+// the "you won X" crate-result toast. See itemLabel() below.
 const ANIMA_CRATE_COST = 4500;
 const ANIMA_CRATE_TITLES = [
-  { id: 'animaCommonGoku', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-common-goku', weight: 31.67, how: 'Won from an Anima Crate spin (common).' },
-  { id: 'animaCommonZoro', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-common-zoro', weight: 31.67, how: 'Won from an Anima Crate spin (common).' },
-  { id: 'animaCommonHatsune', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-common-hatsune', weight: 31.66, how: 'Won from an Anima Crate spin (common).' },
-  { id: 'animaRareYujiro', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-rare-yujiro', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
-  { id: 'animaRareCreator', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-rare-creator', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
-  { id: 'animaRareJinwoo', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-rare-jinwoo', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
-  { id: 'animaMegaKirito', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-mega-kirito', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
-  { id: 'animaMegaItachi', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-mega-itachi', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
-  { id: 'animaMegaGodGoku', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-mega-godgoku', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
-  { id: 'animaMegaLuffy', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-mega-luffy', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaCommonGoku', name: ANIMA_HIDDEN_NAME, displayName: 'Goku', cssClass: 'title-anima-common-goku', weight: 31.67, how: 'Won from an Anima Crate spin (common).' },
+  { id: 'animaCommonZoro', name: ANIMA_HIDDEN_NAME, displayName: 'Zoro', cssClass: 'title-anima-common-zoro', weight: 31.67, how: 'Won from an Anima Crate spin (common).' },
+  { id: 'animaCommonHatsune', name: ANIMA_HIDDEN_NAME, displayName: 'Hatsune', cssClass: 'title-anima-common-hatsune', weight: 31.66, how: 'Won from an Anima Crate spin (common).' },
+  { id: 'animaRareYujiro', name: ANIMA_HIDDEN_NAME, displayName: 'Yujiro', cssClass: 'title-anima-rare-yujiro', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
+  { id: 'animaRareCreator', name: ANIMA_HIDDEN_NAME, displayName: 'The Creator', cssClass: 'title-anima-rare-creator', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
+  { id: 'animaRareJinwoo', name: ANIMA_HIDDEN_NAME, displayName: 'Jinwoo Mog', cssClass: 'title-anima-rare-jinwoo', weight: 1.5, how: 'Won from an Anima Crate spin (Anima Rare).' },
+  { id: 'animaMegaKirito', name: ANIMA_HIDDEN_NAME, displayName: 'Kirito', cssClass: 'title-anima-mega-kirito', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaMegaItachi', name: ANIMA_HIDDEN_NAME, displayName: 'Itachi', cssClass: 'title-anima-mega-itachi', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaMegaGodGoku', name: ANIMA_HIDDEN_NAME, displayName: 'God Goku', cssClass: 'title-anima-mega-godgoku', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
+  { id: 'animaMegaLuffy', name: ANIMA_HIDDEN_NAME, displayName: 'Luffy', cssClass: 'title-anima-mega-luffy', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
   // Once equipped, also recolors the player's actual display name with a rainbow gradient
   // everywhere it renders -- see js/nameStyle.js.
-  { id: 'animaHyperGear5', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-hyper-gear5', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
-  { id: 'animaHyperMakima', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-hyper-makima', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
+  { id: 'animaHyperGear5', name: ANIMA_HIDDEN_NAME, displayName: 'Gear 5 Luffy', cssClass: 'title-anima-hyper-gear5', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
+  { id: 'animaHyperMakima', name: ANIMA_HIDDEN_NAME, displayName: 'Makima', cssClass: 'title-anima-hyper-makima', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
 ];
 
 // Counterfinish Crate: skins/finishes, not characters -- item label text is always visible.
@@ -476,6 +480,15 @@ function clampStat(v) {
 
 function round1(v) {
   return Math.round(v * 10) / 10;
+}
+
+// Plain-text label for an item outside of its badge (Inventory/Cosmetics cards, Trade dropdown,
+// MTN listings, admin lookups, crate-result toasts). Falls back to `name` for every item type
+// except the Anima Crate's hidden-name titles, which need their real `displayName` here instead
+// -- `name` there is invisible-span markup meant only for the badge, and would otherwise render
+// as literal blank/garbled text in a plain-text context.
+function itemLabel(item) {
+  return item.displayName || item.name;
 }
 
 function getItemDef(itemId) {

@@ -184,14 +184,14 @@ function renderInvCheckResult(result) {
   }
   const items = result.inventory.map((stack) => {
     const item = getItemDef(stack.id);
-    return `<div class="arrest-record-row"><span>${item ? item.name : stack.id}</span><span>x${stack.qty}</span></div>`;
+    return `<div class="arrest-record-row"><span>${item ? itemLabel(item) : stack.id}</span><span>x${stack.qty}</span></div>`;
   }).join('') || '<p class="arrest-record-empty">No items.</p>';
 
   const equipped = Object.entries(result.equipment)
     .filter(([, itemId]) => itemId)
     .map(([slot, itemId]) => {
       const item = getItemDef(itemId);
-      return `<div class="arrest-record-row"><span>${slot}</span><span>${item ? item.name : itemId}</span></div>`;
+      return `<div class="arrest-record-row"><span>${slot}</span><span>${item ? itemLabel(item) : itemId}</span></div>`;
     }).join('') || '<p class="arrest-record-empty">Nothing equipped.</p>';
 
   adminInvCheckResult.innerHTML = `

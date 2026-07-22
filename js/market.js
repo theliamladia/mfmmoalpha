@@ -543,13 +543,22 @@ function weightedTitleFrom(titles) {
   return titles[0];
 }
 
+// Whole percents for common items, but rare pulls round to 0% at 0-decimal precision -- give them
+// enough decimals to actually show up (e.g. a 0.05% weight would otherwise just read "0%").
+function formatCratePct(pct) {
+  const decimals = pct >= 1 ? 1 : pct >= 0.1 ? 2 : 3;
+  const str = pct.toFixed(decimals).replace(/\.?0+$/, '');
+  return `${str}%`;
+}
+
 function showCrateOdds(crate) {
   const totalWeight = crate.titles.reduce((sum, t) => sum + t.weight, 0);
   crateOddsTitle.innerHTML = `${crate.icon} ${crate.name} Odds`;
-  crateOddsList.innerHTML = crate.titles.map((t) => `
+  const sorted = [...crate.titles].sort((a, b) => b.weight - a.weight);
+  crateOddsList.innerHTML = sorted.map((t) => `
     <div class="crate-odds-row">
       ${titleBadgeMarkup(t)}
-      <span class="crate-odds-pct">${Math.round((t.weight / totalWeight) * 100)}%</span>
+      <span class="crate-odds-pct">${formatCratePct((t.weight / totalWeight) * 100)}</span>
     </div>
   `).join('');
   crateOddsModal.classList.remove('hidden');
@@ -574,9 +583,12 @@ let crateResultTitleId = null;
 function showCrateResult(title, alreadyOwned) {
   crateResultTitleId = title.id;
   crateResultBadge.innerHTML = titleBadgeMarkup(title);
-  crateResultNote.textContent = alreadyOwned
+  const base = alreadyOwned
     ? 'Already owned — another copy was added to your Inventory to trade.'
     : 'Added to your Inventory.';
+  // Hidden-name titles show a blank badge above, so spell out the real item name here too
+  // (matches the label already used in the Inventory tab and Trade dropdown).
+  crateResultNote.textContent = title.displayName ? `${itemLabel(title)}. ${base}` : base;
   crateResultModal.classList.remove('hidden');
 }
 
@@ -662,8 +674,8 @@ function spinCrate(crate, buttons, messageEl) {
   runCrateAnimation(crate, won, () => {
     const { alreadyOwned } = doGrantCrateWin(won.id);
     const msg = alreadyOwned
-      ? `Spin landed on ${won.name} — already owned! Another copy was added to your Inventory to trade.`
-      : `Spin landed on ${won.name}! Added to your Inventory.`;
+      ? `Spin landed on ${itemLabel(won)} — already owned! Another copy was added to your Inventory to trade.`
+      : `Spin landed on ${itemLabel(won)}! Added to your Inventory.`;
     messageEl.textContent = msg;
     logTo(titleLog, msg, 'gain');
     save();

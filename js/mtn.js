@@ -31,7 +31,7 @@ function buildMtnItemSelect() {
     ? character.inventory.map((stack) => {
       const item = getItemDef(stack.id);
       if (!item) return '';
-      const label = item.type === 'title' ? `${item.name} (Title)` : item.name;
+      const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
       return `<option value="${stack.id}">${label} (x${stack.qty} owned)</option>`;
     }).join('')
     : '<option value="">Nothing to list</option>';
@@ -46,7 +46,7 @@ function buildMtnListingsGrid() {
   mtnListingsGrid.innerHTML = listings.length
     ? listings.map((listing) => {
       const item = getItemDef(listing.itemId);
-      const name = item ? item.name : listing.itemId;
+      const name = item ? itemLabel(item) : listing.itemId;
       const total = round2(listing.pricePerUnit * listing.qty);
       const isMine = listing.sellerName === myName;
       return `
@@ -100,7 +100,7 @@ function buildMtnHistoryList() {
   }
   mtnHistoryList.innerHTML = [...character.mtnHistory].reverse().slice(0, 30).map((entry) => {
     const item = getItemDef(entry.itemId);
-    const name = item ? item.name : entry.itemId;
+    const name = item ? itemLabel(item) : entry.itemId;
     const counterparty = entry.counterpartyName ? ` (${entry.counterpartyName})` : '';
     return `
       <div class="arrest-record-row">
