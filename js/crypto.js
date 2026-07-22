@@ -17,6 +17,7 @@ const CRYPTO_UPGRADE_TIERS = {
   ],
 };
 const CRYPTO_BASE_RATE = 0.05;
+const FC_PRICE = 10000; // must match FC_START_PRICE in mfmmoserver/gameLogic.js
 
 const cryptoFcBalance = document.getElementById('cryptoFcBalance');
 const cryptoUpgradeGrid = document.getElementById('cryptoUpgradeGrid');
@@ -26,6 +27,8 @@ const cryptoBuyInput = document.getElementById('cryptoBuyInput');
 const btnCryptoBuy = document.getElementById('btnCryptoBuy');
 const cryptoSellInput = document.getElementById('cryptoSellInput');
 const btnCryptoSell = document.getElementById('btnCryptoSell');
+const btnCryptoBuyMax = document.getElementById('btnCryptoBuyMax');
+const btnCryptoSellAll = document.getElementById('btnCryptoSellAll');
 const cryptoLog = document.getElementById('cryptoLog');
 
 let cryptoStateCache = null;
@@ -98,8 +101,7 @@ btnCryptoCollect.addEventListener('click', async () => {
   }
 });
 
-btnCryptoBuy.addEventListener('click', async () => {
-  const amount = Number(cryptoBuyInput.value);
+async function runCryptoBuy(amount) {
   try {
     const result = await apiCryptoBuy(amount);
     character = result.character;
@@ -110,10 +112,9 @@ btnCryptoBuy.addEventListener('click', async () => {
   } catch (err) {
     if (err.reason) alert(err.reason);
   }
-});
+}
 
-btnCryptoSell.addEventListener('click', async () => {
-  const amount = Number(cryptoSellInput.value);
+async function runCryptoSell(amount) {
   try {
     const result = await apiCryptoSell(amount);
     character = result.character;
@@ -124,4 +125,20 @@ btnCryptoSell.addEventListener('click', async () => {
   } catch (err) {
     if (err.reason) alert(err.reason);
   }
+}
+
+btnCryptoBuy.addEventListener('click', () => runCryptoBuy(Number(cryptoBuyInput.value)));
+
+btnCryptoSell.addEventListener('click', () => runCryptoSell(Number(cryptoSellInput.value)));
+
+btnCryptoBuyMax.addEventListener('click', () => {
+  const maxAmount = Math.floor((character.cash / FC_PRICE) * 10000) / 10000;
+  if (maxAmount <= 0) { alert('Not enough Floydbucks.'); return; }
+  runCryptoBuy(maxAmount);
+});
+
+btnCryptoSellAll.addEventListener('click', () => {
+  const allFc = cryptoStateCache ? cryptoStateCache.fc : 0;
+  if (allFc <= 0) { alert("You don't have any FC to sell."); return; }
+  runCryptoSell(allFc);
 });

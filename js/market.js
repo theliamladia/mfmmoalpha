@@ -545,7 +545,9 @@ const crateResultBadge = document.getElementById('crateResultBadge');
 const crateResultNote = document.getElementById('crateResultNote');
 const btnCrateResultEquip = document.getElementById('btnCrateResultEquip');
 const btnCrateResultContinue = document.getElementById('btnCrateResultContinue');
+const btnCrateResultRollAgain = document.getElementById('btnCrateResultRollAgain');
 let crateResultTitleId = null;
+let lastSpunCrateContext = null;
 
 function showCrateResult(title, alreadyOwned) {
   crateResultTitleId = title.id;
@@ -556,6 +558,11 @@ function showCrateResult(title, alreadyOwned) {
   // Hidden-name titles show a blank badge above, so spell out the real item name here too
   // (matches the label already used in the Inventory tab and Trade dropdown).
   crateResultNote.textContent = title.displayName ? `${itemLabel(title)}. ${base}` : base;
+  const canRollAgain = lastSpunCrateContext && character.cash >= lastSpunCrateContext.crate.cost;
+  btnCrateResultRollAgain.disabled = !canRollAgain;
+  btnCrateResultRollAgain.textContent = lastSpunCrateContext
+    ? `Roll Again ($${lastSpunCrateContext.crate.cost.toLocaleString()})`
+    : 'Roll Again';
   crateResultModal.classList.remove('hidden');
 }
 
@@ -568,6 +575,13 @@ btnCrateResultEquip.addEventListener('click', () => {
 
 btnCrateResultContinue.addEventListener('click', () => {
   crateResultModal.classList.add('hidden');
+});
+
+btnCrateResultRollAgain.addEventListener('click', () => {
+  crateResultModal.classList.add('hidden');
+  if (!lastSpunCrateContext) return;
+  const { crate, buttons, messageEl } = lastSpunCrateContext;
+  spinCrate(crate, buttons, messageEl, { skipConfirm: true });
 });
 
 // ---------- crate opening animation ----------
@@ -622,13 +636,14 @@ function doGrantCrateWin(titleId) {
   return { alreadyOwned };
 }
 
-function spinCrate(crate, buttons, messageEl) {
+function spinCrate(crate, buttons, messageEl, { skipConfirm = false } = {}) {
   if (character.cash < crate.cost) {
     alert('Not enough Floydbucks.');
     return;
   }
-  if (!confirm(`Spin the ${crate.name} for $${crate.cost.toLocaleString()}? ARE YOU SURE?`)) return;
+  if (!skipConfirm && !confirm(`Spin the ${crate.name} for $${crate.cost.toLocaleString()}? ARE YOU SURE?`)) return;
 
+  lastSpunCrateContext = { crate, buttons, messageEl };
   const start = doStartCrateSpin(crate);
   if (!start.ok) { alert(start.reason); return; }
   const won = start.won;

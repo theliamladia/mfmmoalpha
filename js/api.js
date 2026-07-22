@@ -446,6 +446,14 @@ function apiMarkPaymentNotificationsSeen() {
   return apiRequest('/notifications/payments/seen', { method: 'POST' });
 }
 
+function apiRobberyNotifications() {
+  return apiRequest('/notifications/robberies');
+}
+
+function apiMarkRobberyNotificationsSeen() {
+  return apiRequest('/notifications/robberies/seen', { method: 'POST' });
+}
+
 function apiLeaderboard() {
   return apiRequest('/leaderboard');
 }

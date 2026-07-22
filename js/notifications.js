@@ -60,3 +60,49 @@ document.addEventListener('click', (e) => {
 
 setInterval(refreshNotifications, NOTIF_POLL_MS);
 refreshNotifications();
+
+// ---------- Robbery alert modal ----------
+// Robberies pop an interrupting modal (unlike payments' quiet bell) since losing cash without
+// knowing why is confusing -- polled on the same cadence/idiom as the notification bell above.
+const robberyAlertModal = document.getElementById('robberyAlertModal');
+const robberyAlertText = document.getElementById('robberyAlertText');
+const btnRobberyAlertOk = document.getElementById('btnRobberyAlertOk');
+
+let robberyAlertQueue = [];
+
+function showNextRobberyAlert() {
+  if (!robberyAlertQueue.length) {
+    robberyAlertModal.classList.add('hidden');
+    return;
+  }
+  const n = robberyAlertQueue[0];
+  robberyAlertText.textContent = `${n.robberName} robbed you for $${n.amount.toFixed(2)}!`;
+  robberyAlertModal.classList.remove('hidden');
+}
+
+btnRobberyAlertOk.addEventListener('click', async () => {
+  robberyAlertQueue.shift();
+  if (robberyAlertQueue.length) {
+    showNextRobberyAlert();
+  } else {
+    robberyAlertModal.classList.add('hidden');
+    try { await apiMarkRobberyNotificationsSeen(); } catch { /* best-effort */ }
+  }
+});
+
+async function refreshRobberyAlerts() {
+  if (!getAuthToken()) return;
+  if (robberyAlertQueue.length) return; // already showing/queued -- avoid re-fetching mid-alert
+  try {
+    const result = await apiRobberyNotifications();
+    if (result.notifications.length) {
+      robberyAlertQueue = result.notifications;
+      showNextRobberyAlert();
+    }
+  } catch {
+    // Best-effort, same as the other polled views.
+  }
+}
+
+setInterval(refreshRobberyAlerts, NOTIF_POLL_MS);
+refreshRobberyAlerts();
