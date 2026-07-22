@@ -159,14 +159,30 @@ function renderRankBadge() {
 
 function renderTitleDropdown() {
   checkPeakTitleGrant();
-  const owned = allTitleDefs().filter((t) => isTitleOwned(t.id));
+  const owned = ownedTitleDefs();
   const noneItem = `<div class="title-dropdown-item ${!character.titles.equipped ? 'equipped' : ''}" data-equip="none">${computeRank()} (default)</div>`;
-  const items = owned.map((t) => `
-    <div class="title-dropdown-item ${character.titles.equipped === t.id ? 'equipped' : ''}" data-equip="${t.id}">
-      ${titleHoverMarkup(t)}
-    </div>
-  `).join('');
-  titleDropdown.innerHTML = noneItem + items;
+
+  // Grouped by crate (Open Beta / GOOD Season 1 / Anima / Counterfinish), with everything else
+  // (purchased, PEAK CIVILIAN, leaderboard/achievement, custom) bucketed under "Other Titles" --
+  // insertion order within TITLE_CRATE_GROUPS, "Other Titles" last.
+  const groups = new Map();
+  owned.forEach((t) => {
+    const label = titleCrateGroupLabel(t);
+    if (!groups.has(label)) groups.set(label, []);
+    groups.get(label).push(t);
+  });
+  const orderedLabels = [...TITLE_CRATE_GROUPS.map((g) => g.label), OTHER_TITLES_LABEL].filter((l) => groups.has(l));
+
+  const groupsHtml = orderedLabels.map((label) => {
+    const itemsHtml = groups.get(label).map((t) => `
+      <div class="title-dropdown-item ${character.titles.equipped === t.id ? 'equipped' : ''}" data-equip="${t.id}">
+        ${titleHoverMarkup(t)}
+      </div>
+    `).join('');
+    return `<div class="title-dropdown-group-label">${label}</div>${itemsHtml}`;
+  }).join('');
+
+  titleDropdown.innerHTML = noneItem + groupsHtml;
 
   titleDropdown.querySelectorAll('[data-equip]').forEach((el) => {
     el.addEventListener('click', () => {

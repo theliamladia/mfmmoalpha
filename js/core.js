@@ -529,7 +529,10 @@ function parsePrestigeId(id) {
   return { baseId: id, level: 0 };
 }
 
-function getItemDef(itemId) {
+// `char` defaults to the current player but any character object works -- needed so a prestige or
+// custom title equipped by (and living inside) one player's save can still be looked up correctly
+// when a different client renders THAT player's badge (see displayBadgeMarkupFor in market.js).
+function getItemDef(itemId, char = character) {
   if (GUN_ITEMS_BY_ID[itemId]) return GUN_ITEMS_BY_ID[itemId];
   if (MELEE_ITEMS_BY_ID[itemId]) return MELEE_ITEMS_BY_ID[itemId];
   if (AMMO_ITEMS_BY_ID[itemId]) return AMMO_ITEMS_BY_ID[itemId];
@@ -540,7 +543,7 @@ function getItemDef(itemId) {
   const prestigeMatch = PRESTIGE_ID_RE.exec(itemId);
   if (prestigeMatch) {
     const [, baseId, levelStr] = prestigeMatch;
-    const baseTitle = allTitleDefs().find((t) => t.id === baseId);
+    const baseTitle = allTitleDefsFor(char).find((t) => t.id === baseId);
     if (!baseTitle) return null;
     const level = Number(levelStr);
     const roman = toRoman(level);
@@ -560,7 +563,7 @@ function getItemDef(itemId) {
     };
   }
 
-  const title = allTitleDefs().find((t) => t.id === itemId);
+  const title = allTitleDefsFor(char).find((t) => t.id === itemId);
   // Spread the full def (not just id/name/cssClass) so custom titles keep their background/
   // border/text color fields when rendered from an inventory stack (js/inventory.js Cosmetics tab).
   if (title) return { ...title, type: 'title' };

@@ -283,7 +283,22 @@ button:disabled {
   border-radius: 8px;
   padding: 8px;
   min-width: 200px;
+  max-height: 70vh;
+  overflow-y: auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+.title-dropdown-group-label {
+  padding: 10px 10px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6f7178;
+}
+
+.title-dropdown-group-label:first-child {
+  padding-top: 4px;
 }
 
 .title-dropdown-item {

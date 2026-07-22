@@ -334,6 +334,42 @@ function isTitleOwned(titleId) {
   return character.titles.owned.includes(titleId) || inventoryQty(titleId) > 0;
 }
 
+// Which crate a title (or the base title a prestige stack was prestiged from) came from, for
+// grouping the Switch Title dropdown. Anything not in one of these sets (purchased Cosmetixxx
+// titles, PEAK CIVILIAN, leaderboard/achievement titles, custom titles) falls into "Other Titles".
+const TITLE_CRATE_GROUPS = [
+  { label: '📦 OPEN BETA CRATE', ids: new Set(BETA_SPIN_TITLES.map((t) => t.id)) },
+  { label: '🏆 GOOD® Season 1', ids: new Set(GOOD_SEASON1_TITLES.map((t) => t.id)) },
+  { label: '🎮 ANIMA CRATE', ids: new Set(ANIMA_CRATE_TITLES.map((t) => t.id)) },
+  { label: '🎨 COUNTERFINISH CRATE', ids: new Set(COUNTERFINISH_CRATE_TITLES.map((t) => t.id)) },
+];
+const OTHER_TITLES_LABEL = '🎖️ Other Titles';
+
+function titleCrateGroupLabel(title) {
+  const baseId = title.prestigeBaseId || title.id;
+  const group = TITLE_CRATE_GROUPS.find((g) => g.ids.has(baseId));
+  return group ? group.label : OTHER_TITLES_LABEL;
+}
+
+// Every title def the player currently owns, from both storage shapes: the permanent
+// titles.owned array (Cosmetixxx buys, PEAK CIVILIAN, leaderboard/achievement grants) and
+// inventory stacks (crate wins and their prestige tiers, tradeable, "owned" only while qty > 0).
+// getItemDef resolves prestige ids (betaSpin2026_p1, etc.) that never appear in the static
+// catalogs, so this is the only reliable way to enumerate everything ownable for the dropdown.
+function ownedTitleDefs() {
+  const fromOwned = character.titles.owned.map((id) => getItemDef(id)).filter((t) => t && t.type === 'title');
+  const fromInventory = character.inventory
+    .filter((stack) => stack.qty > 0)
+    .map((stack) => getItemDef(stack.id))
+    .filter((t) => t && t.type === 'title');
+  const seen = new Set();
+  return [...fromOwned, ...fromInventory].filter((t) => {
+    if (seen.has(t.id)) return false;
+    seen.add(t.id);
+    return true;
+  });
+}
+
 function titleBadgeMarkup(title) {
   if (title.custom) {
     const bg = title.isGif
@@ -371,8 +407,11 @@ function getDisplayTitle() {
   checkPeakTitleGrant();
   const equippedId = character.titles.equipped;
   if (equippedId && isTitleOwned(equippedId)) {
-    const t = allTitleDefs().find((x) => x.id === equippedId);
-    if (t) return t;
+    // getItemDef (not allTitleDefs().find) since it also resolves prestige stacks
+    // (e.g. betaSpin2026_p1 -> "Beta 2026 I"), which only ever exist as inventory stacks, never
+    // in the static title catalogs.
+    const t = getItemDef(equippedId);
+    if (t && t.type === 'title') return t;
   }
   return null;
 }
@@ -386,9 +425,10 @@ function displayBadgeMarkupFor(otherChar) {
   if (equippedId) {
     const owned = (otherChar.titles.owned || []).includes(equippedId)
       || (otherChar.inventory || []).some((stack) => stack.id === equippedId && stack.qty > 0);
-    // Look up the def from THIS character's own customTitles, not the viewer's allTitleDefs(),
-    // since a custom title's full definition only ever lives inside its creator's save.
-    if (owned) title = allTitleDefsFor(otherChar).find((t) => t.id === equippedId) || null;
+    // getItemDef(id, otherChar) -- not the viewer's own allTitleDefs() -- so both a custom title's
+    // full definition (which only ever lives inside its creator's save) and a prestige stack
+    // (e.g. betaSpin2026_p1) resolve correctly no matter who's viewing.
+    if (owned) title = getItemDef(equippedId, otherChar);
   }
   if (title) return titleHoverMarkup(title);
 
