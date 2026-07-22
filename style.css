@@ -524,6 +524,11 @@ button:disabled {
   100% { background-position: 100% 50%; }
 }
 
+.title-badge[class*="title-anima-"] {
+  min-width: 120px;
+  height: 40px;
+}
+
 .title-anima-common-goku,
 .title-anima-common-zoro,
 .title-anima-common-hatsune {
@@ -585,18 +590,6 @@ button:disabled {
 .title-anima-hyper-gear5 { background-image: url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3U2cDEyM3c1djFueXI4N2w3cjJqaTA5OGZhYmpkYzlzcGQzOGhkeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IEZy0MXCCxBShZaloq/giphy.gif'); }
 .title-anima-hyper-makima { background-image: url('https://64.media.tumblr.com/519d48bdb9c8b6b4962d9331b862e859/2de001ae1ad3b407-59/s640x960/7e5aa39d5af3247cbbb884f9930a60d9ab9d295c.gifv'); }
 
-.title-anima-hyper-gear5 .title-text,
-.title-anima-hyper-makima .title-text {
-  background: linear-gradient(270deg, #ff0033, #ff9900, #fff200, #33ff33, #00e5ff, #3355ff, #cc33ff, #ff0033);
-  background-size: 400% 400%;
-  animation: rainbowShift 5s linear infinite;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  font-weight: 700;
-}
-
 /* --- Counterfinish Crate --- */
 .title-cf-safari {
   background-image: url('https://static.pattern.wiki/img/f6bf9c9384c795756acf41fafadf887704a3c8ae');
@@ -612,7 +605,7 @@ button:disabled {
   background-position: center;
   border: 2px solid #d4af37;
 }
-.title-cf-tiger .title-text { color: #000; font-weight: 700; }
+.title-cf-tiger .title-text { color: #ff8c00; font-weight: 700; }
 
 .title-cf-tronic {
   background-image: url('https://thumbs.dreamstime.com/b/image-red-metal-background-texture-showcasing-brushed-steel-plate-iron-shiny-reflections-363238309.jpg');
@@ -633,7 +626,7 @@ button:disabled {
   background-position: center;
   border: 2px solid #9b30ff;
 }
-.title-cf-free .title-text { color: #000; font-weight: 700; }
+.title-cf-free .title-text { color: #ffe600; font-weight: 700; }
 
 .title-cf-lore {
   background-image: url('https://images.stockcake.com/public/d/3/e/d3ee6013-d135-49d2-b919-c1dd3b8e7c43_medium/ornate-golden-texture-stockcake.jpg');
@@ -667,6 +660,8 @@ button:disabled {
   color: #ff8c00;
   font-weight: 700;
   text-shadow: 0 0 6px #9b30ff, 0 0 10px #ff8c00;
+  -webkit-text-stroke: 0.6px #ffe600;
+  paint-order: stroke fill;
 }
 
 /* Gem/Hyper Gem backgrounds are placeholder gem-colored gradients -- the supplied Google Drive
@@ -763,6 +758,42 @@ button:disabled {
 
 .rgb-blue-banner .feature-banner-text p {
   color: #e0f4ff;
+}
+
+@keyframes animaBannerShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.feature-banner.anima-banner {
+  background: linear-gradient(120deg, #05050a, #2d0a3d, #7a0033, #2d0a3d, #05050a);
+  background-size: 300% 300%;
+  animation: animaBannerShift 5s ease infinite;
+  border-color: #ff2b7a;
+}
+
+.anima-banner .feature-banner-text h3 {
+  color: #fff;
+}
+
+.anima-banner .feature-banner-text p {
+  color: #f0c9ff;
+}
+
+.feature-banner.counterfinish-banner {
+  background: linear-gradient(120deg, #1c1c1c, #3a3a3a, #d4af37, #3a3a3a, #1c1c1c);
+  background-size: 300% 300%;
+  animation: animaBannerShift 5s ease infinite;
+  border-color: #d4af37;
+}
+
+.counterfinish-banner .feature-banner-text h3 {
+  color: #fff;
+}
+
+.counterfinish-banner .feature-banner-text p {
+  color: #f0e6c9;
 }
 
 #betaSpinMessage {

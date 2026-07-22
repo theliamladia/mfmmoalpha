@@ -509,6 +509,8 @@ function buyTitle(title) {
 
 const CRATE_OPEN_BETA = { name: 'OPEN BETA CRATE', icon: '\u{1F4E6}', cost: BETA_SPIN_COST, titles: BETA_SPIN_TITLES };
 const CRATE_GOOD_SEASON1 = { name: 'GOOD® Season 1', icon: '\u{1F3C6}', cost: GOOD_SEASON1_COST, titles: GOOD_SEASON1_TITLES };
+const CRATE_ANIMA = { name: 'ANIMA CRATE', icon: '\u{1F3AE}', cost: ANIMA_CRATE_COST, titles: ANIMA_CRATE_TITLES };
+const CRATE_COUNTERFINISH = { name: 'COUNTERFINISH CRATE', icon: '\u{1F3A8}', cost: COUNTERFINISH_CRATE_COST, titles: COUNTERFINISH_CRATE_TITLES };
 
 const btnBetaSpin = document.getElementById('btnBetaSpin');
 const betaSpinMessage = document.getElementById('betaSpinMessage');
@@ -517,6 +519,14 @@ const btnViewCrate = document.getElementById('btnViewCrate');
 const btnGoodSeasonSpin = document.getElementById('btnGoodSeasonSpin');
 const goodSeasonSpinMessage = document.getElementById('goodSeasonSpinMessage');
 const btnViewGoodSeasonCrate = document.getElementById('btnViewGoodSeasonCrate');
+
+const btnAnimaSpin = document.getElementById('btnAnimaSpin');
+const animaSpinMessage = document.getElementById('animaSpinMessage');
+const btnViewAnimaCrate = document.getElementById('btnViewAnimaCrate');
+
+const btnCounterfinishSpin = document.getElementById('btnCounterfinishSpin');
+const counterfinishSpinMessage = document.getElementById('counterfinishSpinMessage');
+const btnViewCounterfinishCrate = document.getElementById('btnViewCounterfinishCrate');
 
 const crateOddsModal = document.getElementById('crateOddsModal');
 const crateOddsTitle = document.getElementById('crateOddsTitle');
@@ -547,6 +557,8 @@ function showCrateOdds(crate) {
 
 btnViewCrate.addEventListener('click', () => showCrateOdds(CRATE_OPEN_BETA));
 btnViewGoodSeasonCrate.addEventListener('click', () => showCrateOdds(CRATE_GOOD_SEASON1));
+btnViewAnimaCrate.addEventListener('click', () => showCrateOdds(CRATE_ANIMA));
+btnViewCounterfinishCrate.addEventListener('click', () => showCrateOdds(CRATE_COUNTERFINISH));
 
 btnCrateOddsClose.addEventListener('click', () => {
   crateOddsModal.classList.add('hidden');
@@ -664,4 +676,6 @@ function spinCrate(crate, buttons, messageEl) {
 
 btnBetaSpin.addEventListener('click', () => spinCrate(CRATE_OPEN_BETA, [btnBetaSpin, btnViewCrate], betaSpinMessage));
 btnGoodSeasonSpin.addEventListener('click', () => spinCrate(CRATE_GOOD_SEASON1, [btnGoodSeasonSpin, btnViewGoodSeasonCrate], goodSeasonSpinMessage));
+btnAnimaSpin.addEventListener('click', () => spinCrate(CRATE_ANIMA, [btnAnimaSpin, btnViewAnimaCrate], animaSpinMessage));
+btnCounterfinishSpin.addEventListener('click', () => spinCrate(CRATE_COUNTERFINISH, [btnCounterfinishSpin, btnViewCounterfinishCrate], counterfinishSpinMessage));
 

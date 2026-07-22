@@ -347,7 +347,8 @@ const GOOD_SEASON1_TITLES = [
 ];
 
 // Anima Crate: every item's real name is hidden (invisible LTR-mark characters over the splash
-// art) except the top Mega Hyper Rare tier, which shows its name in a rainbow gradient instead.
+// art), including the Mega Hyper Rare tier -- only the rainbow-gradient border/name-recolor perk
+// marks it as special, the badge label itself stays blank like every other tier.
 const ANIMA_HIDDEN_NAME = '<span style="color:transparent;">&#8206; &#8206; &#8206; &#8206; &#8206;</span>';
 
 const ANIMA_CRATE_COST = 4500;
@@ -362,10 +363,10 @@ const ANIMA_CRATE_TITLES = [
   { id: 'animaMegaItachi', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-mega-itachi', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
   { id: 'animaMegaGodGoku', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-mega-godgoku', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
   { id: 'animaMegaLuffy', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-mega-luffy', weight: 0.075, how: 'Won from an Anima Crate spin (Anima Mega Rare).' },
-  // Mega Hyper Rare breaks the hidden-name convention (shown in a rainbow gradient) and, once
-  // equipped, also recolors the player's actual display name the same way -- see js/nameStyle.js.
-  { id: 'animaHyperGear5', name: 'Gear 5 Luffy', cssClass: 'title-anima-hyper-gear5', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
-  { id: 'animaHyperMakima', name: 'Makima', cssClass: 'title-anima-hyper-makima', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
+  // Once equipped, also recolors the player's actual display name with a rainbow gradient
+  // everywhere it renders -- see js/nameStyle.js.
+  { id: 'animaHyperGear5', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-hyper-gear5', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
+  { id: 'animaHyperMakima', name: ANIMA_HIDDEN_NAME, cssClass: 'title-anima-hyper-makima', weight: 0.05, how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
 ];
 
 // Counterfinish Crate: skins/finishes, not characters -- item label text is always visible.
@@ -380,12 +381,12 @@ const COUNTERFINISH_CRATE_TITLES = [
   { id: 'cfFade', name: 'Fade', cssClass: 'title-cf-fade', weight: 15, how: 'Won from a Counterfinish Crate spin (rare).' },
   { id: 'cfSapphire', name: 'Sapphire', cssClass: 'title-cf-sapphire', weight: 1.5, how: 'Won from a Counterfinish Crate spin (Gem).' },
   { id: 'cfRuby', name: 'Ruby', cssClass: 'title-cf-ruby', weight: 1.5, how: 'Won from a Counterfinish Crate spin (Gem).' },
-  { id: 'cfEmerald', name: 'emerald', cssClass: 'title-cf-emerald', weight: 1.5, how: 'Won from a Counterfinish Crate spin (Gem).' },
-  // Hyper Gems: item label always reads "Hyper" (neutral white glow) -- the gem-colored,
+  { id: 'cfEmerald', name: 'Emerald', cssClass: 'title-cf-emerald', weight: 1.5, how: 'Won from a Counterfinish Crate spin (Gem).' },
+  // Hyper Gems: item label always reads "HYPER" (neutral white glow) -- the gem-colored,
   // cursive-font name recolor is a separate equipped perk, see js/nameStyle.js.
-  { id: 'cfHyperSapphire', name: 'Hyper', cssClass: 'title-cf-hyper-sapphire', weight: 0.17, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Sapphire blue with a cursive font while equipped.' },
-  { id: 'cfHyperRuby', name: 'Hyper', cssClass: 'title-cf-hyper-ruby', weight: 0.17, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Ruby red with a cursive font while equipped.' },
-  { id: 'cfHyperEmerald', name: 'Hyper', cssClass: 'title-cf-hyper-emerald', weight: 0.16, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Emerald green with a cursive font while equipped.' },
+  { id: 'cfHyperSapphire', name: 'HYPER', cssClass: 'title-cf-hyper-sapphire', weight: 0.17, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Sapphire blue with a cursive font while equipped.' },
+  { id: 'cfHyperRuby', name: 'HYPER', cssClass: 'title-cf-hyper-ruby', weight: 0.17, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Ruby red with a cursive font while equipped.' },
+  { id: 'cfHyperEmerald', name: 'HYPER', cssClass: 'title-cf-hyper-emerald', weight: 0.16, how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Emerald green with a cursive font while equipped.' },
 ];
 
 const RENAME_COST = 10000;
