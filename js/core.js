@@ -20,18 +20,8 @@ const GYM_BURN_LBS = 0.5;
 const GYM_COST = 20;
 const GYM_SPEED_GAIN = 0.6; // > SPEED_LOSS_PER_LB * GYM_BURN_LBS (0.5), so a full cycle nets +speed
 
-// Looks is a derived stat: 90% Body (5 body parts x 4 exercises each, 0-100) + 10% Face (Maxx items).
-const BODY_PARTS = ['chest', 'arms', 'legs', 'abs', 'back'];
-const BODY_PART_LABELS = { chest: '🫁 Chest', arms: '💪 Arms', legs: '🦵 Legs', abs: '🍫 Abs', back: '🔙 Back' };
-const BODY_EXERCISE_KEYS = ['ex1', 'ex2', 'ex3', 'ex4'];
-const BODY_EXERCISE_LABELS = {
-  chest: ['Bench Press', 'Push-ups', 'Dips', 'Flyes'],
-  arms: ['Curls', 'Tricep Extensions', 'Hammer Curls', 'Skull Crushers'],
-  legs: ['Squats', 'Lunges', 'Leg Press', 'Calf Raises'],
-  abs: ['Crunches', 'Planks', 'Leg Raises', 'Russian Twists'],
-  back: ['Deadlifts', 'Pull-ups', 'Rows', 'Lat Pulldowns'],
-};
-const BODY_EXERCISE_COOLDOWN_MS = 8000;
+// Looks is a derived stat: 90% Body (built up by Workouts + eating, see gameLogic.js on the
+// server) + 10% Face (Maxx items).
 const MAXX_COMPLETE_MULTIPLIER = 1.25;
 const MUSCLE_GAIN_RATIO = 0.3;
 const STRETCH_HEIGHT_COOLDOWN_MS = 30000;
@@ -702,7 +692,7 @@ function newCharacter(firstName, lastName) {
     gym: {
       steroidTier: null,
       roidJailClicksRemaining: 0,
-      bodyExercises: Object.fromEntries(BODY_PARTS.map((part) => [part, { ex1: 0, ex2: 0, ex3: 0, ex4: 0 }])),
+      bodyScore: 0,
     },
     jail: { inJail: false, crime: null, yearsRemaining: 0, serving: false },
     settings: { hideMilosWarning: false },
@@ -844,7 +834,6 @@ function renderAll() {
 
   renderArrestRecord();
   renderGym();
-  renderBody();
   buildFoodGrid();
   renderBank();
   renderMilos();

@@ -1281,26 +1281,6 @@ button:disabled {
   color: #1b1d22;
 }
 
-.body-part-tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 14px 0;
-}
-
-.body-part-tabs button {
-  background: #24262e;
-  color: #b9bbc4;
-  border: 1px solid #35373f;
-  border-radius: 20px;
-  padding: 9px 16px;
-}
-
-.body-part-tabs button.active-hustle {
-  background: #f2c94c;
-  color: #1b1d22;
-}
-
 .auth-tab-btn {
   background: #24262e;
   color: #b9bbc4;

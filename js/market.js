@@ -2,7 +2,6 @@
 const marketTabBtns = document.querySelectorAll('.market-tab-btn');
 const shopEls = {
   gym: document.getElementById('shop-gym'),
-  body: document.getElementById('shop-body'),
   pizza: document.getElementById('shop-pizza'),
   maxx: document.getElementById('shop-maxx'),
   titles: document.getElementById('shop-titles'),
@@ -93,7 +92,6 @@ function tickCooldownUI() {
   tickMilosCooldownUI();
   tickBankCountdown();
   tickJailActivityUI();
-  if (character.gym.bodyExercises && !shopEls.body.classList.contains('hidden')) renderBodyExerciseGrid();
   if (!shopEls.gym.classList.contains('hidden')) renderGym();
 }
 
@@ -220,74 +218,6 @@ async function runStretchHeightViaServer() {
 }
 
 btnStretchHeight.addEventListener('click', runStretchHeightViaServer);
-
-// ---------- Body (Looks training: 5 body parts x 4 exercises each) ----------
-const bodyPartTabs = document.getElementById('bodyPartTabs');
-const bodyExerciseGrid = document.getElementById('bodyExerciseGrid');
-const bodyLog = document.getElementById('bodyLog');
-let activeBodyPart = BODY_PARTS[0];
-
-function bodyPartAvgClient(exercises) {
-  return (exercises.ex1 + exercises.ex2 + exercises.ex3 + exercises.ex4) / 4;
-}
-
-function renderBodyPartTabs() {
-  bodyPartTabs.innerHTML = BODY_PARTS.map((part) => {
-    const avg = bodyPartAvgClient(character.gym.bodyExercises[part]);
-    const active = part === activeBodyPart;
-    return `<button data-body-part="${part}" class="${active ? 'active-hustle' : ''}">${BODY_PART_LABELS[part]} (${avg.toFixed(0)})</button>`;
-  }).join('');
-  bodyPartTabs.querySelectorAll('[data-body-part]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      activeBodyPart = btn.dataset.bodyPart;
-      renderBody();
-    });
-  });
-}
-
-function renderBodyExerciseGrid() {
-  const part = activeBodyPart;
-  const exercises = character.gym.bodyExercises[part];
-  bodyExerciseGrid.innerHTML = BODY_EXERCISE_KEYS.map((key, i) => {
-    const cooldownKey = `bodyExercise_${part}_${key}`;
-    const remaining = getRemainingCooldown(cooldownKey, BODY_EXERCISE_COOLDOWN_MS);
-    return `
-      <div class="hustle-card job-card">
-        <h3>${BODY_EXERCISE_LABELS[part][i]}</h3>
-        <p>${exercises[key].toFixed(2)}</p>
-        <button data-body-exercise="${key}" data-cooldown="${cooldownKey}" ${remaining > 0 ? 'disabled' : ''}>
-          ${remaining > 0 ? `Train (${Math.ceil(remaining / 1000)}s)` : 'Train'}
-        </button>
-      </div>
-    `;
-  }).join('');
-  bodyExerciseGrid.querySelectorAll('[data-body-exercise]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (getRemainingCooldown(btn.dataset.cooldown, BODY_EXERCISE_COOLDOWN_MS) > 0) return;
-      runBodyExerciseViaServer(activeBodyPart, btn.dataset.bodyExercise);
-    });
-  });
-}
-
-function renderBody() {
-  if (!character.gym.bodyExercises) return;
-  renderBodyPartTabs();
-  renderBodyExerciseGrid();
-}
-
-// Body exercises are server-authoritative, same shape as the gym/hustles -- Looks itself is
-// recomputed server-side from the exercise scores + Maxx items, never sent up directly.
-async function runBodyExerciseViaServer(bodyPart, exerciseKey) {
-  try {
-    const result = await apiBodyExercise(bodyPart, exerciseKey);
-    character = result.character;
-    logTo(bodyLog, result.message, result.cls);
-    save();
-    renderAll();
-  } catch (err) {
-    logTo(bodyLog, err.reason || 'Could not reach the server.', 'loss');
-  }
-}
 
 // ---------- Pete'sza ----------
 const foodGrid = document.getElementById('foodGrid');

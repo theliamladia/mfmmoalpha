@@ -69,10 +69,6 @@ function apiRoidEscape() {
   return apiRequest('/gym/roid-escape', { method: 'POST' });
 }
 
-function apiBodyExercise(bodyPart, exerciseKey) {
-  return apiRequest('/gym/exercise', { method: 'POST', body: JSON.stringify({ bodyPart, exerciseKey }) });
-}
-
 function apiStretchHeight() {
   return apiRequest('/gym/stretch-height', { method: 'POST' });
 }
@@ -313,6 +309,10 @@ function apiAdminInventory(username) {
   return apiRequest('/admin/inventory', { method: 'POST', body: JSON.stringify({ username }) });
 }
 
+function apiAdminResetAllStats() {
+  return apiRequest('/admin/reset-all-stats', { method: 'POST' });
+}
+
 function apiResetCharacter() {
   return apiRequest('/character/reset', { method: 'POST' });
 }
@@ -482,6 +482,9 @@ function apiCryptoCollect() {
 }
 function apiCryptoSell(amount) {
   return apiRequest('/crypto/sell', { method: 'POST', body: JSON.stringify({ amount }) });
+}
+function apiCryptoBuy(amount) {
+  return apiRequest('/crypto/buy', { method: 'POST', body: JSON.stringify({ amount }) });
 }
 
 // ---------- Altcoins ----------

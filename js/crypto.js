@@ -22,6 +22,8 @@ const cryptoFcBalance = document.getElementById('cryptoFcBalance');
 const cryptoUpgradeGrid = document.getElementById('cryptoUpgradeGrid');
 const cryptoRateDesc = document.getElementById('cryptoRateDesc');
 const btnCryptoCollect = document.getElementById('btnCryptoCollect');
+const cryptoBuyInput = document.getElementById('cryptoBuyInput');
+const btnCryptoBuy = document.getElementById('btnCryptoBuy');
 const cryptoSellInput = document.getElementById('cryptoSellInput');
 const btnCryptoSell = document.getElementById('btnCryptoSell');
 const cryptoLog = document.getElementById('cryptoLog');
@@ -39,8 +41,8 @@ function cryptoDailyRate(crypto) {
 function renderCrypto() {
   if (!cryptoStateCache) return;
   const crypto = cryptoStateCache;
-  cryptoFcBalance.textContent = crypto.fc.toFixed(2);
-  cryptoRateDesc.textContent = `Mining at ${cryptoDailyRate(crypto).toFixed(2)} FC/day. Collect roughly once a day.`;
+  cryptoFcBalance.textContent = crypto.fc.toFixed(4);
+  cryptoRateDesc.textContent = `Mining at ${cryptoDailyRate(crypto).toFixed(2)} FC/day. Collect hourly.`;
 
   cryptoUpgradeGrid.innerHTML = ['ram', 'cpu', 'gpu'].map((track) => {
     const tierKey = `${track}Tier`;
@@ -86,6 +88,20 @@ async function refreshCrypto() {
 btnCryptoCollect.addEventListener('click', async () => {
   try {
     const result = await apiCryptoCollect();
+    character = result.character;
+    logTo(cryptoLog, result.message, result.cls);
+    save();
+    renderAll();
+    await refreshCrypto();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
+});
+
+btnCryptoBuy.addEventListener('click', async () => {
+  const amount = Number(cryptoBuyInput.value);
+  try {
+    const result = await apiCryptoBuy(amount);
     character = result.character;
     logTo(cryptoLog, result.message, result.cls);
     save();

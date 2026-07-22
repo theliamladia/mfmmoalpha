@@ -173,7 +173,6 @@
         <h2>🏬 Milos Market</h2>
         <div class="market-tabs">
           <button class="market-tab-btn active" data-shop="gym">🏋️ Plan-it Fitness</button>
-          <button class="market-tab-btn" data-shop="body">🏆 Body</button>
           <button class="market-tab-btn" data-shop="pizza">🍕 Pete's Pies</button>
           <button class="market-tab-btn" data-shop="maxx">💈 Luke's Maxxerstore</button>
           <button class="market-tab-btn" data-shop="titles">🎖️ Cosmetixxx</button>
@@ -190,7 +189,7 @@
           <div class="hustle-grid">
             <div class="hustle-card">
               <h3>🏋️ Workout</h3>
-              <p>$20, burns 0.5 lbs Fat &rarr; +0.6 Speed, +0.15 lbs Muscle, +0.1 Defense. Requires 0.5 lbs of Fat. Train the Body tab for Looks.</p>
+              <p>$20, burns 0.5 lbs Fat &rarr; +0.6 Speed, +0.15 lbs Muscle, +0.1 Defense, +Looks. Requires 0.5 lbs of Fat.</p>
               <button id="btnWorkout">Workout ($20)</button>
             </div>
             <div class="hustle-card">
@@ -208,15 +207,8 @@
           <div id="gymLog" class="log"></div>
         </div>
 
-        <div id="shop-body" class="shop hidden">
-          <p>Looks = 90% Body (train each part below) + 10% Face (Luke's Maxxerstore). Free to train, just a cooldown per exercise.</p>
-          <div class="body-part-tabs" id="bodyPartTabs"></div>
-          <div id="bodyExerciseGrid" class="hustle-grid"></div>
-          <div id="bodyLog" class="log"></div>
-        </div>
-
         <div id="shop-pizza" class="shop hidden">
-          <p>Eating adds weight (fuel for the gym), permanently raises Defense, and temporarily costs Speed.</p>
+          <p>Eating adds weight (fuel for the gym), permanently raises Defense, temporarily costs Speed, and builds Looks. Looks = 90% eating/workouts + 10% Face (Luke's Maxxerstore).</p>
           <div class="hustle-grid" id="foodGrid"></div>
           <div id="pizzaLog" class="log"></div>
         </div>
@@ -735,12 +727,17 @@
 
             <div id="milos-crypto" class="milos-subpage hidden">
               <p class="chip-counter">💻 Floydcoin price: <b>$10,000.00</b>/FC &mdash; Your wallet: <b id="cryptoFcBalance">0</b> FC</p>
-              <p>Your free rig ("MyShitter900") mines passively, no purchase required. Upgrades raise the rate; collect once a day or so.</p>
+              <p>Your free rig ("MyShitter900") mines passively, no purchase required. Upgrades raise the rate; collect hourly.</p>
               <div class="hustle-grid" id="cryptoUpgradeGrid"></div>
               <div class="hustle-card">
                 <h3>⛏️ Collect</h3>
                 <p id="cryptoRateDesc"></p>
                 <button id="btnCryptoCollect">Collect FC</button>
+              </div>
+              <div class="hustle-card">
+                <h3>🛒 Buy Floydcoin</h3>
+                <input type="number" id="cryptoBuyInput" min="1" value="1" placeholder="FC amount">
+                <button id="btnCryptoBuy">Buy with Floydbucks</button>
               </div>
               <div class="hustle-card">
                 <h3>💵 Sell FC</h3>
@@ -1136,6 +1133,13 @@
         <div class="admin-button-row">
           <button id="btnAdminTogglePause">Pause Game</button>
           <button id="btnAdminToggleMaintenance">Start Maintenance</button>
+        </div>
+      </div>
+
+      <div class="admin-block">
+        <p>⚠️ Danger Zone</p>
+        <div class="admin-button-row">
+          <button id="btnAdminResetAllStats" class="secondary-btn">Reset ALL Players' Stats (Keep Cosmetics)</button>
         </div>
       </div>
 

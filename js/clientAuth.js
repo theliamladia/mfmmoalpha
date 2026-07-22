@@ -42,9 +42,7 @@ function migrateServerCharacter(c) {
   if (c.jail && c.jail.contrabandAtkBonus === undefined) c.jail.contrabandAtkBonus = 0;
   if (c.titles && !c.titles.customTitles) c.titles.customTitles = [];
   if (!c.achievements) c.achievements = { foodEaten: 0, slutCount: 0 };
-  if (c.gym && !c.gym.bodyExercises) {
-    c.gym.bodyExercises = Object.fromEntries(BODY_PARTS.map((part) => [part, { ex1: 0, ex2: 0, ex3: 0, ex4: 0 }]));
-  }
+  if (c.gym && c.gym.bodyScore === undefined) c.gym.bodyScore = 0;
   if (c.fatGained === undefined) {
     c.fatGained = c.weightGained || 0;
     c.muscleGained = 0;

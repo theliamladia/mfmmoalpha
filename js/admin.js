@@ -148,6 +148,21 @@ btnAdminToggleMaintenance.addEventListener('click', async () => {
   }
 });
 
+// ---------- Server Controls: reset all stats ----------
+const btnAdminResetAllStats = document.getElementById('btnAdminResetAllStats');
+
+if (btnAdminResetAllStats) {
+  btnAdminResetAllStats.addEventListener('click', async () => {
+    if (!confirm('Wipe EVERY player back to fresh stats (money, chips, jobs, everything)? Titles and cosmetics are kept. This cannot be undone.')) return;
+    try {
+      const result = await apiAdminResetAllStats();
+      alert(result.message);
+    } catch (err) {
+      alert(err.reason || 'Could not reach the server.');
+    }
+  });
+}
+
 // ---------- Modifiers ----------
 const adminModifierButtons = document.querySelectorAll('[data-modifier]');
 
