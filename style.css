@@ -518,6 +518,198 @@ button:disabled {
   font-weight: 700;
 }
 
+/* --- Anima Crate --- */
+@keyframes rainbowShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.title-anima-common-goku,
+.title-anima-common-zoro,
+.title-anima-common-hatsune {
+  border: 3px solid #fff;
+  background-size: cover;
+  background-position: center;
+}
+
+.title-anima-common-goku { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLpnD9k1n_vt_dE3YeT307r9cqKC5_0jYbOAQmtjUG1zqVEyGWsCZ3Rsc&s=10'); }
+.title-anima-common-zoro { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4kqzEJ1f-X1j8ZkaGvzKJfQwf_AVhoyGrTK6MH99F8CiKewAixpfGYjg&s=10'); }
+.title-anima-common-hatsune { background-image: url('https://cdn.wallpapersafari.com/68/79/ImMueJ.jpg'); }
+
+.title-anima-rare-yujiro,
+.title-anima-rare-creator,
+.title-anima-rare-jinwoo {
+  border: 3px solid #2f80ed;
+  background-size: cover;
+  background-position: center;
+}
+
+.title-anima-rare-yujiro { background-image: url('https://media.tenor.com/dXShFmDOCTYAAAAd/yujiro-hanma-baki.gif'); }
+.title-anima-rare-creator { background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2M1YWo0Zm8yYzZpdTczeGlpMHBkNmQzYWdqM3l3NGJpZGl2NWFxeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pVWuLuV1JESZJdebkI/giphy.gif'); }
+.title-anima-rare-jinwoo { background-image: url('https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjl5dTJreXU4cms1MXh3dnZzejVyeDV4N3ZhMTR1bTYwOW5hdzJkcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TDUdFHAc6Q99qa9Crg/giphy.gif'); }
+
+.title-anima-mega-kirito,
+.title-anima-mega-itachi,
+.title-anima-mega-godgoku,
+.title-anima-mega-luffy {
+  border: 3px solid #f2c230;
+  background-size: cover;
+  background-position: center;
+}
+
+.title-anima-mega-kirito { background-image: url('https://media.tenor.com/zbZ3fR5i5hcAAAAC/sao-kirito.gif'); }
+.title-anima-mega-itachi { background-image: url('https://media1.tenor.com/m/ike6N7DwCa0AAAAC/%D8%B1%D9%8A%D8%A7%D9%84-%D9%85%D8%AF%D8%B1%D9%8A%D8%AF.gif'); }
+.title-anima-mega-godgoku { background-image: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWVkdDRyYWRrYjA2ZmhxZ2lqb3EyZmhpczZ3N2NyM2psZ3Q0cG81NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3xCWpDBCsYeNa/giphy.gif'); }
+.title-anima-mega-luffy { background-image: url('https://media.tenor.com/EBz2RssGy9EAAAAi/luffy-power-light.gif'); }
+
+.title-anima-hyper-gear5,
+.title-anima-hyper-makima {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  font-weight: 700;
+}
+
+.title-anima-hyper-gear5::before,
+.title-anima-hyper-makima::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 8px;
+  background: linear-gradient(270deg, #ff0033, #ff9900, #fff200, #33ff33, #00e5ff, #3355ff, #cc33ff, #ff0033);
+  background-size: 400% 400%;
+  animation: rainbowShift 5s linear infinite;
+  z-index: -1;
+}
+
+.title-anima-hyper-gear5 { background-image: url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3U2cDEyM3c1djFueXI4N2w3cjJqaTA5OGZhYmpkYzlzcGQzOGhkeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IEZy0MXCCxBShZaloq/giphy.gif'); }
+.title-anima-hyper-makima { background-image: url('https://64.media.tumblr.com/519d48bdb9c8b6b4962d9331b862e859/2de001ae1ad3b407-59/s640x960/7e5aa39d5af3247cbbb884f9930a60d9ab9d295c.gifv'); }
+
+.title-anima-hyper-gear5 .title-text,
+.title-anima-hyper-makima .title-text {
+  background: linear-gradient(270deg, #ff0033, #ff9900, #fff200, #33ff33, #00e5ff, #3355ff, #cc33ff, #ff0033);
+  background-size: 400% 400%;
+  animation: rainbowShift 5s linear infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-weight: 700;
+}
+
+/* --- Counterfinish Crate --- */
+.title-cf-safari {
+  background-image: url('https://static.pattern.wiki/img/f6bf9c9384c795756acf41fafadf887704a3c8ae');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #8fc797;
+}
+.title-cf-safari .title-text { color: #6fae74; font-weight: 700; }
+
+.title-cf-tiger {
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq4VV3Wv-Dr9mnVtkhCQRSPU6YIwi0ZSrTD1YclGu9R3e4mHhJzCupIc9o&s=10');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #d4af37;
+}
+.title-cf-tiger .title-text { color: #000; font-weight: 700; }
+
+.title-cf-tronic {
+  background-image: url('https://thumbs.dreamstime.com/b/image-red-metal-background-texture-showcasing-brushed-steel-plate-iron-shiny-reflections-363238309.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #050505;
+  box-shadow: 0 0 0 1px #3a3a3a;
+}
+.title-cf-tronic .title-text {
+  color: #c9cbd2;
+  font-weight: 700;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.title-cf-free {
+  background-image: url('https://knify.gg/medias/2024/02/swatch-freehand.webp');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #9b30ff;
+}
+.title-cf-free .title-text { color: #000; font-weight: 700; }
+
+.title-cf-lore {
+  background-image: url('https://images.stockcake.com/public/d/3/e/d3ee6013-d135-49d2-b919-c1dd3b8e7c43_medium/ornate-golden-texture-stockcake.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #d4af37;
+  box-shadow: 0 0 16px 2px #d4af37;
+}
+.title-cf-lore .title-text { color: #000; font-weight: 700; }
+
+.title-cf-howl {
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0jsvqAAddVLwsq8Hu2gVzuOAcmwYl1PkhlqLS1xS6ajwzrooKZ8wjJZbH&s=10');
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 16px 2px #e0342b;
+}
+.title-cf-howl .title-text {
+  color: #ffe066;
+  font-weight: 700;
+  text-shadow: 0 0 6px #ffe066, 0 0 12px #ffe066;
+}
+
+.title-cf-fade {
+  background-image: url('https://i.pinimg.com/736x/55/2b/17/552b17605548a0072c76e9e57d63fe3c.jpg');
+  background-size: cover;
+  background-position: center;
+  border-image: linear-gradient(90deg, #9b30ff 50%, #ff8c00 50%) 1;
+  box-shadow: -3px 0 10px 0 #9b30ff, 3px 0 10px 0 #ff8c00;
+}
+.title-cf-fade .title-text {
+  color: #ff8c00;
+  font-weight: 700;
+  text-shadow: 0 0 6px #9b30ff, 0 0 10px #ff8c00;
+}
+
+/* Gem/Hyper Gem backgrounds are placeholder gem-colored gradients -- the supplied Google Drive
+   swatch images are privately shared and don't load for anyone but the file owner. Swap in real
+   public-hosted images (Imgur/CDN/asset storage) for Sapphire/Ruby/Emerald before shipping. */
+.title-cf-sapphire {
+  background: linear-gradient(135deg, #103a63, #2f80ed);
+  box-shadow: 0 0 16px 2px #2f80ed;
+}
+.title-cf-sapphire .title-text { color: #4da6ff; font-weight: 700; text-shadow: 0 0 6px #4da6ff, 0 0 12px #4da6ff; }
+
+.title-cf-ruby {
+  background: linear-gradient(135deg, #5c1414, #e0342b);
+  box-shadow: 0 0 16px 2px #e0342b;
+}
+.title-cf-ruby .title-text { color: #ff5c5c; font-weight: 700; text-shadow: 0 0 6px #ff5c5c, 0 0 12px #ff5c5c; }
+
+.title-cf-emerald {
+  background: linear-gradient(135deg, #145a32, #2ecc71);
+  box-shadow: 0 0 16px 2px #2ecc71;
+}
+.title-cf-emerald .title-text { color: #4ee08a; font-weight: 700; text-shadow: 0 0 6px #4ee08a, 0 0 12px #4ee08a; }
+
+.title-cf-hyper-sapphire {
+  background: linear-gradient(135deg, #103a63, #2f80ed);
+  box-shadow: 0 0 16px 2px #2f80ed;
+}
+.title-cf-hyper-ruby {
+  background: linear-gradient(135deg, #5c1414, #e0342b);
+  box-shadow: 0 0 16px 2px #e0342b;
+}
+.title-cf-hyper-emerald {
+  background: linear-gradient(135deg, #145a32, #2ecc71);
+  box-shadow: 0 0 16px 2px #2ecc71;
+}
+.title-cf-hyper-sapphire .title-text,
+.title-cf-hyper-ruby .title-text,
+.title-cf-hyper-emerald .title-text {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 0 6px #fff, 0 0 14px #fff;
+}
+
 /* --- Feature banner --- */
 .feature-banner {
   display: flex;

@@ -380,7 +380,7 @@ function allTitleDefsFor(char) {
   return [
     PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE, FAT_FUCK_TITLE, LOOSE_TITLE,
     LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE, HEIGHTMAXXED_TITLE,
-    ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES,
+    ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];
 }
@@ -390,7 +390,9 @@ function allTitleDefs() {
 }
 
 // Titles tracked as inventory stacks: tradeable, "owned" only while at least one copy remains.
-const CRATE_TITLE_IDS = new Set([...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES].map((t) => t.id));
+const CRATE_TITLE_IDS = new Set([
+  ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
+].map((t) => t.id));
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
 CRATE_TITLE_IDS.add(ADMIN_TITLE.id);
 
