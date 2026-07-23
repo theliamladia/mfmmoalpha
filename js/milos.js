@@ -29,7 +29,7 @@ function renderPlayerList() {
   const youRow = `
     <li class="player-row">
       ${badgeMarkup}
-      <span class="player-name">${styledName} (you)</span>
+      <span class="player-name">${styledName}</span>
       <div class="player-hover-card">
         <p><b>${styledName}</b></p>
         <p>Height: ${formatHeight(character.height)}</p>
@@ -1051,12 +1051,9 @@ function renderChatMessages() {
   if (lastId === lastRenderedChatId) return;
   lastRenderedChatId = lastId;
 
-  chatMessagesEl.innerHTML = '';
-  chatMessagesCache.forEach((msg) => {
-    const p = document.createElement('p');
-    p.textContent = `[${msg.titleText}] ${msg.senderName}: ${msg.message}`;
-    chatMessagesEl.appendChild(p);
-  });
+  chatMessagesEl.innerHTML = chatMessagesCache.map((msg) => `
+    <p>[${escapeHtml(msg.titleText)}] ${styledNameHtmlById(msg.titleId, msg.senderName)}: ${escapeHtml(msg.message)}</p>
+  `).join('');
   chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
 }
 
@@ -1078,7 +1075,7 @@ async function sendChatMessage() {
   if (!text) return;
   chatInputEl.value = '';
   try {
-    const result = await apiChatSend(currentDisplayTitleText(), text);
+    const result = await apiChatSend(currentDisplayTitleText(), text, character.titles.equipped);
     chatMessagesCache = result.messages;
     renderChatMessages();
   } catch (err) {

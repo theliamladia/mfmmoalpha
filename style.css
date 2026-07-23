@@ -745,6 +745,15 @@ button:disabled {
   100% { background-position: 300% 50%; }
 }
 
+/* Players Online only -- bump the recolored name up a size so it actually reads over the small
+   default player-row text. Chat/MTN/coinflip intentionally keep the base (unscaled) size. */
+.player-name .name-style-hyper-sapphire,
+.player-name .name-style-hyper-ruby,
+.player-name .name-style-hyper-emerald,
+.player-name .name-style-hyper-rainbow {
+  font-size: 19px;
+}
+
 /* --- Feature banner --- */
 .feature-banner {
   display: flex;

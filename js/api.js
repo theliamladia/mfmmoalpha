@@ -321,8 +321,8 @@ function apiChatMessages() {
   return apiRequest('/chat/messages');
 }
 
-function apiChatSend(titleText, message) {
-  return apiRequest('/chat/send', { method: 'POST', body: JSON.stringify({ titleText, message }) });
+function apiChatSend(titleText, message, titleId) {
+  return apiRequest('/chat/send', { method: 'POST', body: JSON.stringify({ titleText, message, titleId }) });
 }
 
 function apiOnlinePlayers() {
