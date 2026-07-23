@@ -19,13 +19,32 @@ function farmConfiscationChancePct(securityTier) {
   return Math.max(5, 30 - securityTier * 5);
 }
 
+// mm:ss under an hour, h:mm:ss once it's an hour or more (Grow/Ship stages start at 1h).
+function formatFarmDuration(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(seconds).padStart(2, '0');
+  return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+const FARM_STAGE_VERB = { growing: 'Growing', packaging: 'Packaging', shipping: 'Shipping' };
+
+// stageReadyAt is a server-stamped absolute timestamp -- offset by clockOffsetMs (same clock-skew
+// calibration cooldowns use, see clientAuth.js) rather than raw Date.now(), so a player whose
+// device clock drifts doesn't see a wildly wrong countdown.
 function farmStageLabel(plot) {
   if (plot.stage === 'empty') return plot.prepped ? 'Prepped -- ready to plant' : 'Empty -- till/water/fertilize first';
-  if (plot.stage === 'growing') return 'Growing (1h)';
-  if (plot.stage === 'packaging') return 'Packaging (5m)';
-  if (plot.stage === 'shipping') return 'Shipping (1h) -- vulnerable to interception';
   if (plot.stage === 'ready') return 'Ready to collect!';
-  return plot.stage;
+  const remaining = plot.stageReadyAt - (Date.now() + clockOffsetMs);
+  // Local countdown can hit zero slightly before the next refreshFarms() poll confirms the real
+  // stage change -- show a neutral "almost there" line rather than a stale/negative timer.
+  if (remaining <= 0) return 'Almost ready...';
+  const verb = FARM_STAGE_VERB[plot.stage] || plot.stage;
+  const note = plot.stage === 'shipping' ? ' -- vulnerable to interception' : '';
+  return `${verb} (${formatFarmDuration(remaining)})${note}`;
 }
 
 function farmPlotCardHtml(plot) {
@@ -51,7 +70,7 @@ function farmPlotCardHtml(plot) {
   return `
     <div class="hustle-card">
       <h3>🌱 Plot</h3>
-      <p>${farmStageLabel(plot)}</p>
+      <p data-farm-timer="${plot.id}">${farmStageLabel(plot)}</p>
       ${riskNote}
       ${actions.join('')}
     </div>
@@ -122,6 +141,17 @@ function renderFarms() {
         if (err.reason) alert(err.reason);
       }
     });
+  });
+}
+
+// Patches just the timer text in place every tick (see tickCooldownUI in market.js) rather than
+// re-rendering the whole grid, same reasoning as tickCrimeUI/tickBankCountdown -- a full re-render
+// would also nuke the seed <select>'s in-progress value.
+function tickFarmsUI() {
+  if (!farmsStateCache || !farmsStateCache.farms) return;
+  farmsStateCache.farms.plots.forEach((plot) => {
+    const el = farmsPlotsGrid.querySelector(`[data-farm-timer="${plot.id}"]`);
+    if (el) el.textContent = farmStageLabel(plot);
   });
 }
 

@@ -554,9 +554,24 @@ function buildDrugSellSelect() {
 }
 
 // Mirrors the server's doSellDrugs() risk formula exactly, same as crimeFailChance()/
-// badJobBustChance() are already mirrored for their own odds displays.
+// badJobBustChance() are already mirrored for their own odds displays -- Speed+Attack reduce the
+// base risk, same stat-mitigation shape crimeFailChance() already uses.
+const DRUG_SELL_RISK_MIN = 0.03;
+const DRUG_SELL_STAT_MITIGATION = 0.5;
+
 function sellDrugsRiskChance(drug, qty) {
-  return Math.min(0.9, drug.riskBase + (qty - 1) * drug.riskPerUnit);
+  const baseRisk = Math.min(0.9, drug.riskBase + (qty - 1) * drug.riskPerUnit);
+  const statScore = (character.stats.speed + character.stats.attack) / (2 * STAT_CAP);
+  const reduction = Math.min(DRUG_SELL_STAT_MITIGATION, statScore * DRUG_SELL_STAT_MITIGATION);
+  return Math.max(DRUG_SELL_RISK_MIN, baseRisk - reduction);
+}
+
+// Looks gives a smooth-talking revenue bonus, same as the server's drugSellRevenueMultiplier().
+const DRUG_SELL_LOOKS_BONUS_MAX = 0.25;
+
+function sellDrugsRevenueMultiplier() {
+  const looksScore = Math.min(character.stats.looks, STAT_CAP) / STAT_CAP;
+  return 1 + looksScore * DRUG_SELL_LOOKS_BONUS_MAX;
 }
 
 function renderDrugSellOdds() {
@@ -565,7 +580,9 @@ function renderDrugSellOdds() {
   if (!drug) { drugSellOddsLine.textContent = ''; return; }
   const qty = Math.max(1, Math.floor(+drugSellQty.value) || 1);
   const risk = sellDrugsRiskChance(drug, qty);
-  drugSellOddsLine.innerHTML = `Odds of getting caught: <b>${Math.round(risk * 100)}%</b> (scales with quantity).`;
+  const bonusPct = Math.round((sellDrugsRevenueMultiplier() - 1) * 100);
+  const bonusNote = bonusPct > 0 ? ` &mdash; Looks revenue bonus: <b>+${bonusPct}%</b>` : '';
+  drugSellOddsLine.innerHTML = `Odds of getting caught: <b>${Math.round(risk * 100)}%</b> (Speed/Attack lower this)${bonusNote}.`;
 }
 
 drugSellSelect.addEventListener('change', () => { renderMilos(); renderDrugSellOdds(); });

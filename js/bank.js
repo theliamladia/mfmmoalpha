@@ -177,6 +177,9 @@ function renderTitleDropdown() {
     if (!groups.has(label)) groups.set(label, []);
     groups.get(label).push(t);
   });
+  // Within each crate group, highest rarity first then highest prestige first, instead of
+  // whatever order they happened to be won/acquired in.
+  groups.forEach((items) => items.sort(compareTitleStacksByRarityThenPrestige((t) => t.id, (t) => t)));
   const orderedLabels = [...TITLE_CRATE_GROUPS.map((g) => g.label), OTHER_TITLES_LABEL].filter((l) => groups.has(l));
 
   const groupsHtml = orderedLabels.map((label) => {

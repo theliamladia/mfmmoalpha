@@ -70,10 +70,12 @@ function buildInventoryGrid() {
     }).join('')
     : '<p class="equip-picker-empty">No items yet. Buy a gun or ammo at the NMC Gun Club, or drugs from Guzman.</p>';
 
-  const titleStacks = character.inventory.filter((stack) => {
-    const item = getItemDef(stack.id);
-    return item && item.type === 'title';
-  });
+  const titleStacks = character.inventory
+    .filter((stack) => {
+      const item = getItemDef(stack.id);
+      return item && item.type === 'title';
+    })
+    .sort(compareTitleStacksByRarityThenPrestige((s) => s.id, (s) => getItemDef(s.id)));
   cosmeticsGrid.innerHTML = titleStacks.length
     ? titleStacks.map((stack) => {
       const item = getItemDef(stack.id);

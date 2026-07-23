@@ -499,6 +499,24 @@ function itemLabel(item) {
 // catalogs) are sellable; leaderboard/achievement/custom titles have no rarity and aren't.
 const TITLE_SELL_PRICE_BY_RARITY = { common: 1000, uncommon: 2000, rare: 2500, mythic: 10000 };
 
+// Highest rarity first; titles with no rarity (leaderboard/achievement/custom) sort after every
+// tagged rarity, matching their "not sellable/prestigeable" status.
+const TITLE_RARITY_SORT_RANK = { mythic: 3, rare: 2, uncommon: 1, common: 0 };
+
+// Shared comparator for any list of owned title stacks: highest rarity first, then highest
+// prestige level first, so a player's titles read best-to-worst instead of acquisition order.
+// `idOf`/`itemOf` let callers pass either raw stack objects or already-resolved title defs.
+function compareTitleStacksByRarityThenPrestige(idOf, itemOf) {
+  return (a, b) => {
+    const itemA = itemOf(a);
+    const itemB = itemOf(b);
+    const rarityA = itemA.rarity ? TITLE_RARITY_SORT_RANK[itemA.rarity] : -1;
+    const rarityB = itemB.rarity ? TITLE_RARITY_SORT_RANK[itemB.rarity] : -1;
+    if (rarityB !== rarityA) return rarityB - rarityA;
+    return parsePrestigeId(idOf(b)).level - parsePrestigeId(idOf(a)).level;
+  };
+}
+
 // Prestige stacks are synthesized on the fly rather than hardcoded per-title (any crate title can
 // be prestiged) -- id shape is `${baseTitleId}_p${level}`, e.g. betaSpin2026_p1 = "Beta 2026 I".
 const PRESTIGE_ID_RE = /^(.+)_p(\d+)$/;
