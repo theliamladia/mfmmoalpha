@@ -1156,6 +1156,10 @@
         </div>
       </div>
 
+      <div class="admin-block admin-misc">
+        <button id="btnAdminTransactionLog">📊 Transaction Log</button>
+      </div>
+
       <div class="admin-block">
         <p>🔍 Inventory Checker</p>
         <div class="admin-row">
@@ -1184,6 +1188,50 @@
       </div>
 
       <button id="btnAdminClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
+  <div id="transactionLogModal" class="modal-overlay hidden">
+    <div class="modal-box txlog-box">
+      <button id="btnTxLogCloseX" class="admin-close-x" title="Close" aria-label="Close">&times;</button>
+      <h3>📊 Transaction Log</h3>
+
+      <div class="txlog-tiles" id="txlogTiles"></div>
+
+      <div class="txlog-charts">
+        <div class="txlog-chart-col">
+          <p class="txlog-chart-title">💰 Top Money Generators</p>
+          <div id="txlogGainsChart" class="txlog-bars"></div>
+        </div>
+        <div class="txlog-chart-col">
+          <p class="txlog-chart-title">🕳️ Biggest Money Sinks</p>
+          <div id="txlogSinksChart" class="txlog-bars"></div>
+        </div>
+      </div>
+
+      <div class="txlog-charts">
+        <div class="txlog-chart-col">
+          <p class="txlog-chart-title">🏆 Top Earners (Net)</p>
+          <div id="txlogTopEarners" class="txlog-bars"></div>
+        </div>
+        <div class="txlog-chart-col">
+          <p class="txlog-chart-title">📉 Top Spenders (Net)</p>
+          <div id="txlogTopLosers" class="txlog-bars"></div>
+        </div>
+      </div>
+
+      <div class="txlog-block">
+        <p class="txlog-chart-title">🧾 Recent Transactions</p>
+        <div class="admin-row">
+          <input type="text" id="txlogUserFilter" placeholder="Filter by username (optional)">
+          <button id="btnTxLogFilter">Filter</button>
+          <button id="btnTxLogClearFilter" class="secondary-btn">Clear</button>
+        </div>
+        <div id="txlogTable" class="txlog-table"></div>
+        <button id="btnTxLogLoadMore" class="secondary-btn">Load More</button>
+      </div>
+
+      <button id="btnTxLogClose" class="secondary-btn admin-close">Close</button>
     </div>
   </div>
 
@@ -1332,6 +1380,7 @@
 <script src="js/penitentiary.js"></script>
 <script src="js/jail.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/adminTransactions.js"></script>
 <script src="js/clientAuth.js"></script>
 </body>
 </html>

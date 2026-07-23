@@ -313,6 +313,18 @@ function apiAdminResetAllStats() {
   return apiRequest('/admin/reset-all-stats', { method: 'POST' });
 }
 
+function apiAdminTransactions({ username, beforeId } = {}) {
+  const params = new URLSearchParams();
+  if (username) params.set('username', username);
+  if (beforeId) params.set('beforeId', beforeId);
+  const qs = params.toString();
+  return apiRequest(`/admin/transactions${qs ? `?${qs}` : ''}`);
+}
+
+function apiAdminTransactionsSummary() {
+  return apiRequest('/admin/transactions/summary');
+}
+
 function apiResetCharacter() {
   return apiRequest('/character/reset', { method: 'POST' });
 }
