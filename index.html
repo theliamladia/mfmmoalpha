@@ -227,6 +227,7 @@
             </div>
             <div class="feature-banner-actions">
               <button id="btnViewAnimaCrate" class="secondary-btn">View Crate</button>
+              <input type="number" id="animaSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
               <button id="btnAnimaSpin">Spin ($4,500)</button>
             </div>
           </div>
@@ -239,6 +240,7 @@
             </div>
             <div class="feature-banner-actions">
               <button id="btnViewCounterfinishCrate" class="secondary-btn">View Crate</button>
+              <input type="number" id="counterfinishSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
               <button id="btnCounterfinishSpin">Spin ($3,000)</button>
             </div>
           </div>
@@ -1208,6 +1210,7 @@
       <h3>🎉 You Won!</h3>
       <div id="crateResultBadge" class="crate-result-badge"></div>
       <p id="crateResultNote" class="crate-result-note"></p>
+      <div id="crateResultMultiList" class="crate-result-multi-list hidden"></div>
       <div class="crate-result-actions">
         <button id="btnCrateResultEquip">Equip Title</button>
         <button id="btnCrateResultContinue" class="secondary-btn">Continue Without Equipping</button>

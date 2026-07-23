@@ -490,10 +490,37 @@ const btnViewGoodSeasonCrate = document.getElementById('btnViewGoodSeasonCrate')
 const btnAnimaSpin = document.getElementById('btnAnimaSpin');
 const animaSpinMessage = document.getElementById('animaSpinMessage');
 const btnViewAnimaCrate = document.getElementById('btnViewAnimaCrate');
+const animaSpinQtyInput = document.getElementById('animaSpinQty');
 
 const btnCounterfinishSpin = document.getElementById('btnCounterfinishSpin');
 const counterfinishSpinMessage = document.getElementById('counterfinishSpinMessage');
 const btnViewCounterfinishCrate = document.getElementById('btnViewCounterfinishCrate');
+const counterfinishSpinQtyInput = document.getElementById('counterfinishSpinQty');
+
+const CRATE_SPIN_MAX_QTY = 10;
+
+// Keyed by crate object identity so getCrateQty/updateSpinButtonLabel work off whichever crate is
+// passed in, without hardcoding a growing if/else chain as more crates get spin buttons.
+const CRATE_QTY_INPUT_BY_CRATE = new Map();
+
+function registerCrateQtyInput(crate, input, button) {
+  CRATE_QTY_INPUT_BY_CRATE.set(crate, input);
+  const baseLabel = button.textContent;
+  const updateLabel = () => {
+    const qty = getCrateQty(crate);
+    button.textContent = qty > 1 ? `Spin ${qty}x ($${(crate.cost * qty).toLocaleString()})` : baseLabel;
+  };
+  input.addEventListener('input', updateLabel);
+  updateLabel();
+}
+
+function getCrateQty(crate) {
+  const input = CRATE_QTY_INPUT_BY_CRATE.get(crate);
+  if (!input) return 1;
+  const clamped = Math.max(1, Math.min(CRATE_SPIN_MAX_QTY, Math.round(Number(input.value) || 1)));
+  input.value = clamped;
+  return clamped;
+}
 
 const crateOddsModal = document.getElementById('crateOddsModal');
 const crateOddsTitle = document.getElementById('crateOddsTitle');
@@ -549,19 +576,49 @@ const btnCrateResultRollAgain = document.getElementById('btnCrateResultRollAgain
 let crateResultTitleId = null;
 let lastSpunCrateContext = null;
 
-function showCrateResult(title, alreadyOwned) {
-  crateResultTitleId = title.id;
-  crateResultBadge.innerHTML = titleBadgeMarkup(title);
-  const base = alreadyOwned
-    ? 'Already owned — another copy was added to your Inventory to trade.'
-    : 'Added to your Inventory.';
-  // Hidden-name titles show a blank badge above, so spell out the real item name here too
-  // (matches the label already used in the Inventory tab and Trade dropdown).
-  crateResultNote.textContent = title.displayName ? `${itemLabel(title)}. ${base}` : base;
-  const canRollAgain = lastSpunCrateContext && character.cash >= lastSpunCrateContext.crate.cost;
+const crateResultMultiList = document.getElementById('crateResultMultiList');
+
+// results/alreadyOwnedFlags are parallel arrays -- length 1 for a normal single spin (keeps the
+// existing animated badge reveal), length >1 for a multi-open (skips the reel animation, since
+// playing it N times in a row would just be N x 4.5s of waiting -- see spinCrate).
+function showCrateResult(results, alreadyOwnedFlags) {
+  const isMulti = results.length > 1;
+  crateResultTitleId = isMulti ? null : results[0].id;
+
+  crateResultBadge.classList.toggle('hidden', isMulti);
+  crateResultNote.classList.toggle('hidden', isMulti);
+  crateResultMultiList.classList.toggle('hidden', !isMulti);
+  btnCrateResultEquip.classList.toggle('hidden', isMulti);
+
+  if (isMulti) {
+    crateResultMultiList.innerHTML = results.map((title, i) => {
+      const already = alreadyOwnedFlags[i];
+      const note = title.displayName ? itemLabel(title) : (already ? 'Already owned' : 'New!');
+      return `
+        <div class="crate-result-multi-row">
+          ${titleBadgeMarkup(title)}
+          <span class="crate-result-multi-note">${note}${title.displayName && already ? ' (already owned)' : ''}</span>
+        </div>
+      `;
+    }).join('');
+  } else {
+    const title = results[0];
+    const alreadyOwned = alreadyOwnedFlags[0];
+    crateResultBadge.innerHTML = titleBadgeMarkup(title);
+    const base = alreadyOwned
+      ? 'Already owned — another copy was added to your Inventory to trade.'
+      : 'Added to your Inventory.';
+    // Hidden-name titles show a blank badge above, so spell out the real item name here too
+    // (matches the label already used in the Inventory tab and Trade dropdown).
+    crateResultNote.textContent = title.displayName ? `${itemLabel(title)}. ${base}` : base;
+  }
+
+  const qty = lastSpunCrateContext ? lastSpunCrateContext.qty : 1;
+  const totalCost = lastSpunCrateContext ? lastSpunCrateContext.crate.cost * qty : 0;
+  const canRollAgain = lastSpunCrateContext && character.cash >= totalCost;
   btnCrateResultRollAgain.disabled = !canRollAgain;
   btnCrateResultRollAgain.textContent = lastSpunCrateContext
-    ? `Roll Again ($${lastSpunCrateContext.crate.cost.toLocaleString()})`
+    ? (qty > 1 ? `Open ${qty}x Again ($${totalCost.toLocaleString()})` : `Roll Again ($${totalCost.toLocaleString()})`)
     : 'Roll Again';
   crateResultModal.classList.remove('hidden');
 }
@@ -580,8 +637,8 @@ btnCrateResultContinue.addEventListener('click', () => {
 btnCrateResultRollAgain.addEventListener('click', () => {
   crateResultModal.classList.add('hidden');
   if (!lastSpunCrateContext) return;
-  const { crate, buttons, messageEl } = lastSpunCrateContext;
-  spinCrate(crate, buttons, messageEl, { skipConfirm: true });
+  const { crate, buttons, messageEl, qty } = lastSpunCrateContext;
+  spinCrate(crate, buttons, messageEl, { skipConfirm: true, qty });
 });
 
 // ---------- crate opening animation ----------
@@ -623,50 +680,83 @@ function runCrateAnimation(crate, winningTitle, onDone) {
   }, CRATE_REEL_DURATION_MS + 200);
 }
 
-function doStartCrateSpin(crate) {
-  if (character.cash < crate.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
-  character.cash -= crate.cost;
-  const won = weightedTitleFrom(crate.titles);
-  return { ok: true, won };
+function doStartCrateSpin(crate, qty) {
+  const totalCost = crate.cost * qty;
+  if (character.cash < totalCost) return { ok: false, reason: 'Not enough Floydbucks.' };
+  character.cash -= totalCost;
+  const results = [];
+  for (let i = 0; i < qty; i++) results.push(weightedTitleFrom(crate.titles));
+  return { ok: true, results };
 }
 
-function doGrantCrateWin(titleId) {
-  const alreadyOwned = inventoryQty(titleId) > 0;
-  addToInventory(titleId, 1);
-  return { alreadyOwned };
+// Grants sequentially (not in parallel) so if the same title comes up twice in one multi-open,
+// the second copy correctly reports alreadyOwned -- true after the first grant already added it.
+function doGrantCrateWins(titleIds) {
+  return titleIds.map((id) => {
+    const alreadyOwned = inventoryQty(id) > 0;
+    addToInventory(id, 1);
+    return alreadyOwned;
+  });
 }
 
-function spinCrate(crate, buttons, messageEl, { skipConfirm = false } = {}) {
-  if (character.cash < crate.cost) {
+function spinCrate(crate, buttons, messageEl, opts = {}) {
+  const { skipConfirm = false, qty: qtyOverride } = opts;
+  const qty = qtyOverride || getCrateQty(crate);
+  const totalCost = crate.cost * qty;
+
+  if (character.cash < totalCost) {
     alert('Not enough Floydbucks.');
     return;
   }
-  if (!skipConfirm && !confirm(`Spin the ${crate.name} for $${crate.cost.toLocaleString()}? ARE YOU SURE?`)) return;
+  if (!skipConfirm) {
+    const confirmMsg = qty > 1
+      ? `Spin the ${crate.name} ${qty}x for $${totalCost.toLocaleString()} total? ARE YOU SURE?`
+      : `Spin the ${crate.name} for $${crate.cost.toLocaleString()}? ARE YOU SURE?`;
+    if (!confirm(confirmMsg)) return;
+  }
 
-  lastSpunCrateContext = { crate, buttons, messageEl };
-  const start = doStartCrateSpin(crate);
+  lastSpunCrateContext = { crate, buttons, messageEl, qty };
+  const start = doStartCrateSpin(crate, qty);
   if (!start.ok) { alert(start.reason); return; }
-  const won = start.won;
   save();
   renderAll();
 
   buttons.forEach((b) => { b.disabled = true; });
   messageEl.textContent = 'Opening crate...';
 
-  runCrateAnimation(crate, won, () => {
-    const { alreadyOwned } = doGrantCrateWin(won.id);
-    const msg = alreadyOwned
-      ? `Spin landed on ${itemLabel(won)} — already owned! Another copy was added to your Inventory to trade.`
-      : `Spin landed on ${itemLabel(won)}! Added to your Inventory.`;
-    messageEl.textContent = msg;
-    logTo(titleLog, msg, 'gain');
-    save();
-    buildTitleGrid();
-    renderAll();
-    buttons.forEach((b) => { b.disabled = false; });
-    showCrateResult(won, alreadyOwned);
-  });
+  if (qty === 1) {
+    const won = start.results[0];
+    runCrateAnimation(crate, won, () => {
+      const [alreadyOwned] = doGrantCrateWins([won.id]);
+      const msg = alreadyOwned
+        ? `Spin landed on ${itemLabel(won)} — already owned! Another copy was added to your Inventory to trade.`
+        : `Spin landed on ${itemLabel(won)}! Added to your Inventory.`;
+      messageEl.textContent = msg;
+      logTo(titleLog, msg, 'gain');
+      save();
+      buildTitleGrid();
+      renderAll();
+      buttons.forEach((b) => { b.disabled = false; });
+      showCrateResult([won], [alreadyOwned]);
+    });
+    return;
+  }
+
+  // Multi-open skips the slot-reel animation entirely -- playing it qty times back to back would
+  // just be qty x 4.5s of waiting for no benefit, so results resolve instantly into the list view.
+  const alreadyOwnedFlags = doGrantCrateWins(start.results.map((t) => t.id));
+  const msg = `Opened ${crate.name} ${qty}x! See results below.`;
+  messageEl.textContent = msg;
+  logTo(titleLog, msg, 'gain');
+  save();
+  buildTitleGrid();
+  renderAll();
+  buttons.forEach((b) => { b.disabled = false; });
+  showCrateResult(start.results, alreadyOwnedFlags);
 }
+
+registerCrateQtyInput(CRATE_ANIMA, animaSpinQtyInput, btnAnimaSpin);
+registerCrateQtyInput(CRATE_COUNTERFINISH, counterfinishSpinQtyInput, btnCounterfinishSpin);
 
 btnAnimaSpin.addEventListener('click', () => spinCrate(CRATE_ANIMA, [btnAnimaSpin, btnViewAnimaCrate], animaSpinMessage));
 btnCounterfinishSpin.addEventListener('click', () => spinCrate(CRATE_COUNTERFINISH, [btnCounterfinishSpin, btnViewCounterfinishCrate], counterfinishSpinMessage));
