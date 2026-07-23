@@ -37,7 +37,7 @@ const hustleToast = document.getElementById('hustleToast');
 
 function getRemainingCooldown(action, durationMs = COOLDOWN_MS) {
   const last = character.cooldowns[action] || 0;
-  const remaining = durationMs - (Date.now() - last);
+  const remaining = durationMs - (Date.now() + clockOffsetMs - last);
   return remaining > 0 ? remaining : 0;
 }
 

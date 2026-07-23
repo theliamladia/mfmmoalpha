@@ -52,7 +52,14 @@ function migrateServerCharacter(c) {
   return c;
 }
 
-function enterGameWithCharacter(serverCharacter) {
+// Cooldown countdowns are computed client-side against timestamps the server stamped with its own
+// clock -- if the player's device clock is off (wrong time/timezone, drift), those countdowns can
+// read wildly wrong (e.g. "100+s" left on a 12s cooldown) even though the server-side cooldown has
+// long since expired. Calibrated once per session from whichever auth call got us in.
+let clockOffsetMs = 0;
+
+function enterGameWithCharacter(serverCharacter, serverTime) {
+  if (serverTime) clockOffsetMs = serverTime - Date.now();
   character = migrateServerCharacter(serverCharacter);
   save();
   screenAuth.classList.add('hidden');
@@ -68,7 +75,7 @@ btnLogin.addEventListener('click', async () => {
   try {
     const result = await apiLogin(loginUsernameInput.value.trim(), loginPasswordInput.value);
     setAuthToken(result.token);
-    enterGameWithCharacter(result.character);
+    enterGameWithCharacter(result.character, result.serverTime);
   } catch (err) {
     loginError.textContent = err.reason || 'Login failed.';
   } finally {
@@ -87,7 +94,7 @@ btnRegister.addEventListener('click', async () => {
       registerLastNameInput.value.trim()
     );
     setAuthToken(result.token);
-    enterGameWithCharacter(result.character);
+    enterGameWithCharacter(result.character, result.serverTime);
   } catch (err) {
     registerError.textContent = err.reason || 'Registration failed.';
   } finally {
@@ -105,7 +112,7 @@ btnRegister.addEventListener('click', async () => {
 
   try {
     const result = await apiMe();
-    enterGameWithCharacter(result.character);
+    enterGameWithCharacter(result.character, result.serverTime);
   } catch {
     clearAuthToken();
     screenAuth.classList.remove('hidden');
