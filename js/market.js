@@ -711,6 +711,30 @@ function doGrantCrateWins(titleIds) {
   });
 }
 
+// A drop is announcement-worthy if it's tagged mythic, or -- for a crate that has no mythic tier
+// at all -- if it's tied for the single rarest (lowest-weight) title in that crate.
+function isCrateAnnounceWorthy(crate, title) {
+  const hasMythicTier = crate.titles.some((t) => t.rarity === 'mythic');
+  if (hasMythicTier) return title.rarity === 'mythic';
+  const minWeight = Math.min(...crate.titles.map((t) => t.weight));
+  return title.weight === minWeight;
+}
+
+// Fire-and-forget: posts to the shared New Milos City chat exactly like a normal message from this
+// player (same equipped-title bling), but a failure here shouldn't block the crate reveal itself.
+async function announceCrateWin(crate, title) {
+  const totalWeight = crate.titles.reduce((sum, t) => sum + t.weight, 0);
+  const pct = formatCratePct((title.weight / totalWeight) * 100);
+  const message = `${characterFullName()} just unboxed a ${pct} ${itemLabel(title)} from the ${crate.name}`;
+  try {
+    const result = await apiChatSend(currentDisplayTitleText(), message, character.titles.equipped);
+    chatMessagesCache = result.messages;
+    renderChatMessages();
+  } catch {
+    // Best-effort -- same as every other chat send.
+  }
+}
+
 function spinCrate(crate, buttons, messageEl, opts = {}) {
   const { skipConfirm = false, qty: qtyOverride } = opts;
   const qty = qtyOverride || getCrateQty(crate);
@@ -739,6 +763,9 @@ function spinCrate(crate, buttons, messageEl, opts = {}) {
 
   const finishMultiOpen = () => {
     const alreadyOwnedFlags = doGrantCrateWins(start.results.map((t) => t.id));
+    start.results.forEach((title) => {
+      if (isCrateAnnounceWorthy(crate, title)) announceCrateWin(crate, title);
+    });
     const msg = `Opened ${crate.name} ${qty}x! See results below.`;
     messageEl.textContent = msg;
     logTo(titleLog, msg, 'gain');
@@ -753,6 +780,7 @@ function spinCrate(crate, buttons, messageEl, opts = {}) {
     const won = start.results[0];
     runCrateAnimation(crate, won, () => {
       const [alreadyOwned] = doGrantCrateWins([won.id]);
+      if (isCrateAnnounceWorthy(crate, won)) announceCrateWin(crate, won);
       const msg = alreadyOwned
         ? `Spin landed on ${itemLabel(won)} — already owned! Another copy was added to your Inventory to trade.`
         : `Spin landed on ${itemLabel(won)}! Added to your Inventory.`;
