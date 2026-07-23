@@ -1046,13 +1046,32 @@ function currentDisplayTitleText() {
   return display ? display.name : computeRank();
 }
 
+// Resolves to the real badge graphic when possible -- getItemDef works for any static catalog
+// title (crate titles, achievement titles like HIGHEST NET WORTH, etc.) regardless of whose
+// message it is, since those defs don't depend on the sender's own character data. It only fails
+// for another player's CUSTOM (Title Maker) title, since that def lives solely in their own save --
+// falls back to the old bracketed text in that one case.
+function chatTitleMarkup(msg) {
+  if (msg.titleId) {
+    const title = getItemDef(msg.titleId);
+    if (title && title.type === 'title') return titleBadgeMarkup(title);
+  }
+  return `<span class="chat-title-fallback">${escapeHtml(msg.titleText)}</span>`;
+}
+
 function renderChatMessages() {
   const lastId = chatMessagesCache.length ? chatMessagesCache[chatMessagesCache.length - 1].id : null;
   if (lastId === lastRenderedChatId) return;
   lastRenderedChatId = lastId;
 
   chatMessagesEl.innerHTML = chatMessagesCache.map((msg) => `
-    <p>[${escapeHtml(msg.titleText)}] ${styledNameHtmlById(msg.titleId, msg.senderName)}: ${escapeHtml(msg.message)}</p>
+    <div class="chat-message-row">
+      ${chatTitleMarkup(msg)}
+      <span class="chat-message-body">
+        <span class="chat-message-name">${styledNameHtmlById(msg.titleId, msg.senderName)}</span><span class="chat-message-sep">:</span>
+        <span class="chat-message-text">${escapeHtml(msg.message)}</span>
+      </span>
+    </div>
   `).join('');
   chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
 }
