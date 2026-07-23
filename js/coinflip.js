@@ -33,7 +33,7 @@ function renderCoinflipLobbies() {
     const isMine = lobby.creatorName === myName;
     return `
       <div class="hustle-card" data-lobby-id="${lobby.id}">
-        <h3>🪙 ${lobby.creatorName}</h3>
+        <h3>🪙 ${styledNameHtmlById(lobby.creatorTitleId, lobby.creatorName)}</h3>
         <p>Wager: $${lobby.wager.toFixed(2)} &mdash; Called <b>${lobby.creatorSide}</b></p>
         ${isMine
           ? `<button class="coinflip-cancel-btn" data-lobby-id="${lobby.id}">Cancel</button>`

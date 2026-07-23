@@ -888,7 +888,7 @@ function renderAll() {
     processMoralsCenter();
     syncPenitentiaryRecord();
   }
-  charNameEl.textContent = `${character.firstName} ${character.lastName}`;
+  charNameEl.innerHTML = styledNameHtml(character, `${character.firstName} ${character.lastName}`);
   levelBadgeEl.textContent = `⭐ Lvl ${computeLevel()}`;
 
   const s = character.stats;

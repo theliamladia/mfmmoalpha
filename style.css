@@ -720,6 +720,31 @@ button:disabled {
   text-shadow: 0 0 6px #fff, 0 0 14px #fff;
 }
 
+/* --- Equipped name-recolor perk (Hyper Gems / Anima Hyper Rares) -- see js/nameStyle.js --- */
+.name-style-hyper-sapphire,
+.name-style-hyper-ruby,
+.name-style-hyper-emerald {
+  font-family: 'Brush Script MT', 'Segoe Script', cursive;
+  font-weight: 700;
+}
+.name-style-hyper-sapphire { color: #2f80ed; text-shadow: 0 0 6px #2f80ed, 0 0 14px #2f80ed; }
+.name-style-hyper-ruby { color: #e0342b; text-shadow: 0 0 6px #e0342b, 0 0 14px #e0342b; }
+.name-style-hyper-emerald { color: #2ecc71; text-shadow: 0 0 6px #2ecc71, 0 0 14px #2ecc71; }
+
+.name-style-hyper-rainbow {
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff3b3b, #ffb03b, #f4ff3b, #3bff6a, #3bd4ff, #6a3bff, #ff3bd4, #ff3b3b);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-style-rainbow-shift 4s linear infinite;
+}
+@keyframes name-style-rainbow-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
 /* --- Feature banner --- */
 .feature-banner {
   display: flex;

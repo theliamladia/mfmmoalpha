@@ -49,6 +49,7 @@ function buildMtnListingsGrid() {
       const name = item ? itemLabel(item) : listing.itemId;
       const total = round2(listing.pricePerUnit * listing.qty);
       const isMine = listing.sellerName === myName;
+      const sellerNameHtml = styledNameHtmlById(listing.sellerTitleId, listing.sellerName);
       const buttonHtml = isMine
         ? `<button data-mtn-cancel="${listing.id}" class="secondary-btn">Cancel Listing</button>`
         : `<button data-mtn-buy="${listing.id}">Buy</button>`;
@@ -63,7 +64,7 @@ function buildMtnListingsGrid() {
             <p class="title-info-rank">${name}</p>
             ${item.how ? `<p class="title-info-how">${item.how}</p>` : ''}
             <p><b>$${total.toFixed(2)}</b></p>
-            <p>Seller: ${listing.sellerName}</p>
+            <p>Seller: ${sellerNameHtml}</p>
             ${buttonHtml}
           </div>
         `;
@@ -72,7 +73,7 @@ function buildMtnListingsGrid() {
       return `
         <div class="hustle-card">
           <h3>${name}</h3>
-          <p>Qty ${listing.qty} &times; $${listing.pricePerUnit.toFixed(2)} = <b>$${total.toFixed(2)}</b><br>Seller: ${listing.sellerName}</p>
+          <p>Qty ${listing.qty} &times; $${listing.pricePerUnit.toFixed(2)} = <b>$${total.toFixed(2)}</b><br>Seller: ${sellerNameHtml}</p>
           ${buttonHtml}
         </div>
       `;

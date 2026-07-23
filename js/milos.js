@@ -25,29 +25,34 @@ function renderPlayerList() {
     ? titleHoverMarkup(display)
     : `<span class="badge rank-badge">${computeRank()}</span>`;
   const fullName = `${character.firstName} ${character.lastName}`;
+  const styledName = styledNameHtml(character, fullName);
   const youRow = `
     <li class="player-row">
       ${badgeMarkup}
-      <span class="player-name">${fullName} (you)</span>
+      <span class="player-name">${styledName} (you)</span>
       <div class="player-hover-card">
-        <p><b>${fullName}</b></p>
+        <p><b>${styledName}</b></p>
         <p>Height: ${formatHeight(character.height)}</p>
         <p>Weight: ${round1(150 + character.fatGained + character.muscleGained)} lbs</p>
       </div>
     </li>
   `;
 
-  const otherRows = onlinePlayersCache.map((p) => `
+  const otherRows = onlinePlayersCache.map((p) => {
+    const otherFullName = `${p.character.firstName} ${p.character.lastName}`;
+    const otherStyledName = styledNameHtml(p.character, otherFullName);
+    return `
     <li class="player-row" data-username="${p.username}">
       ${displayBadgeMarkupFor(p.character)}
-      <span class="player-name">${p.character.firstName} ${p.character.lastName}</span>
+      <span class="player-name">${otherStyledName}</span>
       <div class="player-hover-card">
-        <p><b>${p.character.firstName} ${p.character.lastName}</b></p>
+        <p><b>${otherStyledName}</b></p>
         <p>Height: ${formatHeight(p.character.height)}</p>
         <p>Weight: ${round1(150 + p.character.fatGained + p.character.muscleGained)} lbs</p>
       </div>
     </li>
-  `).join('');
+  `;
+  }).join('');
 
   playerListEl.innerHTML = youRow + otherRows;
 

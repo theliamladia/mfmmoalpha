@@ -19,8 +19,10 @@ let currentActionTargetUsername = null;
 function openPlayerActionModal(username) {
   currentActionTargetUsername = username;
   const target = onlinePlayersCache.find((p) => p.username === username);
-  const label = target ? `${target.character.firstName} ${target.character.lastName}` : username;
-  playerActionTitle.textContent = label;
+  const label = target
+    ? styledNameHtml(target.character, `${target.character.firstName} ${target.character.lastName}`)
+    : escapeHtml(username);
+  playerActionTitle.innerHTML = label;
   playerActionMessage.textContent = '';
   playerActionPaySub.classList.add('hidden');
   playerActionMenu.classList.remove('hidden');
