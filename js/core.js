@@ -901,6 +901,7 @@ function showGame() {
 
 function renderAll() {
   renderServerBanners();
+  renderSlimedGate();
   if (!isGamePaused()) {
     processBankBilling();
     processMoralsCenter();

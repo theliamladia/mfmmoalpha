@@ -9,6 +9,7 @@ const playerActionPayAmount = document.getElementById('playerActionPayAmount');
 const playerActionMessage = document.getElementById('playerActionMessage');
 const btnPlayerActionPay = document.getElementById('btnPlayerActionPay');
 const btnPlayerActionRob = document.getElementById('btnPlayerActionRob');
+const btnPlayerActionSlime = document.getElementById('btnPlayerActionSlime');
 const btnPlayerActionFight = document.getElementById('btnPlayerActionFight');
 const btnPlayerActionPayBack = document.getElementById('btnPlayerActionPayBack');
 const btnPlayerActionPaySubmit = document.getElementById('btnPlayerActionPaySubmit');
@@ -73,6 +74,22 @@ btnPlayerActionRob.addEventListener('click', async () => {
     renderAll();
     logTo(milosLog, result.message, result.cls);
     closePlayerActionModal();
+  } catch (err) {
+    playerActionMessage.textContent = err.reason || 'Something went wrong.';
+  }
+});
+
+btnPlayerActionSlime.addEventListener('click', async () => {
+  const targetLabel = playerActionTitle.textContent;
+  if (!confirm(`Slime ${targetLabel}? This consumes your equipped gun. ARE YOU SURE?`)) return;
+  try {
+    const result = await apiSlimePlayer(currentActionTargetUsername);
+    closePlayerActionModal();
+    if (result.duel) {
+      showSlimeDuelModal(result);
+    } else {
+      applySlimeResult(result);
+    }
   } catch (err) {
     playerActionMessage.textContent = err.reason || 'Something went wrong.';
   }

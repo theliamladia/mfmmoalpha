@@ -49,6 +49,8 @@ function migrateServerCharacter(c) {
     delete c.weightGained;
   }
   if (c.marriage && c.marriage.spouseUserId === undefined) c.marriage.spouseUserId = null;
+  if (!c.slime) c.slime = { active: false, until: 0, byName: null };
+  if (!c.slimeRecord) c.slimeRecord = [];
   return c;
 }
 

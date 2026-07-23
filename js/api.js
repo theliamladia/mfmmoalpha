@@ -386,6 +386,10 @@ function apiRobPlayer(targetUsername) {
   return apiRequest('/players/rob', { method: 'POST', body: JSON.stringify({ targetUsername }) });
 }
 
+function apiSlimePlayer(targetUsername) {
+  return apiRequest('/players/slime', { method: 'POST', body: JSON.stringify({ targetUsername }) });
+}
+
 function apiDuelChallenge(targetUsername) {
   return apiRequest('/duels/challenge', { method: 'POST', body: JSON.stringify({ targetUsername }) });
 }
@@ -464,6 +468,14 @@ function apiRobberyNotifications() {
 
 function apiMarkRobberyNotificationsSeen() {
   return apiRequest('/notifications/robberies/seen', { method: 'POST' });
+}
+
+function apiSlimeNotifications() {
+  return apiRequest('/notifications/slimes');
+}
+
+function apiMarkSlimeNotificationsSeen() {
+  return apiRequest('/notifications/slimes/seen', { method: 'POST' });
 }
 
 function apiLeaderboard() {

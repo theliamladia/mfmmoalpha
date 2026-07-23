@@ -23,6 +23,19 @@
   </div>
 </div>
 
+<!-- SLIMED OUT TAKEOVER -- covers the whole page for whichever player just lost a sliming, for 10
+     minutes. Server-side (server.js runAction's isSlimed check) is the real gate; this is the
+     client-side reflection, kept in sync by js/slime.js's tickSlimedUI/renderSlimedGate. -->
+<div id="slimedOverlay" class="maintenance-overlay slimed-overlay hidden">
+  <div class="maintenance-box">
+    <div class="maintenance-emoji">🟢🔫🟢</div>
+    <h1>YOU JUST GOT SLIMED, JIT!</h1>
+    <p>Slimed by <b id="slimedByName"></b></p>
+    <p class="maintenance-sub">Locked out for <span id="slimedCountdown">10:00</span></p>
+    <div id="slimedRecordList" class="slimed-record-list"></div>
+  </div>
+</div>
+
 <!-- LOGIN / REGISTER -->
 <section id="screen-auth" class="screen hidden">
   <div class="panel">
@@ -1253,6 +1266,37 @@
     </div>
   </div>
 
+  <div id="slimeAlertModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>🛡️ Attempt Blocked!</h3>
+      <p id="slimeAlertText"></p>
+      <div class="crate-result-actions">
+        <button id="btnSlimeAlertOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="slimeDuelModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>🔫 Shootout!</h3>
+      <div class="slime-duel-rolls">
+        <div class="slime-duel-roll-col">
+          <span class="slime-duel-roll-label">You</span>
+          <span id="slimeDuelShooterRoll" class="slime-duel-roll-value">?</span>
+        </div>
+        <div class="slime-duel-roll-vs">VS</div>
+        <div class="slime-duel-roll-col">
+          <span class="slime-duel-roll-label">Them</span>
+          <span id="slimeDuelTargetRoll" class="slime-duel-roll-value">?</span>
+        </div>
+      </div>
+      <p id="slimeDuelResultText"></p>
+      <div class="crate-result-actions">
+        <button id="btnSlimeDuelOk" class="hidden">OK</button>
+      </div>
+    </div>
+  </div>
+
   <div id="crateResultModal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3>🎉 You Won!</h3>
@@ -1293,6 +1337,7 @@
       <div id="playerActionMenu" class="modal-actions">
         <button id="btnPlayerActionPay">💵 Pay</button>
         <button id="btnPlayerActionRob">🥷 Rob</button>
+        <button id="btnPlayerActionSlime">🔫 Slime</button>
         <button id="btnPlayerActionFight">⚔️ Fight</button>
       </div>
       <div id="playerActionPaySub" class="hidden">
@@ -1370,6 +1415,7 @@
 <script src="js/crypto.js"></script>
 <script src="js/altcoins.js"></script>
 <script src="js/playerActions.js"></script>
+<script src="js/slime.js"></script>
 <script src="js/duels.js"></script>
 <script src="js/coinflip.js"></script>
 <script src="js/casinoTables.js"></script>

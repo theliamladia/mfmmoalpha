@@ -93,6 +93,7 @@ function tickCooldownUI() {
   tickBankCountdown();
   tickJailActivityUI();
   tickFarmsUI();
+  tickSlimedUI();
   if (!shopEls.gym.classList.contains('hidden')) renderGym();
 }
 
