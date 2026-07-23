@@ -157,6 +157,11 @@ function renderRankBadge() {
   }
 }
 
+// Which crate groups are currently expanded -- closed by default (see renderTitleDropdown), and
+// this persists across re-renders so equipping a title or reopening the dropdown doesn't collapse
+// whatever the player already had open.
+const expandedTitleGroups = new Set();
+
 function renderTitleDropdown() {
   checkPeakTitleGrant();
   const owned = ownedTitleDefs();
@@ -164,7 +169,8 @@ function renderTitleDropdown() {
 
   // Grouped by crate (Open Beta / GOOD Season 1 / Anima / Counterfinish), with everything else
   // (purchased, PEAK CIVILIAN, leaderboard/achievement, custom) bucketed under "Other Titles" --
-  // insertion order within TITLE_CRATE_GROUPS, "Other Titles" last.
+  // insertion order within TITLE_CRATE_GROUPS, "Other Titles" last. Each group is a closed
+  // dropdown of its own so a player with a lot of crate titles doesn't get a wall of badges.
   const groups = new Map();
   owned.forEach((t) => {
     const label = titleCrateGroupLabel(t);
@@ -174,15 +180,35 @@ function renderTitleDropdown() {
   const orderedLabels = [...TITLE_CRATE_GROUPS.map((g) => g.label), OTHER_TITLES_LABEL].filter((l) => groups.has(l));
 
   const groupsHtml = orderedLabels.map((label) => {
-    const itemsHtml = groups.get(label).map((t) => `
+    const items = groups.get(label);
+    const isExpanded = expandedTitleGroups.has(label);
+    const equippedInGroup = items.some((t) => character.titles.equipped === t.id);
+    const itemsHtml = items.map((t) => `
       <div class="title-dropdown-item ${character.titles.equipped === t.id ? 'equipped' : ''}" data-equip="${t.id}">
         ${titleHoverMarkup(t)}
       </div>
     `).join('');
-    return `<div class="title-dropdown-group-label">${label}</div>${itemsHtml}`;
+    return `
+      <div class="title-dropdown-group-header ${equippedInGroup ? 'has-equipped' : ''}" data-group-toggle="${escapeHtml(label)}">
+        <span>${label}</span>
+        <span class="title-dropdown-group-count">${items.length}</span>
+        <span class="title-dropdown-group-chevron ${isExpanded ? 'open' : ''}">▾</span>
+      </div>
+      <div class="title-dropdown-group-items ${isExpanded ? '' : 'hidden'}">${itemsHtml}</div>
+    `;
   }).join('');
 
   titleDropdown.innerHTML = noneItem + groupsHtml;
+
+  titleDropdown.querySelectorAll('[data-group-toggle]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const label = el.dataset.groupToggle;
+      if (expandedTitleGroups.has(label)) expandedTitleGroups.delete(label);
+      else expandedTitleGroups.add(label);
+      renderTitleDropdown();
+    });
+  });
 
   titleDropdown.querySelectorAll('[data-equip]').forEach((el) => {
     el.addEventListener('click', () => {
