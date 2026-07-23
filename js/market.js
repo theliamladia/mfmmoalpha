@@ -498,6 +498,10 @@ const btnViewCounterfinishCrate = document.getElementById('btnViewCounterfinishC
 const counterfinishSpinQtyInput = document.getElementById('counterfinishSpinQty');
 
 const CRATE_SPIN_MAX_QTY = 10;
+// Up to this many rolls still play the reel animation once per roll, in sequence. Past it, the
+// button switches to "Quick Open" and results resolve instantly (see spinCrate) -- animating a big
+// batch would just be a long wait with no benefit.
+const CRATE_ANIMATE_MAX_QTY = 5;
 
 // Keyed by crate object identity so getCrateQty/updateSpinButtonLabel work off whichever crate is
 // passed in, without hardcoding a growing if/else chain as more crates get spin buttons.
@@ -508,7 +512,11 @@ function registerCrateQtyInput(crate, input, button) {
   const baseLabel = button.textContent;
   const updateLabel = () => {
     const qty = getCrateQty(crate);
-    button.textContent = qty > 1 ? `Spin ${qty}x ($${(crate.cost * qty).toLocaleString()})` : baseLabel;
+    if (qty <= 1) { button.textContent = baseLabel; return; }
+    const totalCost = crate.cost * qty;
+    button.textContent = qty > CRATE_ANIMATE_MAX_QTY
+      ? `Quick Open ${qty}x ($${totalCost.toLocaleString()})`
+      : `Spin ${qty}x ($${totalCost.toLocaleString()})`;
   };
   input.addEventListener('input', updateLabel);
   updateLabel();
@@ -618,7 +626,11 @@ function showCrateResult(results, alreadyOwnedFlags) {
   const canRollAgain = lastSpunCrateContext && character.cash >= totalCost;
   btnCrateResultRollAgain.disabled = !canRollAgain;
   btnCrateResultRollAgain.textContent = lastSpunCrateContext
-    ? (qty > 1 ? `Open ${qty}x Again ($${totalCost.toLocaleString()})` : `Roll Again ($${totalCost.toLocaleString()})`)
+    ? (qty > CRATE_ANIMATE_MAX_QTY
+      ? `Quick Open ${qty}x Again ($${totalCost.toLocaleString()})`
+      : qty > 1
+        ? `Open ${qty}x Again ($${totalCost.toLocaleString()})`
+        : `Roll Again ($${totalCost.toLocaleString()})`)
     : 'Roll Again';
   crateResultModal.classList.remove('hidden');
 }
@@ -709,8 +721,9 @@ function spinCrate(crate, buttons, messageEl, opts = {}) {
     return;
   }
   if (!skipConfirm) {
+    const verb = qty > CRATE_ANIMATE_MAX_QTY ? 'Quick Open' : 'Spin';
     const confirmMsg = qty > 1
-      ? `Spin the ${crate.name} ${qty}x for $${totalCost.toLocaleString()} total? ARE YOU SURE?`
+      ? `${verb} the ${crate.name} ${qty}x for $${totalCost.toLocaleString()} total? ARE YOU SURE?`
       : `Spin the ${crate.name} for $${crate.cost.toLocaleString()}? ARE YOU SURE?`;
     if (!confirm(confirmMsg)) return;
   }
@@ -723,6 +736,18 @@ function spinCrate(crate, buttons, messageEl, opts = {}) {
 
   buttons.forEach((b) => { b.disabled = true; });
   messageEl.textContent = 'Opening crate...';
+
+  const finishMultiOpen = () => {
+    const alreadyOwnedFlags = doGrantCrateWins(start.results.map((t) => t.id));
+    const msg = `Opened ${crate.name} ${qty}x! See results below.`;
+    messageEl.textContent = msg;
+    logTo(titleLog, msg, 'gain');
+    save();
+    buildTitleGrid();
+    renderAll();
+    buttons.forEach((b) => { b.disabled = false; });
+    showCrateResult(start.results, alreadyOwnedFlags);
+  };
 
   if (qty === 1) {
     const won = start.results[0];
@@ -742,17 +767,25 @@ function spinCrate(crate, buttons, messageEl, opts = {}) {
     return;
   }
 
-  // Multi-open skips the slot-reel animation entirely -- playing it qty times back to back would
-  // just be qty x 4.5s of waiting for no benefit, so results resolve instantly into the list view.
-  const alreadyOwnedFlags = doGrantCrateWins(start.results.map((t) => t.id));
-  const msg = `Opened ${crate.name} ${qty}x! See results below.`;
-  messageEl.textContent = msg;
-  logTo(titleLog, msg, 'gain');
-  save();
-  buildTitleGrid();
-  renderAll();
-  buttons.forEach((b) => { b.disabled = false; });
-  showCrateResult(start.results, alreadyOwnedFlags);
+  if (qty <= CRATE_ANIMATE_MAX_QTY) {
+    // Small batches still get the reel animation, played once per roll in sequence, before the
+    // results list reveals -- unlike a single spin, granting/messaging only happens once at the end.
+    let i = 0;
+    const playNext = () => {
+      if (i >= start.results.length) { finishMultiOpen(); return; }
+      messageEl.textContent = `Opening crate ${i + 1}/${qty}...`;
+      runCrateAnimation(crate, start.results[i], () => {
+        i += 1;
+        playNext();
+      });
+    };
+    playNext();
+    return;
+  }
+
+  // Quick Open (qty > CRATE_ANIMATE_MAX_QTY) skips the slot-reel animation entirely -- playing it
+  // qty times back to back would just be a long wait for no benefit, so results resolve instantly.
+  finishMultiOpen();
 }
 
 registerCrateQtyInput(CRATE_ANIMA, animaSpinQtyInput, btnAnimaSpin);
