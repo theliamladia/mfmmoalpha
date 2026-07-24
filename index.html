@@ -721,38 +721,47 @@
               <p class="chip-counter">💻 Floydcoin price: <b>$10,000.00</b>/FC &mdash; Your wallet: <b id="cryptoFcBalance">0</b> FC</p>
               <h3 id="cryptoRigTitle" class="gunclub-section-title"></h3>
               <button id="btnViewCryptoBalances" class="secondary-btn">🔎 View All Balances</button>
+
+              <h3 class="gunclub-section-title">🖥️ Mining Rig</h3>
               <div class="hustle-grid" id="cryptoUpgradeGrid"></div>
-              <button id="btnCryptoAdvanceMachine" disabled></button>
-              <button id="btnCryptoPrestige" class="secondary-btn" disabled></button>
-
-              <div class="hustle-card">
-                <h3>🧊 Floydcoin Cold Storage Module</h3>
-                <p id="cryptoColdStorageDesc"></p>
-                <label>Deposit <input type="number" id="cryptoColdStorageDepositInput" min="1" value="1" placeholder="FC amount"></label>
-                <button id="btnCryptoColdStorageDeposit">Deposit</button>
-                <button id="btnCryptoColdStorageDepositAll" class="secondary-btn">Deposit All</button>
-                <label>Withdraw <input type="number" id="cryptoColdStorageWithdrawInput" min="1" value="1" placeholder="FC amount"></label>
-                <button id="btnCryptoColdStorageWithdraw">Withdraw</button>
-                <button id="btnCryptoColdStorageWithdrawAll" class="secondary-btn">Withdraw All</button>
-                <button id="btnCryptoColdStorageUpgrade" class="secondary-btn">Upgrade Capacity</button>
+              <div class="crypto-action-row">
+                <button id="btnCryptoAdvanceMachine" disabled></button>
+                <button id="btnCryptoPrestige" class="secondary-btn" disabled></button>
               </div>
 
-              <div class="hustle-card">
-                <h3>⛏️ Collect</h3>
-                <p id="cryptoRateDesc"></p>
-                <button id="btnCryptoCollect">Collect FC</button>
-              </div>
-              <div class="hustle-card">
-                <h3>🛒 Buy Floydcoin</h3>
-                <input type="number" id="cryptoBuyInput" min="1" value="1" placeholder="FC amount">
-                <button id="btnCryptoBuy">Buy with Floydbucks</button>
-                <button id="btnCryptoBuyMax" class="secondary-btn">Buy Max</button>
-              </div>
-              <div class="hustle-card">
-                <h3>💵 Sell FC</h3>
-                <input type="number" id="cryptoSellInput" min="1" value="1" placeholder="FC amount">
-                <button id="btnCryptoSell">Sell for Floydbucks</button>
-                <button id="btnCryptoSellAll" class="secondary-btn">Sell All</button>
+              <hr class="hustle-divider">
+
+              <h3 class="gunclub-section-title">💰 Wallet</h3>
+              <div class="hustle-grid">
+                <div class="hustle-card">
+                  <h3>🧊 Floydcoin Cold Storage Module</h3>
+                  <p id="cryptoColdStorageDesc"></p>
+                  <label>Deposit <input type="number" id="cryptoColdStorageDepositInput" min="1" value="1" placeholder="FC amount"></label>
+                  <button id="btnCryptoColdStorageDeposit">Deposit</button>
+                  <button id="btnCryptoColdStorageDepositAll" class="secondary-btn">Deposit All</button>
+                  <label>Withdraw <input type="number" id="cryptoColdStorageWithdrawInput" min="1" value="1" placeholder="FC amount"></label>
+                  <button id="btnCryptoColdStorageWithdraw">Withdraw</button>
+                  <button id="btnCryptoColdStorageWithdrawAll" class="secondary-btn">Withdraw All</button>
+                  <button id="btnCryptoColdStorageUpgrade" class="secondary-btn">Upgrade Capacity</button>
+                </div>
+
+                <div class="hustle-card">
+                  <h3>⛏️ Collect</h3>
+                  <p id="cryptoRateDesc"></p>
+                  <button id="btnCryptoCollect">Collect FC</button>
+                </div>
+                <div class="hustle-card">
+                  <h3>🛒 Buy Floydcoin</h3>
+                  <input type="number" id="cryptoBuyInput" min="1" value="1" placeholder="FC amount">
+                  <button id="btnCryptoBuy">Buy with Floydbucks</button>
+                  <button id="btnCryptoBuyMax" class="secondary-btn">Buy Max</button>
+                </div>
+                <div class="hustle-card">
+                  <h3>💵 Sell FC</h3>
+                  <input type="number" id="cryptoSellInput" min="1" value="1" placeholder="FC amount">
+                  <button id="btnCryptoSell">Sell for Floydbucks</button>
+                  <button id="btnCryptoSellAll" class="secondary-btn">Sell All</button>
+                </div>
               </div>
             </div>
 

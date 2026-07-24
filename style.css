@@ -2686,6 +2686,13 @@ button:disabled {
   margin: 14px 0;
 }
 
+.crypto-action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 4px 0 18px;
+}
+
 .gun-license-note {
   color: #e0b85c;
   font-size: 12px;
