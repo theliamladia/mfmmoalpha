@@ -315,49 +315,54 @@
               <p>Convert Floydbucks into Chips.</p>
               <input type="number" id="buyChipsInput" min="1" value="100">
               <button id="btnBuyChips">Buy Chips</button>
+              <button id="btnBuyChipsMax" class="secondary-btn">Buy Max</button>
             </div>
             <div class="hustle-card">
               <h3>💵 Cash Out</h3>
               <p>Convert Chips back into Floydbucks.</p>
               <input type="number" id="cashOutInput" min="1" value="100">
               <button id="btnCashOut">Cash Out</button>
+              <button id="btnCashOutMax" class="secondary-btn">Cash Out Max</button>
             </div>
           </div>
         </div>
 
         <div id="shop-blackjack" class="shop hidden">
-          <p>Dealer stands on 17. Blackjack pays 3:2.</p>
+          <p>Dealer stands on 17. Blackjack pays 3:2. Double down on your first two cards, or split matching pairs into two hands.</p>
           <div class="bj-table">
             <div class="bj-dealer">
               <h4>🤵 Dealer <span id="bjDealerTotal"></span></h4>
               <div id="bjDealerCards" class="card-row"></div>
             </div>
-            <div class="bj-player">
-              <h4>🙂 You <span id="bjPlayerTotal"></span></h4>
-              <div id="bjPlayerCards" class="card-row"></div>
-            </div>
+            <div id="bjHands"></div>
           </div>
           <div class="bj-controls">
             <label>Bet <input type="number" id="bjBetInput" min="1" value="10"></label>
+            <button id="btnBjHalfBet" class="secondary-btn">1/2 Bet</button>
+            <button id="btnBjMaxBet" class="secondary-btn">Max Bet</button>
             <button id="btnBjDeal">Deal</button>
             <button id="btnBjHit" disabled>Hit</button>
             <button id="btnBjStand" disabled>Stand</button>
+            <button id="btnBjDouble" disabled>Double</button>
+            <button id="btnBjSplit" disabled>Split</button>
           </div>
           <p id="bjMessage"></p>
           <div id="bjLog" class="log"></div>
         </div>
 
         <div id="shop-slots" class="shop hidden">
-          <div class="slot-reels">
-            <span class="reel" id="reel0">?</span>
-            <span class="reel" id="reel1">?</span>
-            <span class="reel" id="reel2">?</span>
+          <div class="market-tabs">
+            <button class="slot-machine-tab-btn active" data-machine="survivor">🏝️ Lone Slotvivor</button>
+            <button class="slot-machine-tab-btn" data-machine="zeus">⚡ Zeus: King of Storms</button>
+            <button class="slot-machine-tab-btn" data-machine="elite">🏆 ELITE Slots</button>
           </div>
+          <p id="slotMachineDesc"></p>
+          <div class="slot-reels" id="slotReels"></div>
           <div class="hustle-grid">
             <div class="hustle-card">
               <h3>🎰 Spin</h3>
-              <p>Match 3 symbols for a payout. Two cherries refunds your bet.</p>
-              <label>Bet <input type="number" id="slotBetInput" min="1" value="10"></label>
+              <p id="slotMachineRule"></p>
+              <label>Bet <input type="number" id="slotBetInput" min="10" value="10"></label>
               <button id="btnSlotSpin">Spin</button>
             </div>
           </div>

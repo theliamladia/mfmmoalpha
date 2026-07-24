@@ -84,11 +84,22 @@ function placeRouletteBet(type, value, el) {
     return;
   }
 
+  const pendingTotal = Array.from(rouletteBets.values()).reduce((sum, b) => sum + b.amount, 0);
+  const available = Math.floor(character.chips) - pendingTotal;
+  if (available <= 0) {
+    rouletteMessageEl.textContent = 'Not enough Chips.';
+    return;
+  }
+  const amountToAdd = Math.min(chipValue, available);
+  if (amountToAdd < chipValue) {
+    rouletteMessageEl.textContent = `Only ${amountToAdd} Chips left to bet — clamped.`;
+  }
+
   const key = `${type}:${value}`;
   const existing = rouletteBets.get(key);
-  rouletteBets.set(key, { type, value, amount: (existing ? existing.amount : 0) + chipValue });
+  rouletteBets.set(key, { type, value, amount: (existing ? existing.amount : 0) + amountToAdd });
   el.classList.add('selected');
-  rouletteMessageEl.textContent = '';
+  if (amountToAdd === chipValue) rouletteMessageEl.textContent = '';
   renderRoulettePending();
   startRouletteCountdownIfNeeded();
 }

@@ -108,8 +108,16 @@ function apiBjStand() {
   return apiRequest('/casino/blackjack/stand', { method: 'POST' });
 }
 
-function apiSlotSpin(bet) {
-  return apiRequest('/casino/slots/spin', { method: 'POST', body: JSON.stringify({ bet }) });
+function apiBjDouble() {
+  return apiRequest('/casino/blackjack/double', { method: 'POST' });
+}
+
+function apiBjSplit() {
+  return apiRequest('/casino/blackjack/split', { method: 'POST' });
+}
+
+function apiSlotSpin(machine, bet) {
+  return apiRequest('/casino/slots/spin', { method: 'POST', body: JSON.stringify({ machine, bet }) });
 }
 
 function apiBankDeposit(amount) {
