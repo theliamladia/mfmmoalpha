@@ -304,7 +304,7 @@
           <button class="casino-tab-btn active" data-shop="cashier">💵 Cashier</button>
           <button class="casino-tab-btn" data-shop="blackjack">🃏 Blackjack</button>
           <button class="casino-tab-btn" data-shop="slots">🎰 Slots</button>
-          <button class="casino-tab-btn" data-shop="tables">🎲 Tables</button>
+          <button class="casino-tab-btn" data-shop="roulette">🎡 Roulette</button>
         </div>
 
         <div id="shop-cashier" class="shop">
@@ -365,59 +365,27 @@
           <div id="slotLog" class="log"></div>
         </div>
 
-        <div id="shop-tables" class="shop hidden">
-          <p>Play Blackjack or Roulette with real players at the same table. Dealer is CPU. 5 seats max, round starts on a rolling timer.</p>
-          <div id="tableGamePicker">
-            <div class="hustle-grid">
-              <div class="hustle-card">
-                <h3>🃏 Blackjack Table</h3>
-                <p>One shared dealer hand, your own bet and cards.</p>
-                <button id="btnJoinBjTable">Join Table</button>
-              </div>
-              <div class="hustle-card">
-                <h3>🎡 Roulette Table</h3>
-                <p>Straight, red/black, even/odd, high/low bets.</p>
-                <button id="btnJoinRouletteTable">Join Table</button>
-              </div>
-            </div>
+        <div id="shop-roulette" class="shop hidden">
+          <p>Place one or more bets, then the wheel spins automatically 10 seconds after your first bet.</p>
+
+          <div class="roulette-status-row">
+            <span>⏱️ <b id="rouletteTimer">--</b></span>
+            <span>💰 Pending: <b id="roulettePendingTotal">0</b> Chips</span>
+            <button id="btnRouletteClearBets" class="secondary-btn">Clear Bets</button>
           </div>
 
-          <div id="tableRoom" class="hidden">
-            <p id="tableCountdown"></p>
-            <div id="tableSeats" class="table-seats"></div>
+          <div id="rouletteWheel" class="roulette-wheel">🎡 <span id="rouletteResultText"></span></div>
 
-            <div id="tableBjArea" class="hidden">
-              <div class="bj-table">
-                <div class="bj-dealer">
-                  <h4>🤵 Dealer <span id="tableBjDealerTotal"></span></h4>
-                  <div id="tableBjDealerCards" class="card-row"></div>
-                </div>
-                <div class="bj-player">
-                  <h4>🙂 Your Hand <span id="tableBjPlayerTotal"></span></h4>
-                  <div id="tableBjPlayerCards" class="card-row"></div>
-                </div>
-              </div>
-              <div class="bj-controls">
-                <label>Bet <input type="number" id="tableBjBetInput" min="1" value="10"></label>
-                <button id="btnTableBjBet">Bet</button>
-                <button id="btnTableBjHit" disabled>Hit</button>
-                <button id="btnTableBjStand" disabled>Stand</button>
-              </div>
-            </div>
+          <div class="roulette-number-grid" id="rouletteNumberGrid"></div>
 
-            <div id="tableRouletteArea" class="hidden">
-              <div id="rouletteWheel" class="roulette-wheel">🎡 <span id="rouletteResultText"></span></div>
-              <div class="roulette-bet-grid" id="rouletteBetGrid"></div>
-              <div class="bj-controls">
-                <label>Bet Amount <input type="number" id="rouletteBetAmountInput" min="1" value="10"></label>
-                <button id="btnTableRouletteBet">Place Bets</button>
-              </div>
-            </div>
+          <div class="roulette-bet-grid" id="rouletteOutsideGrid"></div>
 
-            <button id="btnLeaveTable" class="secondary-btn">Leave Table</button>
+          <div class="bj-controls">
+            <label>Chip Value <input type="number" id="rouletteChipInput" min="1" value="10"></label>
           </div>
 
-          <div id="tableLog" class="log"></div>
+          <p id="rouletteMessage"></p>
+          <div id="rouletteLog" class="log"></div>
         </div>
       </div>
 
@@ -1428,7 +1396,7 @@
 <script src="js/slime.js"></script>
 <script src="js/duels.js"></script>
 <script src="js/coinflip.js"></script>
-<script src="js/casinoTables.js"></script>
+<script src="js/casinoRoulette.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/leaderboard.js"></script>
 <script src="js/inventory.js"></script>

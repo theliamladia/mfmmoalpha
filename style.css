@@ -3022,30 +3022,18 @@ button:disabled {
   100% { transform: rotateY(1440deg) scale(1); }
 }
 
-/* ---------- Multiplayer casino tables ---------- */
-.table-seats {
+/* ---------- Roulette ---------- */
+.roulette-status-row {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 18px;
   flex-wrap: wrap;
-  margin: 14px 0;
+  margin: 10px 0;
+  font-size: 14px;
 }
 
-.table-seat {
-  background: #262832;
-  border: 1px solid #383a44;
-  border-radius: 10px;
-  padding: 10px 14px;
-  min-width: 100px;
-  text-align: center;
-  font-size: 13px;
-}
-
-.table-seat.table-seat-you {
-  border-color: #6fcf97;
-}
-
-.table-seat.table-seat-empty {
-  opacity: 0.5;
+.roulette-status-row b {
+  color: #f2c94c;
 }
 
 .roulette-wheel {
@@ -3056,6 +3044,33 @@ button:disabled {
 
 .roulette-wheel.roulette-spin {
   animation: coinflipSpin 1.2s ease-out;
+}
+
+.roulette-number-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+  margin: 12px 0;
+}
+
+.roulette-number-btn {
+  border: 1px solid #383a44;
+  border-radius: 6px;
+  padding: 8px 0;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+}
+
+.roulette-number-btn.roulette-red { background: #a93b3b; }
+.roulette-number-btn.roulette-black { background: #262832; }
+.roulette-number-btn.roulette-green { background: #2f7d4f; grid-column: span 12; }
+
+.roulette-number-btn.selected {
+  outline: 2px solid #6fcf97;
+  outline-offset: -2px;
 }
 
 .roulette-bet-grid {

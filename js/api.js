@@ -433,32 +433,8 @@ function apiCoinflipCancel(lobbyId) {
   return apiRequest('/coinflip/cancel', { method: 'POST', body: JSON.stringify({ lobbyId }) });
 }
 
-function apiCasinoTableJoin(game) {
-  return apiRequest('/casino/table/join', { method: 'POST', body: JSON.stringify({ game }) });
-}
-
-function apiCasinoTableLeave(tableId) {
-  return apiRequest('/casino/table/leave', { method: 'POST', body: JSON.stringify({ tableId }) });
-}
-
-function apiCasinoTableGet(tableId) {
-  return apiRequest(`/casino/table/${tableId}`);
-}
-
-function apiTableBjBet(tableId, bet) {
-  return apiRequest('/casino/table/blackjack/bet', { method: 'POST', body: JSON.stringify({ tableId, bet }) });
-}
-
-function apiTableBjHit(tableId) {
-  return apiRequest('/casino/table/blackjack/hit', { method: 'POST', body: JSON.stringify({ tableId }) });
-}
-
-function apiTableBjStand(tableId) {
-  return apiRequest('/casino/table/blackjack/stand', { method: 'POST', body: JSON.stringify({ tableId }) });
-}
-
-function apiTableRouletteBet(tableId, bets) {
-  return apiRequest('/casino/table/roulette/bet', { method: 'POST', body: JSON.stringify({ tableId, bets }) });
+function apiRouletteSpin(bets) {
+  return apiRequest('/casino/roulette/spin', { method: 'POST', body: JSON.stringify({ bets }) });
 }
 
 function apiPaymentNotifications() {

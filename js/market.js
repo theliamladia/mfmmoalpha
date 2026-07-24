@@ -20,14 +20,13 @@ const casinoShopEls = {
   cashier: document.getElementById('shop-cashier'),
   blackjack: document.getElementById('shop-blackjack'),
   slots: document.getElementById('shop-slots'),
-  tables: document.getElementById('shop-tables'),
+  roulette: document.getElementById('shop-roulette'),
 };
 
 casinoTabBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     casinoTabBtns.forEach((b) => b.classList.toggle('active', b === btn));
     Object.entries(casinoShopEls).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.shop));
-    if (typeof setCasinoTablesTabVisible === 'function') setCasinoTablesTabVisible(btn.dataset.shop === 'tables');
   });
 });
 
