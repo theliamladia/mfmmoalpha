@@ -1,6 +1,10 @@
-// ---------- Notifications bell (payments received) ----------
-// Polls globally, independent of page, since the bell lives in the header and a payment can
-// arrive while the recipient is anywhere in the app -- same "always poll" idiom as chat.
+// ---------- Notifications bell (payments received + MTN sales) ----------
+// Polls globally, independent of page, since the bell lives in the header and either kind of
+// notification can arrive while the recipient is anywhere in the app -- same "always poll" idiom
+// as chat. Payments and MTN sales are two separate tables/routes server-side (matching this
+// codebase's convention of not sharing storage across notification types), but both are quiet
+// "good news" that share one bell/dropdown client-side instead of getting a second bell icon --
+// merged and sorted by time here.
 const btnNotifBell = document.getElementById('btnNotifBell');
 const notifBellBadge = document.getElementById('notifBellBadge');
 const notifDropdown = document.getElementById('notifDropdown');
@@ -13,6 +17,15 @@ function renderNotifBadge(unseenCount) {
   notifBellBadge.classList.toggle('hidden', !(unseenCount > 0));
 }
 
+function notifItemText(n) {
+  if (n.kind === 'mtnSale') {
+    const item = getItemDef(n.itemId);
+    const name = item ? itemLabel(item) : n.itemId;
+    return `<b>${escapeHtml(n.buyerName)}</b> bought ${n.qty}x ${escapeHtml(name)} for $${n.total.toFixed(2)}`;
+  }
+  return `<b>${escapeHtml(n.payerName)}</b> paid you $${n.amount.toFixed(2)}`;
+}
+
 function renderNotifList(notifications) {
   if (!notifications.length) {
     notifList.innerHTML = '<p class="notif-empty">No notifications yet.</p>';
@@ -20,18 +33,27 @@ function renderNotifList(notifications) {
   }
   notifList.innerHTML = notifications.map((n) => `
     <div class="notif-item${n.seen ? '' : ' notif-unseen'}">
-      <p><b>${n.payerName}</b> paid you $${n.amount.toFixed(2)}</p>
+      <p>${notifItemText(n)}</p>
       <span class="notif-time">${new Date(n.createdAt).toLocaleString()}</span>
     </div>
   `).join('');
 }
 
+// Merges the two sources by recency -- callers just want one combined, time-sorted feed.
+function mergeNotifications(payments, mtnSales) {
+  const tagged = [
+    ...payments.map((n) => ({ ...n, kind: 'payment' })),
+    ...mtnSales.map((n) => ({ ...n, kind: 'mtnSale' })),
+  ];
+  return tagged.sort((a, b) => b.createdAt - a.createdAt);
+}
+
 async function refreshNotifications() {
   if (!getAuthToken()) return;
   try {
-    const result = await apiPaymentNotifications();
-    renderNotifBadge(result.unseenCount);
-    if (notifDropdownOpen) renderNotifList(result.notifications);
+    const [paymentResult, mtnSaleResult] = await Promise.all([apiPaymentNotifications(), apiMtnSaleNotifications()]);
+    renderNotifBadge(paymentResult.unseenCount + mtnSaleResult.unseenCount);
+    if (notifDropdownOpen) renderNotifList(mergeNotifications(paymentResult.notifications, mtnSaleResult.notifications));
   } catch {
     // Best-effort, same as the other polled views.
   }
@@ -43,9 +65,9 @@ btnNotifBell.addEventListener('click', async (e) => {
   notifDropdown.classList.toggle('hidden', !notifDropdownOpen);
   if (!notifDropdownOpen) return;
   try {
-    const result = await apiMarkPaymentNotificationsSeen();
-    renderNotifList(result.notifications);
-    renderNotifBadge(result.unseenCount);
+    const [paymentResult, mtnSaleResult] = await Promise.all([apiMarkPaymentNotificationsSeen(), apiMarkMtnSaleNotificationsSeen()]);
+    renderNotifList(mergeNotifications(paymentResult.notifications, mtnSaleResult.notifications));
+    renderNotifBadge(paymentResult.unseenCount + mtnSaleResult.unseenCount);
   } catch {
     // Best-effort -- dropdown still opens even if marking-seen fails.
   }

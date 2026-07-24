@@ -477,6 +477,14 @@ function apiMarkPaymentNotificationsSeen() {
   return apiRequest('/notifications/payments/seen', { method: 'POST' });
 }
 
+function apiMtnSaleNotifications() {
+  return apiRequest('/notifications/mtn-sales');
+}
+
+function apiMarkMtnSaleNotificationsSeen() {
+  return apiRequest('/notifications/mtn-sales/seen', { method: 'POST' });
+}
+
 function apiRobberyNotifications() {
   return apiRequest('/notifications/robberies');
 }

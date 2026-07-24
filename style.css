@@ -2968,6 +2968,86 @@ button:disabled {
   width: 100%;
 }
 
+.mtn-item-picker {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.mtn-item-picker-btn {
+  width: 100%;
+  text-align: left;
+  background: #1b1d22;
+  border: 1px solid #3d3f48;
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #e8e8ea;
+  font-size: 13px;
+}
+
+.mtn-item-picker-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #24262e;
+  border: 1px solid #35373f;
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.mtn-item-picker-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.mtn-item-picker-tab {
+  background: #1b1d22;
+  color: #b9bbc4;
+  border: 1px solid #35373f;
+  border-radius: 14px;
+  padding: 5px 11px;
+  font-size: 12px;
+}
+
+.mtn-item-picker-tab.active {
+  background: #f2c94c;
+  color: #1b1d22;
+}
+
+.mtn-item-picker-crate-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6f7178;
+  margin: 12px 0 4px;
+}
+
+.mtn-item-picker-crate-label:first-child {
+  margin-top: 0;
+}
+
+.mtn-item-picker-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #d3d4da;
+}
+
+.mtn-item-picker-row:hover {
+  background: #2c2e37;
+  cursor: pointer;
+}
+
 .item-subheading {
   margin: 0 0 10px;
   font-size: 11px;

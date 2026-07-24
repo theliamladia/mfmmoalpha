@@ -14,7 +14,10 @@ async function refreshMtnListings() {
 }
 
 // ---------- UI ----------
-const mtnItemSelect = document.getElementById('mtnItemSelect');
+const mtnItemPickerBtn = document.getElementById('mtnItemPickerBtn');
+const mtnItemPickerPanel = document.getElementById('mtnItemPickerPanel');
+const mtnItemPickerTabs = document.getElementById('mtnItemPickerTabs');
+const mtnItemPickerList = document.getElementById('mtnItemPickerList');
 const mtnQtyInput = document.getElementById('mtnQtyInput');
 const mtnPriceInput = document.getElementById('mtnPriceInput');
 const btnMtnList = document.getElementById('btnMtnList');
@@ -24,19 +27,127 @@ const mtnLog = document.getElementById('mtnLog');
 
 const MTN_HISTORY_LABELS = { listed: 'Listed', bought: 'Bought', cancelled: 'Cancelled', sold: 'Sold' };
 
-function buildMtnItemSelect() {
-  if (!mtnItemSelect) return;
-  const prevValue = mtnItemSelect.value;
-  mtnItemSelect.innerHTML = character.inventory.length
-    ? character.inventory.map((stack) => {
-      const item = getItemDef(stack.id);
-      if (!item) return '';
-      const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
-      return `<option value="${stack.id}">${label} (x${stack.qty} owned)</option>`;
-    }).join('')
-    : '<option value="">Nothing to list</option>';
-  if (character.inventory.some((s) => s.id === prevValue)) mtnItemSelect.value = prevValue;
+// ---------- Create Listing item picker ----------
+// A custom dropdown (not a plain <select>, since a native select can't have subtabs) so items can
+// be organized by category, then -- for titles specifically, where it actually means something --
+// by crate and rarity, reusing the exact grouping helpers built for the Cosmetics tab
+// (titleCrateGroupLabel/CRATE_GROUP_ORDER/compareTitleStacksByRarityThenPrestige in
+// market.js/inventory.js).
+const MTN_CATEGORY_DEFS = [
+  { key: 'title', label: '🎖️ Titles', match: (item) => item.type === 'title' },
+  { key: 'gun', label: '🔫 Guns', match: (item) => item.type === 'pistol' || item.type === 'rifle' },
+  { key: 'melee', label: '🔪 Melee', match: (item) => item.type === 'melee' },
+  { key: 'ammo', label: '💣 Ammo', match: (item) => item.type === 'ammo' },
+  { key: 'gear', label: '🥋 Gear', match: (item) => item.type === 'gear' },
+  { key: 'drug', label: '💊 Drugs', match: (item) => item.type === 'drug' },
+];
+
+let mtnSelectedItemId = null;
+let mtnPickerActiveCategory = null;
+
+function mtnInventoryStacksByCategory() {
+  const buckets = {};
+  MTN_CATEGORY_DEFS.forEach((c) => { buckets[c.key] = []; });
+  character.inventory.forEach((stack) => {
+    const item = getItemDef(stack.id);
+    if (!item) return;
+    const cat = MTN_CATEGORY_DEFS.find((c) => c.match(item));
+    if (cat) buckets[cat.key].push(stack);
+  });
+  return buckets;
 }
+
+function mtnPickerRowHtml(stack) {
+  const item = getItemDef(stack.id);
+  const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
+  return `<div class="mtn-item-picker-row" data-pick-item="${stack.id}"><span>${escapeHtml(label)}</span><span>x${stack.qty}</span></div>`;
+}
+
+function renderMtnItemPickerList(stacks) {
+  if (mtnPickerActiveCategory === 'title') {
+    const groups = new Map();
+    const byRarity = compareTitleStacksByRarityThenPrestige((s) => s.id, (s) => getItemDef(s.id));
+    stacks.forEach((stack) => {
+      const label = titleCrateGroupLabel(getItemDef(stack.id));
+      if (!groups.has(label)) groups.set(label, []);
+      groups.get(label).push(stack);
+    });
+    groups.forEach((list) => list.sort(byRarity));
+
+    mtnItemPickerList.innerHTML = CRATE_GROUP_ORDER
+      .filter((label) => groups.has(label))
+      .map((label) => `<p class="mtn-item-picker-crate-label">${label}</p>${groups.get(label).map(mtnPickerRowHtml).join('')}`)
+      .join('');
+  } else {
+    const sorted = [...stacks].sort((a, b) => itemLabel(getItemDef(a.id)).localeCompare(itemLabel(getItemDef(b.id))));
+    mtnItemPickerList.innerHTML = sorted.map(mtnPickerRowHtml).join('');
+  }
+
+  mtnItemPickerList.querySelectorAll('[data-pick-item]').forEach((row) => {
+    row.addEventListener('click', () => {
+      mtnSelectedItemId = row.dataset.pickItem;
+      updateMtnItemPickerButtonLabel();
+      mtnItemPickerPanel.classList.add('hidden');
+    });
+  });
+}
+
+function renderMtnItemPickerTabs() {
+  const buckets = mtnInventoryStacksByCategory();
+  const available = MTN_CATEGORY_DEFS.filter((c) => buckets[c.key].length > 0);
+
+  if (!available.length) {
+    mtnItemPickerTabs.innerHTML = '';
+    mtnItemPickerList.innerHTML = '<p class="equip-picker-empty">Nothing to list.</p>';
+    return;
+  }
+  if (!available.some((c) => c.key === mtnPickerActiveCategory)) mtnPickerActiveCategory = available[0].key;
+
+  mtnItemPickerTabs.innerHTML = available.map((c) => `
+    <button type="button" class="mtn-item-picker-tab${c.key === mtnPickerActiveCategory ? ' active' : ''}" data-cat="${c.key}">${c.label}</button>
+  `).join('');
+  mtnItemPickerTabs.querySelectorAll('[data-cat]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      mtnPickerActiveCategory = btn.dataset.cat;
+      renderMtnItemPickerTabs();
+    });
+  });
+
+  renderMtnItemPickerList(buckets[mtnPickerActiveCategory]);
+}
+
+function updateMtnItemPickerButtonLabel() {
+  const stack = mtnSelectedItemId ? character.inventory.find((s) => s.id === mtnSelectedItemId) : null;
+  const item = stack ? getItemDef(mtnSelectedItemId) : null;
+  if (!stack || !item) {
+    mtnSelectedItemId = null;
+    mtnItemPickerBtn.textContent = 'Choose an item…';
+    return;
+  }
+  const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
+  mtnItemPickerBtn.textContent = `${label} (x${stack.qty} owned)`;
+}
+
+// Called whenever character.inventory might have changed (after a listing, or any renderAll) --
+// drops a selection that no longer exists and refreshes the open panel, if any.
+function refreshMtnItemPicker() {
+  if (!mtnItemPickerBtn) return;
+  updateMtnItemPickerButtonLabel();
+  if (!mtnItemPickerPanel.classList.contains('hidden')) renderMtnItemPickerTabs();
+}
+
+mtnItemPickerBtn && mtnItemPickerBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const willOpen = mtnItemPickerPanel.classList.contains('hidden');
+  mtnItemPickerPanel.classList.toggle('hidden');
+  if (willOpen) renderMtnItemPickerTabs();
+});
+
+document.addEventListener('click', (e) => {
+  if (!mtnItemPickerPanel.classList.contains('hidden') && !mtnItemPickerPanel.contains(e.target) && e.target !== mtnItemPickerBtn) {
+    mtnItemPickerPanel.classList.add('hidden');
+  }
+});
 
 function buildMtnListingsGrid() {
   if (!mtnListingsGrid) return;
@@ -132,14 +243,18 @@ function buildMtnHistoryList() {
 }
 
 function buildMtnUI() {
-  if (!mtnItemSelect) return;
-  buildMtnItemSelect();
+  if (!mtnItemPickerBtn) return;
+  refreshMtnItemPicker();
   buildMtnListingsGrid();
   buildMtnHistoryList();
 }
 
 btnMtnList.addEventListener('click', async () => {
-  const itemId = mtnItemSelect.value;
+  if (!mtnSelectedItemId) {
+    alert('Choose an item to list.');
+    return;
+  }
+  const itemId = mtnSelectedItemId;
   const qty = Math.max(1, Math.floor(+mtnQtyInput.value) || 1);
   const pricePerUnit = Math.max(0, +mtnPriceInput.value || 0);
   try {
@@ -149,6 +264,7 @@ btnMtnList.addEventListener('click', async () => {
     logTo(mtnLog, result.message, result.cls);
     mtnQtyInput.value = '1';
     mtnPriceInput.value = '';
+    mtnSelectedItemId = null;
     save();
     renderAll();
   } catch (err) {
