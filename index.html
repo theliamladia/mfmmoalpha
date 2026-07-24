@@ -417,6 +417,7 @@
               <button class="milos-tab-btn" data-milos="farms">🌿 Milos Outlook Farms</button>
               <button class="milos-tab-btn" data-milos="crypto">💻 MyCrypto Setup</button>
               <button class="milos-tab-btn" data-milos="altcoins">🪙 Altcoins</button>
+              <button class="milos-tab-btn" data-milos="stocks">📊 Investors Center</button>
             </div>
 
             <div id="milos-hustles" class="milos-subpage">
@@ -753,6 +754,30 @@
               <div class="hustle-grid" id="altcoinHoldingsGrid"></div>
 
               <div id="altcoinLog" class="log"></div>
+            </div>
+
+            <div id="milos-stocks" class="milos-subpage hidden">
+              <p>Prices move every 32 seconds &mdash; the same price for everyone on the server, at all times. Trading doesn't move the market, but a real headline in InvestorsChat might.</p>
+
+              <div class="hustle-card stock-portfolio-card">
+                <h3>💼 Your Portfolio</h3>
+                <p>Floydbucks: $<span id="stockCashDisplay">0</span></p>
+                <div id="stockPortfolioGrid" class="stock-portfolio-grid"></div>
+              </div>
+
+              <h3 class="gunclub-section-title">📊 Market</h3>
+              <div class="hustle-grid" id="stockTickerGrid"></div>
+              <div id="stockLog" class="log"></div>
+
+              <div class="side-panel chat-box investors-chat-row">
+                <h3>💬 InvestorsChat</h3>
+                <p class="chat-note">Live chat with other traders. Some of what you read here is true. Some of it isn't.</p>
+                <div id="investorChatMessages" class="chat-messages"></div>
+                <div class="chat-input-row">
+                  <input type="text" id="investorChatInput" placeholder="Talk your book...">
+                  <button id="btnInvestorChatSend">Send</button>
+                </div>
+              </div>
             </div>
 
             <div class="side-panel chat-box milos-chat-row">
@@ -1397,6 +1422,7 @@
 <script src="js/farms.js"></script>
 <script src="js/crypto.js"></script>
 <script src="js/altcoins.js"></script>
+<script src="js/stockMarket.js"></script>
 <script src="js/playerActions.js"></script>
 <script src="js/slime.js"></script>
 <script src="js/duels.js"></script>

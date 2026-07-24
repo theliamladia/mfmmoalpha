@@ -356,6 +356,26 @@ function apiOnlinePlayers() {
   return apiRequest('/players/online');
 }
 
+function apiStocks() {
+  return apiRequest('/stocks');
+}
+
+function apiBuyStock(symbol, qty) {
+  return apiRequest('/stocks/buy', { method: 'POST', body: JSON.stringify({ symbol, qty }) });
+}
+
+function apiSellStock(symbol, qty) {
+  return apiRequest('/stocks/sell', { method: 'POST', body: JSON.stringify({ symbol, qty }) });
+}
+
+function apiInvestorChatMessages() {
+  return apiRequest('/investors/chat/messages');
+}
+
+function apiInvestorChatSend(titleText, message, titleId) {
+  return apiRequest('/investors/chat/send', { method: 'POST', body: JSON.stringify({ titleText, message, titleId }) });
+}
+
 // Decodes the JWT payload client-side (no signature check -- purely for UI logic like "is it my
 // turn", never trusted for anything security-relevant; the server independently re-verifies the
 // token on every request).

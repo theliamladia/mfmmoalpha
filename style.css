@@ -1788,6 +1788,95 @@ button:disabled {
   min-height: 380px;
 }
 
+.investors-chat-row {
+  margin-top: 20px;
+}
+
+.investors-chat-row .chat-messages {
+  max-height: 320px;
+  min-height: 200px;
+}
+
+.stock-portfolio-card {
+  margin-bottom: 20px;
+}
+
+.stock-portfolio-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.stock-portfolio-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  background: #1b1d22;
+  border: 1px solid #35373f;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.stock-ticker-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stock-tier-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.stock-tier-megabluechip { background: #2f7d4f; color: #e8ffe8; }
+.stock-tier-bluechip { background: #3d5c8c; color: #cfe0ff; }
+.stock-tier-growth { background: #4a4d99; color: #e2e2ff; }
+.stock-tier-volatile { background: #a3701f; color: #ffe9c2; }
+.stock-tier-meme { background: #a93b3b; color: #ffdede; }
+
+.stock-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f2c94c;
+  margin: 6px 0;
+  transition: color 0.3s ease;
+}
+
+.stock-price-flash-up {
+  color: #6fcf97 !important;
+}
+
+.stock-price-flash-down {
+  color: #e05c5c !important;
+}
+
+.stock-holding-note {
+  font-size: 12px;
+  color: #9a9ca6;
+  margin: 0 0 10px;
+}
+
+.stock-trade-row {
+  display: flex;
+  gap: 6px;
+}
+
+.stock-qty-input {
+  width: 70px;
+  padding: 8px 10px;
+  background: #1b1d22;
+  border: 1px solid #3d3f48;
+  border-radius: 6px;
+  color: #e8e8ea;
+}
+
 .side-panel {
   background: #24262e;
   border: 1px solid #35373f;

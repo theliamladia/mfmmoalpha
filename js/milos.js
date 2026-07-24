@@ -813,6 +813,7 @@ const milosSubpages = {
   farms: document.getElementById('milos-farms'),
   crypto: document.getElementById('milos-crypto'),
   altcoins: document.getElementById('milos-altcoins'),
+  stocks: document.getElementById('milos-stocks'),
 };
 
 milosTabBtns.forEach((btn) => {
@@ -825,6 +826,7 @@ milosTabBtns.forEach((btn) => {
     if (btn.dataset.milos === 'farms' && typeof refreshFarms === 'function') refreshFarms();
     if (btn.dataset.milos === 'crypto' && typeof refreshCrypto === 'function') refreshCrypto();
     if (btn.dataset.milos === 'altcoins' && typeof refreshAltcoins === 'function') refreshAltcoins();
+    if (typeof setStockMarketTabVisible === 'function') setStockMarketTabVisible(btn.dataset.milos === 'stocks');
   });
 });
 
