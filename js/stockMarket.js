@@ -52,15 +52,44 @@ const stockChartEmpty = document.getElementById('stockChartEmpty');
 const stockChartTimeframesEl = document.getElementById('stockChartTimeframes');
 let currentChartRange = '1d';
 
-function drawStockChart(points) {
-  if (!stockChartCanvas) return;
-  if (!points || points.length < 2) {
-    stockChartCanvas.classList.add('hidden');
-    stockChartEmpty.classList.remove('hidden');
-    return;
+let lastChartPoints = null;
+const STOCK_CHART_PADDING = { left: 58, right: 12, top: 14, bottom: 22 };
+
+function formatChartTimeLabel(ts) {
+  const d = new Date(ts);
+  if (currentChartRange === '1h' || currentChartRange === '1d') {
+    return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   }
-  stockChartCanvas.classList.remove('hidden');
-  stockChartEmpty.classList.add('hidden');
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+// Shared by both the base draw and the hover handler so the mouse math always lines up with
+// whatever was actually drawn.
+function computeChartGeometry(points, cssWidth, cssHeight) {
+  const prices = points.map((p) => p.price);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const priceRange = (maxPrice - minPrice) || Math.abs(minPrice) * 0.01 || 1;
+  const pad = STOCK_CHART_PADDING;
+  const chartW = cssWidth - pad.left - pad.right;
+  const chartH = cssHeight - pad.top - pad.bottom;
+  return {
+    prices,
+    minPrice,
+    maxPrice,
+    xForIndex: (i) => pad.left + (i / (prices.length - 1)) * chartW,
+    yForPrice: (p) => pad.top + chartH - ((p - minPrice) / priceRange) * chartH,
+    pad,
+    chartW,
+    chartH,
+  };
+}
+
+// hoverIndex is null when nothing's being hovered -- draws the plain line/area/legend. Called
+// directly (no hover) after every data refresh, and again on every mousemove over the canvas.
+function renderStockChart(hoverIndex) {
+  if (!stockChartCanvas || !lastChartPoints) return;
+  const points = lastChartPoints;
 
   const dpr = window.devicePixelRatio || 1;
   const cssWidth = stockChartCanvas.clientWidth || 400;
@@ -71,29 +100,45 @@ function drawStockChart(points) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-  const prices = points.map((p) => p.price);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
-  const priceRange = (maxPrice - minPrice) || Math.abs(minPrice) * 0.01 || 1;
-  const padding = 10;
-  const chartW = cssWidth - padding * 2;
-  const chartH = cssHeight - padding * 2;
-  const xForIndex = (i) => padding + (i / (prices.length - 1)) * chartW;
-  const yForPrice = (p) => padding + chartH - ((p - minPrice) / priceRange) * chartH;
-
+  const { prices, minPrice, maxPrice, xForIndex, yForPrice, pad, chartW, chartH } = computeChartGeometry(points, cssWidth, cssHeight);
   const isUp = prices[prices.length - 1] >= prices[0];
   const lineColor = isUp ? '#6fcf97' : '#e05c5c';
   const fillColor = isUp ? 'rgba(111, 207, 151, 0.15)' : 'rgba(224, 92, 92, 0.15)';
 
+  // Legend: horizontal gridlines + $ price labels at max/mid/min, and start/mid/end time labels
+  // along the bottom -- the axis context the plain line was missing.
+  ctx.font = '11px sans-serif';
+  ctx.fillStyle = '#6f7178';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.lineWidth = 1;
+  [maxPrice, (maxPrice + minPrice) / 2, minPrice].forEach((price) => {
+    const y = yForPrice(price);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + chartW, y);
+    ctx.stroke();
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`$${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, pad.left - 8, y);
+  });
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  [0, Math.floor((points.length - 1) / 2), points.length - 1].forEach((i) => {
+    ctx.fillText(formatChartTimeLabel(points[i].ts), xForIndex(i), pad.top + chartH + 6);
+  });
+
+  // Area fill
   ctx.beginPath();
   ctx.moveTo(xForIndex(0), yForPrice(prices[0]));
   prices.forEach((p, i) => ctx.lineTo(xForIndex(i), yForPrice(p)));
-  ctx.lineTo(xForIndex(prices.length - 1), padding + chartH);
-  ctx.lineTo(xForIndex(0), padding + chartH);
+  ctx.lineTo(xForIndex(prices.length - 1), pad.top + chartH);
+  ctx.lineTo(xForIndex(0), pad.top + chartH);
   ctx.closePath();
   ctx.fillStyle = fillColor;
   ctx.fill();
 
+  // Line
   ctx.beginPath();
   prices.forEach((p, i) => {
     const x = xForIndex(i);
@@ -104,7 +149,95 @@ function drawStockChart(points) {
   ctx.strokeStyle = lineColor;
   ctx.lineWidth = 2;
   ctx.stroke();
+
+  if (hoverIndex === null || hoverIndex === undefined) return;
+  const i = Math.max(0, Math.min(points.length - 1, hoverIndex));
+  const x = xForIndex(i);
+  const y = yForPrice(prices[i]);
+
+  // Vertical guide line under the cursor
+  ctx.beginPath();
+  ctx.setLineDash([4, 4]);
+  ctx.moveTo(x, pad.top);
+  ctx.lineTo(x, pad.top + chartH);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Dot on the line
+  ctx.beginPath();
+  ctx.arc(x, y, 4, 0, Math.PI * 2);
+  ctx.fillStyle = lineColor;
+  ctx.fill();
+  ctx.strokeStyle = '#1b1d22';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Tooltip box with the exact price + timestamp at that point
+  const priceText = `$${prices[i].toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  const timeText = new Date(points[i].ts).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  ctx.font = 'bold 12px sans-serif';
+  const textW = Math.max(ctx.measureText(priceText).width, ctx.measureText(timeText).width);
+  const boxW = textW + 18;
+  const boxH = 40;
+  let boxX = x + 10;
+  if (boxX + boxW > cssWidth - 4) boxX = x - boxW - 10;
+  let boxY = y - boxH - 10;
+  if (boxY < 0) boxY = y + 10;
+
+  ctx.fillStyle = '#1b1d22';
+  ctx.strokeStyle = '#35373f';
+  ctx.lineWidth = 1;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, 6);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+  }
+
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#f2c94c';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.fillText(priceText, boxX + 9, boxY + 17);
+  ctx.fillStyle = '#9a9ca6';
+  ctx.font = '11px sans-serif';
+  ctx.fillText(timeText, boxX + 9, boxY + 31);
 }
+
+function drawStockChart(points) {
+  if (!stockChartCanvas) return;
+  if (!points || points.length < 2) {
+    lastChartPoints = null;
+    stockChartCanvas.classList.add('hidden');
+    stockChartEmpty.classList.remove('hidden');
+    return;
+  }
+  lastChartPoints = points;
+  stockChartCanvas.classList.remove('hidden');
+  stockChartEmpty.classList.add('hidden');
+  renderStockChart(null);
+}
+
+stockChartCanvas && stockChartCanvas.addEventListener('mousemove', (e) => {
+  if (!lastChartPoints) return;
+  const rect = stockChartCanvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const cssWidth = stockChartCanvas.clientWidth || 400;
+  const cssHeight = stockChartCanvas.clientHeight || 260;
+  const { pad, chartW } = computeChartGeometry(lastChartPoints, cssWidth, cssHeight);
+  const ratio = Math.min(1, Math.max(0, (mouseX - pad.left) / chartW));
+  const index = Math.round(ratio * (lastChartPoints.length - 1));
+  renderStockChart(index);
+});
+
+stockChartCanvas && stockChartCanvas.addEventListener('mouseleave', () => {
+  renderStockChart(null);
+});
 
 async function refreshStockChart() {
   if (!selectedStockSymbol || !getAuthToken()) return;
