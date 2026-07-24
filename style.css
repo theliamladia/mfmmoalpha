@@ -1460,6 +1460,22 @@ button:disabled {
 .log p.gain { color: #6fcf97; }
 .log p.loss { color: #e05c5c; }
 
+.log-single-line {
+  margin-top: 12px;
+  margin-bottom: 22px;
+  max-height: none;
+  height: 42px;
+  overflow: hidden;
+}
+
+.log-single-line p {
+  margin: 0;
+}
+
+.log-single-line p ~ p {
+  display: none;
+}
+
 /* --- Market --- */
 .market-tabs {
   display: flex;
