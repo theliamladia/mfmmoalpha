@@ -1,18 +1,36 @@
 // ---------- Floydcoin (crypto) ----------
-// Must match CRYPTO_RIG_TIERS in mfmmoserver/gameLogic.js -- display-only mirror, the server is
-// authoritative on the actual rate/cost.
-const CRYPTO_RIG_TIERS = [
-  { name: 'MyShitter900', rate: 0.05, cost: 0 },
-  { name: 'iFminer', rate: 0.15, cost: 5000 },
-  { name: 'iFminer360', rate: 0.30, cost: 12000 },
-  { name: 'iFminer720', rate: 0.50, cost: 25000 },
-  { name: 'iFminerX', rate: 0.80, cost: 45000 },
-  { name: 'DBL Azeroth Mining Rig', rate: 1.20, cost: 75000 },
-  { name: 'DBL Azeroth Mining Array', rate: 1.75, cost: 120000 },
-  { name: 'DBL Blackhawk Mining Array', rate: 2.50, cost: 180000 },
-  { name: 'KRG White//White Configured Mining Solution', rate: 3.50, cost: 260000 },
-  { name: 'UNT Prototype Quantum Miner', rate: 5.00, cost: 400000 },
+// Must match CRYPTO_MACHINES/CRYPTO_UPGRADE_TIERS/MACHINE_UPGRADE_SCALING in
+// mfmmoserver/gameLogic.js -- display-only mirror, the server is authoritative on rate/cost.
+const CRYPTO_MACHINES = [
+  { name: 'MyShitter900', baseRate: 0.05 },
+  { name: 'iFminer', baseRate: 0.15 },
+  { name: 'iFminer360', baseRate: 0.30 },
+  { name: 'iFminer720', baseRate: 0.50 },
+  { name: 'iFminerX', baseRate: 0.80 },
+  { name: 'DBL Azeroth Mining Rig', baseRate: 1.20 },
+  { name: 'DBL Azeroth Mining Array', baseRate: 1.75 },
+  { name: 'DBL Blackhawk Mining Array', baseRate: 2.50 },
+  { name: 'KRG White//White Configured Mining Solution', baseRate: 3.50 },
+  { name: 'UNT Prototype Quantum Miner', baseRate: 5.00 },
 ];
+const MACHINE_UPGRADE_SCALING = 1.5;
+const CRYPTO_UPGRADE_TIERS = {
+  ram: [
+    { addRate: 0.02, cost: 2000 },
+    { addRate: 0.05, cost: 5000 },
+    { addRate: 0.10, cost: 10000 },
+  ],
+  cpu: [
+    { addRate: 0.05, cost: 5000 },
+    { addRate: 0.12, cost: 12000 },
+    { addRate: 0.25, cost: 25000 },
+  ],
+  gpu: [
+    { addRate: 0.10, cost: 10000 },
+    { addRate: 0.25, cost: 25000 },
+    { addRate: 0.50, cost: 50000 },
+  ],
+};
 const FC_PRICE = 10000; // must match FC_START_PRICE in mfmmoserver/gameLogic.js
 
 // Must match COLD_STORAGE_BASE_CAP/COLD_STORAGE_UPGRADE_TIERS in mfmmoserver/gameLogic.js --
@@ -31,6 +49,7 @@ function coldStorageCapacity(coldStorage) {
 const cryptoFcBalance = document.getElementById('cryptoFcBalance');
 const cryptoRigTitle = document.getElementById('cryptoRigTitle');
 const cryptoUpgradeGrid = document.getElementById('cryptoUpgradeGrid');
+const btnCryptoAdvanceMachine = document.getElementById('btnCryptoAdvanceMachine');
 const btnCryptoPrestige = document.getElementById('btnCryptoPrestige');
 const cryptoRateDesc = document.getElementById('cryptoRateDesc');
 const btnCryptoCollect = document.getElementById('btnCryptoCollect');
@@ -61,8 +80,32 @@ function cryptoPrestigeCostMultiplier(prestigeLevel) {
   return Math.pow(2, prestigeLevel);
 }
 
+function cryptoMachineScaling(machineTier) {
+  return Math.pow(MACHINE_UPGRADE_SCALING, machineTier);
+}
+
+function cryptoTrackAddRate(crypto, track) {
+  const tier = crypto[`${track}Tier`];
+  const scale = cryptoMachineScaling(crypto.machineTier);
+  return CRYPTO_UPGRADE_TIERS[track].slice(0, tier).reduce((sum, t) => sum + t.addRate * scale, 0);
+}
+
+function cryptoNextTrackCost(crypto, track) {
+  const tiers = CRYPTO_UPGRADE_TIERS[track];
+  const tier = crypto[`${track}Tier`];
+  if (tier >= tiers.length) return null;
+  return Math.round(tiers[tier].cost * cryptoMachineScaling(crypto.machineTier) * cryptoPrestigeCostMultiplier(crypto.prestigeLevel));
+}
+
+function cryptoTracksMaxed(crypto) {
+  return ['ram', 'cpu', 'gpu'].every((track) => crypto[`${track}Tier`] >= CRYPTO_UPGRADE_TIERS[track].length);
+}
+
 function cryptoDailyRate(crypto) {
-  return CRYPTO_RIG_TIERS[crypto.rigTier].rate * cryptoPrestigeRateMultiplier(crypto.prestigeLevel);
+  const machine = CRYPTO_MACHINES[crypto.machineTier];
+  const machineRate = machine.baseRate * cryptoMachineScaling(crypto.machineTier);
+  const upgradeRate = cryptoTrackAddRate(crypto, 'ram') + cryptoTrackAddRate(crypto, 'cpu') + cryptoTrackAddRate(crypto, 'gpu');
+  return (machineRate + upgradeRate) * cryptoPrestigeRateMultiplier(crypto.prestigeLevel);
 }
 
 function renderCrypto() {
@@ -71,9 +114,9 @@ function renderCrypto() {
   cryptoFcBalance.textContent = crypto.fc.toFixed(4);
   cryptoRateDesc.textContent = `Mining at ${cryptoDailyRate(crypto).toFixed(2)} FC/day. Collect hourly.`;
 
-  const currentRig = CRYPTO_RIG_TIERS[crypto.rigTier];
+  const currentMachine = CRYPTO_MACHINES[crypto.machineTier];
   const hourlyRate = cryptoDailyRate(crypto) / 24;
-  cryptoRigTitle.textContent = `${currentRig.name} -- ${hourlyRate.toFixed(4)} FC/hr`
+  cryptoRigTitle.textContent = `${currentMachine.name} -- ${hourlyRate.toFixed(4)} FC/hr`
     + (crypto.prestigeLevel > 0 ? ` (Prestige ${crypto.prestigeLevel})` : '');
 
   const coldStorage = crypto.coldStorage || { fc: 0, tier: 0 };
@@ -86,37 +129,64 @@ function renderCrypto() {
   btnCryptoColdStorageUpgrade.disabled = maxed;
   btnCryptoColdStorageUpgrade.textContent = maxed ? 'Capacity Maxed' : 'Upgrade Capacity';
 
-  const maxTier = CRYPTO_RIG_TIERS.length - 1;
-  const rigMaxed = crypto.rigTier >= maxTier;
-  const nextRig = !rigMaxed ? CRYPTO_RIG_TIERS[crypto.rigTier + 1] : null;
-  const nextRigCost = nextRig ? Math.round(nextRig.cost * cryptoPrestigeCostMultiplier(crypto.prestigeLevel)) : null;
+  const maxMachineTier = CRYPTO_MACHINES.length - 1;
+  const tracksMaxed = cryptoTracksMaxed(crypto);
+  const onLastMachine = crypto.machineTier >= maxMachineTier;
 
-  cryptoUpgradeGrid.innerHTML = `
-    <div class="hustle-card">
-      <h3>🖥️ ${escapeHtml(currentRig.name)}</h3>
-      <p>Tier ${crypto.rigTier}/${maxTier}${rigMaxed ? ' (maxed)' : ` -- next: ${escapeHtml(nextRig.name)} for $${nextRigCost.toLocaleString()}`}</p>
-      <button id="btnCryptoRigUpgrade" ${rigMaxed ? 'disabled' : ''}>${rigMaxed ? 'Maxed' : 'Upgrade'}</button>
-    </div>
-  `;
+  cryptoUpgradeGrid.innerHTML = ['ram', 'cpu', 'gpu'].map((track) => {
+    const tierKey = `${track}Tier`;
+    const tiers = CRYPTO_UPGRADE_TIERS[track];
+    const tier = crypto[tierKey];
+    const maxed = tier >= tiers.length;
+    const cost = !maxed ? cryptoNextTrackCost(crypto, track) : null;
+    return `
+      <div class="hustle-card">
+        <h3>${track.toUpperCase()}</h3>
+        <p>Tier ${tier}/${tiers.length}${maxed ? ' (maxed)' : ` -- next: $${cost.toLocaleString()}`}</p>
+        <button data-crypto-upgrade="${track}" ${maxed ? 'disabled' : ''}>${maxed ? 'Maxed' : 'Upgrade'}</button>
+      </div>
+    `;
+  }).join('');
 
-  document.getElementById('btnCryptoRigUpgrade').addEventListener('click', async () => {
-    try {
-      const result = await apiCryptoUpgrade();
-      character = result.character;
-      logTo(cryptoLog, result.message, result.cls);
-      save();
-      renderAll();
-      await refreshCrypto();
-    } catch (err) {
-      if (err.reason) alert(err.reason);
-    }
+  cryptoUpgradeGrid.querySelectorAll('button[data-crypto-upgrade]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        const result = await apiCryptoUpgrade(btn.dataset.cryptoUpgrade);
+        character = result.character;
+        logTo(cryptoLog, result.message, result.cls);
+        save();
+        renderAll();
+        await refreshCrypto();
+      } catch (err) {
+        if (err.reason) alert(err.reason);
+      }
+    });
   });
 
-  btnCryptoPrestige.disabled = !rigMaxed;
-  btnCryptoPrestige.textContent = rigMaxed
+  btnCryptoAdvanceMachine.disabled = !tracksMaxed || onLastMachine;
+  btnCryptoAdvanceMachine.textContent = onLastMachine
+    ? (tracksMaxed ? 'Last Machine (Prestige to continue)' : 'Max RAM/CPU/GPU to Prestige')
+    : (tracksMaxed ? `Upgrade to ${CRYPTO_MACHINES[crypto.machineTier + 1].name}` : 'Max RAM/CPU/GPU First');
+
+  btnCryptoPrestige.disabled = !(onLastMachine && tracksMaxed);
+  btnCryptoPrestige.textContent = (onLastMachine && tracksMaxed)
     ? '🌟 Prestige (+50% rate, +100% upgrade costs)'
-    : `🌟 Prestige (max out ${CRYPTO_RIG_TIERS[maxTier].name} first)`;
+    : `🌟 Prestige (max out ${CRYPTO_MACHINES[maxMachineTier].name} first)`;
 }
+
+btnCryptoAdvanceMachine.addEventListener('click', async () => {
+  if (btnCryptoAdvanceMachine.disabled) return;
+  try {
+    const result = await apiCryptoAdvanceMachine();
+    character = result.character;
+    logTo(cryptoLog, result.message, result.cls);
+    save();
+    renderAll();
+    await refreshCrypto();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
+});
 
 btnCryptoPrestige.addEventListener('click', async () => {
   if (btnCryptoPrestige.disabled) return;

@@ -547,8 +547,11 @@ function apiFarmsBuySecurity() {
 function apiCryptoState() {
   return apiRequest('/crypto/state');
 }
-function apiCryptoUpgrade() {
-  return apiRequest('/crypto/upgrade', { method: 'POST' });
+function apiCryptoUpgrade(track) {
+  return apiRequest('/crypto/upgrade', { method: 'POST', body: JSON.stringify({ track }) });
+}
+function apiCryptoAdvanceMachine() {
+  return apiRequest('/crypto/advance-machine', { method: 'POST' });
 }
 function apiCryptoPrestige() {
   return apiRequest('/crypto/prestige', { method: 'POST' });
