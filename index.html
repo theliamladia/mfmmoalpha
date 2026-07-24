@@ -153,6 +153,7 @@
       <button class="nav-btn" data-page="leaderboard">🏆 Leaderboard</button>
       <button class="nav-btn" data-page="wiki">📖 Wiki</button>
       <button class="nav-btn" data-page="updates">📰 Updates</button>
+      <button class="nav-btn" data-page="report">📋 Report</button>
     </nav>
 
     <main id="content">
@@ -724,6 +725,17 @@
               <p class="chip-counter">💻 Floydcoin price: <b>$10,000.00</b>/FC &mdash; Your wallet: <b id="cryptoFcBalance">0</b> FC</p>
               <p>Your free rig ("MyShitter900") mines passively, no purchase required. Upgrades raise the rate; collect hourly.</p>
               <div class="hustle-grid" id="cryptoUpgradeGrid"></div>
+
+              <div class="hustle-card">
+                <h3>🧊 Floydcoin Cold Storage Module</h3>
+                <p id="cryptoColdStorageDesc"></p>
+                <label>Deposit <input type="number" id="cryptoColdStorageDepositInput" min="1" value="1" placeholder="FC amount"></label>
+                <button id="btnCryptoColdStorageDeposit">Deposit</button>
+                <label>Withdraw <input type="number" id="cryptoColdStorageWithdrawInput" min="1" value="1" placeholder="FC amount"></label>
+                <button id="btnCryptoColdStorageWithdraw">Withdraw</button>
+                <button id="btnCryptoColdStorageUpgrade" class="secondary-btn">Upgrade Capacity</button>
+              </div>
+
               <div class="hustle-card">
                 <h3>⛏️ Collect</h3>
                 <p id="cryptoRateDesc"></p>
@@ -928,7 +940,7 @@
 
         <div class="wiki-entry">
           <h3>🌆 New Milos City</h3>
-          <p><b>Hustles</b> splits into Good Hustles (small steady legal cash, Neutral alliance or better) and Bad Hustles (drug running, dealing, and robbery &mdash; Bad alliance required, high risk of jail). Both job tracks use a promotion ladder: as your average skill climbs, each rank has its own pay band (the floor rises faster than the ceiling, so higher ranks pay more <i>and</i> more consistently) plus a shorter cooldown. Reaching Supervisor/Lieutenant unlocks a job-specific perk &mdash; Milos11 knocks 20% off Pete's Pies, Pete'sza Delivery grants a permanent +2 Speed, Krogue Wrestler Gear unlocks the exclusive Wrestling Gear Store, Getaway Driver cuts your bust chance, and The Fence knocks 15% off the Gun Club. <b>Combat</b> is turn-based: Punch (reliable), Heavy Strike (bigger damage, can whiff), Guard (blocks most damage, can riposte), and Weapon Attack (biggest damage if you're carrying a weapon) &mdash; Height and equipped weapons/gear boost your Attack, Speed lets you dodge outright, HP protects your cash if you lose, and a win has a chance to grant a small permanent Attack or HP boost. <b>Crime</b> is a set of fixed-payout crimes (Shoplifting up through Grand Theft Auto) where Attack and Speed lower your odds of getting caught; getting caught here (or anywhere) snaps your Alliance straight to Bad and escalates every future sentence until you spend cash on Community Service. <b>City Hall</b> handles renames, marriage, and the Gun Safety Course. <b>NMC Gun Club</b> sells guns, ammo, melee weapons (no license needed), a shooting range, and carry licenses &mdash; you need the Gun Safety License from City Hall before you can buy a gun. <b>Bank</b> keeps your cash safe from robbery, lets you upgrade to hold more, and offers a credit card billed every 24 real-life hours. <b>Morals Center</b> lets you pick a standing stance &mdash; Accept Ricardo, Renounce Ricardo, or Invoke Neutrality &mdash; that quietly nudges your Alliance every 10 seconds, even on other pages. <b>Milos Trading Network</b> is the player marketplace: pick an item to list from a picker organized by category &mdash; and for titles, by crate and rarity &mdash; and once it sells the Floydbucks land in your account, the sale logs to your MTN history, and you get a notification. <b>New Milos Penitentiary</b> shows who's currently locked up (and for what), plus a recent-arrests history &mdash; post bail or send commissary money for their books. <b>Coinflip</b> lets you create a cash-wager lobby and call heads or tails; another player joins and takes the other side, then the winner takes both wagers. <b>Milos Outlook Farms</b> grows weed/coke plots for sale, with a real risk of confiscation or an intercepted shipment. <b>MyCrypto Setup</b> mines Floydcoin (FC) passively based on your rig tier, tradeable for cash at a floating price. <b>Altcoins</b> lets you mint your own rug-pull coin &mdash; whoever holds the plurality can dump the whole pool for a big payout, or offer a fair pro-rata buyout once it fully sells out. <b>Investors Center</b> is the stock market &mdash; see its own Wiki entry below.</p>
+          <p><b>Hustles</b> splits into Good Hustles (small steady legal cash, Neutral alliance or better) and Bad Hustles (drug running, dealing, and robbery &mdash; Bad alliance required, high risk of jail). Both job tracks use a promotion ladder: as your average skill climbs, each rank has its own pay band (the floor rises faster than the ceiling, so higher ranks pay more <i>and</i> more consistently) plus a shorter cooldown. Reaching Supervisor/Lieutenant unlocks a job-specific perk &mdash; Milos11 knocks 20% off Pete's Pies, Pete'sza Delivery grants a permanent +2 Speed, Krogue Wrestler Gear unlocks the exclusive Wrestling Gear Store, Getaway Driver cuts your bust chance, and The Fence knocks 15% off the Gun Club. <b>Combat</b> is turn-based: Punch (reliable), Heavy Strike (bigger damage, can whiff), Guard (blocks most damage, can riposte), and Weapon Attack (biggest damage if you're carrying a weapon) &mdash; Height and equipped weapons/gear boost your Attack, Speed lets you dodge outright, HP protects your cash if you lose, and a win has a chance to grant a small permanent Attack or HP boost. <b>Crime</b> is a set of fixed-payout crimes (Shoplifting up through Grand Theft Auto) where Attack and Speed lower your odds of getting caught; getting caught here (or anywhere) snaps your Alliance straight to Bad and escalates every future sentence until you spend cash on Community Service. <b>City Hall</b> handles renames, marriage, and the Gun Safety Course. <b>NMC Gun Club</b> sells guns, ammo, melee weapons (no license needed), a shooting range, and carry licenses &mdash; you need the Gun Safety License from City Hall before you can buy a gun. <b>Bank</b> keeps your cash safe from robbery, lets you upgrade to hold more, and offers a credit card billed every 24 real-life hours. <b>Morals Center</b> lets you pick a standing stance &mdash; Accept Ricardo, Renounce Ricardo, or Invoke Neutrality &mdash; that quietly nudges your Alliance every 10 seconds, even on other pages. <b>Milos Trading Network</b> is the player marketplace: pick an item to list from a picker organized by category &mdash; and for titles, by crate and rarity &mdash; and once it sells the Floydbucks land in your account, the sale logs to your MTN history, and you get a notification. <b>New Milos Penitentiary</b> shows who's currently locked up (and for what), plus a recent-arrests history &mdash; post bail or send commissary money for their books. <b>Coinflip</b> lets you create a cash-wager lobby and call heads or tails; another player joins and takes the other side, then the winner takes both wagers. <b>Milos Outlook Farms</b> grows weed/coke plots for sale, with a real risk of confiscation or an intercepted shipment. <b>MyCrypto Setup</b> mines Floydcoin (FC) passively based on your rig tier, tradeable for cash at a floating price; a robbery has a small chance to drain some of your hot-wallet FC, so move some into the <b>Cold Storage Module</b> (upgradeable capacity) to keep it safe. <b>Altcoins</b> lets you mint your own rug-pull coin &mdash; whoever holds the plurality can dump the whole pool for a big payout, or offer a fair pro-rata buyout once it fully sells out. <b>Investors Center</b> is the stock market &mdash; see its own Wiki entry below.</p>
         </div>
 
         <div class="wiki-entry">
@@ -950,6 +962,15 @@
       <div id="page-updates" class="page hidden">
         <h2>📰 Updates</h2>
         <p>What's changed, most recent first.</p>
+
+        <div class="update-entry">
+          <div class="update-entry-header"><h3>📋 Report Tab, Floydcoin Cold Storage, Robbery Nerf</h3><span class="update-date">2026-07-24</span></div>
+          <ul>
+            <li>Added a <b>Report</b> tab: submit a Bug Report, Wipe Report, or Suggestion straight to the dev. Reports are visible to the admin account via a paginated, filterable <b>View Logs</b> button.</li>
+            <li>Added a <b>Floydcoin Cold Storage Module</b> under MyCrypto Setup: an offline vault (10 FC base capacity, upgradeable for cash) that's completely safe from the robbery wallet-drain below &mdash; deposit FC there to protect it, withdraw it back to your hot wallet whenever you need to spend or sell it.</li>
+            <li><b>Floydcoin robbery drain nerfed ~90%:</b> the wallet-drain from a successful NMC robbery now takes 1&ndash;3% of the victim's FC balance (was 10&ndash;30%), hard-capped at 3 FC per robbery no matter how large the balance.</li>
+          </ul>
+        </div>
 
         <div class="update-entry">
           <div class="update-entry-header"><h3>📬 MTN Sale Notifications &amp; Create Listing Redesign</h3><span class="update-date">2026-07-24</span></div>
@@ -1073,6 +1094,27 @@
             <li>Overhauled job promotions with real per-rank pay bands and job-specific perks &mdash; including an exclusive Wrestling Gear Store for the Krogue Wrestler Gear job.</li>
           </ul>
         </div>
+      </div>
+
+      <div id="page-report" class="page hidden">
+        <h2>📋 Report</h2>
+        <p>Found a bug, got wiped unfairly, or have an idea? Drop it here &mdash; it goes straight to the dev.</p>
+
+        <div class="hustle-card report-form-card">
+          <h3>📝 Submit a Report</h3>
+          <label>Type
+            <select id="reportTypeSelect">
+              <option value="bug">🐛 BUG REPORT</option>
+              <option value="wipe">🧹 WIPE REPORT</option>
+              <option value="suggestion">💡 SUGGESTION</option>
+            </select>
+          </label>
+          <textarea id="reportMessageInput" rows="6" maxlength="2000" placeholder="Describe what happened, or what you'd like to see..."></textarea>
+          <button id="btnReportSubmit">Submit</button>
+          <p id="reportSubmitMessage"></p>
+        </div>
+
+        <button id="btnViewReportLogs" class="secondary-btn">🔎 View Logs</button>
       </div>
 
     </main>
@@ -1340,6 +1382,28 @@
     </div>
   </div>
 
+  <div id="reportLogsModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <button id="btnReportLogsCloseX" class="admin-close-x" title="Close" aria-label="Close">&times;</button>
+      <h3>🔎 Report Logs</h3>
+      <div class="admin-row">
+        <select id="reportLogsTypeFilter">
+          <option value="">All types</option>
+          <option value="bug">🐛 BUG REPORT</option>
+          <option value="wipe">🧹 WIPE REPORT</option>
+          <option value="suggestion">💡 SUGGESTION</option>
+        </select>
+      </div>
+      <div id="reportLogsList" class="stock-transaction-list"></div>
+      <div class="stock-transaction-pagination">
+        <button id="btnReportLogsPrev" class="secondary-btn">&larr; Prev</button>
+        <span id="reportLogsPageLabel">Page 1 of 1</span>
+        <button id="btnReportLogsNext" class="secondary-btn">Next &rarr;</button>
+      </div>
+      <button id="btnReportLogsClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
   <div id="robResultModal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 id="robResultTitle">🥷 Robbery</h3>
@@ -1522,6 +1586,7 @@
 <script src="js/jail.js"></script>
 <script src="js/admin.js"></script>
 <script src="js/adminTransactions.js"></script>
+<script src="js/report.js"></script>
 <script src="js/clientAuth.js"></script>
 </body>
 </html>

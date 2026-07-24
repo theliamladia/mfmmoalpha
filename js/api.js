@@ -485,6 +485,16 @@ function apiMarkMtnSaleNotificationsSeen() {
   return apiRequest('/notifications/mtn-sales/seen', { method: 'POST' });
 }
 
+function apiReportSubmit(type, message) {
+  return apiRequest('/reports/submit', { method: 'POST', body: JSON.stringify({ type, message }) });
+}
+
+function apiReportsList(page, type) {
+  const params = new URLSearchParams({ page: String(page) });
+  if (type) params.set('type', type);
+  return apiRequest(`/reports/list?${params.toString()}`);
+}
+
 function apiRobberyNotifications() {
   return apiRequest('/notifications/robberies');
 }
@@ -540,6 +550,15 @@ function apiCryptoSell(amount) {
 }
 function apiCryptoBuy(amount) {
   return apiRequest('/crypto/buy', { method: 'POST', body: JSON.stringify({ amount }) });
+}
+function apiCryptoColdStorageDeposit(amount) {
+  return apiRequest('/crypto/cold-storage/deposit', { method: 'POST', body: JSON.stringify({ amount }) });
+}
+function apiCryptoColdStorageWithdraw(amount) {
+  return apiRequest('/crypto/cold-storage/withdraw', { method: 'POST', body: JSON.stringify({ amount }) });
+}
+function apiCryptoColdStorageUpgrade() {
+  return apiRequest('/crypto/cold-storage/upgrade', { method: 'POST' });
 }
 
 // ---------- Altcoins ----------

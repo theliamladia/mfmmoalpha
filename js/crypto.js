@@ -19,6 +19,19 @@ const CRYPTO_UPGRADE_TIERS = {
 const CRYPTO_BASE_RATE = 0.05;
 const FC_PRICE = 10000; // must match FC_START_PRICE in mfmmoserver/gameLogic.js
 
+// Must match COLD_STORAGE_BASE_CAP/COLD_STORAGE_UPGRADE_TIERS in mfmmoserver/gameLogic.js --
+// display-only mirror, the server is authoritative on the actual cap/cost.
+const COLD_STORAGE_BASE_CAP = 10;
+const COLD_STORAGE_UPGRADE_TIERS = [
+  { addCap: 15, cost: 5000 },
+  { addCap: 25, cost: 12000 },
+  { addCap: 50, cost: 25000 },
+];
+
+function coldStorageCapacity(coldStorage) {
+  return COLD_STORAGE_BASE_CAP + COLD_STORAGE_UPGRADE_TIERS.slice(0, coldStorage.tier).reduce((sum, t) => sum + t.addCap, 0);
+}
+
 const cryptoFcBalance = document.getElementById('cryptoFcBalance');
 const cryptoUpgradeGrid = document.getElementById('cryptoUpgradeGrid');
 const cryptoRateDesc = document.getElementById('cryptoRateDesc');
@@ -30,6 +43,13 @@ const btnCryptoSell = document.getElementById('btnCryptoSell');
 const btnCryptoBuyMax = document.getElementById('btnCryptoBuyMax');
 const btnCryptoSellAll = document.getElementById('btnCryptoSellAll');
 const cryptoLog = document.getElementById('cryptoLog');
+
+const cryptoColdStorageDesc = document.getElementById('cryptoColdStorageDesc');
+const cryptoColdStorageDepositInput = document.getElementById('cryptoColdStorageDepositInput');
+const btnCryptoColdStorageDeposit = document.getElementById('btnCryptoColdStorageDeposit');
+const cryptoColdStorageWithdrawInput = document.getElementById('cryptoColdStorageWithdrawInput');
+const btnCryptoColdStorageWithdraw = document.getElementById('btnCryptoColdStorageWithdraw');
+const btnCryptoColdStorageUpgrade = document.getElementById('btnCryptoColdStorageUpgrade');
 
 let cryptoStateCache = null;
 
@@ -46,6 +66,16 @@ function renderCrypto() {
   const crypto = cryptoStateCache;
   cryptoFcBalance.textContent = crypto.fc.toFixed(4);
   cryptoRateDesc.textContent = `Mining at ${cryptoDailyRate(crypto).toFixed(2)} FC/day. Collect hourly.`;
+
+  const coldStorage = crypto.coldStorage || { fc: 0, tier: 0 };
+  const capacity = coldStorageCapacity(coldStorage);
+  const upgradeTiers = COLD_STORAGE_UPGRADE_TIERS;
+  const maxed = coldStorage.tier >= upgradeTiers.length;
+  const next = !maxed ? upgradeTiers[coldStorage.tier] : null;
+  cryptoColdStorageDesc.textContent = `Safe from robbery wallet-drains -- ${coldStorage.fc.toFixed(4)}/${capacity} FC stored.`
+    + (maxed ? ' Capacity maxed.' : ` Next upgrade: +${next.addCap} FC capacity for $${next.cost.toLocaleString()}.`);
+  btnCryptoColdStorageUpgrade.disabled = maxed;
+  btnCryptoColdStorageUpgrade.textContent = maxed ? 'Capacity Maxed' : 'Upgrade Capacity';
 
   cryptoUpgradeGrid.innerHTML = ['ram', 'cpu', 'gpu'].map((track) => {
     const tierKey = `${track}Tier`;
@@ -141,4 +171,45 @@ btnCryptoSellAll.addEventListener('click', () => {
   const allFc = cryptoStateCache ? cryptoStateCache.fc : 0;
   if (allFc <= 0) { alert("You don't have any FC to sell."); return; }
   runCryptoSell(allFc);
+});
+
+btnCryptoColdStorageDeposit.addEventListener('click', async () => {
+  const amount = Number(cryptoColdStorageDepositInput.value);
+  try {
+    const result = await apiCryptoColdStorageDeposit(amount);
+    character = result.character;
+    logTo(cryptoLog, result.message, result.cls);
+    save();
+    renderAll();
+    await refreshCrypto();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
+});
+
+btnCryptoColdStorageWithdraw.addEventListener('click', async () => {
+  const amount = Number(cryptoColdStorageWithdrawInput.value);
+  try {
+    const result = await apiCryptoColdStorageWithdraw(amount);
+    character = result.character;
+    logTo(cryptoLog, result.message, result.cls);
+    save();
+    renderAll();
+    await refreshCrypto();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
+});
+
+btnCryptoColdStorageUpgrade.addEventListener('click', async () => {
+  try {
+    const result = await apiCryptoColdStorageUpgrade();
+    character = result.character;
+    logTo(cryptoLog, result.message, result.cls);
+    save();
+    renderAll();
+    await refreshCrypto();
+  } catch (err) {
+    if (err.reason) alert(err.reason);
+  }
 });

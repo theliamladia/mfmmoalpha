@@ -2635,6 +2635,25 @@ button:disabled {
   color: #e8e8ea;
 }
 
+.hustle-card textarea {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: #1b1d22;
+  border: 1px solid #3d3f48;
+  border-radius: 6px;
+  color: #e8e8ea;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.report-form-card {
+  max-width: 480px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
 .gunclub-section-title {
   margin: 20px 0 8px;
   font-size: 14px;

@@ -882,6 +882,7 @@ const pageLeaderboard = document.getElementById('page-leaderboard');
 const characterSidePanel = document.getElementById('characterSidePanel');
 const pageWiki = document.getElementById('page-wiki');
 const pageUpdates = document.getElementById('page-updates');
+const pageReport = document.getElementById('page-report');
 
 const activityLog = document.getElementById('activityLog');
 
@@ -1015,6 +1016,7 @@ function switchPage(pageName) {
   pageLeaderboard.classList.toggle('hidden', pageName !== 'leaderboard');
   pageWiki.classList.toggle('hidden', pageName !== 'wiki');
   pageUpdates.classList.toggle('hidden', pageName !== 'updates');
+  pageReport.classList.toggle('hidden', pageName !== 'report');
 
   // Always visible except on Milos, which already uses that column for Players Online -- showing
   // both there would cram three columns into the same row.
