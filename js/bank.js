@@ -243,3 +243,43 @@ document.addEventListener('click', (e) => {
   }
 });
 
+
+// ---------- Admin: All Bank Balances ----------
+// Same UI-only convenience pattern as js/admin.js's btnAdmin and js/report.js's btnViewReportLogs
+// -- always visible, but the real gate is server-side (requireAdminPassword on /admin/bank-balances
+// checks the signed JWT's username claim).
+const BANK_ADMIN_USERNAME = 'mrleems';
+const btnViewBankBalances = document.getElementById('btnViewBankBalances');
+const bankBalancesModal = document.getElementById('bankBalancesModal');
+const bankBalancesList = document.getElementById('bankBalancesList');
+const btnBankBalancesClose = document.getElementById('btnBankBalancesClose');
+const btnBankBalancesCloseX = document.getElementById('btnBankBalancesCloseX');
+
+async function refreshBankBalances() {
+  try {
+    const result = await apiAdminBankBalances();
+    bankBalancesList.innerHTML = result.balances.length
+      ? result.balances.map((b) => `
+        <div class="stock-transaction-row">
+          <span><b>${escapeHtml(b.name)}</b> (${escapeHtml(b.username)})</span>
+          <span>${escapeHtml(b.tierName)} &mdash; Bank: $${b.balance.toLocaleString()}${b.hasCreditCard ? ` &mdash; Credit owed: $${b.creditBalance.toLocaleString()}` : ''}</span>
+          <span>Pocket cash: $${b.pocketCash.toLocaleString()}</span>
+        </div>
+      `).join('')
+      : '<p class="equip-picker-empty">No players yet.</p>';
+  } catch (err) {
+    bankBalancesList.innerHTML = `<p class="equip-picker-empty">${escapeHtml(err.reason || 'Failed to load balances.')}</p>`;
+  }
+}
+
+btnViewBankBalances.addEventListener('click', () => {
+  if ((getMyUsername() || '').toLowerCase() !== BANK_ADMIN_USERNAME) {
+    alert('Not authorized.');
+    return;
+  }
+  bankBalancesModal.classList.remove('hidden');
+  refreshBankBalances();
+});
+
+btnBankBalancesClose.addEventListener('click', () => bankBalancesModal.classList.add('hidden'));
+btnBankBalancesCloseX.addEventListener('click', () => bankBalancesModal.classList.add('hidden'));

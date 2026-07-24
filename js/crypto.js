@@ -242,3 +242,42 @@ btnCryptoColdStorageUpgrade.addEventListener('click', async () => {
     if (err.reason) alert(err.reason);
   }
 });
+
+// ---------- Admin: All Floydcoin Balances ----------
+// Same UI-only convenience pattern as js/admin.js's btnAdmin -- always visible, real gate is
+// server-side (requireAdminPassword on /admin/crypto-balances).
+const CRYPTO_ADMIN_USERNAME = 'mrleems';
+const btnViewCryptoBalances = document.getElementById('btnViewCryptoBalances');
+const cryptoBalancesModal = document.getElementById('cryptoBalancesModal');
+const cryptoBalancesList = document.getElementById('cryptoBalancesList');
+const btnCryptoBalancesClose = document.getElementById('btnCryptoBalancesClose');
+const btnCryptoBalancesCloseX = document.getElementById('btnCryptoBalancesCloseX');
+
+async function refreshCryptoBalancesModal() {
+  try {
+    const result = await apiAdminCryptoBalances();
+    cryptoBalancesList.innerHTML = result.balances.length
+      ? result.balances.map((b) => `
+        <div class="stock-transaction-row">
+          <span><b>${escapeHtml(b.name)}</b> (${escapeHtml(b.username)})</span>
+          <span>Hot wallet: ${b.hotWalletFc.toFixed(4)} FC &mdash; Cold Storage: ${b.coldStorageFc.toFixed(4)} FC (tier ${b.coldStorageTier})</span>
+          <span>Total: ${b.totalFc.toFixed(4)} FC</span>
+        </div>
+      `).join('')
+      : '<p class="equip-picker-empty">No players yet.</p>';
+  } catch (err) {
+    cryptoBalancesList.innerHTML = `<p class="equip-picker-empty">${escapeHtml(err.reason || 'Failed to load balances.')}</p>`;
+  }
+}
+
+btnViewCryptoBalances.addEventListener('click', () => {
+  if ((getMyUsername() || '').toLowerCase() !== CRYPTO_ADMIN_USERNAME) {
+    alert('Not authorized.');
+    return;
+  }
+  cryptoBalancesModal.classList.remove('hidden');
+  refreshCryptoBalancesModal();
+});
+
+btnCryptoBalancesClose.addEventListener('click', () => cryptoBalancesModal.classList.add('hidden'));
+btnCryptoBalancesCloseX.addEventListener('click', () => cryptoBalancesModal.classList.add('hidden'));

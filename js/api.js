@@ -495,6 +495,14 @@ function apiReportsList(page, type) {
   return apiRequest(`/reports/list?${params.toString()}`);
 }
 
+function apiAdminBankBalances() {
+  return apiRequest('/admin/bank-balances');
+}
+
+function apiAdminCryptoBalances() {
+  return apiRequest('/admin/crypto-balances');
+}
+
 function apiRobberyNotifications() {
   return apiRequest('/notifications/robberies');
 }
