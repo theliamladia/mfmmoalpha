@@ -14,6 +14,19 @@ const btnPlayerActionFight = document.getElementById('btnPlayerActionFight');
 const btnPlayerActionPayBack = document.getElementById('btnPlayerActionPayBack');
 const btnPlayerActionPaySubmit = document.getElementById('btnPlayerActionPaySubmit');
 const btnPlayerActionClose = document.getElementById('btnPlayerActionClose');
+const robResultModal = document.getElementById('robResultModal');
+const robResultTitle = document.getElementById('robResultTitle');
+const robResultText = document.getElementById('robResultText');
+const btnRobResultOk = document.getElementById('btnRobResultOk');
+
+function showRobResult(result) {
+  robResultTitle.textContent = result.cls === 'gain' ? '🥷 Robbery Successful' : '🚔 Robbery Failed';
+  robResultText.textContent = result.message;
+  robResultText.className = result.cls;
+  robResultModal.classList.remove('hidden');
+}
+
+btnRobResultOk.addEventListener('click', () => robResultModal.classList.add('hidden'));
 
 let currentActionTargetUsername = null;
 
@@ -72,8 +85,8 @@ btnPlayerActionRob.addEventListener('click', async () => {
     character = result.character;
     save();
     renderAll();
-    logTo(milosLog, result.message, result.cls);
     closePlayerActionModal();
+    showRobResult(result);
   } catch (err) {
     playerActionMessage.textContent = err.reason || 'Something went wrong.';
   }

@@ -1965,6 +1965,16 @@ button:disabled {
   font-size: 14px;
 }
 
+.modal-box p.gain {
+  color: #6fcf97;
+  font-weight: 600;
+}
+
+.modal-box p.loss {
+  color: #e05c5c;
+  font-weight: 600;
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;
