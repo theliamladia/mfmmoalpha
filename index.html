@@ -760,15 +760,32 @@
               <p>Prices move every 32 seconds &mdash; the same price for everyone on the server, at all times. Trading doesn't move the market, but a real headline in InvestorsChat might.</p>
 
               <div class="hustle-card stock-portfolio-card">
-                <h3>💼 Your Portfolio</h3>
+                <div class="stock-portfolio-header">
+                  <h3>💼 Your Portfolio</h3>
+                  <button id="btnOpenStockPerformance" class="secondary-btn">📜 Performance Log</button>
+                </div>
                 <p>Floydbucks: $<span id="stockCashDisplay">0</span></p>
                 <div id="stockPortfolioGrid" class="stock-portfolio-grid"></div>
-                <button id="btnOpenStockPerformance" class="secondary-btn">📜 Performance Log</button>
               </div>
 
               <h3 class="gunclub-section-title">📊 Market</h3>
               <select id="stockSelector" class="stock-selector"></select>
-              <div id="stockDetailCard" class="stock-detail-card"></div>
+
+              <div class="stock-market-row">
+                <div id="stockDetailCard" class="stock-detail-card"></div>
+                <div class="stock-chart-card">
+                  <div class="stock-chart-timeframes" id="stockChartTimeframes">
+                    <button class="stock-timeframe-btn" data-range="1h">1H</button>
+                    <button class="stock-timeframe-btn active" data-range="1d">1D</button>
+                    <button class="stock-timeframe-btn" data-range="1w">1W</button>
+                    <button class="stock-timeframe-btn" data-range="1m">1M</button>
+                    <button class="stock-timeframe-btn" data-range="all">All</button>
+                  </div>
+                  <canvas id="stockChartCanvas"></canvas>
+                  <p id="stockChartEmpty" class="equip-picker-empty hidden">Not enough price history yet for this range &mdash; check back in a bit.</p>
+                </div>
+              </div>
+
               <div id="stockLog" class="log"></div>
 
               <div class="side-panel chat-box investors-chat-row">

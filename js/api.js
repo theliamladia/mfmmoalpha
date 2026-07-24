@@ -360,6 +360,10 @@ function apiStocks() {
   return apiRequest('/stocks');
 }
 
+function apiStockHistory(symbol, range) {
+  return apiRequest(`/stocks/${encodeURIComponent(symbol)}/history?range=${encodeURIComponent(range)}`);
+}
+
 function apiBuyStock(symbol, qty) {
   return apiRequest('/stocks/buy', { method: 'POST', body: JSON.stringify({ symbol, qty }) });
 }

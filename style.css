@@ -1798,7 +1798,22 @@ button:disabled {
 }
 
 .stock-portfolio-card {
+  width: 100%;
+  max-width: 720px;
   margin-bottom: 20px;
+}
+
+.stock-portfolio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.stock-portfolio-header h3 {
+  margin: 0;
 }
 
 .stock-portfolio-grid {
@@ -1866,6 +1881,13 @@ button:disabled {
 .stock-trade-row {
   display: flex;
   gap: 6px;
+}
+
+.stock-tax-note {
+  font-size: 11px;
+  color: #6f7178;
+  margin: 4px 0 12px;
+  min-height: 14px;
 }
 
 .stock-qty-input {
@@ -2107,12 +2129,57 @@ button:disabled {
   font-size: 14px;
 }
 
+.stock-market-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
 .stock-detail-card {
   background: #24262e;
   border: 1px solid #35373f;
   border-radius: 10px;
   padding: 18px 20px;
+  flex: 0 0 340px;
   max-width: 360px;
+}
+
+.stock-chart-card {
+  background: #24262e;
+  border: 1px solid #35373f;
+  border-radius: 10px;
+  padding: 18px 20px;
+  flex: 1 1 380px;
+  min-width: 320px;
+}
+
+.stock-chart-timeframes {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.stock-timeframe-btn {
+  background: #1b1d22;
+  color: #b9bbc4;
+  border: 1px solid #35373f;
+  border-radius: 16px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stock-timeframe-btn.active {
+  background: #f2c94c;
+  color: #1b1d22;
+}
+
+#stockChartCanvas {
+  width: 100%;
+  height: 260px;
+  display: block;
 }
 
 .stock-detail-header {
