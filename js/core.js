@@ -239,7 +239,7 @@ const CRIME_TIERS = [
   { id: 'shoplift', name: '🛍️ Shoplifting', desc: 'Slip something into your jacket at a corner store.', minReward: 64, maxReward: 160, jailYears: 1, baseRisk: 0.35 },
   { id: 'pettytheft', name: '👛 Petty Theft', desc: 'Pick a pocket or snatch a purse off a table.', minReward: 280, maxReward: 520, jailYears: 1, baseRisk: 0.45 },
   { id: 'burglary', name: '🏚️ Burglary', desc: "Break into a house while nobody's home.", minReward: 960, maxReward: 1760, jailYears: 4, baseRisk: 0.5 },
-  { id: 'grandtheft', name: '🚗 Grand Theft Auto', desc: 'Boost a car off the street and flip it.', minReward: 3200, maxReward: 4800, jailYears: 10, baseRisk: 0.6 },
+  { id: 'grandtheft', name: '🚗 Grand Theft Auto', desc: 'Boost a car off the street and flip it.', minReward: 1800, maxReward: 2000, jailYears: 6, baseRisk: 0.6 },
 ];
 const CRIME_COOLDOWN_MS = 12000;
 const CRIME_RISK_MIN = 0.05;
