@@ -47,8 +47,10 @@ const cryptoLog = document.getElementById('cryptoLog');
 const cryptoColdStorageDesc = document.getElementById('cryptoColdStorageDesc');
 const cryptoColdStorageDepositInput = document.getElementById('cryptoColdStorageDepositInput');
 const btnCryptoColdStorageDeposit = document.getElementById('btnCryptoColdStorageDeposit');
+const btnCryptoColdStorageDepositAll = document.getElementById('btnCryptoColdStorageDepositAll');
 const cryptoColdStorageWithdrawInput = document.getElementById('cryptoColdStorageWithdrawInput');
 const btnCryptoColdStorageWithdraw = document.getElementById('btnCryptoColdStorageWithdraw');
+const btnCryptoColdStorageWithdrawAll = document.getElementById('btnCryptoColdStorageWithdrawAll');
 const btnCryptoColdStorageUpgrade = document.getElementById('btnCryptoColdStorageUpgrade');
 
 let cryptoStateCache = null;
@@ -173,8 +175,7 @@ btnCryptoSellAll.addEventListener('click', () => {
   runCryptoSell(allFc);
 });
 
-btnCryptoColdStorageDeposit.addEventListener('click', async () => {
-  const amount = Number(cryptoColdStorageDepositInput.value);
+async function runColdStorageDeposit(amount) {
   try {
     const result = await apiCryptoColdStorageDeposit(amount);
     character = result.character;
@@ -185,10 +186,9 @@ btnCryptoColdStorageDeposit.addEventListener('click', async () => {
   } catch (err) {
     if (err.reason) alert(err.reason);
   }
-});
+}
 
-btnCryptoColdStorageWithdraw.addEventListener('click', async () => {
-  const amount = Number(cryptoColdStorageWithdrawInput.value);
+async function runColdStorageWithdraw(amount) {
   try {
     const result = await apiCryptoColdStorageWithdraw(amount);
     character = result.character;
@@ -199,6 +199,35 @@ btnCryptoColdStorageWithdraw.addEventListener('click', async () => {
   } catch (err) {
     if (err.reason) alert(err.reason);
   }
+}
+
+btnCryptoColdStorageDeposit.addEventListener('click', () => {
+  runColdStorageDeposit(Number(cryptoColdStorageDepositInput.value));
+});
+
+btnCryptoColdStorageDepositAll.addEventListener('click', () => {
+  if (!cryptoStateCache) return;
+  const coldStorage = cryptoStateCache.coldStorage || { fc: 0, tier: 0 };
+  const room = Math.round((coldStorageCapacity(coldStorage) - coldStorage.fc) * 10000) / 10000;
+  const amount = Math.min(cryptoStateCache.fc, room);
+  if (amount <= 0) {
+    alert(room <= 0 ? 'Cold Storage is already full.' : "You don't have any FC in your hot wallet to deposit.");
+    return;
+  }
+  runColdStorageDeposit(amount);
+});
+
+btnCryptoColdStorageWithdraw.addEventListener('click', () => {
+  runColdStorageWithdraw(Number(cryptoColdStorageWithdrawInput.value));
+});
+
+btnCryptoColdStorageWithdrawAll.addEventListener('click', () => {
+  const allColdFc = cryptoStateCache && cryptoStateCache.coldStorage ? cryptoStateCache.coldStorage.fc : 0;
+  if (allColdFc <= 0) {
+    alert("You don't have any FC in Cold Storage to withdraw.");
+    return;
+  }
+  runColdStorageWithdraw(allColdFc);
 });
 
 btnCryptoColdStorageUpgrade.addEventListener('click', async () => {
