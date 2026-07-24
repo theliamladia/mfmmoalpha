@@ -827,6 +827,9 @@ milosTabBtns.forEach((btn) => {
     if (btn.dataset.milos === 'crypto' && typeof refreshCrypto === 'function') refreshCrypto();
     if (btn.dataset.milos === 'altcoins' && typeof refreshAltcoins === 'function') refreshAltcoins();
     if (typeof setStockMarketTabVisible === 'function') setStockMarketTabVisible(btn.dataset.milos === 'stocks');
+    // Investors Center has its own InvestorsChat -- showing the main New Milos City chat there too
+    // would just be a redundant second chat box, so it's the one sub-tab that hides it.
+    document.querySelector('.milos-chat-row').classList.toggle('hidden', btn.dataset.milos === 'stocks');
   });
 });
 

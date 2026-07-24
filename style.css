@@ -2084,6 +2084,88 @@ button:disabled {
   font-weight: 600;
 }
 
+/* Generic gain/loss coloring for any element (not just .log/.modal-box p) -- the stock portfolio
+   rows and performance log use these on plain spans. */
+.gain {
+  color: #6fcf97;
+  font-weight: 600;
+}
+
+.loss {
+  color: #e05c5c;
+  font-weight: 600;
+}
+
+.stock-selector {
+  width: 100%;
+  padding: 10px 12px;
+  background: #1b1d22;
+  border: 1px solid #3d3f48;
+  border-radius: 6px;
+  color: #e8e8ea;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.stock-detail-card {
+  background: #24262e;
+  border: 1px solid #35373f;
+  border-radius: 10px;
+  padding: 18px 20px;
+  max-width: 360px;
+}
+
+.stock-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stock-detail-symbol {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e8e8ea;
+}
+
+.stock-performance-summary {
+  line-height: 1.8;
+}
+
+.stock-transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.stock-transaction-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: #1b1d22;
+  border: 1px solid #35373f;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.stock-tx-date {
+  font-size: 11px;
+  color: #6f7178;
+}
+
+.stock-transaction-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: #b9bbc4;
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;
