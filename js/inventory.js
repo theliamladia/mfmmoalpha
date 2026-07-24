@@ -115,6 +115,15 @@ function buildInventoryGrid() {
       return `<option value="${stack.id}">${label} (x${stack.qty})</option>`;
     }).join('')
     : '<option value="">No items to trade</option>';
+
+  // Dropdown of currently online players (excluding yourself), by first/last name -- onlinePlayersCache
+  // is kept fresh app-wide (see milos.js's setInterval), not just while viewing New Milos City.
+  const prevTradeTarget = tradeUsernameInput.value;
+  tradeUsernameInput.innerHTML = onlinePlayersCache.length
+    ? onlinePlayersCache.map((p) => `<option value="${p.username}">${escapeHtml(`${p.character.firstName} ${p.character.lastName}`)}</option>`).join('')
+    : '<option value="">No players online</option>';
+  if (onlinePlayersCache.some((p) => p.username === prevTradeTarget)) tradeUsernameInput.value = prevTradeTarget;
+  btnTradeSend.disabled = !onlinePlayersCache.length;
 }
 
 // Titles are entirely client-side/trust-based (same as buying a crate spin or equipping a title),
@@ -152,10 +161,12 @@ function prestigeTitle(stackId) {
 
 btnTradeSend.addEventListener('click', () => {
   const itemId = tradeItemSelect.value;
-  const username = tradeUsernameInput.value.trim();
+  const username = tradeUsernameInput.value;
   if (!itemId || !username) return;
   const item = getItemDef(itemId);
-  logTo(inventoryLog, `Trade offer for ${item ? itemLabel(item) : itemId} sent to ${username}. They'll see it once multiplayer is live.`, 'gain');
+  const target = onlinePlayersCache.find((p) => p.username === username);
+  const targetName = target ? `${target.character.firstName} ${target.character.lastName}` : username;
+  logTo(inventoryLog, `Trade offer for ${item ? itemLabel(item) : itemId} sent to ${targetName}. They'll see it once multiplayer is live.`, 'gain');
   tradeUsernameInput.value = '';
 });
 

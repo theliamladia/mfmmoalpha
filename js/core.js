@@ -631,7 +631,19 @@ function save() {
     serverSyncPending = true;
     serverSyncTimer = setTimeout(() => {
       serverSyncPending = false;
-      apiSyncCharacter(character).catch(() => {});
+      apiSyncCharacter(character).catch(async (err) => {
+        // A second tab/device already saved a newer version since we last fetched -- rather than
+        // silently clobbering it (the exact bug that once cost a player their FC and titles),
+        // reload the real current state and let the user know why their local changes didn't stick.
+        if (err && err.reason === 'stale_sync') {
+          try {
+            const fresh = await apiMe();
+            character = fresh.character;
+            renderAll();
+            alert("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
+          } catch { /* best-effort */ }
+        }
+      });
     }, 1000);
   }
 }
@@ -640,7 +652,9 @@ function save() {
 // win, a title purchase) never reaches the server -- a real report of this: a player's crate title
 // vanished because it never made it past their own browser. A normal fetch can't be trusted to
 // finish once the page starts unloading, so flush with sendBeacon instead (same fallback shape as
-// /milos/leave: it can't set an Authorization header, so the token rides in the body).
+// /milos/leave: it can't set an Authorization header, so the token rides in the body). sendBeacon
+// can't read a response, so a stale rev here just silently fails to save rather than clobbering --
+// the reconciliation above only needs to happen on the normal (non-beacon) path.
 function flushCharacterSyncBeacon() {
   if (!serverSyncPending) return;
   clearTimeout(serverSyncTimer);
@@ -649,7 +663,7 @@ function flushCharacterSyncBeacon() {
   if (!token || typeof character === 'undefined' || !character) return;
   navigator.sendBeacon(
     `${API_BASE}/character/sync`,
-    new Blob([JSON.stringify({ character, token })], { type: 'application/json' })
+    new Blob([JSON.stringify({ character, token, expectedRev: characterRev })], { type: 'application/json' })
   );
 }
 

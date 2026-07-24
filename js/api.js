@@ -16,6 +16,12 @@ function clearAuthToken() {
   localStorage.removeItem(AUTH_TOKEN_KEY);
 }
 
+// Tracks the character revision the server last confirmed saving -- every response that includes
+// one flows through here automatically (all requests go through this one function), so callers
+// never have to thread it through by hand. apiSyncCharacter reads it back out to guard against a
+// stale tab/device silently overwriting newer progress -- see /character/sync in server.js.
+let characterRev = null;
+
 async function apiRequest(path, options = {}) {
   const token = getAuthToken();
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
@@ -30,6 +36,7 @@ async function apiRequest(path, options = {}) {
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw data;
+  if (typeof data.rev === 'number') characterRev = data.rev;
   return data;
 }
 
@@ -367,7 +374,7 @@ function getMyUsername() {
 }
 
 function apiSyncCharacter(characterToSync) {
-  return apiRequest('/character/sync', { method: 'POST', body: JSON.stringify({ character: characterToSync }) });
+  return apiRequest('/character/sync', { method: 'POST', body: JSON.stringify({ character: characterToSync, expectedRev: characterRev }) });
 }
 
 function apiMilosEnter() {
