@@ -12,6 +12,132 @@ const equipPickerTitle = document.getElementById('equipPickerTitle');
 const equipPickerList = document.getElementById('equipPickerList');
 const btnEquipPickerClose = document.getElementById('btnEquipPickerClose');
 
+// Crate sections render in the same order as the Switch Title dropdown's groups, with
+// "Other Titles" (purchased/leaderboard/custom -- never crate-sourced) always last.
+const CRATE_GROUP_ORDER = [...TITLE_CRATE_GROUPS.map((g) => g.label), OTHER_TITLES_LABEL];
+
+// UI-only state for the Cosmetics accordion -- which crate section is open and which of its
+// Regular/Prestige sub-tabs is active. Lives outside buildInventoryGrid() so it survives the
+// full re-render every save()/renderAll() triggers instead of resetting to collapsed each time.
+let cosmeticsExpandedCrate = null;
+const cosmeticsActiveSubTab = {};
+
+function titleStackCardHtml(stack) {
+  const item = getItemDef(stack.id);
+  const { level } = parsePrestigeId(stack.id);
+  // Only crate/store titles carry a `rarity` -- leaderboard/achievement/custom titles have
+  // none and so get neither button (selling/prestiging those wouldn't make sense).
+  const sellPrice = item.rarity ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
+  // Base (unprestiged) stacks need 6 so one copy survives the prestige; already-prestiged
+  // stacks fully convert at 5, since there's no reason to keep the lower prestige rank around.
+  const prestigeThreshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
+  const canPrestige = item.rarity && stack.qty >= prestigeThreshold;
+  return `
+    <div class="hustle-card">
+      <h3>${itemLabel(item)}</h3>
+      <p class="item-subheading">Title${item.rarity ? ` &middot; ${item.rarity}` : ''}</p>
+      <div class="title-preview">${titleBadgeMarkup(item)}</div>
+      <p>&times; ${stack.qty}</p>
+      ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
+      ${canPrestige ? `<button data-prestige-title="${stack.id}">Prestige Title</button>` : ''}
+    </div>
+  `;
+}
+
+// Groups owned title stacks by the crate they (or their prestige base) came from, then splits
+// each crate's stacks into Regular (prestige level 0) and Prestige (level >= 1) buckets, sorted
+// per the user's ask: Regular by rarity, Prestige by prestige level (then rarity as a tiebreak).
+function groupTitleStacksByCrate(titleStacks) {
+  const groups = new Map();
+  const byRarityThenPrestige = compareTitleStacksByRarityThenPrestige((s) => s.id, (s) => getItemDef(s.id));
+
+  titleStacks.forEach((stack) => {
+    const item = getItemDef(stack.id);
+    const label = titleCrateGroupLabel(item);
+    if (!groups.has(label)) groups.set(label, { regular: [], prestige: [] });
+    const bucket = parsePrestigeId(stack.id).level === 0 ? 'regular' : 'prestige';
+    groups.get(label)[bucket].push(stack);
+  });
+
+  groups.forEach((g) => {
+    g.regular.sort(byRarityThenPrestige);
+    g.prestige.sort(byRarityThenPrestige);
+  });
+
+  return groups;
+}
+
+function renderCosmeticsGrid() {
+  const titleStacks = character.inventory.filter((stack) => {
+    const item = getItemDef(stack.id);
+    return item && item.type === 'title';
+  });
+
+  if (!titleStacks.length) {
+    cosmeticsGrid.innerHTML = '<p class="equip-picker-empty">No titles yet. Win them from a crate in Cosmetixxx.</p>';
+    return;
+  }
+
+  const groups = groupTitleStacksByCrate(titleStacks);
+
+  cosmeticsGrid.innerHTML = CRATE_GROUP_ORDER
+    .filter((label) => groups.has(label))
+    .map((label) => {
+      const g = groups.get(label);
+      const totalQty = [...g.regular, ...g.prestige].reduce((sum, s) => sum + s.qty, 0);
+      const isExpanded = cosmeticsExpandedCrate === label;
+      const hasPrestige = g.prestige.length > 0;
+      const activeTab = hasPrestige ? (cosmeticsActiveSubTab[label] || 'regular') : 'regular';
+      const stacksForTab = activeTab === 'prestige' ? g.prestige : g.regular;
+      const cardsHtml = stacksForTab.length
+        ? stacksForTab.map(titleStackCardHtml).join('')
+        : `<p class="equip-picker-empty">No ${activeTab} titles from this crate yet.</p>`;
+
+      return `
+        <div class="crate-cosmetics-section">
+          <button class="crate-cosmetics-header" data-crate-toggle="${escapeHtml(label)}">
+            <span>${label}</span>
+            <span class="crate-cosmetics-count">${totalQty} owned</span>
+            <span class="crate-cosmetics-caret">${isExpanded ? '▾' : '▸'}</span>
+          </button>
+          ${isExpanded ? `
+            <div class="crate-cosmetics-body">
+              <div class="crate-cosmetics-subtabs">
+                <button class="crate-subtab-btn${activeTab === 'regular' ? ' active' : ''}" data-crate-subtab="${escapeHtml(label)}::regular">Regular</button>
+                ${hasPrestige ? `<button class="crate-subtab-btn${activeTab === 'prestige' ? ' active' : ''}" data-crate-subtab="${escapeHtml(label)}::prestige">Prestige</button>` : ''}
+              </div>
+              <div class="hustle-grid">${cardsHtml}</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+
+  cosmeticsGrid.querySelectorAll('[data-crate-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const label = btn.dataset.crateToggle;
+      cosmeticsExpandedCrate = cosmeticsExpandedCrate === label ? null : label;
+      renderCosmeticsGrid();
+    });
+  });
+  cosmeticsGrid.querySelectorAll('[data-crate-subtab]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const sep = btn.dataset.crateSubtab.lastIndexOf('::');
+      const label = btn.dataset.crateSubtab.slice(0, sep);
+      const tab = btn.dataset.crateSubtab.slice(sep + 2);
+      cosmeticsActiveSubTab[label] = tab;
+      renderCosmeticsGrid();
+    });
+  });
+  cosmeticsGrid.querySelectorAll('[data-sell-title]').forEach((btn) => {
+    btn.addEventListener('click', () => sellTitle(btn.dataset.sellTitle));
+  });
+  cosmeticsGrid.querySelectorAll('[data-prestige-title]').forEach((btn) => {
+    btn.addEventListener('click', () => prestigeTitle(btn.dataset.prestigeTitle));
+  });
+}
+
 function licenseCardHtml(name, lines) {
   return `
     <div class="hustle-card">
@@ -70,42 +196,7 @@ function buildInventoryGrid() {
     }).join('')
     : '<p class="equip-picker-empty">No items yet. Buy a gun or ammo at the NMC Gun Club, or drugs from Guzman.</p>';
 
-  const titleStacks = character.inventory
-    .filter((stack) => {
-      const item = getItemDef(stack.id);
-      return item && item.type === 'title';
-    })
-    .sort(compareTitleStacksByRarityThenPrestige((s) => s.id, (s) => getItemDef(s.id)));
-  cosmeticsGrid.innerHTML = titleStacks.length
-    ? titleStacks.map((stack) => {
-      const item = getItemDef(stack.id);
-      const { level } = parsePrestigeId(stack.id);
-      // Only crate/store titles carry a `rarity` -- leaderboard/achievement/custom titles have
-      // none and so get neither button (selling/prestiging those wouldn't make sense).
-      const sellPrice = item.rarity ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
-      // Base (unprestiged) stacks need 6 so one copy survives the prestige; already-prestiged
-      // stacks fully convert at 5, since there's no reason to keep the lower prestige rank around.
-      const prestigeThreshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
-      const canPrestige = item.rarity && stack.qty >= prestigeThreshold;
-      return `
-        <div class="hustle-card">
-          <h3>${itemLabel(item)}</h3>
-          <p class="item-subheading">Title</p>
-          <div class="title-preview">${titleBadgeMarkup(item)}</div>
-          <p>&times; ${stack.qty}</p>
-          ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
-          ${canPrestige ? `<button data-prestige-title="${stack.id}">Prestige Title</button>` : ''}
-        </div>
-      `;
-    }).join('')
-    : '<p class="equip-picker-empty">No titles yet. Win them from a crate in Cosmetixxx.</p>';
-
-  cosmeticsGrid.querySelectorAll('[data-sell-title]').forEach((btn) => {
-    btn.addEventListener('click', () => sellTitle(btn.dataset.sellTitle));
-  });
-  cosmeticsGrid.querySelectorAll('[data-prestige-title]').forEach((btn) => {
-    btn.addEventListener('click', () => prestigeTitle(btn.dataset.prestigeTitle));
-  });
+  renderCosmeticsGrid();
 
   tradeItemSelect.innerHTML = character.inventory.length
     ? character.inventory.map((stack) => {

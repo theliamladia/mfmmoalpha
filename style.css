@@ -2739,6 +2739,64 @@ button:disabled {
   color: #6f7178;
 }
 
+.crate-cosmetics-section {
+  border: 1px solid #35373f;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.crate-cosmetics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  background: #24262e;
+  color: #e8e8ea;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.crate-cosmetics-count {
+  color: #9a9ca6;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.crate-cosmetics-caret {
+  color: #9a9ca6;
+}
+
+.crate-cosmetics-body {
+  padding: 16px;
+  border-top: 1px solid #35373f;
+}
+
+.crate-cosmetics-subtabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.crate-subtab-btn {
+  background: #24262e;
+  color: #b9bbc4;
+  border: 1px solid #35373f;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+.crate-subtab-btn.active {
+  background: #f2c94c;
+  color: #1b1d22;
+}
+
 /* --- Quiz --- */
 .quiz-box {
   width: 520px;
