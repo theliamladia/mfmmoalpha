@@ -295,7 +295,6 @@ btnTitleMakerCreate.addEventListener('click', () => {
   character.titles.customTitles.push(def);
   addToInventory(def.id, 1);
   save();
-  apiSyncCharacter(character);
   renderAll();
 
   titleMakerLabel.value = '';

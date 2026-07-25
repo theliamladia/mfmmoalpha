@@ -619,6 +619,7 @@ function inventoryQty(itemId) {
 
 let serverSyncTimer = null;
 let serverSyncPending = false;
+let inFlightCharacterSync = null;
 
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(character));
@@ -629,23 +630,47 @@ function save() {
   if (typeof getAuthToken === 'function' && getAuthToken()) {
     clearTimeout(serverSyncTimer);
     serverSyncPending = true;
-    serverSyncTimer = setTimeout(() => {
-      serverSyncPending = false;
-      apiSyncCharacter(character).catch(async (err) => {
-        // A second tab/device already saved a newer version since we last fetched -- rather than
-        // silently clobbering it (the exact bug that once cost a player their FC and titles),
-        // reload the real current state and let the user know why their local changes didn't stick.
-        if (err && err.reason === 'stale_sync') {
-          try {
-            const fresh = await apiMe();
-            character = fresh.character;
-            renderAll();
-            alert("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
-          } catch { /* best-effort */ }
-        }
-      });
-    }, 1000);
+    serverSyncTimer = setTimeout(flushCharacterSync, 1000);
   }
+}
+
+// Fires the debounced sync early instead of waiting out the rest of the 1s timer. apiRequest()
+// awaits this before every other request (see js/api.js) -- that's what actually fixes the false
+// "session conflicted" reports: a client-side-only edit (a custom title, a stat tweak) used to sit
+// queued here for up to a second while whatever the player clicked *next* (Work, a bank deposit,
+// any server-authoritative action) ran against the character still on file on the server -- which
+// didn't have the queued edit yet -- and then overwrote the client's copy with that edit-less
+// result the moment its response came back. Flushing first guarantees the queued edit always
+// reaches the server, and is reflected in the DB, before any later action can read past it.
+//
+// inFlightCharacterSync exists for the same reason: without it, two apiRequest calls dispatched
+// close together (a quick double-click, or two different buttons) can each see serverSyncPending
+// flip to false the instant the FIRST one claims it, and the second would then fire its own
+// request without ever actually waiting for that first sync's response to land -- reopening the
+// exact same race on a shorter fuse. Every caller that arrives while a sync is in flight shares
+// this one promise instead, and re-checks for a newer edit once it settles (save() can queue
+// another one while the first request was already on the wire, which that request's own snapshot
+// of `character` can't have included).
+function flushCharacterSync() {
+  if (inFlightCharacterSync) return inFlightCharacterSync.then(flushCharacterSync);
+  if (!serverSyncPending) return Promise.resolve();
+  clearTimeout(serverSyncTimer);
+  serverSyncPending = false;
+  const attempt = apiSyncCharacter(character).catch(async (err) => {
+    // A second tab/device already saved a newer version since we last fetched -- rather than
+    // silently clobbering it (the exact bug that once cost a player their FC and titles),
+    // reload the real current state and let the user know why their local changes didn't stick.
+    if (err && err.reason === 'stale_sync') {
+      try {
+        const fresh = await apiMe();
+        character = fresh.character;
+        renderAll();
+        alert("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
+      } catch { /* best-effort */ }
+    }
+  });
+  inFlightCharacterSync = attempt.finally(() => { inFlightCharacterSync = null; });
+  return inFlightCharacterSync;
 }
 
 // The 1s debounce above means anything saved right before the tab closes or backgrounds (a crate
@@ -667,8 +692,47 @@ function flushCharacterSyncBeacon() {
   );
 }
 
+// sendBeacon can't read its own response, so characterRev is never updated by a background flush
+// -- it's still whatever it was right before the tab was hidden. On a phone, backgrounding the
+// tab (switching apps, locking the screen) is routine, so this is the other big source of false
+// "session conflicted" reports: the player comes back, makes another client-side-only edit, and
+// the debounced sync above rejects it as stale purely because *our own* characterRev bookkeeping
+// fell behind -- not because anything else actually changed. Re-checking the rev on resume (only
+// the rev -- not blindly adopting the server's character, which would risk masking a real
+// conflict from another tab/device) fixes the bookkeeping in the common case where nothing else
+// touched this character while we were away, and falls back to the normal conflict handling
+// (reload + alert) on the rare occasion something genuinely did.
+// Plain JSON.stringify is sensitive to key insertion order, which can legitimately differ between
+// the server's copy (parsed straight from the stored blob) and the client's (built up through
+// load()'s migrations) even when every value is identical -- sorting keys before comparing avoids
+// mistaking that for a real conflict.
+function stableStringify(value) {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+async function resyncRevAfterResume() {
+  if (serverSyncPending) return; // an edit queued right on resume -- let the normal flush handle it.
+  if (typeof getAuthToken !== 'function' || !getAuthToken()) return;
+  try {
+    const fresh = await apiMe();
+    if (stableStringify(fresh.character) === stableStringify(character)) {
+      characterRev = fresh.rev;
+    } else {
+      character = fresh.character;
+      characterRev = fresh.rev;
+      renderAll();
+      alert("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
+    }
+  } catch { /* best-effort */ }
+}
+
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') flushCharacterSyncBeacon();
+  else if (document.visibilityState === 'visible') resyncRevAfterResume();
 });
 window.addEventListener('pagehide', flushCharacterSyncBeacon);
 

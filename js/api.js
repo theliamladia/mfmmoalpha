@@ -23,6 +23,17 @@ function clearAuthToken() {
 let characterRev = null;
 
 async function apiRequest(path, options = {}) {
+  // Flush any character edit still sitting in save()'s debounce before anything else goes out --
+  // otherwise a server-authoritative action fired right after a client-side-only edit (e.g. the
+  // admin Title Maker) can read/save the character on the server *before* that edit ever arrives,
+  // then hand the client back that edit-less version, silently discarding it (or, if the debounced
+  // sync fires after, rejecting it as stale). See flushCharacterSync() in js/core.js. A no-op if
+  // nothing is pending -- and this request loop is guarded against re-entering itself, since
+  // flushCharacterSync() clears serverSyncPending before the sync request it triggers reaches here.
+  if (path !== '/character/sync' && typeof flushCharacterSync === 'function') {
+    await flushCharacterSync();
+  }
+
   const token = getAuthToken();
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (token) headers.Authorization = `Bearer ${token}`;
