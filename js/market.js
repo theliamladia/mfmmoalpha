@@ -809,7 +809,21 @@ async function announceCrateWin(crate, title) {
   }
 }
 
+// All crate types animate through the same shared #crateReelWrap/#crateReelTrack (see
+// runCrateAnimation), but each spin button only ever disabled its OWN crate's buttons -- clicking
+// a different crate (or Roll Again) while a spin was still mid-animation let a second overlapping
+// requestAnimationFrame/setTimeout chain start on top of the first, stomping the shared track's
+// DOM and never getting cleaned up. This single module-wide flag blocks ANY new spin from starting
+// until the in-flight one has fully finished (including its granting/render tail), regardless of
+// which crate or button triggered it.
+let crateSpinInFlight = false;
+
 async function spinCrate(crate, buttons, messageEl, opts = {}) {
+  if (crateSpinInFlight) {
+    alert('A crate is already spinning -- wait for it to finish first.');
+    return;
+  }
+
   const { skipConfirm = false, qty: qtyOverride } = opts;
   const qty = qtyOverride || getCrateQty(crate);
   const totalCost = crate.cost * qty;
@@ -826,6 +840,7 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
     if (!confirm(confirmMsg)) return;
   }
 
+  crateSpinInFlight = true;
   lastSpunCrateContext = { crate, buttons, messageEl, qty };
   buttons.forEach((b) => { b.disabled = true; });
   messageEl.textContent = crate.limited ? 'Reserving your crate...' : 'Opening crate...';
@@ -835,6 +850,7 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
     alert(start.reason);
     messageEl.textContent = '';
     buttons.forEach((b) => { b.disabled = false; });
+    crateSpinInFlight = false;
     return;
   }
   save();
@@ -854,6 +870,7 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
     buildTitleGrid();
     renderAll();
     buttons.forEach((b) => { b.disabled = false; });
+    crateSpinInFlight = false;
     showCrateResult(start.results, alreadyOwnedFlags);
   };
 
@@ -871,6 +888,7 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
       buildTitleGrid();
       renderAll();
       buttons.forEach((b) => { b.disabled = false; });
+      crateSpinInFlight = false;
       showCrateResult([won], [alreadyOwned]);
     });
     return;
