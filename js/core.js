@@ -998,6 +998,7 @@ function showGame() {
   buildGunClubGrids();
   buildJailContrabandGrid();
   renderAll();
+  switchPage('profile');
 
   if (character.jail.inJail) {
     goToJail(false, false);

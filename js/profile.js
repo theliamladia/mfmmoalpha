@@ -396,6 +396,7 @@ btnProfileShuffleBanner.addEventListener('click', () => {
   if (!profileViewCache) return;
   const owned = profileOwnedTitleDefs(profileViewCache.character);
   openProfilePicker('Change your profile banner');
+  profileShowcasePicker.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const equippedTopHtml = `
     <div class="title-dropdown-item" data-picker-select-top="">
       <span class="badge rank-badge">Use Equipped Title</span>
