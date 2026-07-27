@@ -193,7 +193,6 @@ function renderProfile() {
         ${titleBadgeMarkup(def)}
         <div class="profile-showcase-text">
           <p class="profile-showcase-name">${escapeHtml(itemLabel(def))}</p>
-          <p class="profile-showcase-how">${escapeHtml(def.how || '')}</p>
         </div>
         ${isOwner ? `<button class="secondary-btn" data-showcase-remove="${def.id}">Remove</button>` : ''}
       </div>
