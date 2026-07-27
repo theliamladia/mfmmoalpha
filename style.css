@@ -1985,8 +1985,9 @@ button:disabled {
   background: #1b1d22;
   border: 1px solid #35373f;
   border-radius: 8px;
-  padding: 10px 14px;
-  min-width: 160px;
+  padding: 0 0 10px;
+  min-width: 260px;
+  overflow: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -1998,6 +1999,33 @@ button:disabled {
 
 .player-row:hover .player-hover-card {
   display: block;
+}
+
+.player-hover-banner {
+  height: 70px;
+  border-radius: 0;
+  margin: 0 0 10px;
+}
+
+.player-hover-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  margin-bottom: 8px;
+  white-space: normal;
+}
+
+.player-hover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 14px;
+}
+
+.player-hover-actions button {
+  font-size: 11px;
+  padding: 5px 9px;
 }
 
 .chat-note {
@@ -3736,4 +3764,204 @@ button:disabled {
 .hustle-toast.loss {
   border-left-color: #e05c5c;
   color: #e05c5c;
+}
+
+/* --- Profiles --- */
+.profile-banner {
+  position: relative;
+  height: 180px;
+  border-radius: 10px;
+  background: #24262e;
+  border: 1px solid #35373f;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 18px;
+}
+
+.profile-banner-shuffle {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.profile-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.profile-header-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.profile-name {
+  font-size: 26px;
+  margin: 0;
+}
+
+.profile-status-btn {
+  background: #262832;
+  border: 1px solid #383a44;
+  color: #9a9ca6;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.profile-status-text {
+  font-size: 13px;
+  color: #b9bbc4;
+  font-style: italic;
+  width: 100%;
+}
+
+.profile-header-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.profile-stats-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.profile-stat-pill {
+  background: #24262e;
+  border: 1px solid #35373f;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #b9bbc4;
+}
+
+.profile-columns {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.profile-portfolio-card,
+.profile-showcase-card {
+  flex: 1;
+  min-width: 280px;
+}
+
+.profile-showcase-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #2c2e36;
+}
+
+.profile-showcase-item:last-child {
+  border-bottom: none;
+}
+
+.profile-showcase-text {
+  flex: 1;
+}
+
+.profile-showcase-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 13px;
+  color: #e8e8ea;
+}
+
+.profile-showcase-how {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #9a9ca6;
+}
+
+#profileShowcasePicker {
+  margin-bottom: 18px;
+}
+
+.profile-wall-post-row {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+
+.profile-wall-post-row input {
+  flex: 1;
+}
+
+.profile-wall-post-btn {
+  background: #6fcf97;
+  color: #16321f;
+  border: none;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-wall-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.profile-wall-post {
+  background: #24262e;
+  border: 1px solid #35373f;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.profile-wall-post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.profile-wall-post-date {
+  font-size: 11px;
+  color: #6f7178;
+}
+
+.profile-wall-delete {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 6px;
+}
+
+.profile-wall-post p {
+  margin: 0;
+  font-size: 13px;
+  color: #d5d6db;
+}
+
+.profile-wall-pagination {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.profile-wall-pagination button {
+  padding: 5px 11px;
+  font-size: 12px;
 }

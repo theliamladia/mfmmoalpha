@@ -367,6 +367,28 @@ function apiOnlinePlayers() {
   return apiRequest('/players/online');
 }
 
+function apiGetProfile(username, page) {
+  return apiRequest(`/profile/${encodeURIComponent(username)}?page=${page || 1}`);
+}
+function apiSetProfileStatus(status) {
+  return apiRequest('/profile/status', { method: 'POST', body: JSON.stringify({ status }) });
+}
+function apiSetProfileBanner(titleId) {
+  return apiRequest('/profile/banner', { method: 'POST', body: JSON.stringify({ titleId }) });
+}
+function apiAddShowcaseTitle(titleId) {
+  return apiRequest('/profile/showcase/add', { method: 'POST', body: JSON.stringify({ titleId }) });
+}
+function apiRemoveShowcaseTitle(titleId) {
+  return apiRequest('/profile/showcase/remove', { method: 'POST', body: JSON.stringify({ titleId }) });
+}
+function apiPostWall(targetUsername, text) {
+  return apiRequest('/profile/wall/post', { method: 'POST', body: JSON.stringify({ targetUsername, text }) });
+}
+function apiDeleteWallPost(targetUsername, postId, page) {
+  return apiRequest('/profile/wall/delete', { method: 'POST', body: JSON.stringify({ targetUsername, postId, page }) });
+}
+
 function apiStocks() {
   return apiRequest('/stocks');
 }

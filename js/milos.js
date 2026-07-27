@@ -31,9 +31,14 @@ function renderPlayerList() {
       ${badgeMarkup}
       <span class="player-name">${styledName}</span>
       <div class="player-hover-card">
-        <p><b>${styledName}</b></p>
-        <p>Height: ${formatHeight(character.height)}</p>
-        <p>Weight: ${round1(150 + character.fatGained + character.muscleGained)} lbs</p>
+        ${profileBannerDivHtml(profileBannerTitle(character), 'player-hover-banner')}
+        <div class="player-hover-info">
+          <b>${styledName}</b>
+          <span class="badge">${allianceLabel(character.alliance)}</span>
+        </div>
+        <div class="player-hover-actions">
+          <button class="secondary-btn" data-hover-profile="${getMyUsername()}">👤 My Profile</button>
+        </div>
       </div>
     </li>
   `;
@@ -46,9 +51,18 @@ function renderPlayerList() {
       ${displayBadgeMarkupFor(p.character)}
       <span class="player-name">${otherStyledName}</span>
       <div class="player-hover-card">
-        <p><b>${otherStyledName}</b></p>
-        <p>Height: ${formatHeight(p.character.height)}</p>
-        <p>Weight: ${round1(150 + p.character.fatGained + p.character.muscleGained)} lbs</p>
+        ${profileBannerDivHtml(profileBannerTitle(p.character), 'player-hover-banner')}
+        <div class="player-hover-info">
+          <b>${otherStyledName}</b>
+          <span class="badge">${allianceLabel(p.character.alliance)}</span>
+        </div>
+        <div class="player-hover-actions">
+          <button class="secondary-btn" data-hover-profile="${p.username}">👤 Profile</button>
+          <button data-hover-pay="${p.username}">💵 Pay</button>
+          <button data-hover-rob="${p.username}">🥷 Rob</button>
+          <button data-hover-slime="${p.username}">🔫 Slime</button>
+          <button data-hover-fight="${p.username}">⚔️ Fight</button>
+        </div>
       </div>
     </li>
   `;
@@ -58,6 +72,24 @@ function renderPlayerList() {
 
   playerListEl.querySelectorAll('.player-row[data-username]').forEach((row) => {
     row.addEventListener('click', () => openPlayerActionModal(row.dataset.username));
+  });
+
+  // Hover-card buttons live inside a .player-row, so every click needs stopPropagation() or it'd
+  // also trigger the row's own click handler above (which opens the full action modal).
+  playerListEl.querySelectorAll('button[data-hover-profile]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); viewProfile(btn.dataset.hoverProfile); });
+  });
+  playerListEl.querySelectorAll('button[data-hover-pay]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openPlayerActionModal(btn.dataset.hoverPay); });
+  });
+  playerListEl.querySelectorAll('button[data-hover-rob]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openPlayerActionModal(btn.dataset.hoverRob); });
+  });
+  playerListEl.querySelectorAll('button[data-hover-slime]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openPlayerActionModal(btn.dataset.hoverSlime); });
+  });
+  playerListEl.querySelectorAll('button[data-hover-fight]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openPlayerActionModal(btn.dataset.hoverFight); });
   });
 }
 

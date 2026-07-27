@@ -840,8 +840,8 @@ function looksTier(v) {
   return 'Subhuman';
 }
 
-function computeLevel() {
-  const s = character.stats;
+function computeLevel(char = character) {
+  const s = char.stats;
   const avg = (s.health + s.attack + s.speed + s.defense + s.looks) / 5;
   return Math.max(1, Math.floor(avg / 10));
 }
@@ -947,6 +947,7 @@ const characterSidePanel = document.getElementById('characterSidePanel');
 const pageWiki = document.getElementById('page-wiki');
 const pageUpdates = document.getElementById('page-updates');
 const pageReport = document.getElementById('page-report');
+const pageProfile = document.getElementById('page-profile');
 
 const activityLog = document.getElementById('activityLog');
 
@@ -1081,6 +1082,16 @@ function switchPage(pageName) {
   pageWiki.classList.toggle('hidden', pageName !== 'wiki');
   pageUpdates.classList.toggle('hidden', pageName !== 'updates');
   pageReport.classList.toggle('hidden', pageName !== 'report');
+  pageProfile.classList.toggle('hidden', pageName !== 'profile');
+
+  // profileNavTargetUsername lets viewProfile(username) (js/profile.js) jump straight to someone
+  // else's profile through this same switchPage() call, instead of always loading your own and
+  // then immediately re-fetching -- set right before calling switchPage('profile'), consumed here.
+  if (pageName === 'profile' && typeof loadProfile === 'function') {
+    const target = profileNavTargetUsername || (typeof getMyUsername === 'function' ? getMyUsername() : null);
+    profileNavTargetUsername = null;
+    if (target) loadProfile(target);
+  }
 
   // Always visible except on Milos, which already uses that column for Players Online -- showing
   // both there would cram three columns into the same row.
