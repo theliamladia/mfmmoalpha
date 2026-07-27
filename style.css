@@ -846,6 +846,92 @@ button:disabled {
   text-shadow: 0 0 6px #fff, 0 0 14px #fff;
 }
 
+/* --- RED vs. BLUE Crate --- */
+@keyframes redGlowPulse {
+  0% { box-shadow: 0 0 10px 2px #ff1a1a, 0 0 20px 4px #ff1a1a; }
+  100% { box-shadow: 0 0 20px 5px #ff1a1a, 0 0 38px 10px #ff1a1a; }
+}
+@keyframes blueGlowPulse {
+  0% { box-shadow: 0 0 10px 2px #1a5aff, 0 0 20px 4px #1a5aff; }
+  100% { box-shadow: 0 0 20px 5px #1a5aff, 0 0 38px 10px #1a5aff; }
+}
+
+/* Presidential Rares (mythic, 0.5%) -- pulsing animated glow, the flashiest tier in either crate. */
+.title-red-trumpfistup {
+  background-image: url('https://lh3.googleusercontent.com/d/1f-PUjlZiYy5GiuKInqkBB1YG9IfiHrxr');
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #ff1a1a;
+  animation: redGlowPulse 1.3s ease-in-out infinite alternate;
+}
+.title-blue-darkbrandon {
+  background-image: url('https://lh3.googleusercontent.com/d/1aMoIsaz8akxmYnynKjF8JdHOJnEm61L4');
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #1a5aff;
+  animation: blueGlowPulse 1.3s ease-in-out infinite alternate;
+}
+
+/* Rare tier -- static colored glow (box-shadow halo, no animation). */
+.title-red-trump,
+.title-red-bush,
+.title-red-regan {
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #d0021b;
+  box-shadow: 0 0 16px 2px #d0021b;
+}
+.title-red-trump { background-image: url('https://lh3.googleusercontent.com/d/1Ab7bNNDOQ9qfx43h0r87vg7mNwA_sfxq'); }
+.title-red-bush { background-image: url('https://lh3.googleusercontent.com/d/1uwOw8WSE9hDskkyE4P4Y3x-GoQnuPe77'); }
+.title-red-regan { background-image: url('https://lh3.googleusercontent.com/d/1yHHs6rDoUpcvFtkf71wBhGwQ4Vwj-OEj'); }
+
+.title-blue-biden,
+.title-blue-obama,
+.title-blue-jfk {
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #1565c0;
+  box-shadow: 0 0 16px 2px #1565c0;
+}
+.title-blue-biden { background-image: url('https://lh3.googleusercontent.com/d/1qGhUwuoOMRLBvLCJ_3G9t_pwTL992vJZ'); }
+.title-blue-obama { background-image: url('https://lh3.googleusercontent.com/d/1p8Bfm5xe-MxIQs_u10HYEIJjNjWv_Zk0'); }
+.title-blue-jfk { background-image: url('https://lh3.googleusercontent.com/d/12DvhTmgNRwYyKc-ZwpJ8QJW36hrzu94S'); }
+
+/* Uncommon + Common -- plain solid colored border, no glow. */
+.title-red-nixon,
+.title-red-mcconel,
+.title-red-desantis,
+.title-red-mtg,
+.title-red-loomer,
+.title-red-cruz {
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #d0021b;
+}
+.title-red-nixon { background-image: url('https://lh3.googleusercontent.com/d/15HezmVcD_yK9yWopuAeH5ZROgqwgkNod'); }
+.title-red-mcconel { background-image: url('https://lh3.googleusercontent.com/d/1EiUNNxQlqAUTDnAe7JxtAZzUFXQiT4qC'); }
+.title-red-desantis { background-image: url('https://lh3.googleusercontent.com/d/1VDHDhq2YqgFMRbX0faVs_DcvaWAWEI-5'); }
+.title-red-mtg { background-image: url('https://lh3.googleusercontent.com/d/1fCZlYms8ZCJe_nB589SjG6sbm-Bke5ON'); }
+.title-red-loomer { background-image: url('https://lh3.googleusercontent.com/d/1jp_KPVtOZfJleI3B0_TKtgnsDM_KuW_Q'); }
+.title-red-cruz { background-image: url('https://lh3.googleusercontent.com/d/1psZWXyJp8hgEDmrNks9O2J5BWFOvk90w'); }
+
+.title-blue-harris,
+.title-blue-carter,
+.title-blue-clinton,
+.title-blue-newsome,
+.title-blue-bernie,
+.title-blue-aoc {
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #1565c0;
+}
+.title-blue-harris { background-image: url('https://lh3.googleusercontent.com/d/1slE2Q_rURS0ctSdmKbrQ7aIT9LALnfca'); }
+.title-blue-carter { background-image: url('https://lh3.googleusercontent.com/d/1lCXD69udBG646yGgaTW6j_fBfghlE1WU'); }
+.title-blue-clinton { background-image: url('https://lh3.googleusercontent.com/d/1b_u4pcFKxVOds2iJJ_2AuMryngB8r2Wa'); }
+.title-blue-newsome { background-image: url('https://lh3.googleusercontent.com/d/1H3AhRKRhpfEfAeDa_s7SZj0AAD7uPhrr'); }
+.title-blue-bernie { background-image: url('https://lh3.googleusercontent.com/d/1zt3qASgcO_WJIOH2dOIw9xwmZS-sjzOL'); }
+.title-blue-aoc { background-image: url('https://lh3.googleusercontent.com/d/1Ap9aKHbwRvMKh1Vt2JJGIBSF4oKmap0v'); }
+
 /* --- Equipped name-recolor perk (Hyper Gems / Anima Hyper Rares) -- see js/nameStyle.js --- */
 .name-style-hyper-sapphire,
 .name-style-hyper-ruby,
@@ -877,6 +963,20 @@ button:disabled {
 .player-name .name-style-hyper-ruby,
 .player-name .name-style-hyper-emerald,
 .player-name .name-style-hyper-rainbow {
+  font-size: 19px;
+}
+
+/* Presidential Rares (RED vs. BLUE Crate) -- Xanh Mono font with a colored glow. */
+.name-style-republican-glow,
+.name-style-democrat-glow {
+  font-family: 'Xanh Mono', monospace;
+  font-weight: 700;
+}
+.name-style-republican-glow { color: #ff3b3b; text-shadow: 0 0 6px #ff1a1a, 0 0 14px #ff1a1a, 0 0 24px #ff0000; }
+.name-style-democrat-glow { color: #3b82ff; text-shadow: 0 0 6px #1a5aff, 0 0 14px #1a5aff, 0 0 24px #0044ff; }
+
+.player-name .name-style-republican-glow,
+.player-name .name-style-democrat-glow {
   font-size: 19px;
 }
 
@@ -918,6 +1018,78 @@ button:disabled {
 .crate-qty-input {
   width: 52px;
   text-align: center;
+}
+
+/* PLEDGE YOUR ALLEGIANCE (RED vs. BLUE Crate) -- featured banner, sits above every other crate. */
+.feature-banner.pledge-banner {
+  flex-wrap: wrap;
+  background: linear-gradient(rgba(5, 8, 26, 0.55), rgba(5, 8, 26, 0.55)),
+    url('https://img.magnific.com/free-vector/flag-america-blue-background-with-lights-glow_1017-38616.jpg?semt=ais_hybrid&w=740&q=80');
+  background-size: cover;
+  background-position: center;
+  border-color: #7a8aa8;
+}
+
+.pledge-banner .feature-banner-text {
+  flex: 1 1 100%;
+}
+
+.pledge-banner .feature-banner-text h3 {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pledge-limited-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ffcc00;
+  color: #1c1c1c;
+  text-shadow: none;
+  animation: pledgeLimitedPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes pledgeLimitedPulse {
+  0% { box-shadow: 0 0 2px 0 #ffcc00; }
+  100% { box-shadow: 0 0 10px 3px #ffcc00; }
+}
+
+.pledge-stock-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e7ecff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.pledge-banner .feature-banner-text p {
+  color: #e7ecff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+}
+
+.pledge-banner-row {
+  flex: 1 1 100%;
+  justify-content: flex-end;
+}
+
+.pledge-btn-red {
+  background: #b0121a;
+  border-color: #ff3b3b;
+}
+.pledge-btn-red:hover {
+  background: #d31a22;
+}
+
+.pledge-btn-blue {
+  background: #0a3d91;
+  border-color: #3b8bff;
+}
+.pledge-btn-blue:hover {
+  background: #0f4bb0;
 }
 
 @keyframes rgbBlueBannerShift {

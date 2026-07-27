@@ -366,6 +366,37 @@ const ANIMA_CRATE_TITLES = [
   { id: 'animaHyperMakima', name: 'Makima', hideNameOnBadge: true, cssClass: 'title-anima-hyper-makima', weight: 0.05, rarity: 'mythic', how: 'Won from an Anima Crate spin (Anima Mega Hyper Rare!). Recolors your name everywhere with a rainbow gradient while equipped.' },
 ];
 
+// RED vs. BLUE Crate: same mystery-pull convention as Anima (real name, hideNameOnBadge: true) --
+// two fully independent pools/catalogs, one per crate. Presidential Rares are each side's mythic
+// top prize and additionally recolor the player's name/font while equipped -- see js/nameStyle.js.
+const RED_CRATE_COST = 20000;
+const RED_CRATE_TITLES = [
+  { id: 'redTrumpFistUp', name: 'Donald Trump Fist Up', hideNameOnBadge: true, cssClass: 'title-red-trumpfistup', weight: 0.5, rarity: 'mythic', how: 'Won from a RED Crate spin (Presidential Rare!). Recolors your name everywhere in a glowing Republican Red Xanh Mono font while equipped.' },
+  { id: 'redTrump', name: 'Trump', hideNameOnBadge: true, cssClass: 'title-red-trump', weight: 1.67, rarity: 'rare', how: 'Won from a RED Crate spin (rare).' },
+  { id: 'redBush', name: 'Bush', hideNameOnBadge: true, cssClass: 'title-red-bush', weight: 1.67, rarity: 'rare', how: 'Won from a RED Crate spin (rare).' },
+  { id: 'redRegan', name: 'Regan', hideNameOnBadge: true, cssClass: 'title-red-regan', weight: 1.66, rarity: 'rare', how: 'Won from a RED Crate spin (rare).' },
+  { id: 'redNixon', name: 'Nixon', hideNameOnBadge: true, cssClass: 'title-red-nixon', weight: 3.34, rarity: 'uncommon', how: 'Won from a RED Crate spin (uncommon).' },
+  { id: 'redMcconel', name: 'Mcconel', hideNameOnBadge: true, cssClass: 'title-red-mcconel', weight: 3.33, rarity: 'uncommon', how: 'Won from a RED Crate spin (uncommon).' },
+  { id: 'redDesantis', name: 'Desantis', hideNameOnBadge: true, cssClass: 'title-red-desantis', weight: 3.33, rarity: 'uncommon', how: 'Won from a RED Crate spin (uncommon).' },
+  { id: 'redMtg', name: 'Marjorie Taylor Greene', hideNameOnBadge: true, cssClass: 'title-red-mtg', weight: 28.34, rarity: 'common', how: 'Won from a RED Crate spin (common).' },
+  { id: 'redLoomer', name: 'Laura Loomer', hideNameOnBadge: true, cssClass: 'title-red-loomer', weight: 28.33, rarity: 'common', how: 'Won from a RED Crate spin (common).' },
+  { id: 'redCruz', name: 'Ted Cruz', hideNameOnBadge: true, cssClass: 'title-red-cruz', weight: 28.33, rarity: 'common', how: 'Won from a RED Crate spin (common).' },
+];
+
+const BLUE_CRATE_COST = 20000;
+const BLUE_CRATE_TITLES = [
+  { id: 'blueDarkBrandon', name: 'Dark Brandon', hideNameOnBadge: true, cssClass: 'title-blue-darkbrandon', weight: 0.5, rarity: 'mythic', how: 'Won from a BLUE Crate spin (Presidential Rare!). Recolors your name everywhere in a glowing Democrat Blue Xanh Mono font while equipped.' },
+  { id: 'blueBiden', name: 'Joe Biden', hideNameOnBadge: true, cssClass: 'title-blue-biden', weight: 1.5, rarity: 'rare', how: 'Won from a BLUE Crate spin (rare).' },
+  { id: 'blueObama', name: 'Obama', hideNameOnBadge: true, cssClass: 'title-blue-obama', weight: 1.5, rarity: 'rare', how: 'Won from a BLUE Crate spin (rare).' },
+  { id: 'blueJfk', name: 'JFK', hideNameOnBadge: true, cssClass: 'title-blue-jfk', weight: 1.5, rarity: 'rare', how: 'Won from a BLUE Crate spin (rare).' },
+  { id: 'blueHarris', name: 'Harris', hideNameOnBadge: true, cssClass: 'title-blue-harris', weight: 3.34, rarity: 'uncommon', how: 'Won from a BLUE Crate spin (uncommon).' },
+  { id: 'blueCarter', name: 'Jimmy Carter', hideNameOnBadge: true, cssClass: 'title-blue-carter', weight: 3.33, rarity: 'uncommon', how: 'Won from a BLUE Crate spin (uncommon).' },
+  { id: 'blueClinton', name: 'Clinton', hideNameOnBadge: true, cssClass: 'title-blue-clinton', weight: 3.33, rarity: 'uncommon', how: 'Won from a BLUE Crate spin (uncommon).' },
+  { id: 'blueNewsome', name: 'Gavin Newsome', hideNameOnBadge: true, cssClass: 'title-blue-newsome', weight: 28.34, rarity: 'common', how: 'Won from a BLUE Crate spin (common).' },
+  { id: 'blueBernie', name: 'Bernie', hideNameOnBadge: true, cssClass: 'title-blue-bernie', weight: 28.33, rarity: 'common', how: 'Won from a BLUE Crate spin (common).' },
+  { id: 'blueAoc', name: 'AOC', hideNameOnBadge: true, cssClass: 'title-blue-aoc', weight: 28.33, rarity: 'common', how: 'Won from a BLUE Crate spin (common).' },
+];
+
 // Counterfinish Crate: skins/finishes, not characters -- item label text is always visible.
 const COUNTERFINISH_CRATE_COST = 3000;
 const COUNTERFINISH_CRATE_TITLES = [

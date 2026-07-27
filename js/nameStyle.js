@@ -9,6 +9,8 @@ const NAME_STYLE_CLASS_BY_TITLE_ID = {
   cfHyperEmerald: 'name-style-hyper-emerald',
   animaHyperGear5: 'name-style-hyper-rainbow',
   animaHyperMakima: 'name-style-hyper-rainbow',
+  redTrumpFistUp: 'name-style-republican-glow',
+  blueDarkBrandon: 'name-style-democrat-glow',
 };
 
 function nameStyleClassForTitleId(titleId) {

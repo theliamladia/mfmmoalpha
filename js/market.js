@@ -312,6 +312,7 @@ function allTitleDefsFor(char) {
     PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE, FAT_FUCK_TITLE, LOOSE_TITLE,
     LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE, HEIGHTMAXXED_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
+    ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];
 }
@@ -323,6 +324,7 @@ function allTitleDefs() {
 // Titles tracked as inventory stacks: tradeable, "owned" only while at least one copy remains.
 const CRATE_TITLE_IDS = new Set([
   ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
+  ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES,
 ].map((t) => t.id));
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
 CRATE_TITLE_IDS.add(ADMIN_TITLE.id);
@@ -343,6 +345,8 @@ const TITLE_CRATE_GROUPS = [
   { label: '🏆 GOOD® Season 1', ids: new Set(GOOD_SEASON1_TITLES.map((t) => t.id)) },
   { label: '🎮 ANIMA CRATE', ids: new Set(ANIMA_CRATE_TITLES.map((t) => t.id)) },
   { label: '🎨 COUNTERFINISH CRATE', ids: new Set(COUNTERFINISH_CRATE_TITLES.map((t) => t.id)) },
+  { label: '🔴 RED CRATE', ids: new Set(RED_CRATE_TITLES.map((t) => t.id)) },
+  { label: '🔵 BLUE CRATE', ids: new Set(BLUE_CRATE_TITLES.map((t) => t.id)) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';
 
@@ -483,6 +487,12 @@ const CRATE_OPEN_BETA = { name: 'OPEN BETA CRATE', icon: '\u{1F4E6}', cost: BETA
 const CRATE_GOOD_SEASON1 = { name: 'GOOD® Season 1', icon: '\u{1F3C6}', cost: GOOD_SEASON1_COST, titles: GOOD_SEASON1_TITLES };
 const CRATE_ANIMA = { name: 'ANIMA CRATE', icon: '\u{1F3AE}', cost: ANIMA_CRATE_COST, titles: ANIMA_CRATE_TITLES };
 const CRATE_COUNTERFINISH = { name: 'COUNTERFINISH CRATE', icon: '\u{1F3A8}', cost: COUNTERFINISH_CRATE_COST, titles: COUNTERFINISH_CRATE_TITLES };
+// limited: true routes these two through the server (see apiSpinRedBlueCrate) instead of the local
+// doStartCrateSpin -- cash is deducted server-side and the 1,000-per-crate global stock is reserved
+// atomically there too, since that cap is shared across every player, not just this character.
+const CRATE_STOCK_MAX = 1000;
+const CRATE_RED = { name: 'RED CRATE', icon: '\u{1F534}', cost: RED_CRATE_COST, titles: RED_CRATE_TITLES, limited: true, key: 'red' };
+const CRATE_BLUE = { name: 'BLUE CRATE', icon: '\u{1F535}', cost: BLUE_CRATE_COST, titles: BLUE_CRATE_TITLES, limited: true, key: 'blue' };
 
 // OPEN BETA and GOOD® Season 1 are archived -- view-only odds, no spin button/message element.
 const betaSpinMessage = document.getElementById('betaSpinMessage');
@@ -498,6 +508,44 @@ const btnCounterfinishSpin = document.getElementById('btnCounterfinishSpin');
 const counterfinishSpinMessage = document.getElementById('counterfinishSpinMessage');
 const btnViewCounterfinishCrate = document.getElementById('btnViewCounterfinishCrate');
 const counterfinishSpinQtyInput = document.getElementById('counterfinishSpinQty');
+
+const btnRedSpin = document.getElementById('btnRedSpin');
+const redSpinMessage = document.getElementById('redSpinMessage');
+const btnViewRedCrate = document.getElementById('btnViewRedCrate');
+const redSpinQtyInput = document.getElementById('redSpinQty');
+const redCrateStockLabel = document.getElementById('redCrateStockLabel');
+
+const btnBlueSpin = document.getElementById('btnBlueSpin');
+const blueSpinMessage = document.getElementById('blueSpinMessage');
+const btnViewBlueCrate = document.getElementById('btnViewBlueCrate');
+const blueSpinQtyInput = document.getElementById('blueSpinQty');
+const blueCrateStockLabel = document.getElementById('blueCrateStockLabel');
+
+const CRATE_STOCK_LABEL_BY_KEY = { red: redCrateStockLabel, blue: blueCrateStockLabel };
+const CRATE_SPIN_BUTTON_BY_KEY = { red: btnRedSpin, blue: btnBlueSpin };
+const CRATE_BASE_LABEL_BY_KEY = { red: 'OPEN RED', blue: 'OPEN BLUE' };
+
+// Reflects a just-fetched/just-spent remaining count in the banner, and locks the button once a
+// side sells out -- qty is left alone so it doesn't fight the player mid-edit.
+function renderCrateStock(crateKey, remaining) {
+  const label = CRATE_STOCK_LABEL_BY_KEY[crateKey];
+  const button = CRATE_SPIN_BUTTON_BY_KEY[crateKey];
+  if (label) label.textContent = `${remaining.toLocaleString()} / ${CRATE_STOCK_MAX.toLocaleString()} left`;
+  if (button && remaining <= 0) {
+    button.disabled = true;
+    button.textContent = 'SOLD OUT';
+  }
+}
+
+apiGetCrateStock()
+  .then((stock) => {
+    renderCrateStock('red', stock.red);
+    renderCrateStock('blue', stock.blue);
+  })
+  .catch(() => {
+    // Best-effort -- the labels just stay blank if this fails, spin still works and reports the
+    // real remaining count from its own response.
+  });
 
 const CRATE_SPIN_MAX_QTY = 10;
 // Up to this many rolls still play the reel animation once per roll, in sequence. Past it, the
@@ -572,6 +620,8 @@ btnViewCrate.addEventListener('click', () => showCrateOdds(CRATE_OPEN_BETA));
 btnViewGoodSeasonCrate.addEventListener('click', () => showCrateOdds(CRATE_GOOD_SEASON1));
 btnViewAnimaCrate.addEventListener('click', () => showCrateOdds(CRATE_ANIMA));
 btnViewCounterfinishCrate.addEventListener('click', () => showCrateOdds(CRATE_COUNTERFINISH));
+btnViewRedCrate.addEventListener('click', () => showCrateOdds(CRATE_RED));
+btnViewBlueCrate.addEventListener('click', () => showCrateOdds(CRATE_BLUE));
 
 btnCrateOddsClose.addEventListener('click', () => {
   crateOddsModal.classList.add('hidden');
@@ -703,6 +753,28 @@ function doStartCrateSpin(crate, qty) {
   return { ok: true, results };
 }
 
+// RED/BLUE go through the server first -- it's the sole authority on both the cash deduction and
+// the 1,000-per-crate global stock, since that stock is shared across every player. The actual
+// title draw still happens locally afterward (weightedTitleFrom), same as every other crate, once
+// the server confirms the spend went through.
+async function startLimitedCrateSpin(crate, qty) {
+  let apiResult;
+  try {
+    apiResult = await apiSpinRedBlueCrate(crate.key, qty);
+  } catch (err) {
+    return { ok: false, reason: (err && err.reason) || 'Spin failed. Try again.' };
+  }
+  character = apiResult.character;
+  renderCrateStock(crate.key, apiResult.remaining);
+  const results = [];
+  for (let i = 0; i < qty; i++) results.push(weightedTitleFrom(crate.titles));
+  return { ok: true, results };
+}
+
+function startCrateSpin(crate, qty) {
+  return crate.limited ? startLimitedCrateSpin(crate, qty) : Promise.resolve(doStartCrateSpin(crate, qty));
+}
+
 // Grants sequentially (not in parallel) so if the same title comes up twice in one multi-open,
 // the second copy correctly reports alreadyOwned -- true after the first grant already added it.
 function doGrantCrateWins(titleIds) {
@@ -737,7 +809,7 @@ async function announceCrateWin(crate, title) {
   }
 }
 
-function spinCrate(crate, buttons, messageEl, opts = {}) {
+async function spinCrate(crate, buttons, messageEl, opts = {}) {
   const { skipConfirm = false, qty: qtyOverride } = opts;
   const qty = qtyOverride || getCrateQty(crate);
   const totalCost = crate.cost * qty;
@@ -755,12 +827,19 @@ function spinCrate(crate, buttons, messageEl, opts = {}) {
   }
 
   lastSpunCrateContext = { crate, buttons, messageEl, qty };
-  const start = doStartCrateSpin(crate, qty);
-  if (!start.ok) { alert(start.reason); return; }
+  buttons.forEach((b) => { b.disabled = true; });
+  messageEl.textContent = crate.limited ? 'Reserving your crate...' : 'Opening crate...';
+
+  const start = await startCrateSpin(crate, qty);
+  if (!start.ok) {
+    alert(start.reason);
+    messageEl.textContent = '';
+    buttons.forEach((b) => { b.disabled = false; });
+    return;
+  }
   save();
   renderAll();
 
-  buttons.forEach((b) => { b.disabled = true; });
   messageEl.textContent = 'Opening crate...';
 
   const finishMultiOpen = () => {
@@ -820,7 +899,11 @@ function spinCrate(crate, buttons, messageEl, opts = {}) {
 
 registerCrateQtyInput(CRATE_ANIMA, animaSpinQtyInput, btnAnimaSpin);
 registerCrateQtyInput(CRATE_COUNTERFINISH, counterfinishSpinQtyInput, btnCounterfinishSpin);
+registerCrateQtyInput(CRATE_RED, redSpinQtyInput, btnRedSpin);
+registerCrateQtyInput(CRATE_BLUE, blueSpinQtyInput, btnBlueSpin);
 
 btnAnimaSpin.addEventListener('click', () => spinCrate(CRATE_ANIMA, [btnAnimaSpin, btnViewAnimaCrate], animaSpinMessage));
 btnCounterfinishSpin.addEventListener('click', () => spinCrate(CRATE_COUNTERFINISH, [btnCounterfinishSpin, btnViewCounterfinishCrate], counterfinishSpinMessage));
+btnRedSpin.addEventListener('click', () => spinCrate(CRATE_RED, [btnRedSpin, btnViewRedCrate], redSpinMessage));
+btnBlueSpin.addEventListener('click', () => spinCrate(CRATE_BLUE, [btnBlueSpin, btnViewBlueCrate], blueSpinMessage));
 

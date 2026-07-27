@@ -6,7 +6,7 @@
 <title>SpecialUNITS GUI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&family=Xanh+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -235,6 +235,27 @@
 
         <div id="shop-titles" class="shop hidden">
           <div id="titleLog" class="log log-single-line"></div>
+          <div class="feature-banner pledge-banner">
+            <div class="feature-banner-text">
+              <h3>&#127945; PLEDGE YOUR ALLEGIANCE <span class="pledge-limited-tag">LIMITED</span></h3>
+              <p>Two sides. Two crates. Only 1,000 of each will ever be opened. Chase the Presidential Rare for an exclusive name style change.</p>
+            </div>
+            <div class="feature-banner-actions pledge-banner-row">
+              <button id="btnViewRedCrate" class="secondary-btn">View RED Crate</button>
+              <span id="redCrateStockLabel" class="pledge-stock-label"></span>
+              <input type="number" id="redSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
+              <button id="btnRedSpin" class="pledge-btn-red">OPEN RED ($20,000)</button>
+            </div>
+            <div class="feature-banner-actions pledge-banner-row">
+              <button id="btnViewBlueCrate" class="secondary-btn">View BLUE Crate</button>
+              <span id="blueCrateStockLabel" class="pledge-stock-label"></span>
+              <input type="number" id="blueSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
+              <button id="btnBlueSpin" class="pledge-btn-blue">OPEN BLUE ($20,000)</button>
+            </div>
+          </div>
+          <p id="redSpinMessage"></p>
+          <p id="blueSpinMessage"></p>
+
           <div class="feature-banner anima-banner">
             <div class="feature-banner-text">
               <h3>&#127918; ANIMA CRATE</h3>
@@ -970,6 +991,15 @@
       <div id="page-updates" class="page hidden">
         <h2>📰 Updates</h2>
         <p>What's changed, most recent first.</p>
+
+        <div class="update-entry">
+          <div class="update-entry-header"><h3>🇺🇸 PLEDGE YOUR ALLEGIANCE: RED vs. BLUE Crate</h3><span class="update-date">2026-07-27</span></div>
+          <ul>
+            <li>A new featured banner in Cosmetixxx with two fully independent crate pools &mdash; <b>OPEN RED</b> and <b>OPEN BLUE</b> ($20,000/spin each, multi-open supported) &mdash; sitting above every other crate.</li>
+            <li>Blank-badge mystery pulls, same convention as the Anima Crate. Land either side's 0.5% <b>Presidential Rare</b> (Donald Trump Fist Up / Dark Brandon) and your name recolors everywhere in a glowing Xanh Mono font.</li>
+            <li><b>LIMITED:</b> only 1,000 of each crate will ever be opened, server-wide &mdash; a live counter in the banner tracks what's left. <a class="update-learn-more" href="https://mfmmo.com/update3" target="_blank" rel="noopener">Learn More &rarr;</a></li>
+          </ul>
+        </div>
 
         <div class="update-entry">
           <div class="update-entry-header"><h3>👤 Player Profiles</h3><span class="update-date">2026-07-27</span></div>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RED vs. BLUE Crate Teaser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Xanh+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0e12;
+    --panel: #16171d;
+    --text: #e8e8ee;
+    --muted: #8a8c96;
+    --red: #d0021b;
+    --red-glow: #ff1a1a;
+    --blue: #1565c0;
+    --blue-glow: #1a5aff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 24px 100px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-wrap {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-title {
+    text-align: center;
+    font-size: 28px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .limited-alert {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 50px;
+    background: linear-gradient(90deg, #5a0d14, #16171d, #0c1f4a);
+    border: 1px solid #7a8aa8;
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+  }
+  .limited-alert .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #ffcc00;
+    color: #1c1c1c;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .crate-intro {
+    text-align: center;
+    margin: 0 auto 40px;
+    max-width: 720px;
+  }
+  .crate-intro h1 {
+    font-size: 34px;
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+  }
+  .crate-intro .price {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2ecc71;
+    background: #0f2018;
+    border: 1px solid #1d4a30;
+    border-radius: 999px;
+    padding: 6px 18px;
+    margin-bottom: 16px;
+  }
+  .crate-intro p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .crate-block {
+    width: 100%;
+    margin-bottom: 90px;
+  }
+
+  .rarity-section {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+  .rarity-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .rarity-title h2 {
+    font-size: 18px;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .rarity-title .pct {
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 3px 12px;
+  }
+  .rarity-title .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+    justify-content: center;
+    gap: 18px;
+  }
+
+  .crate-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    padding: 4px;
+    background: var(--panel);
+  }
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 9px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #000;
+  }
+
+  /* Blank badge convention (hideNameOnBadge) -- art only, real name shown as a caption below. */
+  .name-caption {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+  }
+
+  @keyframes redGlowPulse {
+    0% { box-shadow: 0 0 10px 2px var(--red-glow), 0 0 20px 4px var(--red-glow); }
+    100% { box-shadow: 0 0 20px 5px var(--red-glow), 0 0 38px 10px var(--red-glow); }
+  }
+  @keyframes blueGlowPulse {
+    0% { box-shadow: 0 0 10px 2px var(--blue-glow), 0 0 20px 4px var(--blue-glow); }
+    100% { box-shadow: 0 0 20px 5px var(--blue-glow), 0 0 38px 10px var(--blue-glow); }
+  }
+
+  .border-presidential-red { border: 3px solid var(--red-glow); animation: redGlowPulse 1.3s ease-in-out infinite alternate; }
+  .border-presidential-blue { border: 3px solid var(--blue-glow); animation: blueGlowPulse 1.3s ease-in-out infinite alternate; }
+  .border-glow-red { border: 2px solid var(--red); box-shadow: 0 0 16px 2px var(--red); }
+  .border-glow-blue { border: 2px solid var(--blue); box-shadow: 0 0 16px 2px var(--blue); }
+  .border-flat-red { border: 3px solid var(--red); }
+  .border-flat-blue { border: 3px solid var(--blue); }
+
+  .name-style-demo {
+    max-width: 320px;
+    margin: 0 auto;
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .name-style-demo .demo-label {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .name-style-republican-glow,
+  .name-style-democrat-glow {
+    font-family: 'Xanh Mono', monospace;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  .name-style-republican-glow { color: #ff3b3b; text-shadow: 0 0 6px #ff1a1a, 0 0 14px #ff1a1a, 0 0 24px #ff0000; }
+  .name-style-democrat-glow { color: #3b82ff; text-shadow: 0 0 6px #1a5aff, 0 0 14px #1a5aff, 0 0 24px #0044ff; }
+
+  .legend {
+    max-width: 720px;
+    margin: 0 auto 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <h1 class="page-title">🇺🇸 Pledge Your Allegiance &mdash; RED vs. BLUE Crate</h1>
+
+  <div class="limited-alert"><span class="tag">LIMITED</span>Only 1,000 of each crate will EVER be opened. Once they're gone, they're gone for good.</div>
+
+  <p class="legend">Two sides, two fully independent crate pools. Every pull is a blank, art-only badge just like the Anima Crate &mdash; the real name never shows on the chip itself, only in your Inventory, Showcase, and tooltips. Land the 0.5% Presidential Rare and your actual display name recolors everywhere, in a glowing Xanh Mono font.</p>
+
+  <!-- ================= RED CRATE ================= -->
+  <div class="crate-block">
+    <div class="crate-intro">
+      <h1 style="color:#ff5c5c;">🔴 RED Crate</h1>
+      <span class="price">$20,000 / spin</span>
+      <p>Chase the GOP's finest. Presidential Rares and Rares get a glowing Republican Red border; Uncommons and Commons keep the color without the glow.</p>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:conic-gradient(from 0deg, #ff1a1a, #ff8080, #ff1a1a);"></span>
+        <h2>Presidential Rare</h2>
+        <span class="pct">0.5%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-presidential-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1f-PUjlZiYy5GiuKInqkBB1YG9IfiHrxr');"></div>
+          </div>
+          <span class="name-caption">Donald Trump Fist Up</span>
+        </div>
+      </div>
+      <div class="name-style-demo" style="margin-top:20px;">
+        <div class="demo-label">Bonus: Equipped Name Style</div>
+        <span class="name-style-republican-glow">Krog Ershh</span>
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:var(--red);"></span>
+        <h2>Rare</h2>
+        <span class="pct">5%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-glow-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1Ab7bNNDOQ9qfx43h0r87vg7mNwA_sfxq');"></div>
+          </div>
+          <span class="name-caption">Trump</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-glow-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1uwOw8WSE9hDskkyE4P4Y3x-GoQnuPe77');"></div>
+          </div>
+          <span class="name-caption">Bush</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-glow-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1yHHs6rDoUpcvFtkf71wBhGwQ4Vwj-OEj');"></div>
+          </div>
+          <span class="name-caption">Regan</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:var(--red);"></span>
+        <h2>Uncommon</h2>
+        <span class="pct">10%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-flat-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/15HezmVcD_yK9yWopuAeH5ZROgqwgkNod');"></div>
+          </div>
+          <span class="name-caption">Nixon</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1EiUNNxQlqAUTDnAe7JxtAZzUFXQiT4qC');"></div>
+          </div>
+          <span class="name-caption">Mcconel</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1VDHDhq2YqgFMRbX0faVs_DcvaWAWEI-5');"></div>
+          </div>
+          <span class="name-caption">Desantis</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:var(--red);"></span>
+        <h2>Common</h2>
+        <span class="pct">85%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-flat-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1fCZlYms8ZCJe_nB589SjG6sbm-Bke5ON');"></div>
+          </div>
+          <span class="name-caption">Marjorie Taylor Greene</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1jp_KPVtOZfJleI3B0_TKtgnsDM_KuW_Q');"></div>
+          </div>
+          <span class="name-caption">Laura Loomer</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-red">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1psZWXyJp8hgEDmrNks9O2J5BWFOvk90w');"></div>
+          </div>
+          <span class="name-caption">Ted Cruz</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= BLUE CRATE ================= -->
+  <div class="crate-block">
+    <div class="crate-intro">
+      <h1 style="color:#5c9dff;">🔵 BLUE Crate</h1>
+      <span class="price">$20,000 / spin</span>
+      <p>Chase the Dems' finest. Presidential Rares and Rares get a glowing Democrat Blue border; Uncommons and Commons keep the color without the glow.</p>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:conic-gradient(from 0deg, #1a5aff, #80aaff, #1a5aff);"></span>
+        <h2>Presidential Rare</h2>
+        <span class="pct">0.5%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-presidential-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1aMoIsaz8akxmYnynKjF8JdHOJnEm61L4');"></div>
+          </div>
+          <span class="name-caption">Dark Brandon</span>
+        </div>
+      </div>
+      <div class="name-style-demo" style="margin-top:20px;">
+        <div class="demo-label">Bonus: Equipped Name Style</div>
+        <span class="name-style-democrat-glow">Krog Ershh</span>
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:var(--blue);"></span>
+        <h2>Rare</h2>
+        <span class="pct">4.5%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-glow-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1qGhUwuoOMRLBvLCJ_3G9t_pwTL992vJZ');"></div>
+          </div>
+          <span class="name-caption">Joe Biden</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-glow-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1p8Bfm5xe-MxIQs_u10HYEIJjNjWv_Zk0');"></div>
+          </div>
+          <span class="name-caption">Obama</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-glow-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/12DvhTmgNRwYyKc-ZwpJ8QJW36hrzu94S');"></div>
+          </div>
+          <span class="name-caption">JFK</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:var(--blue);"></span>
+        <h2>Uncommon</h2>
+        <span class="pct">10%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-flat-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1slE2Q_rURS0ctSdmKbrQ7aIT9LALnfca');"></div>
+          </div>
+          <span class="name-caption">Harris</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1lCXD69udBG646yGgaTW6j_fBfghlE1WU');"></div>
+          </div>
+          <span class="name-caption">Jimmy Carter</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1b_u4pcFKxVOds2iJJ_2AuMryngB8r2Wa');"></div>
+          </div>
+          <span class="name-caption">Clinton</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rarity-section">
+      <div class="rarity-title">
+        <span class="swatch" style="background:var(--blue);"></span>
+        <h2>Common</h2>
+        <span class="pct">85%</span>
+      </div>
+      <div class="card-grid">
+        <div class="crate-item">
+          <div class="card-frame border-flat-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1H3AhRKRhpfEfAeDa_s7SZj0AAD7uPhrr');"></div>
+          </div>
+          <span class="name-caption">Gavin Newsome</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1zt3qASgcO_WJIOH2dOIw9xwmZS-sjzOL');"></div>
+          </div>
+          <span class="name-caption">Bernie</span>
+        </div>
+        <div class="crate-item">
+          <div class="card-frame border-flat-blue">
+            <div class="card-inner" style="background-image:url('https://lh3.googleusercontent.com/d/1Ap9aKHbwRvMKh1Vt2JJGIBSF4oKmap0v');"></div>
+          </div>
+          <span class="name-caption">AOC</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="limited-alert"><span class="tag">LIMITED</span>Only 1,000 RED and 1,000 BLUE crates will ever be opened, server-wide. Check the live counter in Cosmetixxx before they're gone.</div>
+
+</div>
+
+</body>
+</html>

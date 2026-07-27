@@ -630,3 +630,10 @@ function apiAltcoinDump(altcoinId) {
 function apiAltcoinBuyout(altcoinId) {
   return apiRequest('/altcoins/buyout', { method: 'POST', body: JSON.stringify({ altcoinId }) });
 }
+
+function apiGetCrateStock() {
+  return apiRequest('/crates/redblue/stock');
+}
+function apiSpinRedBlueCrate(crateKey, qty) {
+  return apiRequest('/crates/redblue/spin', { method: 'POST', body: JSON.stringify({ crate: crateKey, qty }) });
+}
