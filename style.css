@@ -2569,6 +2569,21 @@ button:disabled {
   color: #6f7178;
 }
 
+.report-resolve-row {
+  margin-top: 4px;
+}
+
+.report-resolve-row .secondary-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.report-resolved-badge {
+  display: inline-block;
+  font-size: 12px;
+  color: #6fcf97;
+}
+
 .stock-transaction-pagination {
   display: flex;
   align-items: center;

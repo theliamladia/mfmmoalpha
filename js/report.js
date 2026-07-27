@@ -56,9 +56,18 @@ async function refreshReportLogs() {
           <span class="stock-tx-date">${new Date(r.createdAt).toLocaleString()}</span>
           <span><b>${escapeHtml(r.username)}</b> &mdash; ${REPORT_TYPE_LABELS[r.type] || r.type}</span>
           <span>${escapeHtml(r.message)}</span>
+          <div class="report-resolve-row">
+            ${r.resolved
+              ? `<span class="report-resolved-badge">✅ Resolved: ${escapeHtml(r.resolvedComment || '')}</span>`
+              : `<button class="secondary-btn" data-resolve-report="${r.id}">Resolved</button>`}
+          </div>
         </div>
       `).join('')
       : '<p class="equip-picker-empty">No reports yet.</p>';
+
+    reportLogsList.querySelectorAll('[data-resolve-report]').forEach((btn) => {
+      btn.addEventListener('click', () => openReportResolveModal(Number(btn.dataset.resolveReport)));
+    });
 
     reportLogsPageLabel.textContent = `Page ${reportLogsPage + 1} of ${totalPages}`;
     btnReportLogsPrev.disabled = reportLogsPage <= 0;
@@ -92,3 +101,45 @@ btnReportLogsNext.addEventListener('click', () => {
   reportLogsPage += 1;
   refreshReportLogs();
 });
+
+// ---------- Resolve-comment modal ----------
+// Marking a report resolved requires a comment, which the server also sends the reporting player
+// as a notification (see /reports/:id/resolve in mfmmoserver/server.js) -- so the admin always
+// leaves the reporter some kind of response, rather than reports silently disappearing.
+const reportResolveModal = document.getElementById('reportResolveModal');
+const reportResolveCommentInput = document.getElementById('reportResolveCommentInput');
+const btnReportResolveConfirm = document.getElementById('btnReportResolveConfirm');
+const btnReportResolveCancel = document.getElementById('btnReportResolveCancel');
+const reportResolveError = document.getElementById('reportResolveError');
+
+let reportResolveTargetId = null;
+
+function openReportResolveModal(reportId) {
+  reportResolveTargetId = reportId;
+  reportResolveCommentInput.value = '';
+  reportResolveError.textContent = '';
+  reportResolveModal.classList.remove('hidden');
+  reportResolveCommentInput.focus();
+}
+
+function closeReportResolveModal() {
+  reportResolveModal.classList.add('hidden');
+  reportResolveTargetId = null;
+}
+
+btnReportResolveConfirm.addEventListener('click', async () => {
+  const comment = reportResolveCommentInput.value.trim();
+  if (!comment) {
+    reportResolveError.textContent = 'Enter a comment for the reporter.';
+    return;
+  }
+  try {
+    await apiResolveReport(reportResolveTargetId, comment);
+    closeReportResolveModal();
+    refreshReportLogs();
+  } catch (err) {
+    reportResolveError.textContent = err.reason || 'Something went wrong.';
+  }
+});
+
+btnReportResolveCancel.addEventListener('click', closeReportResolveModal);

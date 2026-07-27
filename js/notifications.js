@@ -17,11 +17,17 @@ function renderNotifBadge(unseenCount) {
   notifBellBadge.classList.toggle('hidden', !(unseenCount > 0));
 }
 
+const REPORT_TYPE_NOTIF_LABELS = { bug: 'bug report', wipe: 'wipe report', suggestion: 'suggestion' };
+
 function notifItemText(n) {
   if (n.kind === 'mtnSale') {
     const item = getItemDef(n.itemId);
     const name = item ? itemLabel(item) : n.itemId;
     return `<b>${escapeHtml(n.buyerName)}</b> bought ${n.qty}x ${escapeHtml(name)} for $${n.total.toFixed(2)}`;
+  }
+  if (n.kind === 'reportResolved') {
+    const label = REPORT_TYPE_NOTIF_LABELS[n.reportType] || 'report';
+    return `✅ Your ${label} was marked resolved: <i>${escapeHtml(n.comment)}</i>`;
   }
   return `<b>${escapeHtml(n.payerName)}</b> paid you $${n.amount.toFixed(2)}`;
 }
@@ -39,11 +45,12 @@ function renderNotifList(notifications) {
   `).join('');
 }
 
-// Merges the two sources by recency -- callers just want one combined, time-sorted feed.
-function mergeNotifications(payments, mtnSales) {
+// Merges the three sources by recency -- callers just want one combined, time-sorted feed.
+function mergeNotifications(payments, mtnSales, reportsResolved) {
   const tagged = [
     ...payments.map((n) => ({ ...n, kind: 'payment' })),
     ...mtnSales.map((n) => ({ ...n, kind: 'mtnSale' })),
+    ...reportsResolved.map((n) => ({ ...n, kind: 'reportResolved' })),
   ];
   return tagged.sort((a, b) => b.createdAt - a.createdAt);
 }
@@ -51,9 +58,15 @@ function mergeNotifications(payments, mtnSales) {
 async function refreshNotifications() {
   if (!getAuthToken()) return;
   try {
-    const [paymentResult, mtnSaleResult] = await Promise.all([apiPaymentNotifications(), apiMtnSaleNotifications()]);
-    renderNotifBadge(paymentResult.unseenCount + mtnSaleResult.unseenCount);
-    if (notifDropdownOpen) renderNotifList(mergeNotifications(paymentResult.notifications, mtnSaleResult.notifications));
+    const [paymentResult, mtnSaleResult, reportResolvedResult] = await Promise.all([
+      apiPaymentNotifications(),
+      apiMtnSaleNotifications(),
+      apiReportResolvedNotifications(),
+    ]);
+    renderNotifBadge(paymentResult.unseenCount + mtnSaleResult.unseenCount + reportResolvedResult.unseenCount);
+    if (notifDropdownOpen) {
+      renderNotifList(mergeNotifications(paymentResult.notifications, mtnSaleResult.notifications, reportResolvedResult.notifications));
+    }
   } catch {
     // Best-effort, same as the other polled views.
   }
@@ -65,9 +78,13 @@ btnNotifBell.addEventListener('click', async (e) => {
   notifDropdown.classList.toggle('hidden', !notifDropdownOpen);
   if (!notifDropdownOpen) return;
   try {
-    const [paymentResult, mtnSaleResult] = await Promise.all([apiMarkPaymentNotificationsSeen(), apiMarkMtnSaleNotificationsSeen()]);
-    renderNotifList(mergeNotifications(paymentResult.notifications, mtnSaleResult.notifications));
-    renderNotifBadge(paymentResult.unseenCount + mtnSaleResult.unseenCount);
+    const [paymentResult, mtnSaleResult, reportResolvedResult] = await Promise.all([
+      apiMarkPaymentNotificationsSeen(),
+      apiMarkMtnSaleNotificationsSeen(),
+      apiMarkReportResolvedNotificationsSeen(),
+    ]);
+    renderNotifList(mergeNotifications(paymentResult.notifications, mtnSaleResult.notifications, reportResolvedResult.notifications));
+    renderNotifBadge(paymentResult.unseenCount + mtnSaleResult.unseenCount + reportResolvedResult.unseenCount);
   } catch {
     // Best-effort -- dropdown still opens even if marking-seen fails.
   }

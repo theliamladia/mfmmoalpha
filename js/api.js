@@ -535,6 +535,18 @@ function apiReportsList(page, type) {
   return apiRequest(`/reports/list?${params.toString()}`);
 }
 
+function apiResolveReport(id, comment) {
+  return apiRequest(`/reports/${id}/resolve`, { method: 'POST', body: JSON.stringify({ comment }) });
+}
+
+function apiReportResolvedNotifications() {
+  return apiRequest('/notifications/report-resolved');
+}
+
+function apiMarkReportResolvedNotificationsSeen() {
+  return apiRequest('/notifications/report-resolved/seen', { method: 'POST' });
+}
+
 function apiAdminBankBalances() {
   return apiRequest('/admin/bank-balances');
 }

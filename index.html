@@ -1554,6 +1554,19 @@
     </div>
   </div>
 
+  <div id="reportResolveModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>✅ Resolve Report</h3>
+      <p>Leave a comment for the reporter &mdash; they'll get a notification with what you write here.</p>
+      <textarea id="reportResolveCommentInput" rows="5" maxlength="1000" placeholder="e.g. Fixed in the latest update, thanks for the heads up!"></textarea>
+      <p id="reportResolveError" class="loss"></p>
+      <div class="admin-row">
+        <button id="btnReportResolveConfirm">Mark Resolved &amp; Notify</button>
+        <button id="btnReportResolveCancel" class="secondary-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div id="bankBalancesModal" class="modal-overlay hidden">
     <div class="modal-box">
       <button id="btnBankBalancesCloseX" class="admin-close-x" title="Close" aria-label="Close">&times;</button>
