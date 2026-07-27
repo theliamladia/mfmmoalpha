@@ -376,6 +376,9 @@ function apiSetProfileStatus(status) {
 function apiSetProfileBanner(titleId) {
   return apiRequest('/profile/banner', { method: 'POST', body: JSON.stringify({ titleId }) });
 }
+function apiToggleProfilePrivacy(field) {
+  return apiRequest('/profile/privacy/toggle', { method: 'POST', body: JSON.stringify({ field }) });
+}
 function apiAddShowcaseTitle(titleId) {
   return apiRequest('/profile/showcase/add', { method: 'POST', body: JSON.stringify({ titleId }) });
 }

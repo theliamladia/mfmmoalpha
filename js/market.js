@@ -380,7 +380,8 @@ function titleBadgeMarkup(title) {
     const textColor = title.textColor ? `color:${title.textColor};` : '';
     return `<span class="title-badge" style="${bg}${border}"><span class="title-text" style="${textColor}">${escapeHtml(title.name)}</span></span>`;
   }
-  return `<span class="title-badge ${title.cssClass}"><span class="title-text">${title.name}</span></span>`;
+  const textClass = title.hideNameOnBadge ? 'title-text title-text-hidden' : 'title-text';
+  return `<span class="title-badge ${title.cssClass}"><span class="${textClass}">${escapeHtml(title.name)}</span></span>`;
 }
 
 function titleHoverMarkup(title) {
@@ -602,11 +603,11 @@ function showCrateResult(results, alreadyOwnedFlags) {
   if (isMulti) {
     crateResultMultiList.innerHTML = results.map((title, i) => {
       const already = alreadyOwnedFlags[i];
-      const note = title.displayName ? itemLabel(title) : (already ? 'Already owned' : 'New!');
+      const note = title.hideNameOnBadge ? escapeHtml(itemLabel(title)) : (already ? 'Already owned' : 'New!');
       return `
         <div class="crate-result-multi-row">
           ${titleBadgeMarkup(title)}
-          <span class="crate-result-multi-note">${note}${title.displayName && already ? ' (already owned)' : ''}</span>
+          <span class="crate-result-multi-note">${note}${title.hideNameOnBadge && already ? ' (already owned)' : ''}</span>
         </div>
       `;
     }).join('');
@@ -619,7 +620,7 @@ function showCrateResult(results, alreadyOwnedFlags) {
       : 'Added to your Inventory.';
     // Hidden-name titles show a blank badge above, so spell out the real item name here too
     // (matches the label already used in the Inventory tab and Trade dropdown).
-    crateResultNote.textContent = title.displayName ? `${itemLabel(title)}. ${base}` : base;
+    crateResultNote.textContent = title.hideNameOnBadge ? `${itemLabel(title)}. ${base}` : base;
   }
 
   const qty = lastSpunCrateContext ? lastSpunCrateContext.qty : 1;

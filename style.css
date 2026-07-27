@@ -457,6 +457,12 @@ button:disabled {
   white-space: nowrap;
 }
 
+/* Anima Crate mystery-pull convention: the real name lives in the data (Showcase, Inventory,
+   Trade, MTN, etc.) but never renders on the badge chip itself -- art only. */
+.title-text-hidden {
+  visibility: hidden;
+}
+
 .title-preview {
   margin-bottom: 10px;
 }
@@ -3846,6 +3852,25 @@ button:disabled {
   padding: 8px 14px;
   font-size: 13px;
   color: #b9bbc4;
+}
+
+.profile-privacy-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 0 0 4px;
+  vertical-align: middle;
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-card-header h3 {
+  margin: 0;
 }
 
 .profile-columns {
