@@ -4,6 +4,7 @@ const FARM_PLOT_COST = 50000;
 const FARM_PREP_COST = 1200;
 const FARM_SEED_COST_BY_DRUG = { drugWeed: 150, drugCoke: 1200 };
 const FARM_SECURITY_MAX_TIER = 5;
+const FARM_MAX_QTY = 4;
 
 const farmsLockedNote = document.getElementById('farmsLockedNote');
 const farmsUnlockedContent = document.getElementById('farmsUnlockedContent');
@@ -37,14 +38,15 @@ const FARM_STAGE_VERB = { growing: 'Growing', packaging: 'Packaging', shipping: 
 // device clock drifts doesn't see a wildly wrong countdown.
 function farmStageLabel(plot) {
   if (plot.stage === 'empty') return plot.prepped ? 'Prepped -- ready to plant' : 'Empty -- till/water/fertilize first';
-  if (plot.stage === 'ready') return 'Ready to collect!';
+  const qtyPrefix = plot.qty ? `${plot.qty}x package${plot.qty > 1 ? 's' : ''} -- ` : '';
+  if (plot.stage === 'ready') return `${qtyPrefix}Ready to collect!`;
   const remaining = plot.stageReadyAt - (Date.now() + clockOffsetMs);
   // Local countdown can hit zero slightly before the next refreshFarms() poll confirms the real
   // stage change -- show a neutral "almost there" line rather than a stale/negative timer.
-  if (remaining <= 0) return 'Almost ready...';
+  if (remaining <= 0) return `${qtyPrefix}Almost ready...`;
   const verb = FARM_STAGE_VERB[plot.stage] || plot.stage;
   const note = plot.stage === 'shipping' ? ' -- vulnerable to interception' : '';
-  return `${verb} (${formatFarmDuration(remaining)})${note}`;
+  return `${qtyPrefix}${verb} (${formatFarmDuration(remaining)})${note}`;
 }
 
 function farmPlotCardHtml(plot) {
@@ -53,12 +55,16 @@ function farmPlotCardHtml(plot) {
     actions.push(`<button data-farm-prep="${plot.id}">Till/Water/Fertilize ($${FARM_PREP_COST.toLocaleString()})</button>`);
   }
   if (plot.stage === 'empty' && plot.prepped) {
+    const qtyOptions = Array.from({ length: FARM_MAX_QTY }, (_, i) => i + 1)
+      .map((n) => `<option value="${n}">${n} package${n > 1 ? 's' : ''}</option>`)
+      .join('');
     actions.push(`
       <select data-farm-seed-select="${plot.id}">
-        <option value="drugWeed">🌿 Weed seed ($${FARM_SEED_COST_BY_DRUG.drugWeed.toLocaleString()})</option>
-        <option value="drugCoke">❄️ Cocaine seed ($${FARM_SEED_COST_BY_DRUG.drugCoke.toLocaleString()})</option>
+        <option value="drugWeed">🌿 Weed seed ($${FARM_SEED_COST_BY_DRUG.drugWeed.toLocaleString()} each)</option>
+        <option value="drugCoke">❄️ Cocaine seed ($${FARM_SEED_COST_BY_DRUG.drugCoke.toLocaleString()} each)</option>
       </select>
-      <button data-farm-plant="${plot.id}">Plant Seed</button>
+      <select data-farm-qty-select="${plot.id}">${qtyOptions}</select>
+      <button data-farm-plant="${plot.id}">Plant Seeds</button>
     `);
   }
   if (plot.stage === 'ready') {
@@ -115,8 +121,9 @@ function renderFarms() {
     btn.addEventListener('click', async () => {
       const plotId = btn.dataset.farmPlant;
       const select = farmsPlotsGrid.querySelector(`select[data-farm-seed-select="${plotId}"]`);
+      const qtySelect = farmsPlotsGrid.querySelector(`select[data-farm-qty-select="${plotId}"]`);
       try {
-        const result = await apiFarmsPlantSeed(plotId, select.value);
+        const result = await apiFarmsPlantSeed(plotId, select.value, Number(qtySelect.value));
         character = result.character;
         logTo(farmsLog, result.message, result.cls);
         save();

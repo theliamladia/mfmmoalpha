@@ -544,8 +544,8 @@ function apiFarmsBuyPlot() {
 function apiFarmsPrepPlot(plotId) {
   return apiRequest('/farms/plot/prep', { method: 'POST', body: JSON.stringify({ plotId }) });
 }
-function apiFarmsPlantSeed(plotId, drugId) {
-  return apiRequest('/farms/plot/plant', { method: 'POST', body: JSON.stringify({ plotId, drugId }) });
+function apiFarmsPlantSeed(plotId, drugId, qty) {
+  return apiRequest('/farms/plot/plant', { method: 'POST', body: JSON.stringify({ plotId, drugId, qty }) });
 }
 function apiFarmsCollect(plotId) {
   return apiRequest('/farms/plot/collect', { method: 'POST', body: JSON.stringify({ plotId }) });
