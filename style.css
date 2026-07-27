@@ -455,6 +455,7 @@ button:disabled {
   font-size: 12px;
   line-height: 1.6;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 /* Anima Crate mystery-pull convention: the real name lives in the data (Showcase, Inventory,
@@ -665,10 +666,14 @@ button:disabled {
   100% { background-position: 100% 50%; }
 }
 
+/* Fixed (not min-) width -- a hidden name's text still occupies layout space even with
+   visibility:hidden, so a min-width alone let a long hidden name (e.g. "Donald Trump Fist Up")
+   stretch the badge wider than a short one (e.g. "Bush"). Fixed width + the base rule's
+   overflow:hidden clips that invisible overflow instead of letting it grow the box. */
 .title-badge[class*="title-anima-"],
 .title-badge[class*="title-red-"],
 .title-badge[class*="title-blue-"] {
-  min-width: 120px;
+  width: 120px;
   height: 40px;
 }
 
