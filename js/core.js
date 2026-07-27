@@ -1044,22 +1044,34 @@ function renderAll() {
     lawyerCostEl.textContent = character.jail.yearsRemaining * 150;
   }
 
-  renderArrestRecord();
-  renderGym();
-  buildFoodGrid();
-  renderBank();
-  renderMilos();
   renderRankBadge();
-  renderCityHall();
-  buildGunClubGrids();
-  renderGunClub();
-  buildRangeWeaponSelect();
-  renderGunRange();
   buildInventoryGrid();
   renderEquipmentBoard();
   renderSkillsTab();
   renderAlignmentTab();
-  renderLawBanner();
+
+  // These three blocks are each expensive (gun club/bank/city hall/jobs/dealer/crime/combat/morals
+  // center/MTN/penitentiary under Milos alone add up to 10+ full innerHTML rebuilds) and scoped
+  // entirely to one page's own DOM -- skip them while that page isn't the one on screen, since
+  // renderAll() runs after nearly every action in the ENTIRE app, not just actions on that page.
+  // switchPage() calls the same functions once on entry so the tab is never stale on arrival.
+  if (!pageJail.classList.contains('hidden')) {
+    renderArrestRecord();
+  }
+  if (!pageMarket.classList.contains('hidden')) {
+    renderGym();
+    buildFoodGrid();
+  }
+  if (!pageMilos.classList.contains('hidden')) {
+    renderBank();
+    renderMilos();
+    renderCityHall();
+    buildGunClubGrids();
+    renderGunClub();
+    buildRangeWeaponSelect();
+    renderGunRange();
+    renderLawBanner();
+  }
 }
 
 function renderArrestRecord() {
@@ -1125,6 +1137,22 @@ function switchPage(pageName) {
   characterSidePanel.classList.toggle('hidden', pageName === 'milos');
 
   if (typeof setLeaderboardTabVisible === 'function') setLeaderboardTabVisible(pageName === 'leaderboard');
+
+  // renderAll() skips rebuilding Jail/Market/Milos's own content while that page isn't visible (see
+  // renderAll() in this file), so each one gets refreshed once here on the way in -- otherwise a
+  // tab you haven't looked at in a while would show stale content until your next action.
+  if (pageName === 'jail') renderArrestRecord();
+  if (pageName === 'market') { renderGym(); buildFoodGrid(); }
+  if (pageName === 'milos') {
+    renderBank();
+    renderMilos();
+    renderCityHall();
+    buildGunClubGrids();
+    renderGunClub();
+    buildRangeWeaponSelect();
+    renderGunRange();
+    renderLawBanner();
+  }
 
   if (pageName === 'milos') {
     onMilosPage = true;
