@@ -3777,7 +3777,11 @@ button:disabled {
   position: relative;
   height: 180px;
   border-radius: 10px;
-  background: #24262e;
+  /* background-color, not the `background` shorthand -- a title's own CSS class (e.g.
+     .title-anima-hyper-gear5) sets its background-image directly on this same element, and since
+     this rule comes later in the file at equal specificity, a `background:` shorthand here would
+     reset that image back to none. background-color only touches the fallback color. */
+  background-color: #24262e;
   border: 1px solid #35373f;
   background-size: cover;
   background-position: center;
