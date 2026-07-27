@@ -843,6 +843,28 @@
                   <input type="text" id="investorChatInput" placeholder="Talk your book...">
                   <button id="btnInvestorChatSend">Send</button>
                 </div>
+
+                <div id="investorL2Ad" class="investor-l2-ad hidden">
+                  <h3>🔒 InvestorsCenter LEVEL II Research Panel</h3>
+                  <p><b>Tired of the rumor mill?</b> Get sparse, but more accurate, info on your investments.</p>
+                  <p>Real traders don't guess &mdash; they subscribe. Stop trading on secondhand gossip from randoms who can't spell "fiduciary." Our proprietary feed reports real price movement, straight from the source, every 5 minutes.</p>
+                  <p class="investor-l2-disclaimer-ad">*Level II data is sparse and, on rare occasion, simply wrong. InvestorsCenter is not liable for trades made on any information in this feed. Subscribe at your own risk.</p>
+                  <p class="investor-l2-price">$250,000 to activate &mdash; then $50,000/day, billed automatically</p>
+                  <button id="btnInvestorL2Subscribe">Subscribe Now</button>
+                </div>
+
+                <div id="investorL2CooldownNote" class="investor-l2-cooldown hidden"></div>
+
+                <div id="investorL2Banner" class="investor-l2-banner hidden">
+                  <span id="investorL2BannerText"></span>
+                  <button id="btnInvestorL2Cancel" class="secondary-btn">Cancel Subscription</button>
+                </div>
+
+                <div id="investorL2FeedWrap" class="investor-l2-feed hidden">
+                  <h3 class="investor-l2-feed-title">🟢 LEVEL II RESEARCH FEED</h3>
+                  <p class="investor-l2-disclaimer">⚠ Sparse. Unverified. Accuracy not guaranteed &mdash; trade at your own risk.</p>
+                  <div id="investorL2FeedMessages" class="investor-l2-feed-messages"></div>
+                </div>
               </div>
             </div>
 
@@ -1719,6 +1741,7 @@
 <script src="js/crypto.js"></script>
 <script src="js/altcoins.js"></script>
 <script src="js/stockMarket.js"></script>
+<script src="js/investorL2.js"></script>
 <script src="js/playerActions.js"></script>
 <script src="js/profile.js"></script>
 <script src="js/slime.js"></script>

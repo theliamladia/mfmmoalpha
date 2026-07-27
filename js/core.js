@@ -1013,6 +1013,7 @@ function renderAll() {
     processBankBilling();
     processMoralsCenter();
     syncPenitentiaryRecord();
+    if (typeof processInvestorL2Billing === 'function') processInvestorL2Billing();
   }
   charNameEl.innerHTML = styledNameHtml(character, `${character.firstName} ${character.lastName}`);
   levelBadgeEl.textContent = `⭐ Lvl ${computeLevel()}`;
@@ -1049,6 +1050,7 @@ function renderAll() {
   renderEquipmentBoard();
   renderSkillsTab();
   renderAlignmentTab();
+  if (typeof renderInvestorL2 === 'function') renderInvestorL2();
 
   // These three blocks are each expensive (gun club/bank/city hall/jobs/dealer/crime/combat/morals
   // center/MTN/penitentiary under Milos alone add up to 10+ full innerHTML rebuilds) and scoped

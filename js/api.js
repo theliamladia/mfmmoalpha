@@ -416,6 +416,10 @@ function apiInvestorChatSend(titleText, message, titleId) {
   return apiRequest('/investors/chat/send', { method: 'POST', body: JSON.stringify({ titleText, message, titleId }) });
 }
 
+function apiInvestorL2Feed() {
+  return apiRequest('/investors/l2/feed');
+}
+
 // Decodes the JWT payload client-side (no signature check -- purely for UI logic like "is it my
 // turn", never trusted for anything security-relevant; the server independently re-verifies the
 // token on every request).
