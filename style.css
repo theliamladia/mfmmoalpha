@@ -881,22 +881,30 @@ button:disabled {
 
 /* Hidden autograph parallels (1% secret swap on the Presidential Rare slot -- see
    maybeSwapHiddenAuto in js/market.js) -- same glow as the base Presidential Rare plus a gold
-   frame so an owner can immediately tell it apart from the "normal" pull. */
+   frame so an owner can immediately tell it apart from the "normal" pull.
+   Two background layers: a small recolored signature (assets/signatures/*, true alpha
+   transparency -- Trump's is the real vector recolored red, Biden's is the raw scan with its ink
+   recolored blue and background alpha untouched) sits over the original Presidential Rare photo.
+   No blend-mode needed now that both signature assets have real transparency -- normal
+   compositing alone keeps the photo clean everywhere the signature doesn't actually draw ink. */
 .title-red-trumpauto,
 .title-blue-bidenauto {
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #fff;
+  background-repeat: no-repeat, no-repeat;
+  background-size: 40% auto, cover;
+  background-position: 96% 92%, center;
   border: 3px solid #ffd700;
   box-shadow: 0 0 10px 2px #ffd700;
 }
 .title-red-trumpauto {
-  background-image: url('https://lh3.googleusercontent.com/d/1Sl_3LPAmgmNI_mkVG0KgSMtdWc7ut_Fy');
+  background-image:
+    url('assets/signatures/trump-signature-red.svg'),
+    url('https://lh3.googleusercontent.com/d/1f-PUjlZiYy5GiuKInqkBB1YG9IfiHrxr');
   animation: redGlowPulse 1.3s ease-in-out infinite alternate;
 }
 .title-blue-bidenauto {
-  background-image: url('https://lh3.googleusercontent.com/d/1-resM5if5u9UEPiUeEkwOB3nhst3peuq');
+  background-image:
+    url('assets/signatures/biden-signature-blue.png'),
+    url('https://lh3.googleusercontent.com/d/1aMoIsaz8akxmYnynKjF8JdHOJnEm61L4');
   animation: blueGlowPulse 1.3s ease-in-out infinite alternate;
 }
 
