@@ -91,6 +91,33 @@ function renderPlayerList() {
   playerListEl.querySelectorAll('button[data-hover-fight]').forEach((btn) => {
     btn.addEventListener('click', (e) => { e.stopPropagation(); openPlayerActionModal(btn.dataset.hoverFight); });
   });
+
+  attachPlayerHoverTolerance();
+}
+
+// The hover card is still shown/hidden by the plain CSS :hover rule (see .player-row:hover in
+// style.css) -- this only adds a short grace period on top of it via a "pinned-open" class, so a
+// quick mouse movement from the row down into the card doesn't lose hover for the one frame in
+// between and snap the card shut before the click registers.
+let playerHoverCloseTimer = null;
+
+function attachPlayerHoverTolerance() {
+  playerListEl.querySelectorAll('.player-row').forEach((row) => {
+    const card = row.querySelector('.player-hover-card');
+    if (!card) return;
+    const keepOpen = () => {
+      clearTimeout(playerHoverCloseTimer);
+      card.classList.add('pinned-open');
+    };
+    const scheduleClose = () => {
+      clearTimeout(playerHoverCloseTimer);
+      playerHoverCloseTimer = setTimeout(() => card.classList.remove('pinned-open'), 350);
+    };
+    row.addEventListener('mouseenter', keepOpen);
+    row.addEventListener('mouseleave', scheduleClose);
+    card.addEventListener('mouseenter', keepOpen);
+    card.addEventListener('mouseleave', scheduleClose);
+  });
 }
 
 // Presence is scoped to New Milos City specifically (see /milos/enter, /milos/leave) -- poll

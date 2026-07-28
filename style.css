@@ -2303,12 +2303,15 @@ button:disabled {
   display: none;
   position: absolute;
   left: 0;
-  top: calc(100% + 6px);
+  top: 100%;
+  /* Zero visual gap from the row -- a gap here is dead space the mouse has to cross exactly right
+     to reach the card without losing :hover, which is most of why this felt finicky. The illusion
+     of a gap comes from padding-top instead, which stays part of the same hoverable box. */
+  padding: 6px 0 10px;
   z-index: 10;
   background: #1b1d22;
   border: 1px solid #35373f;
   border-radius: 8px;
-  padding: 0 0 10px;
   min-width: 260px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
@@ -2320,7 +2323,8 @@ button:disabled {
   color: #b9bbc4;
 }
 
-.player-row:hover .player-hover-card {
+.player-row:hover .player-hover-card,
+.player-hover-card.pinned-open {
   display: block;
 }
 

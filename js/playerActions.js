@@ -7,6 +7,7 @@ const playerActionMenu = document.getElementById('playerActionMenu');
 const playerActionPaySub = document.getElementById('playerActionPaySub');
 const playerActionPayAmount = document.getElementById('playerActionPayAmount');
 const playerActionMessage = document.getElementById('playerActionMessage');
+const btnPlayerActionProfile = document.getElementById('btnPlayerActionProfile');
 const btnPlayerActionPay = document.getElementById('btnPlayerActionPay');
 const btnPlayerActionRob = document.getElementById('btnPlayerActionRob');
 const btnPlayerActionSlime = document.getElementById('btnPlayerActionSlime');
@@ -49,6 +50,15 @@ function closePlayerActionModal() {
 }
 
 btnPlayerActionClose.addEventListener('click', closePlayerActionModal);
+
+// The hover card over each row in Players Online has the same Profile button, but only while
+// hovering holds; this persistent modal (opened by clicking the row) needed the same action so
+// viewing a profile doesn't depend on the mouse staying put.
+btnPlayerActionProfile.addEventListener('click', () => {
+  const username = currentActionTargetUsername;
+  closePlayerActionModal();
+  if (username) viewProfile(username);
+});
 
 btnPlayerActionPay.addEventListener('click', () => {
   playerActionMenu.classList.add('hidden');
