@@ -313,7 +313,7 @@ function allTitleDefsFor(char) {
     PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE, FAT_FUCK_TITLE, LOOSE_TITLE,
     LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE, HEIGHTMAXXED_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
-    ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES,
+    ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];
 }
@@ -325,7 +325,7 @@ function allTitleDefs() {
 // Titles tracked as inventory stacks: tradeable, "owned" only while at least one copy remains.
 const CRATE_TITLE_IDS = new Set([
   ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
-  ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES,
+  ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES,
 ].map((t) => t.id));
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
 CRATE_TITLE_IDS.add(ADMIN_TITLE.id);
@@ -346,8 +346,8 @@ const TITLE_CRATE_GROUPS = [
   { label: '🏆 GOOD® Season 1', ids: new Set(GOOD_SEASON1_TITLES.map((t) => t.id)) },
   { label: '🎮 ANIMA CRATE', ids: new Set(ANIMA_CRATE_TITLES.map((t) => t.id)) },
   { label: '🎨 COUNTERFINISH CRATE', ids: new Set(COUNTERFINISH_CRATE_TITLES.map((t) => t.id)) },
-  { label: '🔴 RED CRATE', ids: new Set(RED_CRATE_TITLES.map((t) => t.id)) },
-  { label: '🔵 BLUE CRATE', ids: new Set(BLUE_CRATE_TITLES.map((t) => t.id)) },
+  { label: '🔴 RED CRATE', ids: new Set([...RED_CRATE_TITLES.map((t) => t.id), 'redTrumpAuto']) },
+  { label: '🔵 BLUE CRATE', ids: new Set([...BLUE_CRATE_TITLES.map((t) => t.id), 'blueBidenAuto']) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';
 
@@ -492,8 +492,24 @@ const CRATE_COUNTERFINISH = { name: 'COUNTERFINISH CRATE', icon: '\u{1F3A8}', co
 // doStartCrateSpin -- cash is deducted server-side and the 1,000-per-crate global stock is reserved
 // atomically there too, since that cap is shared across every player, not just this character.
 const CRATE_STOCK_MAX = 1000;
-const CRATE_RED = { name: 'RED CRATE', icon: '\u{1F534}', cost: RED_CRATE_COST, titles: RED_CRATE_TITLES, limited: true, key: 'red' };
-const CRATE_BLUE = { name: 'BLUE CRATE', icon: '\u{1F535}', cost: BLUE_CRATE_COST, titles: BLUE_CRATE_TITLES, limited: true, key: 'blue' };
+// hiddenAuto: a secret 1% swap-in whenever the draw lands on that side's Presidential Rare -- see
+// maybeSwapHiddenAuto below. Deliberately not reflected anywhere in `titles`/odds.
+const CRATE_RED = {
+  name: 'RED CRATE', icon: '\u{1F534}', cost: RED_CRATE_COST, titles: RED_CRATE_TITLES, limited: true, key: 'red',
+  hiddenAuto: { fromId: 'redTrumpFistUp', toId: 'redTrumpAuto', chance: 0.01 },
+};
+const CRATE_BLUE = {
+  name: 'BLUE CRATE', icon: '\u{1F535}', cost: BLUE_CRATE_COST, titles: BLUE_CRATE_TITLES, limited: true, key: 'blue',
+  hiddenAuto: { fromId: 'blueDarkBrandon', toId: 'blueBidenAuto', chance: 0.01 },
+};
+
+// Rolled once per drawn title -- if it's not that crate's Presidential Rare (or the crate has no
+// hidden swap at all), the draw stands untouched.
+function maybeSwapHiddenAuto(crate, title) {
+  if (!crate.hiddenAuto || title.id !== crate.hiddenAuto.fromId) return title;
+  if (Math.random() >= crate.hiddenAuto.chance) return title;
+  return getItemDef(crate.hiddenAuto.toId) || title;
+}
 
 // OPEN BETA and GOOD® Season 1 are archived -- view-only odds, no spin button/message element.
 const betaSpinMessage = document.getElementById('betaSpinMessage');
@@ -750,7 +766,7 @@ function doStartCrateSpin(crate, qty) {
   if (character.cash < totalCost) return { ok: false, reason: 'Not enough Floydbucks.' };
   character.cash -= totalCost;
   const results = [];
-  for (let i = 0; i < qty; i++) results.push(weightedTitleFrom(crate.titles));
+  for (let i = 0; i < qty; i++) results.push(maybeSwapHiddenAuto(crate, weightedTitleFrom(crate.titles)));
   return { ok: true, results };
 }
 
@@ -768,7 +784,7 @@ async function startLimitedCrateSpin(crate, qty) {
   character = apiResult.character;
   renderCrateStock(crate.key, apiResult.remaining);
   const results = [];
-  for (let i = 0; i < qty; i++) results.push(weightedTitleFrom(crate.titles));
+  for (let i = 0; i < qty; i++) results.push(maybeSwapHiddenAuto(crate, weightedTitleFrom(crate.titles)));
   return { ok: true, results };
 }
 

@@ -879,6 +879,27 @@ button:disabled {
   animation: blueGlowPulse 1.3s ease-in-out infinite alternate;
 }
 
+/* Hidden autograph parallels (1% secret swap on the Presidential Rare slot -- see
+   maybeSwapHiddenAuto in js/market.js) -- same glow as the base Presidential Rare plus a gold
+   frame so an owner can immediately tell it apart from the "normal" pull. */
+.title-red-trumpauto,
+.title-blue-bidenauto {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #fff;
+  border: 3px solid #ffd700;
+  box-shadow: 0 0 10px 2px #ffd700;
+}
+.title-red-trumpauto {
+  background-image: url('https://lh3.googleusercontent.com/d/1Sl_3LPAmgmNI_mkVG0KgSMtdWc7ut_Fy');
+  animation: redGlowPulse 1.3s ease-in-out infinite alternate;
+}
+.title-blue-bidenauto {
+  background-image: url('https://lh3.googleusercontent.com/d/1-resM5if5u9UEPiUeEkwOB3nhst3peuq');
+  animation: blueGlowPulse 1.3s ease-in-out infinite alternate;
+}
+
 /* Rare tier -- static colored glow (box-shadow halo, no animation). */
 .title-red-trump,
 .title-red-bush,

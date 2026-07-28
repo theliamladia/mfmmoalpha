@@ -11,6 +11,8 @@ const NAME_STYLE_CLASS_BY_TITLE_ID = {
   animaHyperMakima: 'name-style-hyper-rainbow',
   redTrumpFistUp: 'name-style-republican-glow',
   blueDarkBrandon: 'name-style-democrat-glow',
+  redTrumpAuto: 'name-style-republican-glow',
+  blueBidenAuto: 'name-style-democrat-glow',
 };
 
 function nameStyleClassForTitleId(titleId) {

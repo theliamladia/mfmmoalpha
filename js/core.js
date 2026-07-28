@@ -397,6 +397,17 @@ const BLUE_CRATE_TITLES = [
   { id: 'blueAoc', name: 'AOC', hideNameOnBadge: true, cssClass: 'title-blue-aoc', weight: 15, rarity: 'common', how: 'Won from a BLUE Crate spin (common).' },
 ];
 
+// Hidden autograph parallels: NOT in RED_CRATE_TITLES/BLUE_CRATE_TITLES (so they never show in the
+// crate odds list and weightedTitleFrom can never draw them directly -- see maybeSwapHiddenAuto in
+// market.js), no `weight` for the same reason. A 1% roll swaps one in whenever a spin lands on that
+// side's Presidential Rare, so from the player's perspective it's a secret alternate pull, not a
+// separately-listed prize. Still resolvable via getItemDef/allTitleDefsFor like any other title
+// (inventory, showcase, trade, sell) once actually won.
+const RED_BLUE_HIDDEN_TITLES = [
+  { id: 'redTrumpAuto', name: 'Donald Trump Auto', hideNameOnBadge: true, cssClass: 'title-red-trumpauto', rarity: 'mythic', how: 'Hidden 1% pull from a RED Crate Presidential Rare spin -- an autographed alternate. Recolors your name everywhere in a glowing Republican Red Xanh Mono font while equipped.' },
+  { id: 'blueBidenAuto', name: 'Joe Biden Auto', hideNameOnBadge: true, cssClass: 'title-blue-bidenauto', rarity: 'mythic', how: 'Hidden 1% pull from a BLUE Crate Presidential Rare spin -- an autographed alternate. Recolors your name everywhere in a glowing Democrat Blue Xanh Mono font while equipped.' },
+];
+
 // Counterfinish Crate: skins/finishes, not characters -- item label text is always visible.
 const COUNTERFINISH_CRATE_COST = 3000;
 const COUNTERFINISH_CRATE_TITLES = [
