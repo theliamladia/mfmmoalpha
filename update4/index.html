@@ -118,36 +118,106 @@
   .vision-card .vpct { font-size: 11px; color: #aab4ff; }
   .vision-tier-label { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; color: #fff; font-size: 15px; margin: 26px 0 4px; text-align: center; }
 
-  /* ---------- John Doe profile mockup ---------- */
-  .mockup-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 20px; }
-  .mock-profile { border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.25); }
-  .mock-banner { height: 90px; display: flex; align-items: flex-end; padding: 10px 14px; position: relative; }
-  .mock-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
-  .mock-body { padding: 14px; }
-  .mock-vision-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; opacity: 0.8; }
+  /* ---------- Full-page John Doe profile mockup ---------- */
+  /* VISIONS doesn't just reskin the profile -- it reskins the whole app shell (sidebar, header,
+     character panel included), so each mockup replicates that full chrome instead of just a
+     banner+badge snippet. The banner in every mockup is the actual Joe Biden Auto title art
+     (signature layered over the Dark Brandon photo, same two background layers as the real
+     .title-blue-bidenauto badge class) to show a real owned cosmetic riding along with the theme. */
+  .mock-app {
+    display: grid;
+    grid-template-columns: 130px 1fr 190px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.25);
+    margin-bottom: 22px;
+    font-size: 12px;
+  }
+  .mock-app-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px; color: #c7ceff; }
+
+  .mock-sidebar { padding: 14px 10px; }
+  .mock-nav-pill { padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; font-size: 11px; }
+  .mock-nav-pill.active { font-weight: 700; }
+
+  .mock-main { padding: 14px; }
+  .mock-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .mock-name { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
+  .mock-bell { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+
+  .mock-banner-bidenauto {
+    height: 110px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-repeat: no-repeat, no-repeat;
+    background-size: 34% auto, cover;
+    background-position: 94% 90%, center;
+    background-image: url('../assets/signatures/biden-signature-blue.png'), url('https://lh3.googleusercontent.com/d/1aMoIsaz8akxmYnynKjF8JdHOJnEm61L4');
+  }
   .mock-badges { display: flex; flex-wrap: wrap; gap: 6px; }
   .mock-badge { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; }
 
-  /* GOODTRIX theme */
-  .theme-goodtrix { background: #05070a; }
-  .theme-goodtrix .mock-banner { background: repeating-linear-gradient(0deg, #001a0f, #001a0f 2px, #000 2px, #000 4px); border-bottom: 2px solid #0ff9ff; }
-  .theme-goodtrix .mock-name { color: #4fd8ff; text-shadow: 0 0 8px #1ab8ff; font-family: 'Courier New', monospace; }
-  .theme-goodtrix .mock-body { color: #7fd6ff; font-family: 'Courier New', monospace; }
-  .theme-goodtrix .mock-badge { background: #001824; color: #4fd8ff; border: 1px solid #1ab8ff; }
+  .mock-charpanel { padding: 14px 12px; }
+  .mock-charpanel h5 { margin: 0 0 10px; font-size: 12px; }
+  .mock-tab-pill { display: inline-block; padding: 5px 10px; border-radius: 6px; font-size: 10.5px; margin: 0 5px 5px 0; }
 
-  /* Imperial Jade theme */
-  .theme-jade { background: #0c1410; }
-  .theme-jade .mock-banner { background: linear-gradient(135deg, #0d3b2e, #145c3f 60%, #d4af37); }
-  .theme-jade .mock-name { color: #d4af37; }
-  .theme-jade .mock-body { color: #bfe3d1; }
-  .theme-jade .mock-badge { background: #123d2d; color: #d4af37; border: 1px solid #2f7a54; }
+  /* Players Online hover card also picks up the Vision -- shown as its own small mock beneath
+     each app mockup so it's clear the reskin follows you outside the Profile page too. */
+  .mock-hover-wrap { padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); margin: -12px 0 22px; }
+  .mock-hover-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; margin: 0 0 8px; opacity: 0.75; }
+  .mock-hover-card { width: 260px; border-radius: 8px; overflow: hidden; padding: 6px 0 10px; }
+  .mock-hover-banner { height: 70px; margin: 0 0 10px; background-size: 34% auto, cover !important; }
+  .mock-hover-info { display: flex; align-items: center; gap: 8px; padding: 0 14px; margin-bottom: 8px; }
+  .mock-hover-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px; }
+  .mock-hover-actions span { font-size: 10.5px; padding: 5px 9px; border-radius: 5px; }
+
+  /* GOODTRIX theme */
+  .theme-goodtrix .mock-sidebar { background: #05070a; border-right: 1px solid #0d2a1f; }
+  .theme-goodtrix .mock-main { background: #060a08; font-family: 'Courier New', monospace; }
+  .theme-goodtrix .mock-charpanel { background: #05070a; border-left: 1px solid #0d2a1f; font-family: 'Courier New', monospace; }
+  .theme-goodtrix .mock-name { color: #4fd8ff; text-shadow: 0 0 8px #1ab8ff; font-family: 'Courier New', monospace; }
+  .theme-goodtrix .mock-bell { background: #001824; color: #4fd8ff; }
+  .theme-goodtrix .mock-nav-pill { color: #2f6d80; }
+  .theme-goodtrix .mock-nav-pill.active { background: #001824; color: #4fd8ff; }
+  .theme-goodtrix .mock-badge { background: #001824; color: #4fd8ff; border: 1px solid #1ab8ff; }
+  .theme-goodtrix .mock-tab-pill { background: #001824; color: #4fd8ff; border: 1px solid #1ab8ff; }
+  .theme-goodtrix .mock-charpanel h5 { color: #4fd8ff; }
+  .theme-goodtrix .mock-hover-wrap { background: #060a08; font-family: 'Courier New', monospace; }
+  .theme-goodtrix .mock-hover-card { background: #001018; border: 1px solid #1ab8ff; box-shadow: 0 0 10px rgba(26,184,255,0.25); }
+  .theme-goodtrix .mock-hover-info b { color: #4fd8ff; }
+  .theme-goodtrix .mock-hover-actions span { background: #001824; color: #4fd8ff; border: 1px solid #1ab8ff; }
+
+  /* Pandora's Box theme */
+  .theme-pandora .mock-sidebar { background: #140c22; border-right: 1px solid #2a1a45; }
+  .theme-pandora .mock-main { background: #0f0a1a; }
+  .theme-pandora .mock-charpanel { background: #140c22; border-left: 1px solid #2a1a45; }
+  .theme-pandora .mock-name { color: #d9b8ff; }
+  .theme-pandora .mock-bell { background: #2a1a45; color: #7ee0f0; }
+  .theme-pandora .mock-nav-pill { color: #9a7fc9; }
+  .theme-pandora .mock-nav-pill.active { background: #3a2260; color: #d9b8ff; }
+  .theme-pandora .mock-badge { background: #3a2260; color: #d9b8ff; border: 1px solid #2a8fa6; }
+  .theme-pandora .mock-tab-pill { background: #3a2260; color: #d9b8ff; border: 1px solid #2a8fa6; }
+  .theme-pandora .mock-charpanel h5 { color: #d9b8ff; }
+  .theme-pandora .mock-hover-wrap { background: #0f0a1a; }
+  .theme-pandora .mock-hover-card { background: #140c22; border: 1px solid #2a8fa6; box-shadow: 0 0 10px rgba(74,35,128,0.35); }
+  .theme-pandora .mock-hover-info b { color: #d9b8ff; }
+  .theme-pandora .mock-hover-actions span { background: #3a2260; color: #d9b8ff; border: 1px solid #2a8fa6; }
+  .theme-pandora, .theme-goodtrix, .theme-slate { color: #cfd2e0; }
 
   /* Slate theme */
-  .theme-slate { background: #202226; }
-  .theme-slate .mock-banner { background: linear-gradient(135deg, #2b2e35, #3a3d45); border-bottom: 2px solid #565a63; }
+  .theme-slate .mock-sidebar { background: #1b1d22; border-right: 1px solid #35373f; }
+  .theme-slate .mock-main { background: #202226; }
+  .theme-slate .mock-charpanel { background: #1b1d22; border-left: 1px solid #35373f; }
   .theme-slate .mock-name { color: #e8e8ee; }
-  .theme-slate .mock-body { color: #b9bbc4; }
+  .theme-slate .mock-bell { background: #2c2e34; color: #dcdce2; }
+  .theme-slate .mock-nav-pill { color: #9a9ca6; }
+  .theme-slate .mock-nav-pill.active { background: #2c2e34; color: #e8e8ee; }
   .theme-slate .mock-badge { background: #2c2e34; color: #dcdce2; border: 1px solid #565a63; }
+  .theme-slate .mock-tab-pill { background: #2c2e34; color: #dcdce2; border: 1px solid #565a63; }
+  .theme-slate .mock-charpanel h5 { color: #e8e8ee; }
+  .theme-slate .mock-hover-wrap { background: #202226; }
+  .theme-slate .mock-hover-card { background: #1b1d22; border: 1px solid #35373f; box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+  .theme-slate .mock-hover-info b { color: #e8e8ee; }
+  .theme-slate .mock-hover-actions span { background: #2c2e34; color: #dcdce2; border: 1px solid #565a63; }
 
   .legend { max-width: 720px; margin: 0 auto 20px; text-align: center; color: var(--muted); font-size: 13px; }
 </style>
@@ -400,9 +470,9 @@
         <span class="vpct">Darkmode + blue text, Matrix-style font</span>
       </div>
       <div class="vision-card">
-        <div class="vision-icon" style="background:linear-gradient(135deg, #145c3f 50%, #d4af37 50%);"></div>
-        <h4>Imperial Jade</h4>
-        <span class="vpct">Pandora's Box CS2 gloves colorway</span>
+        <div class="vision-icon" style="background:linear-gradient(135deg, #4a2380 50%, #2a8fa6 50%);"></div>
+        <h4>Pandora's Box</h4>
+        <span class="vpct">CS2 Pandora's Box gloves colorway</span>
       </div>
       <div class="vision-card">
         <div class="vision-icon" style="background:linear-gradient(135deg, #2b2e35 50%, #565a63 50%);"></div>
@@ -411,16 +481,24 @@
       </div>
     </div>
 
-    <div class="vision-tier-label">Uncommon</div>
+    <div class="vision-tier-label">Rare &mdash; 14.5%</div>
     <div class="visions-grid">
-      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#4a0d0d 50%,#8f1c1c 50%);"></div><h4>Crimson Tide</h4><span class="vpct">Deep red / maroon</span></div>
       <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#ff2bd6 50%,#1ae0ff 50%);"></div><h4>Neon Nights</h4><span class="vpct">Hot pink + cyan cyberpunk</span></div>
-      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#8a4a1a 50%,#c97a2b 50%);"></div><h4>Copper Rust</h4><span class="vpct">Industrial copper / orange</span></div>
-      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#dff3ff 50%,#7fb8e0 50%);"></div><h4>Arctic Frost</h4><span class="vpct">Icy blue &amp; white</span></div>
+      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#4a0d0d 50%,#8f1c1c 50%);"></div><h4>Crimson Tide</h4><span class="vpct">Deep red / maroon</span></div>
       <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#111 50%,#d4af37 50%);"></div><h4>Obsidian Gold</h4><span class="vpct">Black + gold luxury</span></div>
+      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#dff3ff 50%,#7fb8e0 50%);"></div><h4>Arctic Frost</h4><span class="vpct">Icy blue &amp; white</span></div>
     </div>
 
-    <div class="vision-tier-label">Common</div>
+    <div class="vision-tier-label">Uncommon &mdash; 30%</div>
+    <div class="visions-grid">
+      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#8a4a1a 50%,#c97a2b 50%);"></div><h4>Copper Rust</h4><span class="vpct">Industrial copper / orange</span></div>
+      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#2a4a1a 50%,#8fd400 50%);"></div><h4>Toxic Waste</h4><span class="vpct">Radioactive green / yellow</span></div>
+      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#031c33 50%,#0e5c73 50%);"></div><h4>Deep Sea</h4><span class="vpct">Navy / teal</span></div>
+      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#b76e79 50%,#e8c39e 50%);"></div><h4>Rose Gold</h4><span class="vpct">Pink-gold metallic</span></div>
+      <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#8fd6ff 50%,#ffb3e6 50%);"></div><h4>Cotton Candy</h4><span class="vpct">Blue / pink pastel</span></div>
+    </div>
+
+    <div class="vision-tier-label">Common &mdash; 55%</div>
     <div class="visions-grid">
       <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#2f3d2a 50%,#5c6b3e 50%);"></div><h4>Forest Moss</h4><span class="vpct">Muted green / brown</span></div>
       <div class="vision-card"><div class="vision-icon" style="background:linear-gradient(135deg,#e6d3a3 50%,#c9a86a 50%);"></div><h4>Sandstorm</h4><span class="vpct">Tan / desert</span></div>
@@ -430,40 +508,115 @@
     </div>
 
     <h2 class="good-sub-title" style="margin-top:40px;">VISIONS Preview &mdash; John Doe's Profile</h2>
-    <p style="color:#c7ceff; font-size:12.5px; margin:0 0 4px;">Equipping a Vision restyles your Profile page banner and badge display along with the rest of the site.</p>
+    <p style="color:#c7ceff; font-size:12.5px; margin:0 0 16px;">All of THIS changes &mdash; sidebar, header, character panel, the whole app shell, not just the profile page. Banner shown here is an actual owned cosmetic: the Joe Biden Auto title.</p>
 
-    <div class="mockup-row">
-      <div class="mock-profile theme-goodtrix">
-        <div class="mock-banner"><span class="mock-name">John Doe</span></div>
-        <div class="mock-body">
-          <div class="mock-vision-label">VISION: GOODTRIX</div>
-          <div class="mock-badges">
-            <span class="mock-badge">🎖️ CIVILIAN</span>
-            <span class="mock-badge">⭐ Lvl 42</span>
-            <span class="mock-badge">GOOD&reg;</span>
-          </div>
+    <p class="mock-app-label">Vision: GOODTRIX</p>
+    <div class="mock-app theme-goodtrix">
+      <div class="mock-sidebar">
+        <div class="mock-nav-pill active">👤 Profile</div>
+        <div class="mock-nav-pill">🛣️ Da Skreetz</div>
+        <div class="mock-nav-pill">🏬 Milos Market</div>
+        <div class="mock-nav-pill">🎰 Midas Casino</div>
+        <div class="mock-nav-pill">🌆 New Milos City</div>
+      </div>
+      <div class="mock-main">
+        <div class="mock-header-row"><span class="mock-name">John Doe</span><span class="mock-bell">&#128276;</span></div>
+        <div class="mock-banner-bidenauto"></div>
+        <div class="mock-badges">
+          <span class="mock-badge">🎖️ CIVILIAN</span>
+          <span class="mock-badge">⭐ Lvl 42</span>
+          <span class="mock-badge">GOOD&reg;</span>
         </div>
       </div>
-      <div class="mock-profile theme-jade">
-        <div class="mock-banner"><span class="mock-name">John Doe</span></div>
-        <div class="mock-body">
-          <div class="mock-vision-label">VISION: IMPERIAL JADE</div>
-          <div class="mock-badges">
-            <span class="mock-badge">🎖️ CIVILIAN</span>
-            <span class="mock-badge">⭐ Lvl 42</span>
-            <span class="mock-badge">GOOD&reg;</span>
-          </div>
+      <div class="mock-charpanel">
+        <h5>🎒 CHARACTER</h5>
+        <span class="mock-tab-pill">Inventory</span>
+        <span class="mock-tab-pill">Equipment</span>
+        <span class="mock-tab-pill">Skills</span>
+        <span class="mock-tab-pill">Alignment</span>
+      </div>
+    </div>
+    <div class="theme-goodtrix mock-hover-wrap">
+      <p class="mock-hover-label">Also reskinned: Players Online hover card</p>
+      <div class="mock-hover-card">
+        <div class="mock-banner-bidenauto mock-hover-banner"></div>
+        <div class="mock-hover-info"><b>John Doe</b> <span class="mock-badge">Civilian</span></div>
+        <div class="mock-hover-actions">
+          <span>👤 Profile</span><span>💵 Pay</span><span>🥷 Rob</span><span>🔫 Slime</span><span>⚔️ Fight</span>
         </div>
       </div>
-      <div class="mock-profile theme-slate">
-        <div class="mock-banner"><span class="mock-name">John Doe</span></div>
-        <div class="mock-body">
-          <div class="mock-vision-label">VISION: SLATE</div>
-          <div class="mock-badges">
-            <span class="mock-badge">🎖️ CIVILIAN</span>
-            <span class="mock-badge">⭐ Lvl 42</span>
-            <span class="mock-badge">GOOD&reg;</span>
-          </div>
+    </div>
+
+    <p class="mock-app-label">Vision: Pandora's Box</p>
+    <div class="mock-app theme-pandora">
+      <div class="mock-sidebar">
+        <div class="mock-nav-pill active">👤 Profile</div>
+        <div class="mock-nav-pill">🛣️ Da Skreetz</div>
+        <div class="mock-nav-pill">🏬 Milos Market</div>
+        <div class="mock-nav-pill">🎰 Midas Casino</div>
+        <div class="mock-nav-pill">🌆 New Milos City</div>
+      </div>
+      <div class="mock-main">
+        <div class="mock-header-row"><span class="mock-name">John Doe</span><span class="mock-bell">&#128276;</span></div>
+        <div class="mock-banner-bidenauto"></div>
+        <div class="mock-badges">
+          <span class="mock-badge">🎖️ CIVILIAN</span>
+          <span class="mock-badge">⭐ Lvl 42</span>
+          <span class="mock-badge">GOOD&reg;</span>
+        </div>
+      </div>
+      <div class="mock-charpanel">
+        <h5>🎒 CHARACTER</h5>
+        <span class="mock-tab-pill">Inventory</span>
+        <span class="mock-tab-pill">Equipment</span>
+        <span class="mock-tab-pill">Skills</span>
+        <span class="mock-tab-pill">Alignment</span>
+      </div>
+    </div>
+    <div class="theme-pandora mock-hover-wrap">
+      <p class="mock-hover-label">Also reskinned: Players Online hover card</p>
+      <div class="mock-hover-card">
+        <div class="mock-banner-bidenauto mock-hover-banner"></div>
+        <div class="mock-hover-info"><b>John Doe</b> <span class="mock-badge">Civilian</span></div>
+        <div class="mock-hover-actions">
+          <span>👤 Profile</span><span>💵 Pay</span><span>🥷 Rob</span><span>🔫 Slime</span><span>⚔️ Fight</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-app-label">Vision: SLATE</p>
+    <div class="mock-app theme-slate">
+      <div class="mock-sidebar">
+        <div class="mock-nav-pill active">👤 Profile</div>
+        <div class="mock-nav-pill">🛣️ Da Skreetz</div>
+        <div class="mock-nav-pill">🏬 Milos Market</div>
+        <div class="mock-nav-pill">🎰 Midas Casino</div>
+        <div class="mock-nav-pill">🌆 New Milos City</div>
+      </div>
+      <div class="mock-main">
+        <div class="mock-header-row"><span class="mock-name">John Doe</span><span class="mock-bell">&#128276;</span></div>
+        <div class="mock-banner-bidenauto"></div>
+        <div class="mock-badges">
+          <span class="mock-badge">🎖️ CIVILIAN</span>
+          <span class="mock-badge">⭐ Lvl 42</span>
+          <span class="mock-badge">GOOD&reg;</span>
+        </div>
+      </div>
+      <div class="mock-charpanel">
+        <h5>🎒 CHARACTER</h5>
+        <span class="mock-tab-pill">Inventory</span>
+        <span class="mock-tab-pill">Equipment</span>
+        <span class="mock-tab-pill">Skills</span>
+        <span class="mock-tab-pill">Alignment</span>
+      </div>
+    </div>
+    <div class="theme-slate mock-hover-wrap">
+      <p class="mock-hover-label">Also reskinned: Players Online hover card</p>
+      <div class="mock-hover-card">
+        <div class="mock-banner-bidenauto mock-hover-banner"></div>
+        <div class="mock-hover-info"><b>John Doe</b> <span class="mock-badge">Civilian</span></div>
+        <div class="mock-hover-actions">
+          <span>👤 Profile</span><span>💵 Pay</span><span>🥷 Rob</span><span>🔫 Slime</span><span>⚔️ Fight</span>
         </div>
       </div>
     </div>
