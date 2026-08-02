@@ -1603,6 +1603,26 @@ button:disabled {
   font-size: 22px;
 }
 
+.wallet-widget {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.wallet-widget-item {
+  flex: 1;
+  background: var(--surface-3);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.wallet-widget-item b {
+  color: var(--text-primary);
+}
+
 #characterSidePanel .hustle-grid {
   flex-direction: column;
   gap: 10px;
@@ -2094,6 +2114,26 @@ button:disabled {
 .milos-players-panel #playerListEl {
   max-height: 140px;
   overflow: visible;
+}
+
+#playerListSearch {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#playerListSearch:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring-accent);
 }
 
 .milos-chat-row {

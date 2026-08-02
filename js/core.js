@@ -971,6 +971,8 @@ const statWeightEl = document.getElementById('statWeight');
 const cashEl = document.getElementById('cash');
 const statAllianceEl = document.getElementById('statAlliance');
 const casinoChipCounterEl = document.getElementById('casinoChipCounter');
+const walletCashEl = document.getElementById('walletCash');
+const walletChipsEl = document.getElementById('walletChips');
 
 const navBtns = document.querySelectorAll('.nav-btn');
 const sidebar = document.getElementById('sidebar');
@@ -1041,6 +1043,8 @@ function renderAll() {
   statWeightEl.textContent = `${round1(150 + character.fatGained + character.muscleGained)} lbs`;
   cashEl.textContent = character.cash.toFixed(2);
   casinoChipCounterEl.textContent = Math.floor(character.chips);
+  walletCashEl.textContent = character.cash.toFixed(2);
+  walletChipsEl.textContent = Math.floor(character.chips);
   statAllianceEl.textContent = allianceLabel(character.alliance);
 
   jailNavBtn.disabled = !character.jail.inJail;

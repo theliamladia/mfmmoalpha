@@ -892,6 +892,7 @@
           <div class="milos-side">
             <div class="side-panel milos-players-panel">
               <h3>🟢 Players Online</h3>
+              <input type="text" id="playerListSearch" placeholder="Search players...">
               <ul id="playerListEl"></ul>
             </div>
           </div>
@@ -1288,6 +1289,10 @@
 
     <aside id="characterSidePanel">
       <h2>🎒 Character</h2>
+      <div class="wallet-widget">
+        <div class="wallet-widget-item">💵 <b id="walletCash">0</b></div>
+        <div class="wallet-widget-item">🪙 <b id="walletChips">0</b></div>
+      </div>
       <div class="market-tabs">
         <button class="inv-tab-btn active" data-inv="items">🎒 Inventory</button>
         <button class="inv-tab-btn" data-inv="equipment">🛡️ Equipment</button>

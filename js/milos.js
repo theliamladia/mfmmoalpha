@@ -93,7 +93,23 @@ function renderPlayerList() {
   });
 
   attachPlayerHoverTolerance();
+  applyPlayerListSearchFilter();
 }
+
+// Client-side only -- no new API calls. Re-applied at the end of every renderPlayerList() call
+// (including the 15s presence poll) so an in-progress search survives the list being rebuilt.
+const playerListSearchEl = document.getElementById('playerListSearch');
+
+function applyPlayerListSearchFilter() {
+  const term = (playerListSearchEl.value || '').trim().toLowerCase();
+  playerListEl.querySelectorAll('.player-row[data-username]').forEach((row) => {
+    const name = row.querySelector('.player-name').textContent.toLowerCase();
+    const username = (row.dataset.username || '').toLowerCase();
+    row.classList.toggle('hidden', !!term && !name.includes(term) && !username.includes(term));
+  });
+}
+
+playerListSearchEl.addEventListener('input', applyPlayerListSearchFilter);
 
 // The hover card is still shown/hidden by the plain CSS :hover rule (see .player-row:hover in
 // style.css) -- this only adds a short grace period on top of it via a "pinned-open" class, so a
