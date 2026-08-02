@@ -973,6 +973,7 @@ const statAllianceEl = document.getElementById('statAlliance');
 const casinoChipCounterEl = document.getElementById('casinoChipCounter');
 
 const navBtns = document.querySelectorAll('.nav-btn');
+const sidebar = document.getElementById('sidebar');
 const jailNavBtn = document.getElementById('jailNavBtn');
 const pageStreets = document.getElementById('page-streets');
 const pageMarket = document.getElementById('page-market');
@@ -1198,10 +1199,41 @@ window.addEventListener('pagehide', () => {
   navigator.sendBeacon(`${API_BASE}/milos/leave`, new Blob([JSON.stringify({ token })], { type: 'application/json' }));
 });
 
+// Mobile off-canvas drawer -- #sidebar itself becomes position:fixed and slides on/off screen
+// under the 900px breakpoint (style.css); on desktop these classes are never applied so this is
+// a no-op there. switchPage() itself is untouched -- this only closes the drawer after it runs.
+const btnMobileNavToggle = document.getElementById('btnMobileNavToggle');
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+function closeMobileNavDrawer() {
+  sidebar.classList.remove('sidebar-open');
+  sidebarBackdrop.classList.remove('visible');
+}
+
+function openMobileNavDrawer() {
+  sidebar.classList.add('sidebar-open');
+  sidebarBackdrop.classList.add('visible');
+}
+
+if (btnMobileNavToggle) {
+  btnMobileNavToggle.addEventListener('click', () => {
+    if (sidebar.classList.contains('sidebar-open')) {
+      closeMobileNavDrawer();
+    } else {
+      openMobileNavDrawer();
+    }
+  });
+}
+
+if (sidebarBackdrop) {
+  sidebarBackdrop.addEventListener('click', closeMobileNavDrawer);
+}
+
 navBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     if (btn.disabled) return;
     switchPage(btn.dataset.page);
+    closeMobileNavDrawer();
   });
 });
 

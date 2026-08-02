@@ -1478,6 +1478,24 @@ button:disabled {
   min-height: 0;
 }
 
+/* Hamburger toggle + backdrop only ever appear under the mobile drawer breakpoint below --
+   hidden by default so desktop is unaffected. */
+.mobile-nav-toggle {
+  display: none;
+  background: var(--surface-4);
+  color: var(--text-primary);
+  font-size: 16px;
+  padding: 8px 12px;
+}
+
+#sidebarBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
+}
+
 #sidebar {
   width: 232px;
   flex-shrink: 0;
@@ -3658,40 +3676,40 @@ button:disabled {
   }
 }
 
-/* Tablet and below: sidebar becomes a horizontal nav bar instead of a
-   left column, and the two-column New Milos City layout stacks. */
+/* Tablet and below: sidebar becomes an off-canvas drawer (hamburger toggle in the topbar)
+   instead of always-visible chrome, and the two-column New Milos City layout stacks. The
+   drawer reuses the desktop #sidebar/.nav-btn styling as-is (same vertical column, same
+   active left-border accent) -- only position/visibility change here. */
 @media (max-width: 900px) {
+  .mobile-nav-toggle {
+    display: inline-flex;
+  }
+
   .layout {
     flex-direction: column;
     min-height: 0;
   }
 
   #sidebar {
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    padding: 14px 14px 10px;
-    border-right: none;
-    border-bottom: 1px solid #35373f;
-    gap: 6px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 280px;
+    max-width: 82vw;
+    z-index: 200;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: var(--shadow-md);
   }
 
-  .sidebar-stats {
-    flex: 1 0 100%;
-    padding: 0 0 14px;
-    margin-bottom: 10px;
+  #sidebar.sidebar-open {
+    transform: translateX(0);
   }
 
-  .nav-btn {
-    flex: 0 0 auto;
-    border-radius: 20px;
-    padding: 9px 14px;
-    border-left: none !important;
-  }
-
-  .nav-btn.active {
-    background: #2f323c;
+  #sidebarBackdrop.visible {
+    display: block;
   }
 
   #content {
