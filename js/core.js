@@ -1241,3 +1241,24 @@ navBtns.forEach((btn) => {
   });
 });
 
+// Global modal Escape/backdrop-close -- applies uniformly to all .modal-overlay elements since
+// none of them wire their own dismissal beyond an explicit button. Modals representing an
+// active session, a choice the player must make explicitly, or a result that's only actually
+// applied to `character` when their OK button is clicked (duel/marriage prompts, a live duel in
+// progress, the slime duel result, the first-visit Milos warning) opt out via
+// [data-no-backdrop-close] so closing them any other way can't silently skip that.
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  document.querySelectorAll('.modal-overlay:not(.hidden)').forEach((modal) => {
+    if (!modal.hasAttribute('data-no-backdrop-close')) modal.classList.add('hidden');
+  });
+});
+
+document.querySelectorAll('.modal-overlay').forEach((modal) => {
+  modal.addEventListener('click', (e) => {
+    if (e.target !== modal) return;
+    if (modal.hasAttribute('data-no-backdrop-close')) return;
+    modal.classList.add('hidden');
+  });
+});
+
