@@ -893,6 +893,22 @@ milosTabBtns.forEach((btn) => {
   });
 });
 
+// ---------- milos category pills ----------
+// Pure opt-in filtering layer on top of the tab bar above -- only shows/hides which
+// .milos-tab-btn elements are visible by category. Never touches milosSubpages or which
+// subpage content renders; that stays 100% controlled by the handler above.
+const milosCatBtns = document.querySelectorAll('.milos-cat-btn');
+
+milosCatBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    milosCatBtns.forEach((b) => b.classList.toggle('active', b === btn));
+    const cat = btn.dataset.cat;
+    milosTabBtns.forEach((tabBtn) => {
+      tabBtn.classList.toggle('hidden', cat !== 'all' && tabBtn.dataset.milosCategory !== cat);
+    });
+  });
+});
+
 // ---------- inventory sub-tabs ----------
 const invTabBtns = document.querySelectorAll('.inv-tab-btn');
 const invSubpages = {

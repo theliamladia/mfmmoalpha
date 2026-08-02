@@ -1942,6 +1942,30 @@ button:disabled {
   color: var(--accent-foreground);
 }
 
+/* Category filter row above the milos-tab-btn bar -- same pill recipe, one tone lighter
+   (soft accent) so it doesn't compete visually with the tab-bar's own active state below it. */
+.milos-cat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.milos-cat-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.milos-cat-btn.active {
+  background: var(--accent-soft-bg);
+  color: var(--accent);
+  border-color: var(--accent-soft-border);
+}
+
 .gunclub-tab-btn {
   background: var(--surface-3);
   color: var(--text-secondary);
