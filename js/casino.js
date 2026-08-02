@@ -8,6 +8,15 @@ const btnBuyChipsMax = document.getElementById('btnBuyChipsMax');
 const btnCashOut = document.getElementById('btnCashOut');
 const btnCashOutMax = document.getElementById('btnCashOutMax');
 
+const btnGoToCoinflip = document.getElementById('btnGoToCoinflip');
+btnGoToCoinflip.addEventListener('click', () => {
+  switchPage('milos');
+  // Coinflip's own tab button might be hidden if a category pill filter was left active from a
+  // previous visit -- reset to "All" first so the click below always has something to click.
+  document.querySelector('.milos-cat-btn[data-cat="all"]').click();
+  document.querySelector('.milos-tab-btn[data-milos="coinflip"]').click();
+});
+
 btnBuyChips.addEventListener('click', async () => {
   try {
     const result = await apiBuyChips(Math.floor(+buyChipsInput.value));

@@ -10,6 +10,9 @@ const coinflipAnimation = document.getElementById('coinflipAnimation');
 const coinflipCoin = document.getElementById('coinflipCoin');
 const coinflipResultText = document.getElementById('coinflipResultText');
 
+const btnGoToCasino = document.getElementById('btnGoToCasino');
+btnGoToCasino.addEventListener('click', () => switchPage('casino'));
+
 let selectedCoinflipSide = 'heads';
 let coinflipLobbiesCache = [];
 let coinflipPollInterval = null;

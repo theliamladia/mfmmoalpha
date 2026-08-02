@@ -1949,6 +1949,15 @@ button:disabled {
   font-size: 16px;
 }
 
+.cross-link {
+  margin: 4px 0 18px;
+}
+
+.cross-link .secondary-btn {
+  font-size: 13px;
+  padding: 7px 14px;
+}
+
 .milos-tab-btn {
   background: var(--surface-3);
   color: var(--text-secondary);
