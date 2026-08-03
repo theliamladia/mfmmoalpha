@@ -71,6 +71,19 @@
   .balaclava-tier { padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #1c1c1c; }
   .balaclava-arrow { color: var(--muted); }
 
+  /* Balaclava image preview grid -- all 10 rank/gem badge assets at a glance. */
+  .balaclava-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 12px; margin: 16px 0; }
+  .balaclava-preview-item { text-align: center; }
+  .balaclava-preview-item img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #0d0e12; border: 1px solid #2c2e36; border-radius: 10px; }
+  .balaclava-preview-item span { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); }
+
+  /* Badge + title example row (John Doe mockup) -- badge slot shows BEFORE the title, per spec. */
+  .badge-title-example { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-family: var(--font-body); font-size: 15px; }
+  .badge-icon-img { width: 26px; height: 26px; object-fit: contain; vertical-align: middle; background: #0d0e12; border: 1px solid #2c2e36; border-radius: 6px; }
+  .title-badge { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 12px; line-height: 1.6; white-space: nowrap; vertical-align: middle; }
+  .title-million { background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcndscWptMXVneTR6N250Zzhod3V6c3RiNTI5bXJ5cWtsa2R2bnI3aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/12Eo7WogCAoj84/giphy.gif'); background-size: cover; background-position: center; font-weight: 700; }
+  .title-million .title-text { background: linear-gradient(90deg, #ff3b3b, #ff9d3b, #f4e04d, #4de07b, #4dc9f0, #8f6dff, #ff6de0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-weight: 700; -webkit-text-stroke: 0.6px #c9a227; paint-order: stroke fill; }
+
   .legends-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   .legend-chip { background: var(--panel2); border: 1px solid #2c2e36; border-radius: 8px; padding: 10px 12px; font-size: 13px; text-align: center; }
 
@@ -245,6 +258,12 @@
     <div class="card">
       <h3>Equip Title, Badge, or Both</h3>
       <p>You'll be able to equip a Title, a Badge, or one of each at the same time. The Switch Title chevron gets a matching dropdown for badge combos, so you can mix and match instead of picking just one.</p>
+      <p class="section-desc" style="margin:12px 0 0;">Example &mdash; Badge always renders first:</p>
+      <div class="badge-title-example">
+        <img class="badge-icon-img" src="../assets/badges/gold.png" alt="Gold Balaclava Badge">
+        <span class="title-badge title-million"><span class="title-text">$MILLION$</span></span>
+        <span>John Doe</span>
+      </div>
     </div>
   </div>
 
@@ -380,13 +399,27 @@
         <span class="balaclava-arrow">&rarr;</span>
         <span class="balaclava-tier" style="background:#ffd700;">Gold</span>
         <span class="balaclava-arrow">&rarr;</span>
-        <span class="balaclava-tier" style="background:#4da6ff;">Blue</span>
+        <span class="balaclava-tier" style="background:#5be3c9;">Platinum</span>
         <span class="balaclava-arrow">&rarr;</span>
-        <span class="balaclava-tier" style="background:#ff8c00;">Orange</span>
+        <span class="balaclava-tier" style="background:#a239ea; color:#fff;">Master</span>
         <span class="balaclava-arrow">&rarr;</span>
-        <span class="balaclava-tier" style="background:#ffffff;">Radiant White</span>
+        <span class="balaclava-tier" style="background:#e0483a; color:#fff;">Grandmaster</span>
       </div>
-      <p>Once you hit Radiant, trade it in for a <b>GEM Balaclava</b>: Sapphire (blue), Ruby (red), or Emerald (green). Collect all three Gem Balaclavas and trade up one final time for the <b>UNITS Balaclava</b> (yellow).</p>
+      <p>Once you hit Grandmaster, trade it in for a <b>GEM Balaclava</b>: Ruby (red), Sapphire (blue), or Emerald (green). Collect all three Gem Balaclavas and trade up one final time for the <b>UNITS Balaclava</b> (yellow).</p>
+
+      <p class="section-desc" style="margin:16px 0 0;">All 10 badge states:</p>
+      <div class="balaclava-preview-grid">
+        <div class="balaclava-preview-item"><img src="../assets/badges/bronze.png" alt="Bronze"><span>Bronze</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/silver.png" alt="Silver"><span>Silver</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/gold.png" alt="Gold"><span>Gold</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/platinum.png" alt="Platinum"><span>Platinum</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/master.png" alt="Master"><span>Master</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/grandmaster.png" alt="Grandmaster"><span>Grandmaster</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/ruby.png" alt="Ruby"><span>Ruby</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/sapphire.png" alt="Sapphire"><span>Sapphire</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/emerald.png" alt="Emerald"><span>Emerald</span></div>
+        <div class="balaclava-preview-item"><img src="../assets/badges/units.png" alt="UNITS"><span>UNITS</span></div>
+      </div>
     </div>
 
     <div class="card">
