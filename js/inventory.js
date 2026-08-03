@@ -12,9 +12,11 @@ const equipPickerTitle = document.getElementById('equipPickerTitle');
 const equipPickerList = document.getElementById('equipPickerList');
 const btnEquipPickerClose = document.getElementById('btnEquipPickerClose');
 
-// Crate sections render in the same order as the Switch Title dropdown's groups, with
-// "Other Titles" (purchased/leaderboard/custom -- never crate-sourced) always last.
-const CRATE_GROUP_ORDER = [...TITLE_CRATE_GROUPS.map((g) => g.label), OTHER_TITLES_LABEL];
+// Crate sections render in the same order as the Switch Title dropdown's groups, with a dedicated
+// Graded Titles section (still reachable here via the MTN item picker, js/mtn.js, even though
+// renderCosmeticsGrid() below excludes graded stacks from this file's own grid) and "Other Titles"
+// (purchased/leaderboard/custom -- never crate-sourced) always last.
+const CRATE_GROUP_ORDER = [...TITLE_CRATE_GROUPS.map((g) => g.label), NMG_GRADED_LABEL, OTHER_TITLES_LABEL];
 
 // UI-only state for the Cosmetics accordion -- which crate section is open and which of its
 // Regular/Prestige sub-tabs is active. Lives outside buildInventoryGrid() so it survives the

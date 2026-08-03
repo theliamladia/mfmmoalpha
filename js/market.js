@@ -352,8 +352,14 @@ const TITLE_CRATE_GROUPS = [
   { label: '🔵 BLUE CRATE', ids: new Set([...BLUE_CRATE_TITLES.map((t) => t.id), 'blueBidenAuto']) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';
+const NMG_GRADED_LABEL = '🏅 Graded Titles';
 
 function titleCrateGroupLabel(title) {
+  // Graded titles get their own section regardless of which crate the base title came from --
+  // checked before the crate lookup below since nmgBaseId (not prestigeBaseId) would otherwise
+  // just fall through to "Other Titles" (the full `${baseId}_nmg${grade}` id never matches any
+  // crate's id Set).
+  if (title.nmgGrade) return NMG_GRADED_LABEL;
   const baseId = title.prestigeBaseId || title.id;
   const group = TITLE_CRATE_GROUPS.find((g) => g.ids.has(baseId));
   return group ? group.label : OTHER_TITLES_LABEL;

@@ -271,13 +271,25 @@ function renderGradedTitlesGrid() {
     return;
   }
 
-  gradedTitlesGrid.innerHTML = gradedStacks.map(({ stack, item }) => `
+  gradedTitlesGrid.innerHTML = gradedStacks.map(({ stack, item }) => {
+    // Graded titles still carry `rarity` (inherited via the spread in getItemDef's NMG branch),
+    // so the existing sellTitle() (js/inventory.js) works unchanged -- same price table as any
+    // other title of that base rarity, same confirm-dialog/remove/pay-out flow. This doubles as
+    // the "delete" option: there's nothing else useful to do with a graded slab you don't want.
+    const sellPrice = item.rarity ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
+    return `
     <div class="hustle-card">
       ${nmgSlabHtml(item, { small: true })}
       <p>&times; ${stack.qty}</p>
       <button data-nmg-showcase="${stack.id}" class="secondary-btn">Add to Showcase</button>
+      ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
     </div>
-  `).join('');
+  `;
+  }).join('');
+
+  gradedTitlesGrid.querySelectorAll('button[data-sell-title]').forEach((btn) => {
+    btn.addEventListener('click', () => sellTitle(btn.dataset.sellTitle));
+  });
 
   gradedTitlesGrid.querySelectorAll('button[data-nmg-showcase]').forEach((btn) => {
     btn.addEventListener('click', async () => {
