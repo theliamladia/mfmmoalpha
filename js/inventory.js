@@ -31,7 +31,12 @@ function titleStackCardHtml(stack) {
   // Base (unprestiged) stacks need 6 so one copy survives the prestige; already-prestiged
   // stacks fully convert at 5, since there's no reason to keep the lower prestige rank around.
   const prestigeThreshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
-  const canPrestige = item.rarity && stack.qty >= prestigeThreshold;
+  // A graded (NMG) title inherits `rarity` from its base via the spread in getItemDef(), so this
+  // must explicitly exclude it too -- otherwise a slab could be "prestiged" into a nonsensical
+  // double-suffixed id (`..._nmg7_p1`). Graded stacks shouldn't reach this card at all in practice
+  // (renderCosmeticsGrid() excludes them, they render via the Graded Titles tab instead) but this
+  // stays defensive since titleStackCardHtml() has no other guarantee about its caller.
+  const canPrestige = item.rarity && !item.nmgGrade && stack.qty >= prestigeThreshold;
   return `
     <div class="hustle-card">
       <h3>${itemLabel(item)}</h3>
@@ -68,9 +73,11 @@ function groupTitleStacksByCrate(titleStacks) {
 }
 
 function renderCosmeticsGrid() {
+  // Graded (NMG) titles get their own dedicated Graded Titles tab, kept separate from Cosmetics --
+  // see renderGradedTitlesGrid() in js/nmg.js.
   const titleStacks = character.inventory.filter((stack) => {
     const item = getItemDef(stack.id);
-    return item && item.type === 'title';
+    return item && item.type === 'title' && !item.nmgGrade;
   });
 
   if (!titleStacks.length) {
@@ -197,6 +204,7 @@ function buildInventoryGrid() {
     : '<p class="equip-picker-empty">No items yet. Buy a gun or ammo at the NMC Gun Club, or drugs from Guzman.</p>';
 
   renderCosmeticsGrid();
+  if (typeof renderGradedTitlesGrid === 'function') renderGradedTitlesGrid();
 
   tradeItemSelect.innerHTML = character.inventory.length
     ? character.inventory.map((stack) => {
@@ -234,7 +242,7 @@ function sellTitle(stackId) {
 
 function prestigeTitle(stackId) {
   const item = getItemDef(stackId);
-  if (!item || !item.rarity) return;
+  if (!item || !item.rarity || item.nmgGrade) return;
   const { baseId, level } = parsePrestigeId(stackId);
   const threshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
   if (inventoryQty(stackId) < threshold) return;

@@ -489,6 +489,107 @@ button:disabled {
   overflow: hidden;
 }
 
+/* ---------- New Milos Grading (NMG) ---------- */
+/* Widened toward the source title art's real aspect ratio (the RED/BLUE crate photos are ~2.6:1
+   landscape) rather than a tall trading-card shape -- a near-square art panel would crop that
+   framing away under background-size:cover. */
+.nmg-slab {
+  width: 340px;
+  max-width: 100%;
+  border-radius: 14px;
+  background: #d9dadd;
+  border: 3px solid #b8b9bd;
+  padding: 10px;
+  margin: 0 auto;
+}
+
+.nmg-slab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  gap: 8px;
+}
+
+.nmg-slab-header-text p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 11px;
+  color: #111;
+  line-height: 1.35;
+}
+
+.nmg-slab-grade-box {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.nmg-slab-grade-label {
+  display: block;
+  font-family: cursive;
+  font-size: 12px;
+}
+
+.nmg-slab-grade-number {
+  display: block;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.nmg-slab-wordmark {
+  text-align: center;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin: 6px 0;
+  background: linear-gradient(90deg, #e0393e, #3b5fe0, #7d3be0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nmg-slab-art {
+  width: 100%;
+  height: 150px;
+  border-radius: 6px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-0);
+}
+
+/* Small variant for inline contexts -- Graded Titles inventory cards, submit-modal preview.
+   Same ~2.3:1 landscape ratio as the full slab, just scaled down. */
+.nmg-slab.nmg-slab-sm { width: 240px; }
+.nmg-slab.nmg-slab-sm .nmg-slab-art { height: 105px; }
+.nmg-slab.nmg-slab-sm .nmg-slab-grade-number { font-size: 24px; }
+
+/* Slot cards -- Market > New Milos Grading, one of 3 states (empty/pending/ready). */
+.nmg-slot-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.nmg-slot-empty-icon { font-size: 40px; opacity: 0.5; }
+.nmg-slot-pending-title { font-weight: 600; }
+.nmg-slot-countdown { font-size: 13px; color: var(--text-muted); }
+.nmg-slot-ready-badge { color: var(--accent); font-weight: 700; }
+
+/* Submit-modal turnaround tier picker. */
+.nmg-tier-options { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.nmg-tier-btn {
+  background: var(--surface-3);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  text-align: left;
+  line-height: 1.5;
+}
+.nmg-tier-btn.active {
+  background: var(--accent-soft-bg);
+  border-color: var(--accent-soft-border);
+  color: var(--accent);
+}
+
 /* Anima Crate mystery-pull convention: the real name lives in the data (Showcase, Inventory,
    Trade, MTN, etc.) but never renders on the badge chip itself -- art only. */
 .title-text-hidden {

@@ -315,7 +315,11 @@ btnProfileStatus.addEventListener('click', async () => {
 // self-only "equip" action and character.titles.equipped highlighting.
 const expandedProfilePickerGroups = new Set();
 
-function renderGroupedTitlePicker(items, onPick, extraTopHtml) {
+// `listEl` defaults to the Profile Showcase/Banner picker's own list so both existing call sites
+// (Showcase-add, Banner-shuffle) work unchanged -- pass a different element to reuse this same
+// grouped/sorted/collapsible picker UI against a different modal (e.g. the NMG title-submit picker
+// in js/nmg.js) without duplicating this logic.
+function renderGroupedTitlePicker(items, onPick, extraTopHtml, listEl = profileShowcasePickerList) {
   const groups = new Map();
   items.forEach((t) => {
     const label = titleCrateGroupLabel(t);
@@ -343,23 +347,23 @@ function renderGroupedTitlePicker(items, onPick, extraTopHtml) {
     `;
   }).join('');
 
-  profileShowcasePickerList.innerHTML = (extraTopHtml || '') + groupsHtml
+  listEl.innerHTML = (extraTopHtml || '') + groupsHtml
     || '<p class="equip-picker-empty">Nothing to pick from.</p>';
 
-  profileShowcasePickerList.querySelectorAll('[data-picker-group-toggle]').forEach((el) => {
+  listEl.querySelectorAll('[data-picker-group-toggle]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       const label = el.dataset.pickerGroupToggle;
       if (expandedProfilePickerGroups.has(label)) expandedProfilePickerGroups.delete(label);
       else expandedProfilePickerGroups.add(label);
-      renderGroupedTitlePicker(items, onPick, extraTopHtml);
+      renderGroupedTitlePicker(items, onPick, extraTopHtml, listEl);
     });
   });
 
-  profileShowcasePickerList.querySelectorAll('[data-picker-select]').forEach((el) => {
+  listEl.querySelectorAll('[data-picker-select]').forEach((el) => {
     el.addEventListener('click', () => onPick(el.dataset.pickerSelect));
   });
-  profileShowcasePickerList.querySelectorAll('[data-picker-select-top]').forEach((el) => {
+  listEl.querySelectorAll('[data-picker-select-top]').forEach((el) => {
     el.addEventListener('click', () => onPick(el.dataset.pickerSelectTop));
   });
 }

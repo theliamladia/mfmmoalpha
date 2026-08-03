@@ -5,6 +5,7 @@ const shopEls = {
   pizza: document.getElementById('shop-pizza'),
   maxx: document.getElementById('shop-maxx'),
   titles: document.getElementById('shop-titles'),
+  nmg: document.getElementById('shop-nmg'),
 };
 
 marketTabBtns.forEach((btn) => {
@@ -94,6 +95,7 @@ function tickCooldownUI() {
   tickFarmsUI();
   tickSlimedUI();
   if (typeof tickInvestorL2CountdownUI === 'function') tickInvestorL2CountdownUI();
+  if (typeof tickNmgSlotsUI === 'function') tickNmgSlotsUI();
   if (!shopEls.gym.classList.contains('hidden')) renderGym();
 }
 
@@ -363,11 +365,11 @@ function titleCrateGroupLabel(title) {
 // getItemDef resolves prestige ids (betaSpin2026_p1, etc.) that never appear in the static
 // catalogs, so this is the only reliable way to enumerate everything ownable for the dropdown.
 function ownedTitleDefs() {
-  const fromOwned = character.titles.owned.map((id) => getItemDef(id)).filter((t) => t && t.type === 'title');
+  const fromOwned = character.titles.owned.map((id) => getItemDef(id)).filter((t) => t && t.type === 'title' && !t.nonEquippable);
   const fromInventory = character.inventory
     .filter((stack) => stack.qty > 0)
     .map((stack) => getItemDef(stack.id))
-    .filter((t) => t && t.type === 'title');
+    .filter((t) => t && t.type === 'title' && !t.nonEquippable);
   const seen = new Set();
   return [...fromOwned, ...fromInventory].filter((t) => {
     if (seen.has(t.id)) return false;
@@ -376,11 +378,18 @@ function ownedTitleDefs() {
   });
 }
 
+// Extracted so other surfaces that need a title's own art (e.g. the NMG slab's big art panel,
+// js/nmg.js) can reuse this exact background construction without duplicating the ternary.
+function titleArtInlineStyle(title) {
+  if (!title.custom) return '';
+  return title.isGif
+    ? `background-image:url('${title.background}');background-size:cover;background-position:center;`
+    : `background:${title.background};`;
+}
+
 function titleBadgeMarkup(title) {
   if (title.custom) {
-    const bg = title.isGif
-      ? `background-image:url('${title.background}');background-size:cover;background-position:center;`
-      : `background:${title.background};`;
+    const bg = titleArtInlineStyle(title);
     const border = title.borderColor ? `border:2px solid ${title.borderColor};` : '';
     const textColor = title.textColor ? `color:${title.textColor};` : '';
     return `<span class="title-badge" style="${bg}${border}"><span class="title-text" style="${textColor}">${escapeHtml(title.name)}</span></span>`;

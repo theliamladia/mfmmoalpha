@@ -561,6 +561,27 @@ function compareTitleStacksByRarityThenPrestige(idOf, itemOf) {
 const PRESTIGE_ID_RE = /^(.+)_p(\d+)$/;
 const PRESTIGE_COST = 5;
 
+// New Milos Grading (NMG) results are synthesized the same way prestige is -- id shape
+// `${baseTitleId}_nmg${grade}`, e.g. cfHyperSapphire_p1_nmg7 = "HYPER I NMG 7". Unlike prestige's
+// numeral, the grade itself was a one-time random roll (server-side, see mfmmoserver/gameLogic.js
+// rollNmgGrade), but once revealed it's permanently baked into the id string exactly like the
+// prestige level is -- so no separate persisted-full-def array is needed, the id alone is
+// self-describing. This is the client's single source of truth for label/color display; the
+// server's own copy (gameLogic.js NMG_GRADE_WEIGHTS) only needs the numeric odds, never these.
+const NMG_ID_RE = /^(.+)_nmg(\d{1,2})$/;
+const NMG_GRADE_TIERS = {
+  10: { label: 'Elite', color: '#f7d51d' },
+  9: { label: 'Mint', color: '#ffffff' },
+  8: { label: 'Good', color: '#ffffff' },
+  7: { label: 'Worn', color: '#c9a875' },
+  6: { label: 'Worn', color: '#c9a875' },
+  5: { label: 'Worn', color: '#c9a875' },
+  4: { label: 'Worn', color: '#c9a875' },
+  3: { label: 'Sub', color: '#8a8a8a' },
+  2: { label: 'Sub', color: '#8a8a8a' },
+  1: { label: 'Sub', color: '#8a8a8a' },
+};
+
 function toRoman(num) {
   const table = [
     [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
@@ -596,6 +617,28 @@ function getItemDef(itemId, char = character) {
   if (DRUG_ITEMS_BY_ID[itemId]) return DRUG_ITEMS_BY_ID[itemId];
   if (WRESTLING_GEAR_ITEMS_BY_ID[itemId]) return WRESTLING_GEAR_ITEMS_BY_ID[itemId];
   if (ARMOR_ITEMS_BY_ID[itemId]) return ARMOR_ITEMS_BY_ID[itemId];
+
+  // Checked before the plain prestige branch below since a graded PRESTIGED title's id wraps the
+  // prestige id (`${baseId}_p2_nmg7`) -- the two regexes have disjoint literal markers (`_p` vs
+  // `_nmg`) so trying this one first never misfires on a plain (non-graded) prestige id.
+  const nmgMatch = NMG_ID_RE.exec(itemId);
+  if (nmgMatch) {
+    const [, baseId, gradeStr] = nmgMatch;
+    const baseTitle = getItemDef(baseId, char);
+    if (!baseTitle) return null;
+    const grade = Number(gradeStr);
+    const tier = NMG_GRADE_TIERS[grade];
+    return {
+      ...baseTitle,
+      id: itemId,
+      name: `${baseTitle.name} NMG ${grade}`,
+      how: `${baseTitle.how} (New Milos Graded: ${tier.label} ${grade}.)`,
+      type: 'title',
+      nonEquippable: true,
+      nmgGrade: grade,
+      nmgBaseId: baseId,
+    };
+  }
 
   const prestigeMatch = PRESTIGE_ID_RE.exec(itemId);
   if (prestigeMatch) {

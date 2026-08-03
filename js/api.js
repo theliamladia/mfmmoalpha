@@ -653,3 +653,13 @@ function apiGetCrateStock() {
 function apiSpinRedBlueCrate(crateKey, qty) {
   return apiRequest('/crates/redblue/spin', { method: 'POST', body: JSON.stringify({ crate: crateKey, qty }) });
 }
+
+function apiNmgState() {
+  return apiRequest('/nmg/state');
+}
+function apiNmgSubmit(stackId, tier) {
+  return apiRequest('/nmg/submit', { method: 'POST', body: JSON.stringify({ stackId, tier }) });
+}
+function apiNmgReveal(slotId) {
+  return apiRequest('/nmg/reveal', { method: 'POST', body: JSON.stringify({ slotId }) });
+}
