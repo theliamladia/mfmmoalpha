@@ -524,6 +524,11 @@ button:disabled {
 .nmg-slab-grade-box {
   text-align: right;
   flex-shrink: 0;
+  background: #0a0a0a;
+  border-radius: 6px;
+  padding: 4px 10px;
+  /* White-graded tiers (Mint/Good) would otherwise render invisible against the header's white
+     background -- this box is what the reference image actually showed, not an afterthought. */
 }
 
 .nmg-slab-grade-label {
