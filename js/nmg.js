@@ -311,6 +311,14 @@ function crackNmgTitle(stackId) {
   character.cash = round2(character.cash - NMG_CRACK_COST);
   removeFromInventory(stackId, 1);
   addToInventory(item.nmgBaseId, 1);
+  // Portfolio Showcase pins by id, not by live ownership (getItemDef synthesizes the slab from the
+  // id alone, same as the original Title Showcase) -- without this it'd keep rendering a slab that
+  // no longer exists. No Player Market cleanup needed here: a listed slab is already pulled out of
+  // character.inventory at listing time (doCreateListing), so it can never appear in
+  // crackNmgCandidates() to begin with -- you'd have to cancel the listing first.
+  if (character.profile && character.profile.slabShowcaseIds) {
+    character.profile.slabShowcaseIds = character.profile.slabShowcaseIds.filter((id) => id !== stackId);
+  }
   logTo(nmgLog, `Cracked ${itemLabel(item)} back into ${itemLabel(baseTitle)}.`, 'loss');
   save();
   renderAll();
