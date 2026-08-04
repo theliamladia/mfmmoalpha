@@ -4552,6 +4552,43 @@ button:disabled {
   margin-bottom: 18px;
 }
 
+.profile-slab-section-card {
+  margin-bottom: 18px;
+}
+
+.profile-slab-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 12px 0;
+}
+
+.profile-slab-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 340px;
+  max-width: 100%;
+}
+
+.profile-slab-slot-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.profile-slab-slot-actions button {
+  flex: 1;
+}
+
+.profile-slab-market-price {
+  margin: 0;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent);
+}
+
 .profile-wall-post-row {
   display: flex;
   gap: 10px;

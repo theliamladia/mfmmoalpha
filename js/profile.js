@@ -1,5 +1,7 @@
 // ---------- Player Profiles ----------
 const PROFILE_SHOWCASE_MAX = 4;
+const PROFILE_SLAB_SHOWCASE_MAX = 4;
+const PROFILE_SLAB_MARKET_MAX = 4;
 
 const profileNotFound = document.getElementById('profileNotFound');
 const profileContent = document.getElementById('profileContent');
@@ -22,6 +24,10 @@ const profileShowcasePicker = document.getElementById('profileShowcasePicker');
 const profileShowcasePickerTitle = document.getElementById('profileShowcasePickerTitle');
 const profileShowcasePickerList = document.getElementById('profileShowcasePickerList');
 const btnProfileShowcasePickerClose = document.getElementById('btnProfileShowcasePickerClose');
+const profileSlabShowcaseGrid = document.getElementById('profileSlabShowcaseGrid');
+const btnProfileSlabShowcaseAdd = document.getElementById('btnProfileSlabShowcaseAdd');
+const profileSlabMarketGrid = document.getElementById('profileSlabMarketGrid');
+const btnProfileSlabMarketList = document.getElementById('btnProfileSlabMarketList');
 const profileWallInput = document.getElementById('profileWallInput');
 const btnProfileWallPost = document.getElementById('btnProfileWallPost');
 const profileWallList = document.getElementById('profileWallList');
@@ -217,7 +223,112 @@ function renderProfile() {
     });
   }
 
+  renderProfileSlabShowcase();
+  renderProfileSlabMarket();
   renderProfileWall();
+}
+
+// Portfolio Showcase: same pin/unpin shape as the Title Showcase above, restricted to graded slabs
+// (nmgGrade truthy) and rendered full-size via nmgSlabHtml (js/nmg.js) instead of the small badge
+// chip -- the whole point of this section is showing off the actual slab art.
+function renderProfileSlabShowcase() {
+  if (!profileViewCache) return;
+  const { character: viewedChar, isOwner } = profileViewCache;
+  const profileState = viewedChar.profile || {};
+  const slabIds = profileState.slabShowcaseIds || [];
+  const slabDefs = slabIds.map((id) => getItemDef(id, viewedChar)).filter((d) => d && d.nmgGrade);
+
+  profileSlabShowcaseGrid.innerHTML = slabDefs.length
+    ? slabDefs.map((def) => `
+      <div class="profile-slab-slot">
+        ${nmgSlabHtml(def)}
+        ${isOwner ? `
+          <div class="profile-slab-slot-actions">
+            <button class="secondary-btn" data-slab-showcase-remove="${def.id}">Remove</button>
+          </div>
+        ` : ''}
+      </div>
+    `).join('')
+    : '<p class="equip-picker-empty">No slabs showcased yet.</p>';
+
+  btnProfileSlabShowcaseAdd.classList.toggle('hidden', !isOwner || slabIds.length >= PROFILE_SLAB_SHOWCASE_MAX);
+
+  if (isOwner) {
+    profileSlabShowcaseGrid.querySelectorAll('button[data-slab-showcase-remove]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        try {
+          const result = await apiRemoveSlabShowcase(btn.dataset.slabShowcaseRemove);
+          character = result.character;
+          save();
+          renderAll();
+          await loadProfile(profileViewCache.username);
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
+      });
+    });
+  }
+}
+
+// Player Market: backed by the same shared mtn_listings table as the general Milos Trading
+// Network (js/mtn.js) -- listings are agnostic to which UI created them, so Cancel/Buy here just
+// reuse apiMtnCancel/apiMtnBuy unchanged. profileViewCache.slabMarketListings is already scoped to
+// this one profile's graded-title listings server-side (GET /profile/:username).
+function renderProfileSlabMarket() {
+  if (!profileViewCache) return;
+  const { isOwner, slabMarketListings } = profileViewCache;
+  const listings = slabMarketListings || [];
+
+  profileSlabMarketGrid.innerHTML = listings.length
+    ? listings.map((listing) => {
+      const def = getItemDef(listing.itemId);
+      if (!def) return '';
+      return `
+        <div class="profile-slab-slot">
+          ${nmgSlabHtml(def)}
+          <p class="profile-slab-market-price">$${listing.pricePerUnit.toLocaleString()}</p>
+          <div class="profile-slab-slot-actions">
+            ${isOwner
+              ? `<button class="secondary-btn" data-slab-market-cancel="${listing.id}">Cancel Listing</button>`
+              : `<button data-slab-market-buy="${listing.id}">Buy</button>`}
+          </div>
+        </div>
+      `;
+    }).join('')
+    : '<p class="equip-picker-empty">No slabs listed for sale.</p>';
+
+  btnProfileSlabMarketList.classList.toggle('hidden', !isOwner || listings.length >= PROFILE_SLAB_MARKET_MAX);
+
+  if (isOwner) {
+    profileSlabMarketGrid.querySelectorAll('button[data-slab-market-cancel]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        try {
+          const result = await apiMtnCancel(Number(btn.dataset.slabMarketCancel));
+          character = result.character;
+          save();
+          renderAll();
+          await loadProfile(profileViewCache.username);
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
+      });
+    });
+  } else {
+    profileSlabMarketGrid.querySelectorAll('button[data-slab-market-buy]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Buy this slab?')) return;
+        try {
+          const result = await apiMtnBuy(Number(btn.dataset.slabMarketBuy));
+          character = result.character;
+          save();
+          renderAll();
+          await loadProfile(profileViewCache.username);
+        } catch (err) {
+          if (err.reason) alert(err.reason);
+        }
+      });
+    });
+  }
 }
 
 function renderProfileWall() {
@@ -389,6 +500,56 @@ btnProfileShowcaseAdd.addEventListener('click', () => {
       save();
       renderAll();
       profileShowcasePicker.classList.add('hidden');
+      await loadProfile(profileViewCache.username);
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
+  });
+});
+
+btnProfileSlabShowcaseAdd.addEventListener('click', () => {
+  if (!profileViewCache) return;
+  const owned = profileOwnedTitleDefs(profileViewCache.character).filter((d) => d.nmgGrade);
+  const slabIds = (profileViewCache.character.profile && profileViewCache.character.profile.slabShowcaseIds) || [];
+  const available = owned.filter((d) => !slabIds.includes(d.id));
+  openProfilePicker('Add a slab to your Portfolio Showcase');
+  renderGroupedTitlePicker(available, async (titleId) => {
+    try {
+      const result = await apiAddSlabShowcase(titleId);
+      character = result.character;
+      save();
+      renderAll();
+      profileShowcasePicker.classList.add('hidden');
+      await loadProfile(profileViewCache.username);
+    } catch (err) {
+      if (err.reason) alert(err.reason);
+    }
+  });
+});
+
+// Reuses the same picker modal (openProfilePicker/renderGroupedTitlePicker) as every other
+// title-picking flow on this page -- the only thing unique to listing is the price, asked via a
+// plain prompt() after the pick, same idiom the profile Status editor already uses rather than
+// building a whole second modal step just for one number input.
+btnProfileSlabMarketList.addEventListener('click', () => {
+  if (!profileViewCache) return;
+  const owned = profileOwnedTitleDefs(profileViewCache.character).filter((d) => d.nmgGrade);
+  openProfilePicker('List a slab for sale');
+  renderGroupedTitlePicker(owned, async (titleId) => {
+    profileShowcasePicker.classList.add('hidden');
+    const def = getItemDef(titleId, profileViewCache.character);
+    const priceStr = prompt(`List ${def ? itemLabel(def) : titleId} for how much? ($)`);
+    if (priceStr === null) return;
+    const price = Number(priceStr);
+    if (!(price > 0)) {
+      alert('Enter a valid price.');
+      return;
+    }
+    try {
+      const result = await apiListSlabForSale(titleId, price);
+      character = result.character;
+      save();
+      renderAll();
       await loadProfile(profileViewCache.username);
     } catch (err) {
       if (err.reason) alert(err.reason);

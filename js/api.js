@@ -393,6 +393,15 @@ function apiAddShowcaseTitle(titleId) {
 function apiRemoveShowcaseTitle(titleId) {
   return apiRequest('/profile/showcase/remove', { method: 'POST', body: JSON.stringify({ titleId }) });
 }
+function apiAddSlabShowcase(titleId) {
+  return apiRequest('/profile/slab-showcase/add', { method: 'POST', body: JSON.stringify({ titleId }) });
+}
+function apiRemoveSlabShowcase(titleId) {
+  return apiRequest('/profile/slab-showcase/remove', { method: 'POST', body: JSON.stringify({ titleId }) });
+}
+function apiListSlabForSale(itemId, price) {
+  return apiRequest('/profile/slab-market/list', { method: 'POST', body: JSON.stringify({ itemId, price }) });
+}
 function apiPostWall(targetUsername, text) {
   return apiRequest('/profile/wall/post', { method: 'POST', body: JSON.stringify({ targetUsername, text }) });
 }
