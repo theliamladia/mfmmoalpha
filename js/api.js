@@ -343,6 +343,10 @@ function apiAdminGrantItem(username, itemId, qty) {
   return apiRequest('/admin/grant-item', { method: 'POST', body: JSON.stringify({ username, itemId, qty }) });
 }
 
+function apiAdminNmgFastForwardAll() {
+  return apiRequest('/admin/nmg-fast-forward-all', { method: 'POST' });
+}
+
 function apiAdminTransactions({ username, beforeId } = {}) {
   const params = new URLSearchParams();
   if (username) params.set('username', username);
