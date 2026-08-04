@@ -24,6 +24,17 @@ const nmgRevealStatus = document.getElementById('nmgRevealStatus');
 const nmgRevealSlab = document.getElementById('nmgRevealSlab');
 const btnNmgRevealOk = document.getElementById('btnNmgRevealOk');
 
+const btnNmgCrackOpen = document.getElementById('btnNmgCrackOpen');
+const nmgCrackModal = document.getElementById('nmgCrackModal');
+const nmgCrackPickerList = document.getElementById('nmgCrackPickerList');
+const btnNmgCrackClose = document.getElementById('btnNmgCrackClose');
+
+const nmgViewSlabModal = document.getElementById('nmgViewSlabModal');
+const nmgViewSlabContent = document.getElementById('nmgViewSlabContent');
+const btnNmgViewSlabClose = document.getElementById('btnNmgViewSlabClose');
+
+const NMG_CRACK_COST = 50000;
+
 let nmgSlotsCache = [];
 let nmgSubmitSelectedStackId = null;
 let nmgSubmitSelectedTier = null;
@@ -50,16 +61,18 @@ function titleOddsLabel(item) {
   return item.rarity ? item.rarity.toUpperCase() : '';
 }
 
-// Shared by the reveal modal (full size) and the Graded Titles inventory grid (small size).
-// `item` must already be the resolved graded def (has nmgGrade/nmgBaseId set, see the NMG_ID_RE
-// branch in getItemDef, js/core.js).
-function nmgSlabHtml(item, { small } = {}) {
+// Used for the reveal modal's "big reveal" moment, where there's room for the full header/
+// wordmark/art treatment. `item` must already be the resolved graded def (has nmgGrade/nmgBaseId
+// set, see the NMG_ID_RE branch in getItemDef, js/core.js). The Graded Titles inventory list uses
+// the much more compact nmgGradedRowPreviewHtml() below instead -- the full slab is too tall/heavy
+// for routine browsing in the narrow character side panel.
+function nmgSlabHtml(item) {
   const baseTitle = getItemDef(item.nmgBaseId);
   const tier = NMG_GRADE_TIERS[item.nmgGrade];
   const artClass = baseTitle.custom ? '' : baseTitle.cssClass;
   const artStyle = titleArtInlineStyle(baseTitle);
   return `
-    <div class="nmg-slab${small ? ' nmg-slab-sm' : ''}">
+    <div class="nmg-slab">
       <div class="nmg-slab-header">
         <div class="nmg-slab-header-text">
           <p>${escapeHtml(titleCrateGroupLabel(baseTitle).replace(/^\S+\s/, ''))}</p>
@@ -73,6 +86,22 @@ function nmgSlabHtml(item, { small } = {}) {
       </div>
       <div class="nmg-slab-wordmark">NMG</div>
       <div class="nmg-slab-art ${artClass}" style="${artStyle}"></div>
+    </div>
+  `;
+}
+
+// Compact preview for the Graded Titles inventory list -- a small landscape art thumbnail with
+// the grade badge overlaid in the corner, matching the same compact/scannable card shape every
+// other inventory card in this sidebar already uses (title, subheading, small preview, qty,
+// actions -- see titleStackCardHtml, js/inventory.js) instead of the full ornate slab.
+function nmgGradedRowPreviewHtml(item) {
+  const baseTitle = getItemDef(item.nmgBaseId);
+  const tier = NMG_GRADE_TIERS[item.nmgGrade];
+  const artClass = baseTitle.custom ? '' : baseTitle.cssClass;
+  const artStyle = titleArtInlineStyle(baseTitle);
+  return `
+    <div class="nmg-mini-preview ${artClass}" style="${artStyle}">
+      <span class="nmg-mini-grade-badge" style="color:${tier.color}">${item.nmgGrade}</span>
     </div>
   `;
 }
@@ -258,6 +287,66 @@ btnNmgRevealOk.addEventListener('click', () => {
   nmgRevealModal.classList.add('hidden');
 });
 
+// ---------- Crack flow ----------
+// Cracking has no timing/pricing property to protect (unlike grading itself), so it follows the
+// same client-side/trust-based precedent as Sell/Prestige (js/inventory.js) rather than adding a
+// new server route.
+function crackNmgCandidates() {
+  return character.inventory
+    .filter((stack) => stack.qty > 0)
+    .map((stack) => getItemDef(stack.id))
+    .filter((t) => t && t.nmgGrade);
+}
+
+function crackNmgTitle(stackId) {
+  const item = getItemDef(stackId);
+  if (!item || !item.nmgGrade) return;
+  if (character.cash < NMG_CRACK_COST) {
+    alert(`You need $${NMG_CRACK_COST.toLocaleString()} to crack a slab.`);
+    return;
+  }
+  const baseTitle = getItemDef(item.nmgBaseId);
+  if (!confirm(`Crack ${itemLabel(item)} for $${NMG_CRACK_COST.toLocaleString()}? This removes the grade and returns 1x ${itemLabel(baseTitle)} to your inventory. This cannot be undone.`)) return;
+
+  character.cash = round2(character.cash - NMG_CRACK_COST);
+  removeFromInventory(stackId, 1);
+  addToInventory(item.nmgBaseId, 1);
+  logTo(nmgLog, `Cracked ${itemLabel(item)} back into ${itemLabel(baseTitle)}.`, 'loss');
+  save();
+  renderAll();
+}
+
+function openNmgCrackModal() {
+  renderGroupedTitlePicker(crackNmgCandidates(), (titleId) => {
+    nmgCrackModal.classList.add('hidden');
+    crackNmgTitle(titleId);
+  }, null, nmgCrackPickerList);
+  nmgCrackModal.classList.remove('hidden');
+}
+
+if (btnNmgCrackOpen) {
+  btnNmgCrackOpen.addEventListener('click', () => openNmgCrackModal());
+}
+if (btnNmgCrackClose) {
+  btnNmgCrackClose.addEventListener('click', () => {
+    nmgCrackModal.classList.add('hidden');
+  });
+}
+
+// ---------- View full slab modal ----------
+
+function openNmgViewSlabModal(item) {
+  if (!nmgViewSlabModal || !nmgViewSlabContent) return;
+  nmgViewSlabContent.innerHTML = nmgSlabHtml(item);
+  nmgViewSlabModal.classList.remove('hidden');
+}
+
+if (btnNmgViewSlabClose) {
+  btnNmgViewSlabClose.addEventListener('click', () => {
+    nmgViewSlabModal.classList.add('hidden');
+  });
+}
+
 // ---------- Graded Titles inventory tab ----------
 
 function renderGradedTitlesGrid() {
@@ -272,6 +361,8 @@ function renderGradedTitlesGrid() {
   }
 
   gradedTitlesGrid.innerHTML = gradedStacks.map(({ stack, item }) => {
+    const baseTitle = getItemDef(item.nmgBaseId);
+    const tier = NMG_GRADE_TIERS[item.nmgGrade];
     // Graded titles still carry `rarity` (inherited via the spread in getItemDef's NMG branch),
     // so the existing sellTitle() (js/inventory.js) works unchanged -- same price table as any
     // other title of that base rarity, same confirm-dialog/remove/pay-out flow. This doubles as
@@ -279,7 +370,9 @@ function renderGradedTitlesGrid() {
     const sellPrice = item.rarity ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
     return `
     <div class="hustle-card">
-      ${nmgSlabHtml(item, { small: true })}
+      <h3>${itemLabel(item)}</h3>
+      <p class="item-subheading">${escapeHtml(tier.label)} ${item.nmgGrade} &middot; ${escapeHtml(titleCrateGroupLabel(baseTitle).replace(/^\S+\s/, ''))}</p>
+      ${nmgGradedRowPreviewHtml(item)}
       <p>&times; ${stack.qty}</p>
       <button data-nmg-showcase="${stack.id}" class="secondary-btn">Add to Showcase</button>
       ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
@@ -302,6 +395,10 @@ function renderGradedTitlesGrid() {
         alert(err.reason || 'Could not reach the server.');
       }
     });
+  });
+
+  gradedTitlesGrid.querySelectorAll('.nmg-mini-preview').forEach((el, i) => {
+    el.addEventListener('click', () => openNmgViewSlabModal(gradedStacks[i].item));
   });
 }
 

@@ -565,11 +565,31 @@ button:disabled {
   background-color: var(--surface-0);
 }
 
-/* Small variant for inline contexts -- Graded Titles inventory cards, submit-modal preview.
-   Same ~2.3:1 landscape ratio as the full slab, just scaled down. */
-.nmg-slab.nmg-slab-sm { width: 240px; }
-.nmg-slab.nmg-slab-sm .nmg-slab-art { height: 105px; }
-.nmg-slab.nmg-slab-sm .nmg-slab-grade-number { font-size: 24px; }
+/* Compact preview for the Graded Titles inventory list (nmgGradedRowPreviewHtml, js/nmg.js) --
+   same shape as .title-preview elsewhere in this sidebar, not the full slab (too tall/heavy for
+   routine browsing in a 300px-wide column). */
+.nmg-mini-preview {
+  position: relative;
+  width: 100%;
+  height: 70px;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-0);
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+.nmg-mini-grade-badge {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  background: #0a0a0a;
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-weight: 900;
+  font-size: 16px;
+}
 
 /* Slot cards -- Market > New Milos Grading, one of 3 states (empty/pending/ready). */
 .nmg-slot-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
