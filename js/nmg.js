@@ -39,8 +39,7 @@ let nmgSlotsCache = [];
 let nmgSubmitSelectedStackId = null;
 let nmgSubmitSelectedTier = null;
 
-// mm under an hour, "Hh Mm" under a day, "Dd Hh" once it's a day or more -- 14-day turnarounds
-// need coarser granularity than the mm:ss farms/crypto use for their much shorter timers.
+// mm under an hour, "Hh Mm" under a day, "Dd Hh" once it's a day or more.
 function nmgDurationLabel(ms) {
   const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
   const days = Math.floor(totalMinutes / 1440);
