@@ -4562,10 +4562,14 @@ button:disabled {
   margin-bottom: 18px;
 }
 
+/* auto-fit + minmax fills the full card width every time (4 columns at typical desktop widths,
+   fewer/wider columns as it narrows) instead of flex-wrap's fixed 340px cards leaving a big unused
+   gap once only 2 fit per row -- both sections cap at 4 items by design, so this never needs more
+   than one row. */
 .profile-slab-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
   margin: 12px 0;
 }
 
@@ -4574,8 +4578,7 @@ button:disabled {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: 340px;
-  max-width: 100%;
+  width: 100%;
 }
 
 .profile-slab-slot-actions {
