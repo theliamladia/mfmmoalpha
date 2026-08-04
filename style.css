@@ -4564,8 +4564,8 @@ button:disabled {
 
 /* auto-fit + minmax fills the full card width every time (4 columns at typical desktop widths,
    fewer/wider columns as it narrows) instead of flex-wrap's fixed 340px cards leaving a big unused
-   gap once only 2 fit per row -- both sections cap at 4 items by design, so this never needs more
-   than one row. */
+   gap once only 2 fit per row. Both sections cap at 6 items, so this can wrap to a second row --
+   auto-fit handles that the same way, no extra rules needed. */
 .profile-slab-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
