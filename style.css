@@ -513,22 +513,32 @@ button:disabled {
   gap: 8px;
 }
 
-.nmg-slab-header-text p {
+/* Chained on .nmg-slab (not just .nmg-slab-header-text) so this out-specifies .modal-box p --
+   without it, the slab loses this rule to .modal-box p (equal specificity, later in the cascade)
+   whenever it renders inside the reveal/view-slab modal, which is what actually caused the
+   low-contrast text: not this color, .modal-box's var(--text-secondary) silently winning instead. */
+.nmg-slab .nmg-slab-header-text p {
   margin: 0;
   font-weight: 700;
   font-size: 11px;
-  color: #111;
+  color: #333333;
   line-height: 1.35;
 }
 
 .nmg-slab-grade-box {
-  text-align: right;
+  text-align: center;
   flex-shrink: 0;
-  background: #0a0a0a;
+  background: #334155;
+  color: #ffffff;
   border-radius: 6px;
   padding: 4px 10px;
-  /* White-graded tiers (Mint/Good) would otherwise render invisible against the header's white
-     background -- this box is what the reference image actually showed, not an afterthought. */
+  /* Slate-on-white keeps every non-Elite grade legible; Elite gets its own black+gold treatment
+     below rather than each tier's color, per the reference image. */
+}
+
+.nmg-slab-grade-box.nmg-slab-grade-elite {
+  background: #0a0a0a;
+  color: #f7d51d;
 }
 
 .nmg-slab-grade-label {

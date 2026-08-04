@@ -68,6 +68,7 @@ function titleOddsLabel(item) {
 function nmgSlabHtml(item) {
   const baseTitle = getItemDef(item.nmgBaseId);
   const tier = NMG_GRADE_TIERS[item.nmgGrade];
+  const isElite = item.nmgGrade === 10;
   const artClass = baseTitle.custom ? '' : baseTitle.cssClass;
   const artStyle = titleArtInlineStyle(baseTitle);
   return `
@@ -78,7 +79,7 @@ function nmgSlabHtml(item) {
           <p>${escapeHtml(itemLabel(baseTitle))}</p>
           <p>${escapeHtml(titleOddsLabel(baseTitle))}</p>
         </div>
-        <div class="nmg-slab-grade-box" style="color:${tier.color}">
+        <div class="nmg-slab-grade-box${isElite ? ' nmg-slab-grade-elite' : ''}">
           <span class="nmg-slab-grade-label">${tier.label}</span>
           <span class="nmg-slab-grade-number">${item.nmgGrade}</span>
         </div>
