@@ -4553,6 +4553,11 @@ button:disabled {
 }
 
 .profile-slab-section-card {
+  /* .hustle-card's base width:230px is meant for small grid-item cards -- this section instead
+     sits as a plain full-width block below .profile-columns (Portfolio + Title Showcase never
+     needed this override themselves since flex:1 inside that row already replaces the fixed
+     width), so it needs its own explicit override to span the same total width as that row. */
+  width: 100%;
   margin-bottom: 18px;
 }
 
