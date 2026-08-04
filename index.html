@@ -1480,6 +1480,19 @@
       </div>
 
       <div class="admin-block">
+        <p>🎁 Grant Item</p>
+        <div class="admin-row">
+          <input type="text" id="adminGrantUsernameInput" placeholder="Player username">
+        </div>
+        <div class="admin-row">
+          <input type="text" id="adminGrantItemIdInput" placeholder="Item id (e.g. cfHowl_p4)">
+          <input type="number" id="adminGrantQtyInput" placeholder="Qty" value="1" min="1" style="width:70px;">
+          <button id="btnAdminGrantItem">Grant</button>
+        </div>
+        <div id="adminGrantItemResult"></div>
+      </div>
+
+      <div class="admin-block">
         <p>🎨 Title Maker</p>
         <div class="admin-row">
           <input type="text" id="titleMakerLabel" placeholder="Title label" maxlength="30">

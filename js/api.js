@@ -339,6 +339,10 @@ function apiAdminResetAllStats() {
   return apiRequest('/admin/reset-all-stats', { method: 'POST' });
 }
 
+function apiAdminGrantItem(username, itemId, qty) {
+  return apiRequest('/admin/grant-item', { method: 'POST', body: JSON.stringify({ username, itemId, qty }) });
+}
+
 function apiAdminTransactions({ username, beforeId } = {}) {
   const params = new URLSearchParams();
   if (username) params.set('username', username);

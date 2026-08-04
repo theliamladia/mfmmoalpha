@@ -226,6 +226,22 @@ btnAdminInvCheck.addEventListener('click', async () => {
   }
 });
 
+// ---------- Grant Item ----------
+const adminGrantUsernameInput = document.getElementById('adminGrantUsernameInput');
+const adminGrantItemIdInput = document.getElementById('adminGrantItemIdInput');
+const adminGrantQtyInput = document.getElementById('adminGrantQtyInput');
+const btnAdminGrantItem = document.getElementById('btnAdminGrantItem');
+const adminGrantItemResult = document.getElementById('adminGrantItemResult');
+
+btnAdminGrantItem.addEventListener('click', async () => {
+  try {
+    const result = await apiAdminGrantItem(adminGrantUsernameInput.value, adminGrantItemIdInput.value, adminGrantQtyInput.value);
+    adminGrantItemResult.innerHTML = `<p class="gain">${result.message}</p>`;
+  } catch (err) {
+    adminGrantItemResult.innerHTML = `<p class="loss">${err.reason || 'Could not reach the server.'}</p>`;
+  }
+});
+
 // ---------- Title Maker ----------
 // Client-side only, like the rest of this admin menu (Give ADMIN Title, stat editors) -- creates a
 // full title definition (not just a name) and stores it directly on this character's own save
