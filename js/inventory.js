@@ -38,7 +38,7 @@ function titleStackCardHtml(stack) {
   // double-suffixed id (`..._nmg7_p1`). Graded stacks shouldn't reach this card at all in practice
   // (renderCosmeticsGrid() excludes them, they render via the Graded Titles tab instead) but this
   // stays defensive since titleStackCardHtml() has no other guarantee about its caller.
-  const canPrestige = item.rarity && !item.nmgGrade && stack.qty >= prestigeThreshold;
+  const canPrestige = item.rarity && !item.nmgGrade && stack.qty >= prestigeThreshold && !llgPrestigeCapReached(parsePrestigeId(stack.id).baseId, level);
   return `
     <div class="hustle-card">
       <h3>${itemLabel(item)}</h3>
@@ -248,6 +248,7 @@ function prestigeTitle(stackId) {
   const { baseId, level } = parsePrestigeId(stackId);
   const threshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
   if (inventoryQty(stackId) < threshold) return;
+  if (llgPrestigeCapReached(baseId, level)) return;
 
   const nextId = `${baseId}_p${level + 1}`;
   const nextDef = getItemDef(nextId);

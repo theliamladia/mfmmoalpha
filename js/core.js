@@ -428,6 +428,49 @@ const COUNTERFINISH_CRATE_TITLES = [
   { id: 'cfHyperEmerald', name: 'HYPER', cssClass: 'title-cf-hyper-emerald', weight: 0.16, rarity: 'mythic', how: 'Won from a Counterfinish Crate spin (Hyper Gem!). Recolors your name everywhere in Emerald green with a cursive font while equipped.' },
 ];
 
+// Leems Larudo x GOOD: every title's art IS its name (a piece of wordmark/logo design), so like
+// Anima/Red/Blue the badge chip stays art-only (hideNameOnBadge) while the real name still shows
+// everywhere else (Inventory, Trade, MTN, the "you won X" toast). NOT wired into any shop/crate UI
+// yet -- staged ahead of the update that introduces it, per explicit instruction not to ship this live.
+const LLG_CRATE_COST = 20000;
+const LEEMS_LARUDO_GOOD_TITLES = [
+  { id: 'llgSkyCommon', name: 'Good Sky Common', hideNameOnBadge: true, cssClass: 'title-llg-sky-common', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
+  { id: 'llgSkyRegistered', name: 'Sky Registered', hideNameOnBadge: true, cssClass: 'title-llg-sky-registered', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
+  { id: 'llgGRegistered', name: 'G Registered', hideNameOnBadge: true, cssClass: 'title-llg-g-registered', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
+  { id: 'llgHappy', name: 'Happy', hideNameOnBadge: true, cssClass: 'title-llg-happy', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
+  { id: 'llgRegisteredSkyAlt', name: 'Registered Sky Alt', hideNameOnBadge: true, cssClass: 'title-llg-registered-sky-alt', weight: 8, rarity: 'uncommon', how: 'Won from a Leems Larudo x GOOD spin (uncommon).' },
+  { id: 'llgHappyAlt', name: 'Happy Alt', hideNameOnBadge: true, cssClass: 'title-llg-happy-alt', weight: 8, rarity: 'uncommon', how: 'Won from a Leems Larudo x GOOD spin (uncommon).' },
+  { id: 'llgRegisteredAlt', name: 'Good Registered Alt', hideNameOnBadge: true, cssClass: 'title-llg-registered-alt', weight: 3, rarity: 'rare', how: 'Won from a Leems Larudo x GOOD spin (rare).' },
+  { id: 'llgTypeface', name: 'Good Typeface', hideNameOnBadge: true, cssClass: 'title-llg-typeface', weight: 3, rarity: 'rare', how: 'Won from a Leems Larudo x GOOD spin (rare).' },
+  { id: 'llgImpossible', name: 'Impossible', hideNameOnBadge: true, cssClass: 'title-llg-impossible', weight: 0.05, rarity: 'mythic', how: 'Won from a Leems Larudo x GOOD spin (mythic! 0.05% odds).' },
+  { id: 'llgSpecialFont', name: 'GOOD Special Font', hideNameOnBadge: true, cssClass: 'title-llg-special-font', weight: 0.05, rarity: 'mythic', how: 'Won from a Leems Larudo x GOOD spin (mythic! 0.05% odds).' },
+];
+
+// Prestiging a Leems Larudo x GOOD title swaps in a wholly different piece of art per level instead
+// of the usual "append a roman numeral to the name" -- each base id here maps to how many prestige
+// art levels actually exist (Impossible/GOOD Special Font only got 2 designed; everything else got
+// the full 4). Read by the getItemDef prestige branch below, checked before the generic one.
+const LLG_MAX_PRESTIGE = {
+  llgSkyCommon: 4,
+  llgSkyRegistered: 4,
+  llgGRegistered: 4,
+  llgHappy: 4,
+  llgRegisteredSkyAlt: 4,
+  llgHappyAlt: 4,
+  llgRegisteredAlt: 4,
+  llgTypeface: 4,
+  llgImpossible: 2,
+  llgSpecialFont: 2,
+};
+
+// A normal title can prestige indefinitely (the generic branch just keeps appending roman
+// numerals), but these have a finite amount of designed art -- checked by both the Prestige
+// button's visibility and prestigeTitle() itself (js/inventory.js) so a title can't be pushed past
+// its last drawn level.
+function llgPrestigeCapReached(baseId, level) {
+  return baseId in LLG_MAX_PRESTIGE && level >= LLG_MAX_PRESTIGE[baseId];
+}
+
 const RENAME_COST = 10000;
 
 const PISTOL_ITEMS = [
@@ -637,6 +680,28 @@ function getItemDef(itemId, char = character) {
       nonEquippable: true,
       nmgGrade: grade,
       nmgBaseId: baseId,
+    };
+  }
+
+  // Leems Larudo x GOOD: prestiging swaps the art (cssClass) instead of appending a roman numeral
+  // to the name -- checked before the generic branch below, same disjoint-marker reasoning as the
+  // NMG branch above (both match the same `_p\d+` id shape, so this one must run first). Only
+  // intercepts levels that actually have designed art (LLG_MAX_PRESTIGE); prestiging past that
+  // falls through to the generic roman-numeral branch as a safe default rather than reusing stale art.
+  const llgPrestigeMatch = PRESTIGE_ID_RE.exec(itemId);
+  if (llgPrestigeMatch && LLG_MAX_PRESTIGE[llgPrestigeMatch[1]] >= Number(llgPrestigeMatch[2])) {
+    const [, baseId, levelStr] = llgPrestigeMatch;
+    const baseTitle = allTitleDefsFor(char).find((t) => t.id === baseId);
+    if (!baseTitle) return null;
+    const level = Number(levelStr);
+    return {
+      ...baseTitle,
+      id: itemId,
+      cssClass: `${baseTitle.cssClass}-p${level}`,
+      how: `${baseTitle.how} (Prestige ${toRoman(level)}.)`,
+      type: 'title',
+      prestigeLevel: level,
+      prestigeBaseId: baseId,
     };
   }
 

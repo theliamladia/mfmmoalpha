@@ -840,7 +840,8 @@ button:disabled {
    overflow:hidden clips that invisible overflow instead of letting it grow the box. */
 .title-badge[class*="title-anima-"],
 .title-badge[class*="title-red-"],
-.title-badge[class*="title-blue-"] {
+.title-badge[class*="title-blue-"],
+.title-badge[class*="title-llg-"] {
   width: 120px;
   height: 40px;
 }
@@ -1136,6 +1137,130 @@ button:disabled {
 .title-blue-bernie { background-image: url('https://lh3.googleusercontent.com/d/1zt3qASgcO_WJIOH2dOIw9xwmZS-sjzOL'); }
 .title-blue-aoc { background-image: url('https://lh3.googleusercontent.com/d/1Ap9aKHbwRvMKh1Vt2JJGIBSF4oKmap0v'); }
 
+/* --- Leems Larudo x GOOD (staged, not wired into any shop/crate UI yet) --- */
+/* Common-tier art is transparent (logo only, no card) -- gets the collection's own blue-gradient
+   card background so it doesn't look broken sitting on whatever's behind the badge/slot. Every
+   other tier's art already bakes in its own full card background, same as RED/BLUE Crate photos. */
+.title-llg-sky-common,
+.title-llg-sky-common-p1,
+.title-llg-sky-common-p2,
+.title-llg-sky-common-p3,
+.title-llg-sky-common-p4,
+.title-llg-sky-registered,
+.title-llg-sky-registered-p1,
+.title-llg-sky-registered-p2,
+.title-llg-sky-registered-p3,
+.title-llg-sky-registered-p4,
+.title-llg-g-registered,
+.title-llg-g-registered-p1,
+.title-llg-g-registered-p2,
+.title-llg-g-registered-p3,
+.title-llg-g-registered-p4,
+.title-llg-happy,
+.title-llg-happy-p1,
+.title-llg-happy-p2,
+.title-llg-happy-p3,
+.title-llg-happy-p4 {
+  background: linear-gradient(180deg, #005a96, #cbe0f5);
+}
+
+.title-llg-sky-common,
+.title-llg-sky-common-p1,
+.title-llg-sky-common-p2,
+.title-llg-sky-common-p3,
+.title-llg-sky-common-p4,
+.title-llg-sky-registered,
+.title-llg-sky-registered-p1,
+.title-llg-sky-registered-p2,
+.title-llg-sky-registered-p3,
+.title-llg-sky-registered-p4,
+.title-llg-g-registered,
+.title-llg-g-registered-p1,
+.title-llg-g-registered-p2,
+.title-llg-g-registered-p3,
+.title-llg-g-registered-p4,
+.title-llg-happy,
+.title-llg-happy-p1,
+.title-llg-happy-p2,
+.title-llg-happy-p3,
+.title-llg-happy-p4,
+.title-llg-registered-sky-alt,
+.title-llg-registered-sky-alt-p1,
+.title-llg-registered-sky-alt-p2,
+.title-llg-registered-sky-alt-p3,
+.title-llg-registered-sky-alt-p4,
+.title-llg-happy-alt,
+.title-llg-happy-alt-p1,
+.title-llg-happy-alt-p2,
+.title-llg-happy-alt-p3,
+.title-llg-happy-alt-p4,
+.title-llg-registered-alt,
+.title-llg-registered-alt-p1,
+.title-llg-registered-alt-p2,
+.title-llg-registered-alt-p3,
+.title-llg-registered-alt-p4,
+.title-llg-typeface,
+.title-llg-typeface-p1,
+.title-llg-typeface-p2,
+.title-llg-typeface-p3,
+.title-llg-typeface-p4,
+.title-llg-impossible,
+.title-llg-impossible-p1,
+.title-llg-impossible-p2,
+.title-llg-special-font,
+.title-llg-special-font-p1,
+.title-llg-special-font-p2 {
+  background-size: cover;
+  background-position: center;
+}
+
+.title-llg-sky-common { background-image: url('assets/titles/llg/sky-common.png'); }
+.title-llg-sky-common-p1 { background-image: url('assets/titles/llg/sky-common-p1.png'); }
+.title-llg-sky-common-p2 { background-image: url('assets/titles/llg/sky-common-p2.png'); }
+.title-llg-sky-common-p3 { background-image: url('assets/titles/llg/sky-common-p3.png'); }
+.title-llg-sky-common-p4 { background-image: url('assets/titles/llg/sky-common-p4.png'); }
+.title-llg-sky-registered { background-image: url('assets/titles/llg/sky-registered.png'); }
+.title-llg-sky-registered-p1 { background-image: url('assets/titles/llg/sky-registered-p1.png'); }
+.title-llg-sky-registered-p2 { background-image: url('assets/titles/llg/sky-registered-p2.png'); }
+.title-llg-sky-registered-p3 { background-image: url('assets/titles/llg/sky-registered-p3.png'); }
+.title-llg-sky-registered-p4 { background-image: url('assets/titles/llg/sky-registered-p4.png'); }
+.title-llg-g-registered { background-image: url('assets/titles/llg/g-registered.png'); }
+.title-llg-g-registered-p1 { background-image: url('assets/titles/llg/g-registered-p1.png'); }
+.title-llg-g-registered-p2 { background-image: url('assets/titles/llg/g-registered-p2.png'); }
+.title-llg-g-registered-p3 { background-image: url('assets/titles/llg/g-registered-p3.png'); }
+.title-llg-g-registered-p4 { background-image: url('assets/titles/llg/g-registered-p4.png'); }
+.title-llg-happy { background-image: url('assets/titles/llg/happy.png'); }
+.title-llg-happy-p1 { background-image: url('assets/titles/llg/happy-p1.png'); }
+.title-llg-happy-p2 { background-image: url('assets/titles/llg/happy-p2.png'); }
+.title-llg-happy-p3 { background-image: url('assets/titles/llg/happy-p3.png'); }
+.title-llg-happy-p4 { background-image: url('assets/titles/llg/happy-p4.png'); }
+.title-llg-registered-sky-alt { background-image: url('assets/titles/llg/registered-sky-alt.png'); }
+.title-llg-registered-sky-alt-p1 { background-image: url('assets/titles/llg/registered-sky-alt-p1.png'); }
+.title-llg-registered-sky-alt-p2 { background-image: url('assets/titles/llg/registered-sky-alt-p2.png'); }
+.title-llg-registered-sky-alt-p3 { background-image: url('assets/titles/llg/registered-sky-alt-p3.png'); }
+.title-llg-registered-sky-alt-p4 { background-image: url('assets/titles/llg/registered-sky-alt-p4.png'); }
+.title-llg-happy-alt { background-image: url('assets/titles/llg/happy-alt.png'); }
+.title-llg-happy-alt-p1 { background-image: url('assets/titles/llg/happy-alt-p1.png'); }
+.title-llg-happy-alt-p2 { background-image: url('assets/titles/llg/happy-alt-p2.png'); }
+.title-llg-happy-alt-p3 { background-image: url('assets/titles/llg/happy-alt-p3.png'); }
+.title-llg-happy-alt-p4 { background-image: url('assets/titles/llg/happy-alt-p4.png'); }
+.title-llg-registered-alt { background-image: url('assets/titles/llg/registered-alt.png'); }
+.title-llg-registered-alt-p1 { background-image: url('assets/titles/llg/registered-alt-p1.png'); }
+.title-llg-registered-alt-p2 { background-image: url('assets/titles/llg/registered-alt-p2.png'); }
+.title-llg-registered-alt-p3 { background-image: url('assets/titles/llg/registered-alt-p3.png'); }
+.title-llg-registered-alt-p4 { background-image: url('assets/titles/llg/registered-alt-p4.png'); }
+.title-llg-typeface { background-image: url('assets/titles/llg/typeface.png'); }
+.title-llg-typeface-p1 { background-image: url('assets/titles/llg/typeface-p1.png'); }
+.title-llg-typeface-p2 { background-image: url('assets/titles/llg/typeface-p2.png'); }
+.title-llg-typeface-p3 { background-image: url('assets/titles/llg/typeface-p3.png'); }
+.title-llg-typeface-p4 { background-image: url('assets/titles/llg/typeface-p4.png'); }
+.title-llg-impossible { background-image: url('assets/titles/llg/impossible.png'); }
+.title-llg-impossible-p1 { background-image: url('assets/titles/llg/impossible-p1.png'); }
+.title-llg-impossible-p2 { background-image: url('assets/titles/llg/impossible-p2.png'); }
+.title-llg-special-font { background-image: url('assets/titles/llg/special-font.png'); }
+.title-llg-special-font-p1 { background-image: url('assets/titles/llg/special-font-p1.png'); }
+.title-llg-special-font-p2 { background-image: url('assets/titles/llg/special-font-p2.png'); }
+
 /* --- Equipped name-recolor perk (Hyper Gems / Anima Hyper Rares) -- see js/nameStyle.js --- */
 .name-style-hyper-sapphire,
 .name-style-hyper-ruby,
@@ -1351,6 +1476,29 @@ button:disabled {
 
 .counterfinish-banner .feature-banner-text p {
   color: #f0e6c9;
+}
+
+/* LEEMS LARUDO x GOOD -- same photo-banner-with-dark-overlay treatment as .pledge-banner (RED vs.
+   BLUE), just its own background image instead of an animated gradient. */
+.feature-banner.llg-banner {
+  flex-wrap: wrap;
+  background: linear-gradient(rgba(5, 8, 26, 0.45), rgba(5, 8, 26, 0.45)),
+    url('assets/titles/llg/bgbanner.jpg');
+  background-size: cover;
+  background-position: center;
+  border-color: #7ab8e0;
+}
+
+.llg-banner .feature-banner-text h3 {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+.llg-banner .feature-banner-text p {
+  color: #e7f3ff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .archived-crates-heading {

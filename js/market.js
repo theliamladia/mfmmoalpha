@@ -315,7 +315,7 @@ function allTitleDefsFor(char) {
     PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE, FAT_FUCK_TITLE, LOOSE_TITLE,
     LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE, HEIGHTMAXXED_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
-    ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES,
+    ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];
 }
@@ -327,7 +327,7 @@ function allTitleDefs() {
 // Titles tracked as inventory stacks: tradeable, "owned" only while at least one copy remains.
 const CRATE_TITLE_IDS = new Set([
   ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
-  ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES,
+  ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
 ].map((t) => t.id));
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
 CRATE_TITLE_IDS.add(ADMIN_TITLE.id);
@@ -350,6 +350,7 @@ const TITLE_CRATE_GROUPS = [
   { label: '🎨 COUNTERFINISH CRATE', ids: new Set(COUNTERFINISH_CRATE_TITLES.map((t) => t.id)) },
   { label: '🔴 RED CRATE', ids: new Set([...RED_CRATE_TITLES.map((t) => t.id), 'redTrumpAuto']) },
   { label: '🔵 BLUE CRATE', ids: new Set([...BLUE_CRATE_TITLES.map((t) => t.id), 'blueBidenAuto']) },
+  { label: '✅ LEEMS LARUDO x GOOD', ids: new Set(LEEMS_LARUDO_GOOD_TITLES.map((t) => t.id)) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';
 const NMG_GRADED_LABEL = '🏅 Graded Titles';
@@ -517,6 +518,9 @@ const CRATE_BLUE = {
   name: 'BLUE CRATE', icon: '\u{1F535}', cost: BLUE_CRATE_COST, titles: BLUE_CRATE_TITLES, limited: true, key: 'blue',
   hiddenAuto: { fromId: 'blueDarkBrandon', toId: 'blueBidenAuto', chance: 0.01 },
 };
+// Staged ahead of the update that introduces it -- not linked from anywhere else in the nav, but
+// otherwise a fully real, working crate (same client-trust spin/grant flow as every other one).
+const CRATE_LLG = { name: 'LEEMS LARUDO x GOOD', icon: '\u{2601}\u{FE0F}', cost: LLG_CRATE_COST, titles: LEEMS_LARUDO_GOOD_TITLES };
 
 // Rolled once per drawn title -- if it's not that crate's Presidential Rare (or the crate has no
 // hidden swap at all), the draw stands untouched.
@@ -540,6 +544,11 @@ const btnCounterfinishSpin = document.getElementById('btnCounterfinishSpin');
 const counterfinishSpinMessage = document.getElementById('counterfinishSpinMessage');
 const btnViewCounterfinishCrate = document.getElementById('btnViewCounterfinishCrate');
 const counterfinishSpinQtyInput = document.getElementById('counterfinishSpinQty');
+
+const btnLlgSpin = document.getElementById('btnLlgSpin');
+const llgSpinMessage = document.getElementById('llgSpinMessage');
+const btnViewLlgCrate = document.getElementById('btnViewLlgCrate');
+const llgSpinQtyInput = document.getElementById('llgSpinQty');
 
 const btnRedSpin = document.getElementById('btnRedSpin');
 const redSpinMessage = document.getElementById('redSpinMessage');
@@ -654,6 +663,7 @@ btnViewAnimaCrate.addEventListener('click', () => showCrateOdds(CRATE_ANIMA));
 btnViewCounterfinishCrate.addEventListener('click', () => showCrateOdds(CRATE_COUNTERFINISH));
 btnViewRedCrate.addEventListener('click', () => showCrateOdds(CRATE_RED));
 btnViewBlueCrate.addEventListener('click', () => showCrateOdds(CRATE_BLUE));
+btnViewLlgCrate.addEventListener('click', () => showCrateOdds(CRATE_LLG));
 
 btnCrateOddsClose.addEventListener('click', () => {
   crateOddsModal.classList.add('hidden');
@@ -951,9 +961,11 @@ registerCrateQtyInput(CRATE_ANIMA, animaSpinQtyInput, btnAnimaSpin);
 registerCrateQtyInput(CRATE_COUNTERFINISH, counterfinishSpinQtyInput, btnCounterfinishSpin);
 registerCrateQtyInput(CRATE_RED, redSpinQtyInput, btnRedSpin);
 registerCrateQtyInput(CRATE_BLUE, blueSpinQtyInput, btnBlueSpin);
+registerCrateQtyInput(CRATE_LLG, llgSpinQtyInput, btnLlgSpin);
 
 btnAnimaSpin.addEventListener('click', () => spinCrate(CRATE_ANIMA, [btnAnimaSpin, btnViewAnimaCrate], animaSpinMessage));
 btnCounterfinishSpin.addEventListener('click', () => spinCrate(CRATE_COUNTERFINISH, [btnCounterfinishSpin, btnViewCounterfinishCrate], counterfinishSpinMessage));
 btnRedSpin.addEventListener('click', () => spinCrate(CRATE_RED, [btnRedSpin, btnViewRedCrate], redSpinMessage));
 btnBlueSpin.addEventListener('click', () => spinCrate(CRATE_BLUE, [btnBlueSpin, btnViewBlueCrate], blueSpinMessage));
+btnLlgSpin.addEventListener('click', () => spinCrate(CRATE_LLG, [btnLlgSpin, btnViewLlgCrate], llgSpinMessage));
 
