@@ -35,6 +35,7 @@ const MTN_HISTORY_LABELS = { listed: 'Listed', bought: 'Bought', cancelled: 'Can
 // market.js/inventory.js).
 const MTN_CATEGORY_DEFS = [
   { key: 'title', label: '🎖️ Titles', match: (item) => item.type === 'title' },
+  { key: 'vision', label: '🌀 Visions', match: (item) => item.type === 'vision' },
   { key: 'gun', label: '🔫 Guns', match: (item) => item.type === 'pistol' || item.type === 'rifle' },
   { key: 'melee', label: '🔪 Melee', match: (item) => item.type === 'melee' },
   { key: 'ammo', label: '💣 Ammo', match: (item) => item.type === 'ammo' },
@@ -59,7 +60,8 @@ function mtnInventoryStacksByCategory() {
 
 function mtnPickerRowHtml(stack) {
   const item = getItemDef(stack.id);
-  const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
+  const typeSuffix = item.type === 'title' ? ' (Title)' : item.type === 'vision' ? ' (Vision)' : '';
+  const label = `${itemLabel(item)}${typeSuffix}`;
   return `<div class="mtn-item-picker-row" data-pick-item="${stack.id}"><span>${escapeHtml(label)}</span><span>x${stack.qty}</span></div>`;
 }
 
@@ -124,7 +126,8 @@ function updateMtnItemPickerButtonLabel() {
     mtnItemPickerBtn.textContent = 'Choose an item…';
     return;
   }
-  const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
+  const typeSuffix = item.type === 'title' ? ' (Title)' : item.type === 'vision' ? ' (Vision)' : '';
+  const label = `${itemLabel(item)}${typeSuffix}`;
   mtnItemPickerBtn.textContent = `${label} (x${stack.qty} owned)`;
 }
 
@@ -165,10 +168,12 @@ function buildMtnListingsGrid() {
         ? `<button data-mtn-cancel="${listing.id}" class="secondary-btn">Cancel Listing</button>`
         : `<button data-mtn-buy="${listing.id}">Buy</button>`;
 
-      // Titles get the full badge treatment (preview, name, how-obtained) since the plain id/name
-      // alone doesn't tell a buyer anything -- physical items (guns/ammo/drugs/gear) keep the
-      // simpler layout, since they have no badge or "how" flavor text to show.
-      if (item && item.type === 'title') {
+      // Titles and Visions both get the full badge treatment (preview, name, how-obtained) since
+      // the plain id/name alone doesn't tell a buyer anything -- titleBadgeMarkup works off
+      // cssClass/name/hideNameOnBadge, none of which are title-specific, so a Vision's own art
+      // renders correctly here too. Physical items (guns/ammo/drugs/gear) keep the simpler layout,
+      // since they have no badge or "how" flavor text to show.
+      if (item && (item.type === 'title' || item.type === 'vision')) {
         return `
           <div class="hustle-card">
             <div class="title-preview">${titleBadgeMarkup(item)}</div>

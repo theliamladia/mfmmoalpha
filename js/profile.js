@@ -132,6 +132,10 @@ function renderProfile() {
   const { character: viewedChar, isOwner, level, username } = profileViewCache;
   if (!viewedChar.profile) viewedChar.profile = { bannerTitleId: null, showcaseTitleIds: [], status: '' };
   const profileState = viewedChar.profile;
+  // Driven by whoever's profile THIS IS (viewedChar), never the viewer's own character -- so
+  // visiting someone else's profile shows THEIR equipped Vision scoped to just this page, while
+  // the rest of your own app view stays on your own theme (see applyOwnVisionTheme in renderAll).
+  if (typeof applyProfileVisionTheme === 'function') applyProfileVisionTheme(viewedChar);
   const privacy = profileState.privacy || { cash: false, fc: false, portfolio: false };
 
   const bannerTitle = profileBannerTitle(viewedChar);

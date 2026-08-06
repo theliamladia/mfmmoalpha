@@ -191,7 +191,7 @@ function buildInventoryGrid() {
 
   const gunAndAmmoStacks = character.inventory.filter((stack) => {
     const item = getItemDef(stack.id);
-    return item && item.type !== 'title';
+    return item && item.type !== 'title' && item.type !== 'vision';
   });
   itemsGrid.innerHTML = gunAndAmmoStacks.length
     ? gunAndAmmoStacks.map((stack) => {
@@ -213,7 +213,8 @@ function buildInventoryGrid() {
     ? character.inventory.map((stack) => {
       const item = getItemDef(stack.id);
       if (!item) return '';
-      const label = item.type === 'title' ? `${itemLabel(item)} (Title)` : itemLabel(item);
+      const typeSuffix = item.type === 'title' ? ' (Title)' : item.type === 'vision' ? ' (Vision)' : '';
+      const label = `${itemLabel(item)}${typeSuffix}`;
       return `<option value="${stack.id}">${label} (x${stack.qty})</option>`;
     }).join('')
     : '<option value="">No items to trade</option>';

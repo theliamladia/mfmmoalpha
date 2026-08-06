@@ -56,6 +56,10 @@ function migrateServerCharacter(c) {
   if (!c.enjoyed) c.enjoyed = { active: false, until: 0, byName: null };
   if (!c.secumax) c.secumax = { tier: null, lastBillTs: Date.now(), robBlocksUsed: 0, enjoyBlocksUsed: 0, slimeBlocksUsed: 0 };
   if (!c.badges) c.badges = { equipped: null };
+  if (!c.visions) c.visions = { equipped: null };
+  // Visions briefly behaved like titles before this fix -- clear out any stale title-equip
+  // pointing at one, since getDisplayTitle() would just silently stop showing it now anyway.
+  if (c.titles && VISIONS_TITLES.some((v) => v.id === c.titles.equipped)) c.titles.equipped = null;
   return c;
 }
 

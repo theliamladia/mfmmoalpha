@@ -1198,11 +1198,12 @@ function currentDisplayTitleText() {
 // for another player's CUSTOM (Title Maker) title, since that def lives solely in their own save --
 // falls back to the old bracketed text in that one case.
 function chatTitleMarkup(msg) {
+  const badgeChip = typeof badgeChipMarkupById === 'function' ? badgeChipMarkupById(msg.badgeId) : '';
   if (msg.titleId) {
     const title = getItemDef(msg.titleId);
-    if (title && title.type === 'title') return titleBadgeMarkup(title);
+    if (title && title.type === 'title') return badgeChip + titleBadgeMarkup(title);
   }
-  return `<span class="chat-title-fallback">${escapeHtml(msg.titleText)}</span>`;
+  return `${badgeChip}<span class="chat-title-fallback">${escapeHtml(msg.titleText)}</span>`;
 }
 
 function renderChatMessages() {

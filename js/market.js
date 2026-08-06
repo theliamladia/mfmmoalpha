@@ -313,12 +313,14 @@ const titleDropdown = document.getElementById('titleDropdown');
 // `char` defaults to the current player but any character object works -- needed so a custom
 // title created by (and living inside) one player's save can still be looked up correctly when a
 // different client renders THAT player's badge (see displayBadgeMarkupFor below).
+// VISIONS_TITLES is deliberately NOT spread in here -- Visions aren't titles (see the dedicated
+// getItemDef branch in core.js), so they must never be resolvable as one via this catalog.
 function allTitleDefsFor(char) {
   return [
     PEAK_TITLE, CAESAR_TI_TITLE, ADMIN_TITLE, FAT_FUCK_TITLE, LOOSE_TITLE,
     LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE, HEIGHTMAXXED_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
-    ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES, ...VISIONS_TITLES,
+    ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
     ...MILOS_LEGENDS_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];
@@ -331,7 +333,7 @@ function allTitleDefs() {
 // Titles tracked as inventory stacks: tradeable, "owned" only while at least one copy remains.
 const CRATE_TITLE_IDS = new Set([
   ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
-  ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES, ...VISIONS_TITLES,
+  ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
   ...MILOS_LEGENDS_TITLES,
 ].map((t) => t.id));
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
@@ -356,7 +358,6 @@ const TITLE_CRATE_GROUPS = [
   { label: '🔴 RED CRATE', ids: new Set([...RED_CRATE_TITLES.map((t) => t.id), 'redTrumpAuto']) },
   { label: '🔵 BLUE CRATE', ids: new Set([...BLUE_CRATE_TITLES.map((t) => t.id), 'blueBidenAuto']) },
   { label: '✅ LEEMS LARUDO x GOOD®', ids: new Set(LEEMS_LARUDO_GOOD_TITLES.map((t) => t.id)) },
-  { label: '🌀 VISIONS', ids: new Set(VISIONS_TITLES.map((t) => t.id)) },
   { label: '🎖️ MILOS LEGENDS 1', ids: new Set(MILOS_LEGENDS_TITLES.map((t) => t.id)) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';

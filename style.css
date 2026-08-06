@@ -1639,6 +1639,7 @@ button:disabled {
   background-position: center;
   vertical-align: middle;
   margin-right: 4px;
+  flex-shrink: 0;
 }
 .badge-chip-large {
   display: inline-block;
@@ -1658,6 +1659,28 @@ button:disabled {
 .badge-sapphire { background-image: url('assets/badges/sapphire.png'); }
 .badge-emerald { background-image: url('assets/badges/emerald.png'); }
 .badge-units { background-image: url('assets/badges/units.png'); }
+
+/* VISIONS collectible-chip icons -- diagonal 2-color gradient per Vision, matching each one's own
+   VISION_PALETTES accent/surface tones (js/visions.js). These were missing entirely until now (a
+   real bug: every Vision badge rendered blank). Not used for the actual app-reskin effect itself --
+   that's done via inline CSS custom-property overrides in js/visions.js, not these classes. */
+.title-vision-goodtrix { background: linear-gradient(135deg, #2e8eff 50%, #39ff6a 50%); }
+.title-vision-pandora { background: linear-gradient(135deg, #b83bdb 50%, #f4c95a 50%); }
+.title-vision-slate { background: linear-gradient(135deg, #9fb4cc 50%, #3e4a5c 50%); }
+.title-vision-neonnights { background: linear-gradient(135deg, #ff2d92 50%, #00e5ff 50%); }
+.title-vision-crimsontide { background: linear-gradient(135deg, #d21f3c 50%, #6b0f1a 50%); }
+.title-vision-obsidiangold { background: linear-gradient(135deg, #0a0a0a 50%, #d4af37 50%); }
+.title-vision-arcticfrost { background: linear-gradient(135deg, #eaf6ff 50%, #2f8fd0 50%); }
+.title-vision-copperrust { background: linear-gradient(135deg, #cc6a2e 50%, #7a3b12 50%); }
+.title-vision-toxicwaste { background: linear-gradient(135deg, #a6ff00 50%, #f2e400 50%); }
+.title-vision-deepsea { background: linear-gradient(135deg, #0a2e4d 50%, #17c3b2 50%); }
+.title-vision-rosegold { background: linear-gradient(135deg, #eb9c86 50%, #d8ae6d 50%); }
+.title-vision-cottoncandy { background: linear-gradient(135deg, #ff8fd1 50%, #8fd1ff 50%); }
+.title-vision-forestmoss { background: linear-gradient(135deg, #7a9a4a 50%, #6b4a2f 50%); }
+.title-vision-sandstorm { background: linear-gradient(135deg, #d4a05a 50%, #8a5a2e 50%); }
+.title-vision-steelblue { background: linear-gradient(135deg, #4a86b8 50%, #5b6b78 50%); }
+.title-vision-blush { background: linear-gradient(135deg, #f4a0c2 50%, #c23f74 50%); }
+.title-vision-charcoal { background: linear-gradient(135deg, #9a9da4 50%, #46474c 50%); }
 
 /* ---------- GOOD® tab: the Blue theme (matches the update4 teaser exactly) ---------- */
 .good-section {
@@ -1918,6 +1941,21 @@ button:disabled {
 .badge-default-rank {
   background: #3d5c8c;
   color: #cfe0ff;
+}
+
+/* Sidebar's own rank/title badge slot -- .badge-chip (Balaclava Badge) gets prepended as a sibling
+   before the title/rank markup (see renderRankBadge in js/bank.js). Without this, the two spans
+   fall back to plain inline flow and wrap onto their own lines the moment a wide photo-art title
+   (Milos Legends, a custom title, etc.) doesn't fit next to a 20px chip within the sidebar's width.
+   inline-flex keeps them on one row and lets the title art shrink to make room instead. */
+.badge-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.badge-slot .badge-chip {
+  flex-shrink: 0;
 }
 
 #looksTier {

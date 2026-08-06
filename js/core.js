@@ -480,29 +480,29 @@ function llgPrestigeCapReached(baseId, level) {
 }
 
 // VISIONS: full app-shell theme reskins. Each icon is a diagonal 2-color split (no art asset --
-// same gradient the design doc's own mockup used). The crate/grant/inventory machinery here is
-// fully real; the actual reskin ENGINE (applying a won Vision's theme across the app) is a
-// separate, much larger project and is intentionally not built yet -- these are just collectibles
-// for now, same as any other title, until that lands.
+// same gradient the design doc's own mockup used). NOT titles -- see the dedicated getItemDef
+// branch above and js/visions.js for the equip/reskin engine. Equipping one reskins the equipper's
+// own whole app view AND their Profile page for anyone visiting it (driven by the profile
+// SUBJECT's equipped Vision, not the viewer's own).
 const VISIONS_CRATE_COST = 20000;
 const VISIONS_TITLES = [
-  { id: 'visionGoodtrix', name: 'GOODTRIX', cssClass: 'title-vision-goodtrix', weight: 0.167, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). Darkmode + blue text, Matrix-style font. Full app reskin -- coming soon.' },
-  { id: 'visionPandora', name: "Pandora's Box", cssClass: 'title-vision-pandora', weight: 0.167, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). CS2 Pandora\'s Box gloves colorway. Full app reskin -- coming soon.' },
-  { id: 'visionSlate', name: 'SLATE', cssClass: 'title-vision-slate', weight: 0.166, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). Clean darkmode. Full app reskin -- coming soon.' },
-  { id: 'visionNeonNights', name: 'Neon Nights', cssClass: 'title-vision-neonnights', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Hot pink + cyan cyberpunk. Full app reskin -- coming soon.' },
-  { id: 'visionCrimsonTide', name: 'Crimson Tide', cssClass: 'title-vision-crimsontide', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Deep red / maroon. Full app reskin -- coming soon.' },
-  { id: 'visionObsidianGold', name: 'Obsidian Gold', cssClass: 'title-vision-obsidiangold', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Black + gold luxury. Full app reskin -- coming soon.' },
-  { id: 'visionArcticFrost', name: 'Arctic Frost', cssClass: 'title-vision-arcticfrost', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Icy blue & white. Full app reskin -- coming soon.' },
-  { id: 'visionCopperRust', name: 'Copper Rust', cssClass: 'title-vision-copperrust', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Industrial copper / orange. Full app reskin -- coming soon.' },
-  { id: 'visionToxicWaste', name: 'Toxic Waste', cssClass: 'title-vision-toxicwaste', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Radioactive green / yellow. Full app reskin -- coming soon.' },
-  { id: 'visionDeepSea', name: 'Deep Sea', cssClass: 'title-vision-deepsea', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Navy / teal. Full app reskin -- coming soon.' },
-  { id: 'visionRoseGold', name: 'Rose Gold', cssClass: 'title-vision-rosegold', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Pink-gold metallic. Full app reskin -- coming soon.' },
-  { id: 'visionCottonCandy', name: 'Cotton Candy', cssClass: 'title-vision-cottoncandy', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Blue / pink pastel. Full app reskin -- coming soon.' },
-  { id: 'visionForestMoss', name: 'Forest Moss', cssClass: 'title-vision-forestmoss', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Muted green / brown. Full app reskin -- coming soon.' },
-  { id: 'visionSandstorm', name: 'Sandstorm', cssClass: 'title-vision-sandstorm', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Tan / desert. Full app reskin -- coming soon.' },
-  { id: 'visionSteelBlue', name: 'Steel Blue', cssClass: 'title-vision-steelblue', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Simple corporate blue-gray. Full app reskin -- coming soon.' },
-  { id: 'visionBlush', name: 'Blush', cssClass: 'title-vision-blush', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Soft pink pastel. Full app reskin -- coming soon.' },
-  { id: 'visionCharcoal', name: 'Charcoal', cssClass: 'title-vision-charcoal', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Plain gray-black. Full app reskin -- coming soon.' },
+  { id: 'visionGoodtrix', name: 'GOODTRIX', cssClass: 'title-vision-goodtrix', weight: 0.167, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). Darkmode + blue text, Matrix-style font. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionPandora', name: "Pandora's Box", cssClass: 'title-vision-pandora', weight: 0.167, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). CS2 Pandora\'s Box gloves colorway. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionSlate', name: 'SLATE', cssClass: 'title-vision-slate', weight: 0.166, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). Clean darkmode. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionNeonNights', name: 'Neon Nights', cssClass: 'title-vision-neonnights', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Hot pink + cyan cyberpunk. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionCrimsonTide', name: 'Crimson Tide', cssClass: 'title-vision-crimsontide', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Deep red / maroon. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionObsidianGold', name: 'Obsidian Gold', cssClass: 'title-vision-obsidiangold', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Black + gold luxury. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionArcticFrost', name: 'Arctic Frost', cssClass: 'title-vision-arcticfrost', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Icy blue & white. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionCopperRust', name: 'Copper Rust', cssClass: 'title-vision-copperrust', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Industrial copper / orange. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionToxicWaste', name: 'Toxic Waste', cssClass: 'title-vision-toxicwaste', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Radioactive green / yellow. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionDeepSea', name: 'Deep Sea', cssClass: 'title-vision-deepsea', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Navy / teal. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionRoseGold', name: 'Rose Gold', cssClass: 'title-vision-rosegold', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Pink-gold metallic. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionCottonCandy', name: 'Cotton Candy', cssClass: 'title-vision-cottoncandy', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Blue / pink pastel. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionForestMoss', name: 'Forest Moss', cssClass: 'title-vision-forestmoss', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Muted green / brown. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionSandstorm', name: 'Sandstorm', cssClass: 'title-vision-sandstorm', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Tan / desert. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionSteelBlue', name: 'Steel Blue', cssClass: 'title-vision-steelblue', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Simple corporate blue-gray. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionBlush', name: 'Blush', cssClass: 'title-vision-blush', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Soft pink pastel. Reskins your whole game view, and your Profile page for anyone visiting it.' },
+  { id: 'visionCharcoal', name: 'Charcoal', cssClass: 'title-vision-charcoal', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Plain gray-black. Reskins your whole game view, and your Profile page for anyone visiting it.' },
 ];
 
 // Milos Legends 1 Crate: real character portraits (not wordmark art), so names show normally on
@@ -688,12 +688,18 @@ function getBadgeDef(id) {
   return BADGE_DEFS.find((b) => b.id === id) || null;
 }
 
-function badgeChipMarkup(char) {
-  const badgeId = char.badges && char.badges.equipped;
+// Same "ById" split as styledNameHtmlById (js/nameStyle.js) -- chat messages only ever carry a raw
+// badgeId (see chatTitleMarkup in js/milos.js), never a full character object, so the actual chip
+// markup lives here and badgeChipMarkup(char) is just a thin wrapper over it.
+function badgeChipMarkupById(badgeId) {
   if (!badgeId) return '';
   const def = getBadgeDef(badgeId);
   if (!def) return '';
   return `<span class="badge-chip ${def.cssClass}" title="${escapeHtml(def.name)}"></span>`;
+}
+
+function badgeChipMarkup(char) {
+  return badgeChipMarkupById(char.badges && char.badges.equipped);
 }
 
 // New Milos Grading (NMG) results are synthesized the same way prestige is -- id shape
@@ -817,6 +823,15 @@ function getItemDef(itemId, char = character) {
       prestigeBaseId: baseId,
     };
   }
+
+  // VISIONS are NOT titles, despite being won from a crate the same way -- they're a full
+  // app-reskin, their own cosmetic category entirely (see js/visions.js). Checked before the
+  // generic title fallback below so `type` ends up 'vision', never force-overwritten to 'title'
+  // the way that fallback always does -- this is what keeps a Vision out of the Switch Title
+  // dropdown/Cosmetics tab (both filter on type === 'title') while still resolving correctly for
+  // type-agnostic consumers (itemLabel, the MTN trade picker) that just need a name/id.
+  const visionMatch = VISIONS_TITLES.find((v) => v.id === itemId);
+  if (visionMatch) return { ...visionMatch, type: 'vision' };
 
   const title = allTitleDefsFor(char).find((t) => t.id === itemId);
   // Spread the full def (not just id/name/cssClass) so custom titles keep their background/
@@ -1035,6 +1050,7 @@ function load() {
   if (loaded.enjoyed === undefined) loaded.enjoyed = { active: false, until: 0, byName: null };
   if (loaded.secumax === undefined) loaded.secumax = { tier: null, lastBillTs: Date.now(), robBlocksUsed: 0, enjoyBlocksUsed: 0, slimeBlocksUsed: 0 };
   if (loaded.badges === undefined) loaded.badges = { equipped: null };
+  if (loaded.visions === undefined) loaded.visions = { equipped: null };
   return loaded;
 }
 
@@ -1125,6 +1141,7 @@ function newCharacter(firstName, lastName) {
     settings: { hideMilosWarning: false },
     titles: { owned: [], equipped: null },
     badges: { equipped: null },
+    visions: { equipped: null },
     marriage: { proposedTo: null, spouseName: null, spouseUserId: null },
     licenses: { gunSafety: false, concealedPermit: false, concealedPendingUntil: 0 },
     inventory: [],
@@ -1263,6 +1280,8 @@ function renderAll() {
   statAllianceEl.textContent = allianceLabel(character.alliance);
   if (typeof renderVarietyStatus === 'function') renderVarietyStatus();
   if (typeof renderSecumaxStatus === 'function') renderSecumaxStatus();
+  if (typeof applyOwnVisionTheme === 'function') applyOwnVisionTheme();
+  if (typeof renderVisionsGrid === 'function') renderVisionsGrid();
 
   jailNavBtn.disabled = !character.jail.inJail;
   jailNavBtn.classList.toggle('hidden', !character.jail.inJail);
