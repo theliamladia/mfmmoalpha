@@ -51,6 +51,11 @@ function migrateServerCharacter(c) {
   if (c.marriage && c.marriage.spouseUserId === undefined) c.marriage.spouseUserId = null;
   if (!c.slime) c.slime = { active: false, until: 0, byName: null };
   if (!c.slimeRecord) c.slimeRecord = [];
+  if (typeof c.variety !== 'number') c.variety = 0;
+  if (!c.varietyTimeout) c.varietyTimeout = { until: 0 };
+  if (!c.enjoyed) c.enjoyed = { active: false, until: 0, byName: null };
+  if (!c.secumax) c.secumax = { tier: null, lastBillTs: Date.now(), robBlocksUsed: 0, enjoyBlocksUsed: 0, slimeBlocksUsed: 0 };
+  if (!c.badges) c.badges = { equipped: null };
   return c;
 }
 

@@ -66,6 +66,7 @@ function tradeGemsForUnits() {
 }
 
 function equipBadge(badgeId) {
+  if (!character.badges) character.badges = { equipped: null };
   character.badges.equipped = character.badges.equipped === badgeId ? null : badgeId;
   save();
   renderAll();
@@ -73,6 +74,7 @@ function equipBadge(badgeId) {
 
 function renderBadgesGrid() {
   if (!badgesGrid) return;
+  if (!character.badges) character.badges = { equipped: null };
   const ownedStacks = character.inventory.filter((stack) => stack.qty > 0 && getBadgeDef(stack.id));
   if (!ownedStacks.length) {
     badgesGrid.innerHTML = '<p class="equip-picker-empty">No badges yet. Buy a Balaclava Badge Crate above.</p>';
