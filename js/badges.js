@@ -3,16 +3,30 @@
 // character.inventory stack mutations here are just posted up on the next /character/sync like
 // everything else in this economy.
 const btnBuyBadgeCrate = document.getElementById('btnBuyBadgeCrate');
+const btnBuyBadgeCrateBanner = document.getElementById('btnBuyBadgeCrateBanner');
+const btnViewBadgesInvcat = document.getElementById('btnViewBadgesInvcat');
 const badgesGrid = document.getElementById('badgesGrid');
 
-btnBuyBadgeCrate.addEventListener('click', () => {
+function buyBadgeCrate() {
   if (character.cash < BALACLAVA_BADGE_CRATE_COST) { alert('Not enough Floydbucks.'); return; }
   character.cash = round2(character.cash - BALACLAVA_BADGE_CRATE_COST);
   addToInventory('badgeBronze', 1);
   logTo(inventoryLog, 'Opened a Balaclava Badge Crate: 1x Bronze Balaclava!', 'gain');
   save();
   renderAll();
-});
+}
+
+btnBuyBadgeCrate.addEventListener('click', buyBadgeCrate);
+if (btnBuyBadgeCrateBanner) btnBuyBadgeCrateBanner.addEventListener('click', buyBadgeCrate);
+
+// Jumps straight from the Cosmetixxx banner to the Inventory > Badges sub-tab -- same tab-click
+// idiom as every other cross-link button in this codebase (e.g. btnGoToCoinflip).
+if (btnViewBadgesInvcat) {
+  btnViewBadgesInvcat.addEventListener('click', () => {
+    document.querySelector('[data-inv="items"]').click();
+    document.querySelector('[data-invcat="badges"]').click();
+  });
+}
 
 function rankUpBadge(fromId) {
   const idx = BADGE_RANK_CHAIN.indexOf(fromId);

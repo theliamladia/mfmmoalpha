@@ -1538,6 +1538,40 @@ button:disabled {
   color: #ffe9b3;
 }
 
+/* Balaclava Badge Crate -- same photo-banner-with-dark-overlay treatment as LLG/pledge, using the
+   Bronze badge art itself as the background so it visually reads as "a badge" at a glance, per the
+   user's explicit ask, rather than just being another text banner. */
+.feature-banner.badge-crate-banner {
+  background: linear-gradient(rgba(10, 10, 10, 0.55), rgba(10, 10, 10, 0.55)),
+    url('assets/badges/bronze.png');
+  background-size: cover;
+  background-position: center;
+  border-color: #cd7f32;
+}
+
+.badge-crate-banner .feature-banner-text h3 {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+.badge-crate-banner .feature-banner-text p {
+  color: #f3e6d8;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.badge-crate-tag {
+  display: inline-block;
+  background: #cd7f32;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
 /* Milos Legends 1 title art -- real character portraits (not wordmark-only like LLG), so no
    hideNameOnBadge and no card-background fallback needed; every image already fills the frame.
    Mythic tier (Special Unit/Krogger) gets the same pulsing-glow treatment as Presidential Rares;
