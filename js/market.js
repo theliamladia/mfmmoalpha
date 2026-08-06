@@ -95,6 +95,7 @@ function tickCooldownUI() {
   tickJailActivityUI();
   tickFarmsUI();
   tickSlimedUI();
+  if (typeof tickEnjoyedUI === 'function') tickEnjoyedUI();
   if (typeof tickInvestorL2CountdownUI === 'function') tickInvestorL2CountdownUI();
   if (typeof tickNmgSlotsUI === 'function') tickNmgSlotsUI();
   if (typeof tickCuriosCountdownUI === 'function') tickCuriosCountdownUI();
@@ -449,6 +450,7 @@ function getDisplayTitle() {
 // online roster) -- takes the character as a parameter instead of touching the global `character`,
 // and skips checkPeakTitleGrant() since we shouldn't be mutating someone else's save.
 function displayBadgeMarkupFor(otherChar) {
+  const badgeChip = typeof badgeChipMarkup === 'function' ? badgeChipMarkup(otherChar) : '';
   const equippedId = otherChar.titles && otherChar.titles.equipped;
   let title = null;
   if (equippedId) {
@@ -459,11 +461,11 @@ function displayBadgeMarkupFor(otherChar) {
     // (e.g. betaSpin2026_p1) resolve correctly no matter who's viewing.
     if (owned) title = getItemDef(equippedId, otherChar);
   }
-  if (title) return titleHoverMarkup(title);
+  if (title) return badgeChip + titleHoverMarkup(title);
 
   const s = otherChar.stats;
   const allMax = [s.health, s.attack, s.speed, s.defense, s.looks].every((v) => v >= STAT_CAP);
-  return `<span class="badge rank-badge">${allMax ? 'PEAK CIVILIAN' : 'CIVILIAN'}</span>`;
+  return `${badgeChip}<span class="badge rank-badge">${allMax ? 'PEAK CIVILIAN' : 'CIVILIAN'}</span>`;
 }
 
 function buildTitleGrid() {
@@ -489,6 +491,7 @@ function buildTitleGrid() {
 }
 
 function doBuyTitle(title) {
+  if (character.variety >= 75) return { ok: false, reason: 'Your Variety is too high to buy cosmetics. Renounce it at the Morals Center first.' };
   if (character.titles.owned.includes(title.id)) return { ok: false };
   if (character.cash < title.cost) return { ok: false, reason: 'Not enough Floydbucks.' };
   character.cash -= title.cost;
@@ -865,6 +868,10 @@ async function announceCrateWin(crate, title) {
 let crateSpinInFlight = false;
 
 async function spinCrate(crate, buttons, messageEl, opts = {}) {
+  if (character.variety >= 75) {
+    alert('Your Variety is too high to buy cosmetics. Renounce it at the Morals Center first.');
+    return;
+  }
   if (crateSpinInFlight) {
     alert('A crate is already spinning -- wait for it to finish first.');
     return;

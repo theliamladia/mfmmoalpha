@@ -257,6 +257,21 @@ btnAdminGrantItem.addEventListener('click', async () => {
   }
 });
 
+// ---------- Grant Cash ----------
+const adminGrantCashUsernameInput = document.getElementById('adminGrantCashUsernameInput');
+const adminGrantCashAmountInput = document.getElementById('adminGrantCashAmountInput');
+const btnAdminGrantCash = document.getElementById('btnAdminGrantCash');
+const adminGrantCashResult = document.getElementById('adminGrantCashResult');
+
+btnAdminGrantCash.addEventListener('click', async () => {
+  try {
+    const result = await apiAdminGrantCash(adminGrantCashUsernameInput.value, adminGrantCashAmountInput.value);
+    adminGrantCashResult.innerHTML = `<p class="gain">${result.message}</p>`;
+  } catch (err) {
+    adminGrantCashResult.innerHTML = `<p class="loss">${err.reason || 'Could not reach the server.'}</p>`;
+  }
+});
+
 // ---------- NMG: fast-forward all pending grading ----------
 const btnAdminNmgFastForward = document.getElementById('btnAdminNmgFastForward');
 const adminNmgFastForwardResult = document.getElementById('adminNmgFastForwardResult');

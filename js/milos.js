@@ -54,7 +54,7 @@ function renderPlayerList() {
         ${profileBannerDivHtml(profileBannerTitle(p.character), 'player-hover-banner')}
         <div class="player-hover-info">
           <b>${otherStyledName}</b>
-          <span class="badge">${allianceLabel(p.character.alliance)}</span>
+          <span class="badge">${allianceLabel(p.character.alliance, p.character)}</span>
         </div>
         <div class="player-hover-actions">
           <button class="secondary-btn" data-hover-profile="${p.username}">👤 Profile</button>
@@ -866,6 +866,11 @@ function buildMoralsCenterUI() {
       <p>Stop taking a stance. Your Alliance stays where it is. Always free.</p>
       <button data-morals-choice="none" class="${!mc.choice ? 'active-hustle' : ''}">${!mc.choice ? 'Active' : 'Choose'}</button>
     </div>
+    <div class="hustle-card">
+      <h3>🌈 Renounce Variety</h3>
+      <p>Currently at ${round1(character.variety || 0)}% Variety. Bring it down by 25 points.</p>
+      <button id="btnRenounceVariety" ${!(character.variety > 0) ? 'disabled' : ''}>Renounce ($${VARIETY_RENOUNCE_COST_CLIENT.toLocaleString()})</button>
+    </div>
   `;
 
   moralsCenterGrid.querySelectorAll('[data-morals-choice]').forEach((btn) => {
@@ -880,6 +885,21 @@ function buildMoralsCenterUI() {
       renderAll();
     });
   });
+
+  const btnRenounceVariety = document.getElementById('btnRenounceVariety');
+  if (btnRenounceVariety) {
+    btnRenounceVariety.addEventListener('click', async () => {
+      try {
+        const result = await apiVarietyRenounce();
+        character = result.character;
+        save();
+        renderAll();
+        logTo(moralsCenterLog, result.message, result.cls);
+      } catch (err) {
+        logTo(moralsCenterLog, err.reason || 'Could not reach the server.', 'loss');
+      }
+    });
+  }
 }
 
 // ---------- milos sub-tabs ----------
@@ -960,6 +980,7 @@ const invcatSubpages = {
   items: document.getElementById('invcat-items'),
   cosmetics: document.getElementById('invcat-cosmetics'),
   graded: document.getElementById('invcat-graded'),
+  badges: document.getElementById('invcat-badges'),
 };
 
 invcatTabBtns.forEach((btn) => {

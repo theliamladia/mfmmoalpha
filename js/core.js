@@ -59,6 +59,9 @@ const MORALS_NEUTRAL_STEP = 3;
 // Taking a stance now costs cash (Update 4) -- stepping back to no stance stays free, so there's
 // always a no-cost way out rather than being stuck paying to undo a change.
 const MORALS_CHANGE_COST = 5000;
+// Mirrors gameLogic.js's VARIETY_RENOUNCE_COST server-side -- server is authoritative (Variety is
+// server-side state, unlike Morals Center's own client-trust choice), this is just for display.
+const VARIETY_RENOUNCE_COST_CLIENT = 5000;
 const MORALS_CHOICES = {
   acceptRicardo: { name: '😇 Accept Ricardo', desc: 'Every 10s, nudge your Alliance toward Good.' },
   renounceRicardo: { name: '😈 Renounce Ricardo', desc: 'Every 10s, nudge your Alliance toward Bad.' },
@@ -652,6 +655,46 @@ function compareTitleStacksByRarityThenPrestige(idOf, itemOf) {
 const PRESTIGE_ID_RE = /^(.+)_p(\d+)$/;
 const PRESTIGE_COST = 5;
 
+// ---------- Balaclava Badges ----------
+// A cosmetic slot separate from Titles -- renders BEFORE the title everywhere a name shows.
+// Deliberately kept structurally separate from the title system (own catalog, own equip field,
+// own inventory-stack rank-up flow) rather than routed through getItemDef/allTitleDefsFor, since
+// those are full of title-only assumptions (prestige/NMG id regexes, rarity odds, etc.) that don't
+// apply here.
+const BALACLAVA_BADGE_CRATE_COST = 960;
+const BADGE_RANK_UP_COST = 5; // same duplicate-consumption idiom as PRESTIGE_COST for titles
+const BADGE_DEFS = [
+  { id: 'badgeBronze', name: 'Bronze Balaclava', cssClass: 'badge-bronze' },
+  { id: 'badgeSilver', name: 'Silver Balaclava', cssClass: 'badge-silver' },
+  { id: 'badgeGold', name: 'Gold Balaclava', cssClass: 'badge-gold' },
+  { id: 'badgePlatinum', name: 'Platinum Balaclava', cssClass: 'badge-platinum' },
+  { id: 'badgeMaster', name: 'Master Balaclava', cssClass: 'badge-master' },
+  { id: 'badgeGrandmaster', name: 'Grandmaster Balaclava', cssClass: 'badge-grandmaster' },
+  { id: 'badgeRuby', name: 'Ruby Balaclava', cssClass: 'badge-ruby' },
+  { id: 'badgeSapphire', name: 'Sapphire Balaclava', cssClass: 'badge-sapphire' },
+  { id: 'badgeEmerald', name: 'Emerald Balaclava', cssClass: 'badge-emerald' },
+  { id: 'badgeUnits', name: 'UNITS Balaclava', cssClass: 'badge-units' },
+];
+// Bronze -> Silver -> Gold -> Platinum -> Master -> Grandmaster: each step consumes
+// BADGE_RANK_UP_COST of the current rank, grants 1 of the next. Grandmaster -> Gem and
+// 3 Gems -> UNITS are their own special-cased trades (see rankUpBadge/tradeGrandmasterForGem/
+// tradeGemsForUnits in inventory.js), not part of this linear chain.
+const BADGE_RANK_CHAIN = ['badgeBronze', 'badgeSilver', 'badgeGold', 'badgePlatinum', 'badgeMaster', 'badgeGrandmaster'];
+const BADGE_GEM_IDS = ['badgeRuby', 'badgeSapphire', 'badgeEmerald'];
+const BADGE_UNITS_ID = 'badgeUnits';
+
+function getBadgeDef(id) {
+  return BADGE_DEFS.find((b) => b.id === id) || null;
+}
+
+function badgeChipMarkup(char) {
+  const badgeId = char.badges && char.badges.equipped;
+  if (!badgeId) return '';
+  const def = getBadgeDef(badgeId);
+  if (!def) return '';
+  return `<span class="badge-chip ${def.cssClass}" title="${escapeHtml(def.name)}"></span>`;
+}
+
 // New Milos Grading (NMG) results are synthesized the same way prestige is -- id shape
 // `${baseTitleId}_nmg${grade}`, e.g. cfHyperSapphire_p1_nmg7 = "HYPER I NMG 7". Unlike prestige's
 // numeral, the grade itself was a one-time random roll (server-side, see mfmmoserver/gameLogic.js
@@ -986,10 +1029,18 @@ function load() {
   if (loaded.crimeRecord === undefined) loaded.crimeRecord = { streak: 0 };
   if (loaded.moralsCenter === undefined) loaded.moralsCenter = { choice: null, lastTickTs: Date.now() };
   if (loaded.mtnHistory === undefined) loaded.mtnHistory = [];
+  if (loaded.variety === undefined) loaded.variety = 0;
+  if (loaded.varietyTimeout === undefined) loaded.varietyTimeout = { until: 0 };
+  if (loaded.enjoyed === undefined) loaded.enjoyed = { active: false, until: 0, byName: null };
+  if (loaded.secumax === undefined) loaded.secumax = { tier: null, lastBillTs: Date.now(), robBlocksUsed: 0, enjoyBlocksUsed: 0, slimeBlocksUsed: 0 };
+  if (loaded.badges === undefined) loaded.badges = { equipped: null };
   return loaded;
 }
 
-function allianceLabel(score) {
+// character defaults to the global `character` -- optional param so this can also label another
+// player's alliance (e.g. the online roster) by passing their character object.
+function allianceLabel(score, char = character) {
+  if (char && char.variety >= 50) return '💀 Dirty Bad'; // forced display, per Variety's "Dangers" ladder -- doesn't touch the real alliance number
   for (const tier of ALLIANCE_TIERS) {
     if (score <= tier.max) return tier.label;
   }
@@ -1072,6 +1123,7 @@ function newCharacter(firstName, lastName) {
     jail: { inJail: false, crime: null, yearsRemaining: 0, serving: false },
     settings: { hideMilosWarning: false },
     titles: { owned: [], equipped: null },
+    badges: { equipped: null },
     marriage: { proposedTo: null, spouseName: null, spouseUserId: null },
     licenses: { gunSafety: false, concealedPermit: false, concealedPendingUntil: 0 },
     inventory: [],
@@ -1083,6 +1135,10 @@ function newCharacter(firstName, lastName) {
     badJobs: { currentJob: null, skills: { skill1: 0, skill2: 0, skill3: 0, skill4: 0 } },
     drugDealer: { unitsSold: 0 },
     crimeRecord: { streak: 0 },
+    variety: 0,
+    varietyTimeout: { until: 0 },
+    enjoyed: { active: false, until: 0, byName: null },
+    secumax: { tier: null, lastBillTs: Date.now(), robBlocksUsed: 0, enjoyBlocksUsed: 0, slimeBlocksUsed: 0 },
     moralsCenter: { choice: null, lastTickTs: Date.now() },
     mtnHistory: [],
   };
@@ -1180,6 +1236,7 @@ function showGame() {
 function renderAll() {
   renderServerBanners();
   renderSlimedGate();
+  if (typeof renderEnjoyedGate === 'function') renderEnjoyedGate();
   if (!isGamePaused()) {
     processBankBilling();
     processMoralsCenter();
@@ -1203,6 +1260,8 @@ function renderAll() {
   walletCashEl.textContent = character.cash.toFixed(2);
   walletChipsEl.textContent = Math.floor(character.chips);
   statAllianceEl.textContent = allianceLabel(character.alliance);
+  if (typeof renderVarietyStatus === 'function') renderVarietyStatus();
+  if (typeof renderSecumaxStatus === 'function') renderSecumaxStatus();
 
   jailNavBtn.disabled = !character.jail.inJail;
   jailNavBtn.classList.toggle('hidden', !character.jail.inJail);

@@ -207,6 +207,7 @@ function buildInventoryGrid() {
 
   renderCosmeticsGrid();
   if (typeof renderGradedTitlesGrid === 'function') renderGradedTitlesGrid();
+  if (typeof renderBadgesGrid === 'function') renderBadgesGrid();
 
   tradeItemSelect.innerHTML = character.inventory.length
     ? character.inventory.map((stack) => {

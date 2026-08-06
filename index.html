@@ -36,6 +36,17 @@
   </div>
 </div>
 
+<!-- ENJOYED TAKEOVER -- same idea as SLIMED OUT above, but for Enjoying's 1-minute lockout.
+     Server-side (character.enjoyed) is the real gate; js/variety.js keeps this in sync. -->
+<div id="enjoyedOverlay" class="maintenance-overlay slimed-overlay hidden">
+  <div class="maintenance-box">
+    <div class="maintenance-emoji">😏</div>
+    <h1>I COULDN'T DO A THING!</h1>
+    <p>Enjoyed by <b id="enjoyedByName"></b></p>
+    <p class="maintenance-sub">Locked out for <span id="enjoyedCountdown">1:00</span></p>
+  </div>
+</div>
+
 <!-- LOGIN / REGISTER -->
 <section id="screen-auth" class="screen hidden">
   <div class="panel">
@@ -145,6 +156,8 @@
         <div class="stat-line">⚖️ ALLIANCE <i id="statAlliance"></i></div>
         <div class="stat-line">📏 Height <b id="statHeight"></b> &nbsp; ⚖️ Weight <b id="statWeight"></b></div>
         <div class="stat-line cash">💵 Floydbucks: <b id="cash">0</b></div>
+        <div class="stat-line" id="varietyStatLine">🌈 VARIETY <b id="statVariety">0%</b> <i id="varietyTierLabel"></i></div>
+        <div class="stat-line" id="secumaxStatLine">🛡️ Secumax: <b id="secumaxStatusLabel">None</b></div>
       </div>
 
       <button class="nav-btn active" data-page="profile">👤 Profile</button>
@@ -1089,15 +1102,18 @@
         <p>What's changed, most recent first.</p>
 
         <div class="update-entry">
-          <div class="update-entry-header"><h3>&#128640; Update 4 is Live: GOOD&reg; Relaunch, VISIONS, Milos Legends 1, Curios George, Morals Center Paywall, Season Wipe</h3><span class="update-date">2026-08-06</span></div>
+          <div class="update-entry-header"><h3>&#128640; Update 4 is Live: GOOD&reg; Relaunch, VISIONS, Milos Legends 1, Enjoying &amp; Variety, Secumax, Balaclava Badges, Season Wipe</h3><span class="update-date">2026-08-06</span></div>
           <ul>
             <li><b>GOOD&reg;</b> relaunched into its own tab with a full visual overhaul, now home to the <b>Leems Larudo x GOOD&reg;</b> title crate and <b>VISIONS</b> &mdash; a $20,000 crate that reskins your entire game and profile theme (17 possible Visions, 3 mythic-rare; the actual reskin engine is still coming).</li>
             <li>New <b>Milos Legends 1</b> crate in Cosmetixxx ($20,000): 10 titles, 2 of them mythic at 0.05% odds.</li>
             <li><b>Curios George</b> tab added &mdash; auction coming soon, countdown to the next Friday drop.</li>
+            <li><b>Enjoying</b>: a new PVP action (Looks + Attack based) that locks the victim out for 1 minute and announces it in New Milos Chat. Builds <b>Variety</b> on both sides &mdash; rack up enough and you're auto-fired, treated as Dirty Bad, locked out of buying cosmetics, or hit with a 1-day timeout at 100%. Type "chill" in chat to bump your own Variety +1%, or renounce it at the Morals Center.</li>
+            <li><b>Secumax</b> is back: a daily subscription (Basic $10k, Plus $50k, Max $90k) that shields you from Robbery, Enjoyment, and Sliming, with Max auto-countersliming whoever tries you. Status shown right in the sidebar.</li>
+            <li><b>Balaclava Badges</b>: a new cosmetic slot that renders before your title everywhere your name shows. Buy the $960 crate for a guaranteed Bronze, then rank it up (Bronze &rarr; Silver &rarr; Gold &rarr; Platinum &rarr; Master &rarr; Grandmaster &rarr; a Gem of your choice &rarr; collect all 3 Gems for the UNITS Balaclava).</li>
             <li><b>Morals Center</b> stance changes now cost $5,000 (Step Back stays free); Good Hustle jobs got another +20% pay bump.</li>
             <li><b>Anima, Counterfinish, and RED vs. BLUE crates are now archived</b> &mdash; view-only odds, no longer purchasable. Titles you already own are unaffected and stay tradeable.</li>
             <li><b>Season Wipe:</b> inventory cleared except crate-won and Graded Titles; all earned/purchased titles removed; Farms/Crypto/Altcoins/job progress reset; cash converted down at a 100,000:1,000 ratio.</li>
-            <li>Badges, Enjoying &amp; Variety, Secumax, and the Combat rework are still in progress and not live yet. <a class="update-learn-more" href="https://mfmmo.com/update4" target="_blank" rel="noopener">Learn More &rarr;</a></li>
+            <li>The Combat rework and Krogzillian Tickets are still to come. <a class="update-learn-more" href="https://mfmmo.com/update4" target="_blank" rel="noopener">Learn More &rarr;</a></li>
           </ul>
         </div>
 
@@ -1390,6 +1406,7 @@
           <button class="invcat-tab-btn" data-invcat="items">📦 Items</button>
           <button class="invcat-tab-btn" data-invcat="cosmetics">🎖️ Cosmetics</button>
           <button class="invcat-tab-btn" data-invcat="graded">🏅 Graded Titles</button>
+          <button class="invcat-tab-btn" data-invcat="badges">🥷 Badges</button>
         </div>
 
         <div id="inventoryLog" class="log log-single-line"></div>
@@ -1405,6 +1422,14 @@
         </div>
         <div id="invcat-graded" class="invcat-subpage hidden">
           <div class="hustle-grid" id="gradedTitlesGrid"></div>
+        </div>
+        <div id="invcat-badges" class="invcat-subpage hidden">
+          <div class="hustle-card">
+            <h3>🥷 Balaclava Badge Crate <span class="price">$960</span></h3>
+            <p>100% guaranteed Bronze Balaclava Badge. Rank it up through a full prestige chain: Bronze &rarr; Silver &rarr; Gold &rarr; Platinum &rarr; Master &rarr; Grandmaster &rarr; a Gem of your choice (Ruby/Sapphire/Emerald) &rarr; collect all 3 Gems for the UNITS Balaclava.</p>
+            <button id="btnBuyBadgeCrate">Buy ($960)</button>
+          </div>
+          <div class="hustle-grid" id="badgesGrid"></div>
         </div>
 
         <div class="hustle-card trade-card">
@@ -1560,6 +1585,16 @@
           <button id="btnAdminGrantItem">Grant</button>
         </div>
         <div id="adminGrantItemResult"></div>
+      </div>
+
+      <div class="admin-block">
+        <p>💵 Grant Cash</p>
+        <div class="admin-row">
+          <input type="text" id="adminGrantCashUsernameInput" placeholder="Player username">
+          <input type="number" id="adminGrantCashAmountInput" placeholder="Amount" min="1" style="width:110px;">
+          <button id="btnAdminGrantCash">Grant</button>
+        </div>
+        <div id="adminGrantCashResult"></div>
       </div>
 
       <div class="admin-block">
@@ -1726,6 +1761,17 @@
     </div>
   </div>
 
+  <div id="secumaxModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>🛡️ Secumax</h3>
+      <p>Subscription protection against Robbery, Enjoyment, and Sliming &mdash; billed daily.</p>
+      <div id="secumaxModalBody"></div>
+      <div class="crate-result-actions">
+        <button id="btnSecumaxClose">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div id="robberyAlertModal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3>🚨 You Got Robbed!</h3>
@@ -1858,6 +1904,7 @@
         <button id="btnPlayerActionProfile" class="secondary-btn">👤 Profile</button>
         <button id="btnPlayerActionPay">💵 Pay</button>
         <button id="btnPlayerActionRob">🥷 Rob</button>
+        <button id="btnPlayerActionEnjoy">😏 Enjoy</button>
         <button id="btnPlayerActionSlime">🔫 Slime</button>
         <button id="btnPlayerActionFight">⚔️ Fight</button>
       </div>
@@ -1948,6 +1995,8 @@
 <script src="js/inventory.js"></script>
 <script src="js/nmg.js"></script>
 <script src="js/curios.js"></script>
+<script src="js/variety.js"></script>
+<script src="js/badges.js"></script>
 <script src="js/mtn.js"></script>
 <script src="js/penitentiary.js"></script>
 <script src="js/jail.js"></script>

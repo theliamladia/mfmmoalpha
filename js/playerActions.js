@@ -10,6 +10,7 @@ const playerActionMessage = document.getElementById('playerActionMessage');
 const btnPlayerActionProfile = document.getElementById('btnPlayerActionProfile');
 const btnPlayerActionPay = document.getElementById('btnPlayerActionPay');
 const btnPlayerActionRob = document.getElementById('btnPlayerActionRob');
+const btnPlayerActionEnjoy = document.getElementById('btnPlayerActionEnjoy');
 const btnPlayerActionSlime = document.getElementById('btnPlayerActionSlime');
 const btnPlayerActionFight = document.getElementById('btnPlayerActionFight');
 const btnPlayerActionPayBack = document.getElementById('btnPlayerActionPayBack');
@@ -22,6 +23,15 @@ const btnRobResultOk = document.getElementById('btnRobResultOk');
 
 function showRobResult(result) {
   robResultTitle.textContent = result.cls === 'gain' ? '🥷 Robbery Successful' : '🚔 Robbery Failed';
+  robResultText.textContent = result.message;
+  robResultText.className = result.cls;
+  robResultModal.classList.remove('hidden');
+}
+
+// Reuses the same result modal as Rob (identical title/text/OK shape) rather than duplicating a
+// second modal for what's structurally the same "here's what happened" popup.
+function showEnjoyResult(result) {
+  robResultTitle.textContent = result.blocked ? '🛡️ Secumax Blocked It' : (result.success ? '😏 Enjoyed' : '😤 Fought Off');
   robResultText.textContent = result.message;
   robResultText.className = result.cls;
   robResultModal.classList.remove('hidden');
@@ -97,6 +107,21 @@ btnPlayerActionRob.addEventListener('click', async () => {
     renderAll();
     closePlayerActionModal();
     showRobResult(result);
+  } catch (err) {
+    playerActionMessage.textContent = err.reason || 'Something went wrong.';
+  }
+});
+
+btnPlayerActionEnjoy.addEventListener('click', async () => {
+  const targetLabel = playerActionTitle.textContent;
+  if (!confirm(`Enjoy ${targetLabel}? ARE YOU SURE?`)) return;
+  try {
+    const result = await apiEnjoyPlayer(currentActionTargetUsername);
+    character = result.character;
+    save();
+    renderAll();
+    closePlayerActionModal();
+    showEnjoyResult(result);
   } catch (err) {
     playerActionMessage.textContent = err.reason || 'Something went wrong.';
   }

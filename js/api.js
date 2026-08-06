@@ -347,6 +347,10 @@ function apiAdminGrantItem(username, itemId, qty) {
   return apiRequest('/admin/grant-item', { method: 'POST', body: JSON.stringify({ username, itemId, qty }) });
 }
 
+function apiAdminGrantCash(username, amount) {
+  return apiRequest('/admin/grant-cash', { method: 'POST', body: JSON.stringify({ username, amount }) });
+}
+
 function apiAdminNmgFastForwardAll() {
   return apiRequest('/admin/nmg-fast-forward-all', { method: 'POST' });
 }
@@ -488,6 +492,30 @@ function apiRobPlayer(targetUsername) {
 
 function apiSlimePlayer(targetUsername) {
   return apiRequest('/players/slime', { method: 'POST', body: JSON.stringify({ targetUsername }) });
+}
+
+function apiEnjoyPlayer(targetUsername) {
+  return apiRequest('/players/enjoy', { method: 'POST', body: JSON.stringify({ targetUsername }) });
+}
+
+function apiVarietyState() {
+  return apiRequest('/variety/state');
+}
+
+function apiVarietyRenounce() {
+  return apiRequest('/variety/renounce', { method: 'POST' });
+}
+
+function apiSecumaxState() {
+  return apiRequest('/secumax/state');
+}
+
+function apiSecumaxSubscribe(tier) {
+  return apiRequest('/secumax/subscribe', { method: 'POST', body: JSON.stringify({ tier }) });
+}
+
+function apiSecumaxCancel() {
+  return apiRequest('/secumax/cancel', { method: 'POST' });
 }
 
 function apiDuelChallenge(targetUsername) {

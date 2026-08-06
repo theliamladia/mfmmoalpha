@@ -1593,6 +1593,38 @@ button:disabled {
 .title-ml-otaku { background-image: url('assets/titles/milos-legends/otaku.png'); }
 .title-ml-pileit { background-image: url('assets/titles/milos-legends/pileit.png'); }
 
+/* ---------- Balaclava Badges ---------- */
+/* Small inline chip (renders before the title everywhere a name shows, see badgeChipMarkup in
+   core.js) and a bigger preview square for the Badges inventory tab -- same asset, two sizes. */
+.badge-chip {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+.badge-chip-large {
+  display: inline-block;
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+}
+.badge-bronze { background-image: url('assets/badges/bronze.png'); }
+.badge-silver { background-image: url('assets/badges/silver.png'); }
+.badge-gold { background-image: url('assets/badges/gold.png'); }
+.badge-platinum { background-image: url('assets/badges/platinum.png'); }
+.badge-master { background-image: url('assets/badges/master.png'); }
+.badge-grandmaster { background-image: url('assets/badges/grandmaster.png'); }
+.badge-ruby { background-image: url('assets/badges/ruby.png'); }
+.badge-sapphire { background-image: url('assets/badges/sapphire.png'); }
+.badge-emerald { background-image: url('assets/badges/emerald.png'); }
+.badge-units { background-image: url('assets/badges/units.png'); }
+
 /* ---------- GOOD® tab: the Blue theme (matches the update4 teaser exactly) ---------- */
 .good-section {
   background: linear-gradient(160deg, #00001a, #000033 40%, #0000ff 200%);
@@ -1951,6 +1983,13 @@ button:disabled {
 
 .stat-line {
   margin: 4px 0;
+}
+
+#secumaxStatLine {
+  cursor: pointer;
+}
+#secumaxStatLine:hover {
+  color: var(--text-primary);
 }
 
 .sidebar-stats b {

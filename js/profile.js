@@ -147,7 +147,7 @@ function renderProfile() {
   profileStatusText.classList.toggle('hidden', !status);
 
   profileLevelBadge.textContent = `⭐ Lvl ${level}`;
-  profileAllianceBadge.textContent = allianceLabel(viewedChar.alliance);
+  profileAllianceBadge.textContent = allianceLabel(viewedChar.alliance, viewedChar);
 
   // The server already redacts cash/fc/stocks to null/empty for non-owners when private (see
   // GET /profile/:username) -- this just decides what to show in their place. The owner's own

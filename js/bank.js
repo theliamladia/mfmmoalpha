@@ -147,13 +147,14 @@ btnBankPayCredit.addEventListener('click', () => runBankAction(apiBankPayCredit)
 
 function renderRankBadge() {
   const display = getDisplayTitle();
+  const badgeChip = typeof badgeChipMarkup === 'function' ? badgeChipMarkup(character) : '';
   rankBadgeEl.innerHTML = '';
   if (display) {
     rankBadgeEl.className = 'badge-slot';
-    rankBadgeEl.innerHTML = titleHoverMarkup(display);
+    rankBadgeEl.innerHTML = badgeChip + titleHoverMarkup(display);
   } else {
     rankBadgeEl.className = 'badge badge-default-rank';
-    rankBadgeEl.textContent = computeRank();
+    rankBadgeEl.innerHTML = badgeChip + escapeHtml(computeRank());
   }
 }
 
