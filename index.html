@@ -154,6 +154,7 @@
       <button class="nav-btn" data-page="milos">🌆 New Milos City</button>
       <button class="nav-btn hidden" data-page="jail" id="jailNavBtn">⛓️ Jail</button>
       <button class="nav-btn" data-page="leaderboard">🏆 Leaderboard</button>
+      <button class="nav-btn" data-page="curios">🗿 Curios George</button>
       <button class="nav-btn" data-page="wiki">📖 Wiki</button>
       <button class="nav-btn" data-page="updates">📰 Updates</button>
       <button class="nav-btn" data-page="report">📋 Report</button>
@@ -194,6 +195,7 @@
           <button class="market-tab-btn" data-shop="maxx">💈 Luke's Maxxerstore</button>
           <button class="market-tab-btn" data-shop="titles">🎖️ Cosmetixxx</button>
           <button class="market-tab-btn" data-shop="nmg">🏅 New Milos Grading</button>
+          <button class="market-tab-btn" data-shop="good">✅ GOOD&reg;</button>
         </div>
 
         <div id="shop-gym" class="shop">
@@ -238,76 +240,57 @@
 
         <div id="shop-titles" class="shop hidden">
           <div id="titleLog" class="log log-single-line"></div>
-          <div class="feature-banner pledge-banner">
-            <div class="feature-banner-text">
-              <h3>&#127945; PLEDGE YOUR ALLEGIANCE <span class="pledge-limited-tag">LIMITED</span></h3>
-              <p>Two sides. Two crates. Only 1,000 of each will ever be opened. Chase the Presidential Rare for an exclusive name style change.</p>
-            </div>
-            <div class="feature-banner-actions pledge-banner-row">
-              <button id="btnViewRedCrate" class="secondary-btn">View RED Crate</button>
-              <span id="redCrateStockLabel" class="pledge-stock-label"></span>
-              <input type="number" id="redSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
-              <button id="btnRedSpin" class="pledge-btn-red">OPEN RED ($20,000)</button>
-            </div>
-            <div class="feature-banner-actions pledge-banner-row">
-              <button id="btnViewBlueCrate" class="secondary-btn">View BLUE Crate</button>
-              <span id="blueCrateStockLabel" class="pledge-stock-label"></span>
-              <input type="number" id="blueSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
-              <button id="btnBlueSpin" class="pledge-btn-blue">OPEN BLUE ($20,000)</button>
-            </div>
-          </div>
-          <p id="redSpinMessage"></p>
-          <p id="blueSpinMessage"></p>
 
-          <div class="feature-banner llg-banner hidden">
+          <div class="feature-banner ml-banner">
             <div class="feature-banner-text">
-              <h3>HEAD IN THE &copy;LOUDS</h3>
-              <p>LEEMS LARUDO x GOOD&reg;</p>
+              <h3>&#127942; MILOS LEGENDS 1</h3>
             </div>
             <div class="feature-banner-actions">
-              <button id="btnViewLlgCrate" class="secondary-btn">View Crate</button>
-              <input type="number" id="llgSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
-              <button id="btnLlgSpin">EXPERIENCE CRATE ($20,000)</button>
+              <button id="btnViewMlCrate" class="secondary-btn">View Crate</button>
+              <input type="number" id="mlSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
+              <button id="btnMlSpin">Spin ($20,000)</button>
             </div>
           </div>
-          <p id="llgSpinMessage"></p>
-
-          <div class="feature-banner anima-banner">
-            <div class="feature-banner-text">
-              <h3>&#127918; ANIMA CRATE</h3>
-              <p>Do meet your heroes. Imported right from Japan. Chase the Mega Hyper Rare for an exclusive name style change.</p>
-            </div>
-            <div class="feature-banner-actions">
-              <button id="btnViewAnimaCrate" class="secondary-btn">View Crate</button>
-              <input type="number" id="animaSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
-              <button id="btnAnimaSpin">Spin ($4,500)</button>
-            </div>
-          </div>
-          <p id="animaSpinMessage"></p>
-
-          <div class="feature-banner counterfinish-banner">
-            <div class="feature-banner-text">
-              <h3>&#127912; COUNTERFINISH CRATE</h3>
-              <p>Look at that subtle Count&rsquo;Strike finishing&hellip;The tasteful Litness of it&hellip;Oh my God&hellip;it even has a Titlemark&hellip;</p>
-            </div>
-            <div class="feature-banner-actions">
-              <button id="btnViewCounterfinishCrate" class="secondary-btn">View Crate</button>
-              <input type="number" id="counterfinishSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
-              <button id="btnCounterfinishSpin">Spin ($3,000)</button>
-            </div>
-          </div>
-          <p id="counterfinishSpinMessage"></p>
-
-          <div id="crateReelWrap" class="crate-reel-wrap hidden">
-            <div class="crate-reel-viewport">
-              <div class="crate-reel-pointer"></div>
-              <div id="crateReelTrack" class="crate-reel-track"></div>
-            </div>
-          </div>
+          <p id="mlSpinMessage"></p>
           <p id="betaSpinMessage"></p>
 
           <h3 class="archived-crates-heading">&#128465;&#65039; Archived Crates</h3>
           <p>No longer purchasable &mdash; view-only odds. Titles you already own stay exactly as they are and remain tradeable.</p>
+
+          <div class="feature-banner archived-banner">
+            <div class="feature-banner-text">
+              <h3>&#127945; PLEDGE YOUR ALLEGIANCE: RED vs. BLUE</h3>
+              <p>Archived. Was a limited spin (1,000 max per side) for an exclusive Presidential Rare name-style title.</p>
+            </div>
+            <div class="feature-banner-actions pledge-banner-row">
+              <button id="btnViewRedCrate" class="secondary-btn">View RED Crate</button>
+              <span id="redCrateStockLabel" class="pledge-stock-label"></span>
+            </div>
+            <div class="feature-banner-actions pledge-banner-row">
+              <button id="btnViewBlueCrate" class="secondary-btn">View BLUE Crate</button>
+              <span id="blueCrateStockLabel" class="pledge-stock-label"></span>
+            </div>
+          </div>
+
+          <div class="feature-banner archived-banner">
+            <div class="feature-banner-text">
+              <h3>&#127918; ANIMA CRATE</h3>
+              <p>Archived. Was a spin for anime titles, including a rainbow-name Mega Hyper Rare.</p>
+            </div>
+            <div class="feature-banner-actions">
+              <button id="btnViewAnimaCrate" class="secondary-btn">View Crate</button>
+            </div>
+          </div>
+
+          <div class="feature-banner archived-banner">
+            <div class="feature-banner-text">
+              <h3>&#127912; COUNTERFINISH CRATE</h3>
+              <p>Archived. Was a spin for skins/finishes, including a gem-colored cursive-name Hyper Gem.</p>
+            </div>
+            <div class="feature-banner-actions">
+              <button id="btnViewCounterfinishCrate" class="secondary-btn">View Crate</button>
+            </div>
+          </div>
 
           <div class="feature-banner archived-banner">
             <div class="feature-banner-text">
@@ -316,16 +299,6 @@
             </div>
             <div class="feature-banner-actions">
               <button id="btnViewCrate" class="secondary-btn">View Crate</button>
-            </div>
-          </div>
-
-          <div class="feature-banner archived-banner">
-            <div class="feature-banner-text">
-              <h3>&#127942; GOOD® Season 1</h3>
-              <p>Archived. Was a spin for exclusive GOOD&reg; Season 1 flex titles.</p>
-            </div>
-            <div class="feature-banner-actions">
-              <button id="btnViewGoodSeasonCrate" class="secondary-btn">View Crate</button>
             </div>
           </div>
 
@@ -341,6 +314,61 @@
           <h3 class="gunclub-section-title">🔨 Crack a Slab</h3>
           <p>Remove the grade from a graded title in your inventory, returning it to its equippable form. This cannot be undone.</p>
           <button id="btnNmgCrackOpen">Crack a Title ($50,000)</button>
+        </div>
+
+        <div id="shop-good" class="shop hidden">
+          <div class="good-section">
+            <h1 class="good-title">GOOD&reg;</h1>
+            <p class="good-tagline">THE PENULTIMATE SHOPPING EXPERIENCE</p>
+
+            <div class="good-card">
+              <p>GOOD&reg; titles live here now &mdash; this is their permanent home.</p>
+            </div>
+
+            <div class="feature-banner llg-banner">
+              <div class="feature-banner-text">
+                <h3>HEAD IN THE &copy;LOUDS</h3>
+                <p>LEEMS LARUDO x GOOD&reg;</p>
+              </div>
+              <div class="feature-banner-actions">
+                <button id="btnViewLlgCrate" class="secondary-btn">View Crate</button>
+                <input type="number" id="llgSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
+                <button id="btnLlgSpin">EXPERIENCE CRATE ($20,000)</button>
+              </div>
+            </div>
+            <p id="llgSpinMessage"></p>
+
+            <div class="feature-banner visions-banner">
+              <div class="feature-banner-text">
+                <h3>&#127760; VISIONS</h3>
+                <p>Reskins the theme of your entire game AND your profile. 17 possible Visions, 3 of them mythic-rare.</p>
+              </div>
+              <div class="feature-banner-actions">
+                <button id="btnViewVisionsCrate" class="secondary-btn">View Crate</button>
+                <input type="number" id="visionsSpinQty" class="crate-qty-input" min="1" max="10" value="1" title="How many to spin">
+                <button id="btnVisionsSpin">Spin ($20,000)</button>
+              </div>
+            </div>
+            <p id="visionsSpinMessage"></p>
+
+            <h2 class="good-sub-title" style="margin-top:30px;">&#127942; GOOD&reg; Season 1</h2>
+            <div class="good-card">
+              <p>Archived. Was a spin for exclusive GOOD&reg; Season 1 flex titles.</p>
+              <button id="btnViewGoodSeasonCrate" class="secondary-btn">View Crate</button>
+            </div>
+
+            <h2 class="good-sub-title">&#128302; GOOD&reg; Season 2</h2>
+            <div class="good-card">
+              <p>Coming soon &mdash; a huge new crate.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="crateReelWrap" class="crate-reel-wrap hidden">
+          <div class="crate-reel-viewport">
+            <div class="crate-reel-pointer"></div>
+            <div id="crateReelTrack" class="crate-reel-track"></div>
+          </div>
         </div>
       </div>
 
@@ -1007,6 +1035,15 @@
         </div>
       </div>
 
+      <div id="page-curios" class="page hidden">
+        <h2>🗿 Curios George</h2>
+        <p>Expensive, one-of-a-kind flex items. Every week, one item goes up for auction for 5 days -- post your bid straight into New Milos Chat.</p>
+        <div class="curios-coming-soon">
+          <h3>🔨 AUCTION COMING SOON</h3>
+          <p id="curiosCountdown" class="curios-countdown"></p>
+        </div>
+      </div>
+
       <div id="page-wiki" class="page hidden">
         <h2>📖 Wiki</h2>
         <p>A quick rundown of every page and how to use it.</p>
@@ -1052,10 +1089,15 @@
         <p>What's changed, most recent first.</p>
 
         <div class="update-entry">
-          <div class="update-entry-header"><h3>📰 Coming Soon: Badges, Enjoying &amp; Variety, Secumax, GOOD&reg; VISIONS</h3><span class="update-date">2026-07-30</span></div>
+          <div class="update-entry-header"><h3>&#128640; Update 4 is Live: GOOD&reg; Relaunch, VISIONS, Milos Legends 1, Curios George, Morals Center Paywall, Season Wipe</h3><span class="update-date">2026-08-06</span></div>
           <ul>
-            <li>A new <b>Badges</b> cosmetic slot (shown before your title), <b>Enjoying &amp; Variety</b> as New Milos City subtraits, a rework of PVP into <b>Combat</b>, a <b>Secumax</b> anti-rob/anti-slime subscription, new Badge crates, a <b>Kirkimmerman Ticket</b> wipe-carryover, a <b>Curios George</b> weekly auction tab, and <b>GOOD&reg;</b> getting a full relaunch &mdash; including <b>VISIONS</b>, a $20,000 crate that reskins your entire game and profile theme.</li>
-            <li>None of this is live yet. <a class="update-learn-more" href="https://mfmmo.com/update4" target="_blank" rel="noopener">Learn More &rarr;</a></li>
+            <li><b>GOOD&reg;</b> relaunched into its own tab with a full visual overhaul, now home to the <b>Leems Larudo x GOOD&reg;</b> title crate and <b>VISIONS</b> &mdash; a $20,000 crate that reskins your entire game and profile theme (17 possible Visions, 3 mythic-rare; the actual reskin engine is still coming).</li>
+            <li>New <b>Milos Legends 1</b> crate in Cosmetixxx ($20,000): 10 titles, 2 of them mythic at 0.05% odds.</li>
+            <li><b>Curios George</b> tab added &mdash; auction coming soon, countdown to the next Friday drop.</li>
+            <li><b>Morals Center</b> stance changes now cost $5,000 (Step Back stays free); Good Hustle jobs got another +20% pay bump.</li>
+            <li><b>Anima, Counterfinish, and RED vs. BLUE crates are now archived</b> &mdash; view-only odds, no longer purchasable. Titles you already own are unaffected and stay tradeable.</li>
+            <li><b>Season Wipe:</b> inventory cleared except crate-won and Graded Titles; all earned/purchased titles removed; Farms/Crypto/Altcoins/job progress reset; cash converted down at a 100,000:1,000 ratio.</li>
+            <li>Badges, Enjoying &amp; Variety, Secumax, and the Combat rework are still in progress and not live yet. <a class="update-learn-more" href="https://mfmmo.com/update4" target="_blank" rel="noopener">Learn More &rarr;</a></li>
           </ul>
         </div>
 
@@ -1481,6 +1523,7 @@
         <p>⚠️ Danger Zone</p>
         <div class="admin-button-row">
           <button id="btnAdminResetAllStats" class="secondary-btn">Reset ALL Players' Stats (Keep Cosmetics)</button>
+          <button id="btnAdminSeasonWipe" class="secondary-btn">Update 4 Season Wipe (Keep Crate/Graded Titles, Convert Cash 100k:1k)</button>
         </div>
       </div>
 
@@ -1904,6 +1947,7 @@
 <script src="js/leaderboard.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/nmg.js"></script>
+<script src="js/curios.js"></script>
 <script src="js/mtn.js"></script>
 <script src="js/penitentiary.js"></script>
 <script src="js/jail.js"></script>

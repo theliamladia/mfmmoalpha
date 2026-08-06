@@ -56,6 +56,9 @@ const MORALS_TICK_MS = 10000;
 const MORALS_GOOD_STEP = 2;
 const MORALS_BAD_STEP = 2;
 const MORALS_NEUTRAL_STEP = 3;
+// Taking a stance now costs cash (Update 4) -- stepping back to no stance stays free, so there's
+// always a no-cost way out rather than being stuck paying to undo a change.
+const MORALS_CHANGE_COST = 5000;
 const MORALS_CHOICES = {
   acceptRicardo: { name: '😇 Accept Ricardo', desc: 'Every 10s, nudge your Alliance toward Good.' },
   renounceRicardo: { name: '😈 Renounce Ricardo', desc: 'Every 10s, nudge your Alliance toward Bad.' },
@@ -83,16 +86,17 @@ const GOOD_CEO_MIN_AVG = 95;
 // eventually beat just clicking Work in Da Skreetz. Ranks past Trainee/Rookie also unlock a
 // job-specific perk (see JOB_PERKS below) once you reach them.
 const JOB_PERK_MIN_AVG = 55; // Supervisor/Lieutenant and up
-// Pay ranges are 10% above their original values (Drugs & Rugs balance pass -- Good Hustle pay up).
-// Must match JOB_RANKS in mfmmoserver/gameLogic.js exactly -- this copy only drives the client's
-// pay-range preview, the server computes the actual payout.
+// Pay ranges are 32% above their original values now (10% from the first Drugs & Rugs balance
+// pass, another 20% on top of that per Update 4's second Good Hustle buff). Must match JOB_RANKS
+// in mfmmoserver/gameLogic.js exactly -- this copy only drives the client's pay-range preview, the
+// server computes the actual payout.
 const JOB_RANKS = [
-  { minAvg: 0, title: 'Trainee', payMin: 0.11, payMax: 0.55, cooldownMs: 2000 },
-  { minAvg: 15, title: 'Associate', payMin: 0.22, payMax: 0.83, cooldownMs: 1800 },
-  { minAvg: 35, title: 'Senior Associate', payMin: 0.44, payMax: 1.21, cooldownMs: 1600 },
-  { minAvg: 55, title: 'Supervisor', payMin: 0.77, payMax: 1.98, cooldownMs: 1400 },
-  { minAvg: 75, title: 'Manager', payMin: 1.27, payMax: 3.03, cooldownMs: 1200 },
-  { minAvg: 95, title: 'Regional Manager', payMin: 1.98, payMax: 4.40, cooldownMs: 1000 },
+  { minAvg: 0, title: 'Trainee', payMin: 0.132, payMax: 0.66, cooldownMs: 2000 },
+  { minAvg: 15, title: 'Associate', payMin: 0.264, payMax: 0.996, cooldownMs: 1800 },
+  { minAvg: 35, title: 'Senior Associate', payMin: 0.528, payMax: 1.452, cooldownMs: 1600 },
+  { minAvg: 55, title: 'Supervisor', payMin: 0.924, payMax: 2.376, cooldownMs: 1400 },
+  { minAvg: 75, title: 'Manager', payMin: 1.524, payMax: 3.636, cooldownMs: 1200 },
+  { minAvg: 95, title: 'Regional Manager', payMin: 2.376, payMax: 5.28, cooldownMs: 1000 },
 ];
 const BAD_JOB_RANKS = [
   { minAvg: 0, title: 'Rookie', payMin: 5, payMax: 25, cooldownMs: 2000 },
@@ -430,20 +434,20 @@ const COUNTERFINISH_CRATE_TITLES = [
 
 // Leems Larudo x GOOD: every title's art IS its name (a piece of wordmark/logo design), so like
 // Anima/Red/Blue the badge chip stays art-only (hideNameOnBadge) while the real name still shows
-// everywhere else (Inventory, Trade, MTN, the "you won X" toast). NOT wired into any shop/crate UI
-// yet -- staged ahead of the update that introduces it, per explicit instruction not to ship this live.
+// everywhere else (Inventory, Trade, MTN, the "you won X" toast). Lives in the GOOD tab (see
+// CRATE_LLG in js/market.js), not Cosmetixxx.
 const LLG_CRATE_COST = 20000;
 const LEEMS_LARUDO_GOOD_TITLES = [
-  { id: 'llgSkyCommon', name: 'Good Sky Common', hideNameOnBadge: true, cssClass: 'title-llg-sky-common', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
-  { id: 'llgSkyRegistered', name: 'Sky Registered', hideNameOnBadge: true, cssClass: 'title-llg-sky-registered', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
-  { id: 'llgGRegistered', name: 'G Registered', hideNameOnBadge: true, cssClass: 'title-llg-g-registered', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
-  { id: 'llgHappy', name: 'Happy', hideNameOnBadge: true, cssClass: 'title-llg-happy', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD spin (common).' },
-  { id: 'llgRegisteredSkyAlt', name: 'Registered Sky Alt', hideNameOnBadge: true, cssClass: 'title-llg-registered-sky-alt', weight: 8, rarity: 'uncommon', how: 'Won from a Leems Larudo x GOOD spin (uncommon).' },
-  { id: 'llgHappyAlt', name: 'Happy Alt', hideNameOnBadge: true, cssClass: 'title-llg-happy-alt', weight: 8, rarity: 'uncommon', how: 'Won from a Leems Larudo x GOOD spin (uncommon).' },
-  { id: 'llgRegisteredAlt', name: 'Good Registered Alt', hideNameOnBadge: true, cssClass: 'title-llg-registered-alt', weight: 3, rarity: 'rare', how: 'Won from a Leems Larudo x GOOD spin (rare).' },
-  { id: 'llgTypeface', name: 'Good Typeface', hideNameOnBadge: true, cssClass: 'title-llg-typeface', weight: 3, rarity: 'rare', how: 'Won from a Leems Larudo x GOOD spin (rare).' },
-  { id: 'llgImpossible', name: 'Impossible', hideNameOnBadge: true, cssClass: 'title-llg-impossible', weight: 0.05, rarity: 'mythic', how: 'Won from a Leems Larudo x GOOD spin (mythic! 0.05% odds).' },
-  { id: 'llgSpecialFont', name: 'GOOD Special Font', hideNameOnBadge: true, cssClass: 'title-llg-special-font', weight: 0.05, rarity: 'mythic', how: 'Won from a Leems Larudo x GOOD spin (mythic! 0.05% odds).' },
+  { id: 'llgSkyCommon', name: 'Good Sky Common', hideNameOnBadge: true, cssClass: 'title-llg-sky-common', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD® spin (common).' },
+  { id: 'llgSkyRegistered', name: 'Sky Registered', hideNameOnBadge: true, cssClass: 'title-llg-sky-registered', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD® spin (common).' },
+  { id: 'llgGRegistered', name: 'G Registered', hideNameOnBadge: true, cssClass: 'title-llg-g-registered', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD® spin (common).' },
+  { id: 'llgHappy', name: 'Happy', hideNameOnBadge: true, cssClass: 'title-llg-happy', weight: 19.475, rarity: 'common', how: 'Won from a Leems Larudo x GOOD® spin (common).' },
+  { id: 'llgRegisteredSkyAlt', name: 'Registered Sky Alt', hideNameOnBadge: true, cssClass: 'title-llg-registered-sky-alt', weight: 8, rarity: 'uncommon', how: 'Won from a Leems Larudo x GOOD® spin (uncommon).' },
+  { id: 'llgHappyAlt', name: 'Happy Alt', hideNameOnBadge: true, cssClass: 'title-llg-happy-alt', weight: 8, rarity: 'uncommon', how: 'Won from a Leems Larudo x GOOD® spin (uncommon).' },
+  { id: 'llgRegisteredAlt', name: 'Good Registered Alt', hideNameOnBadge: true, cssClass: 'title-llg-registered-alt', weight: 3, rarity: 'rare', how: 'Won from a Leems Larudo x GOOD® spin (rare).' },
+  { id: 'llgTypeface', name: 'Good Typeface', hideNameOnBadge: true, cssClass: 'title-llg-typeface', weight: 3, rarity: 'rare', how: 'Won from a Leems Larudo x GOOD® spin (rare).' },
+  { id: 'llgImpossible', name: 'Impossible', hideNameOnBadge: true, cssClass: 'title-llg-impossible', weight: 0.05, rarity: 'mythic', how: 'Won from a Leems Larudo x GOOD® spin (mythic! 0.05% odds).' },
+  { id: 'llgSpecialFont', name: 'GOOD® Special Font', hideNameOnBadge: true, cssClass: 'title-llg-special-font', weight: 0.05, rarity: 'mythic', how: 'Won from a Leems Larudo x GOOD® spin (mythic! 0.05% odds).' },
 ];
 
 // Prestiging a Leems Larudo x GOOD title swaps in a wholly different piece of art per level instead
@@ -470,6 +474,50 @@ const LLG_MAX_PRESTIGE = {
 function llgPrestigeCapReached(baseId, level) {
   return baseId in LLG_MAX_PRESTIGE && level >= LLG_MAX_PRESTIGE[baseId];
 }
+
+// VISIONS: full app-shell theme reskins. Each icon is a diagonal 2-color split (no art asset --
+// same gradient the design doc's own mockup used). The crate/grant/inventory machinery here is
+// fully real; the actual reskin ENGINE (applying a won Vision's theme across the app) is a
+// separate, much larger project and is intentionally not built yet -- these are just collectibles
+// for now, same as any other title, until that lands.
+const VISIONS_CRATE_COST = 20000;
+const VISIONS_TITLES = [
+  { id: 'visionGoodtrix', name: 'GOODTRIX', cssClass: 'title-vision-goodtrix', weight: 0.167, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). Darkmode + blue text, Matrix-style font. Full app reskin -- coming soon.' },
+  { id: 'visionPandora', name: "Pandora's Box", cssClass: 'title-vision-pandora', weight: 0.167, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). CS2 Pandora\'s Box gloves colorway. Full app reskin -- coming soon.' },
+  { id: 'visionSlate', name: 'SLATE', cssClass: 'title-vision-slate', weight: 0.166, rarity: 'mythic', how: 'Won from a VISIONS spin (mythic!). Clean darkmode. Full app reskin -- coming soon.' },
+  { id: 'visionNeonNights', name: 'Neon Nights', cssClass: 'title-vision-neonnights', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Hot pink + cyan cyberpunk. Full app reskin -- coming soon.' },
+  { id: 'visionCrimsonTide', name: 'Crimson Tide', cssClass: 'title-vision-crimsontide', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Deep red / maroon. Full app reskin -- coming soon.' },
+  { id: 'visionObsidianGold', name: 'Obsidian Gold', cssClass: 'title-vision-obsidiangold', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Black + gold luxury. Full app reskin -- coming soon.' },
+  { id: 'visionArcticFrost', name: 'Arctic Frost', cssClass: 'title-vision-arcticfrost', weight: 3.625, rarity: 'rare', how: 'Won from a VISIONS spin (rare). Icy blue & white. Full app reskin -- coming soon.' },
+  { id: 'visionCopperRust', name: 'Copper Rust', cssClass: 'title-vision-copperrust', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Industrial copper / orange. Full app reskin -- coming soon.' },
+  { id: 'visionToxicWaste', name: 'Toxic Waste', cssClass: 'title-vision-toxicwaste', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Radioactive green / yellow. Full app reskin -- coming soon.' },
+  { id: 'visionDeepSea', name: 'Deep Sea', cssClass: 'title-vision-deepsea', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Navy / teal. Full app reskin -- coming soon.' },
+  { id: 'visionRoseGold', name: 'Rose Gold', cssClass: 'title-vision-rosegold', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Pink-gold metallic. Full app reskin -- coming soon.' },
+  { id: 'visionCottonCandy', name: 'Cotton Candy', cssClass: 'title-vision-cottoncandy', weight: 6, rarity: 'uncommon', how: 'Won from a VISIONS spin (uncommon). Blue / pink pastel. Full app reskin -- coming soon.' },
+  { id: 'visionForestMoss', name: 'Forest Moss', cssClass: 'title-vision-forestmoss', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Muted green / brown. Full app reskin -- coming soon.' },
+  { id: 'visionSandstorm', name: 'Sandstorm', cssClass: 'title-vision-sandstorm', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Tan / desert. Full app reskin -- coming soon.' },
+  { id: 'visionSteelBlue', name: 'Steel Blue', cssClass: 'title-vision-steelblue', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Simple corporate blue-gray. Full app reskin -- coming soon.' },
+  { id: 'visionBlush', name: 'Blush', cssClass: 'title-vision-blush', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Soft pink pastel. Full app reskin -- coming soon.' },
+  { id: 'visionCharcoal', name: 'Charcoal', cssClass: 'title-vision-charcoal', weight: 11, rarity: 'common', how: 'Won from a VISIONS spin (common). Plain gray-black. Full app reskin -- coming soon.' },
+];
+
+// Milos Legends 1 Crate: real character portraits (not wordmark art), so names show normally on
+// the badge, same as RED/BLUE Crate. Lives in Cosmetixxx (shop-titles), not GOOD -- confirmed by
+// the user, who drew a hard line between the two ("Milos Legends is in Cosmetixxx. Only Leems
+// Larudo x Good is in GOOD®").
+const MILOS_LEGENDS_CRATE_COST = 20000;
+const MILOS_LEGENDS_TITLES = [
+  { id: 'mlConnie', name: 'Connie the Boytoy', cssClass: 'title-ml-connie', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlEliteUnit', name: 'ELITE Unit', cssClass: 'title-ml-elite-unit', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlMrSerious', name: 'Mr. Serious', cssClass: 'title-ml-mr-serious', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlOtaku', name: 'The Otaku', cssClass: 'title-ml-otaku', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlPileit', name: "Pile'it the Pilot", cssClass: 'title-ml-pileit', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlKhylil', name: 'Khylil Draine', cssClass: 'title-ml-khylil', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
+  { id: 'mlHawken', name: 'Hawken Runquist', cssClass: 'title-ml-hawken', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
+  { id: 'mlSuperjailWarden', name: 'Superjail Warden', cssClass: 'title-ml-superjail-warden', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
+  { id: 'mlSpecialUnit', name: 'Special Unit', cssClass: 'title-ml-special-unit', weight: 0.05, rarity: 'mythic', how: 'Won from a Milos Legends 1 spin (mythic! 0.05% odds).' },
+  { id: 'mlKrogger', name: 'Krogger', cssClass: 'title-ml-krogger', weight: 0.05, rarity: 'mythic', how: 'Won from a Milos Legends 1 spin (mythic! 0.05% odds).' },
+];
 
 const RENAME_COST = 10000;
 
@@ -1096,6 +1144,7 @@ const pageWiki = document.getElementById('page-wiki');
 const pageUpdates = document.getElementById('page-updates');
 const pageReport = document.getElementById('page-report');
 const pageProfile = document.getElementById('page-profile');
+const pageCurios = document.getElementById('page-curios');
 
 const activityLog = document.getElementById('activityLog');
 
@@ -1248,6 +1297,7 @@ function switchPage(pageName) {
   pageUpdates.classList.toggle('hidden', pageName !== 'updates');
   pageReport.classList.toggle('hidden', pageName !== 'report');
   pageProfile.classList.toggle('hidden', pageName !== 'profile');
+  pageCurios.classList.toggle('hidden', pageName !== 'curios');
 
   // profileNavTargetUsername lets viewProfile(username) (js/profile.js) jump straight to someone
   // else's profile through this same switchPage() call, instead of always loading your own and

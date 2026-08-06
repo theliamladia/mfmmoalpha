@@ -1501,6 +1501,149 @@ button:disabled {
   letter-spacing: 0.5px;
 }
 
+.feature-banner.visions-banner {
+  background: linear-gradient(160deg, #00001a, #000033 40%, #0000ff 200%);
+  border-color: #0000ff;
+  box-shadow: 0 0 24px rgba(0, 0, 255, 0.3);
+}
+
+.visions-banner .feature-banner-text h3 {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(80, 120, 255, 0.9);
+}
+
+.visions-banner .feature-banner-text p {
+  color: #c7ceff;
+}
+
+/* Milos Legends 1 -- lives in Cosmetixxx, not GOOD (confirmed by the user). Royal purple/gold
+   "hall of legends" gradient, distinct from Anima's pink and Counterfinish's plain gold. */
+@keyframes mlBannerShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.feature-banner.ml-banner {
+  background: linear-gradient(120deg, #1a0d05, #3d1f0a, #7a5c00, #3d1f0a, #1a0d05);
+  background-size: 300% 300%;
+  animation: mlBannerShift 5s ease infinite;
+  border-color: #ffd700;
+}
+
+.ml-banner .feature-banner-text h3 {
+  color: #fff;
+}
+
+.ml-banner .feature-banner-text p {
+  color: #ffe9b3;
+}
+
+/* Milos Legends 1 title art -- real character portraits (not wordmark-only like LLG), so no
+   hideNameOnBadge and no card-background fallback needed; every image already fills the frame.
+   Mythic tier (Special Unit/Krogger) gets the same pulsing-glow treatment as Presidential Rares;
+   uncommon gets a plain colored border per-title (Superjail Warden's tied to its own neon-red art
+   since the user didn't specify a color for it); common gets a shared neutral border. */
+@keyframes mlGlowPulseYellow {
+  0% { box-shadow: 0 0 10px 2px #ffd700, 0 0 20px 4px #ffd700; }
+  100% { box-shadow: 0 0 20px 5px #ffd700, 0 0 38px 10px #ffd700; }
+}
+@keyframes mlGlowPulsePink {
+  0% { box-shadow: 0 0 10px 2px #ff2b9e, 0 0 20px 4px #ff2b9e; }
+  100% { box-shadow: 0 0 20px 5px #ff2b9e, 0 0 38px 10px #ff2b9e; }
+}
+.title-ml-special-unit,
+.title-ml-krogger {
+  background-size: cover;
+  background-position: center;
+}
+.title-ml-special-unit {
+  background-image: url('assets/titles/milos-legends/special-unit.png');
+  border: 3px solid #ffd700;
+  animation: mlGlowPulseYellow 1.3s ease-in-out infinite alternate;
+}
+.title-ml-krogger {
+  background-image: url('assets/titles/milos-legends/krogger.png');
+  border: 3px solid #ff2b9e;
+  animation: mlGlowPulsePink 1.3s ease-in-out infinite alternate;
+}
+
+.title-ml-khylil,
+.title-ml-hawken,
+.title-ml-superjail-warden {
+  background-size: cover;
+  background-position: center;
+  border: 3px solid;
+}
+.title-ml-khylil { background-image: url('assets/titles/milos-legends/khylil.png'); border-color: #2ecc40; }
+.title-ml-hawken { background-image: url('assets/titles/milos-legends/hawken.png'); border-color: #ffd700; }
+.title-ml-superjail-warden { background-image: url('assets/titles/milos-legends/superjail-warden.png'); border-color: #ff3b3b; }
+
+.title-ml-connie,
+.title-ml-elite-unit,
+.title-ml-mr-serious,
+.title-ml-otaku,
+.title-ml-pileit {
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #9a9a9a;
+}
+.title-ml-connie { background-image: url('assets/titles/milos-legends/connie.png'); }
+.title-ml-elite-unit { background-image: url('assets/titles/milos-legends/elite-unit.png'); }
+.title-ml-mr-serious { background-image: url('assets/titles/milos-legends/mr-serious.png'); }
+.title-ml-otaku { background-image: url('assets/titles/milos-legends/otaku.png'); }
+.title-ml-pileit { background-image: url('assets/titles/milos-legends/pileit.png'); }
+
+/* ---------- GOOD® tab: the Blue theme (matches the update4 teaser exactly) ---------- */
+.good-section {
+  background: linear-gradient(160deg, #00001a, #000033 40%, #0000ff 200%);
+  border: 2px solid #0000ff;
+  border-radius: 16px;
+  padding: 40px 30px;
+  box-shadow: 0 0 40px rgba(0, 0, 255, 0.35);
+}
+
+.good-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 3px;
+  margin: 0;
+  text-shadow: 0 0 18px rgba(80, 120, 255, 0.9);
+}
+
+.good-tagline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: #aab4ff;
+  text-align: center;
+  letter-spacing: 2px;
+  margin: 0 0 30px;
+}
+
+.good-sub-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  color: #fff;
+  letter-spacing: 1.5px;
+  margin: 0 0 6px;
+}
+
+.good-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.good-card p {
+  margin: 0 0 10px;
+  color: #dfe4ff;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .archived-crates-heading {
   margin: 20px 0 4px;
   color: #9a9ca6;
@@ -4531,6 +4674,31 @@ button:disabled {
 .leaderboard-value {
   color: #6fcf97;
   font-weight: 700;
+}
+
+/* ---------- Curios George ---------- */
+.curios-coming-soon {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-container);
+  margin-top: 20px;
+}
+
+.curios-coming-soon h3 {
+  margin: 0 0 14px;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+
+.curios-countdown {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
 }
 
 /* ---------- Hustle toast (Da Skreetz) ---------- */

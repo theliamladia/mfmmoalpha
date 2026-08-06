@@ -163,6 +163,21 @@ if (btnAdminResetAllStats) {
   });
 }
 
+// ---------- Server Controls: Update 4 season wipe ----------
+const btnAdminSeasonWipe = document.getElementById('btnAdminSeasonWipe');
+
+if (btnAdminSeasonWipe) {
+  btnAdminSeasonWipe.addEventListener('click', async () => {
+    if (!confirm("Update 4 Season Wipe: EVERY player's inventory clears except crate-won titles and Graded Titles, all owned/achievement/purchased titles are dropped, Farms/Crypto/Altcoins/jobs reset -- but cash converts down 100,000:1,000 instead of zeroing. This cannot be undone. Continue?")) return;
+    try {
+      const result = await apiAdminSeasonWipe();
+      alert(result.message);
+    } catch (err) {
+      alert(err.reason || 'Could not reach the server.');
+    }
+  });
+}
+
 // ---------- Modifiers ----------
 const adminModifierButtons = document.querySelectorAll('[data-modifier]');
 

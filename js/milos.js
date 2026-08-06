@@ -835,9 +835,16 @@ function processMoralsCenter() {
   if (anyTicked) save();
 }
 
+// Returns false (and leaves everything untouched) if the player can't afford it -- caller checks
+// this before logging/saving/re-rendering, same pattern as every other paid action.
 function doSetMoralsChoice(choiceId) {
+  if (choiceId) {
+    if (character.cash < MORALS_CHANGE_COST) return false;
+    character.cash = round2(character.cash - MORALS_CHANGE_COST);
+  }
   character.moralsCenter.choice = choiceId;
   character.moralsCenter.lastTickTs = Date.now();
+  return true;
 }
 
 function buildMoralsCenterUI() {
@@ -851,12 +858,12 @@ function buildMoralsCenterUI() {
     <div class="hustle-card">
       <h3>${choice.name}</h3>
       <p>${choice.desc}</p>
-      <button data-morals-choice="${id}" class="${mc.choice === id ? 'active-hustle' : ''}">${mc.choice === id ? 'Active' : 'Choose'}</button>
+      <button data-morals-choice="${id}" class="${mc.choice === id ? 'active-hustle' : ''}">${mc.choice === id ? 'Active' : `Choose ($${MORALS_CHANGE_COST.toLocaleString()})`}</button>
     </div>
   `).join('') + `
     <div class="hustle-card">
       <h3>Step Back</h3>
-      <p>Stop taking a stance. Your Alliance stays where it is.</p>
+      <p>Stop taking a stance. Your Alliance stays where it is. Always free.</p>
       <button data-morals-choice="none" class="${!mc.choice ? 'active-hustle' : ''}">${!mc.choice ? 'Active' : 'Choose'}</button>
     </div>
   `;
@@ -864,7 +871,10 @@ function buildMoralsCenterUI() {
   moralsCenterGrid.querySelectorAll('[data-morals-choice]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const choiceId = btn.dataset.moralsChoice === 'none' ? null : btn.dataset.moralsChoice;
-      doSetMoralsChoice(choiceId);
+      if (!doSetMoralsChoice(choiceId)) {
+        logTo(moralsCenterLog, `Not enough Floydbucks. Taking a stance costs $${MORALS_CHANGE_COST.toLocaleString()}.`, 'loss');
+        return;
+      }
       logTo(moralsCenterLog, choiceId ? `You side with ${MORALS_CHOICES[choiceId].name}.` : 'You step back from the Morals Center.', '');
       save();
       renderAll();
