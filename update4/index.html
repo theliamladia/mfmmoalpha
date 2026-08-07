@@ -87,6 +87,33 @@
   .legends-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   .legend-chip { background: var(--panel2); border: 1px solid #2c2e36; border-radius: 8px; padding: 10px 12px; font-size: 13px; text-align: center; }
 
+  /* ---------- Big title-art grids (Milos Legends / Leems Larudo x GOOD) ---------- */
+  /* Fixed 4-per-row, unlike the auto-fit grids above -- these are meant to read as a big, roster-style
+     showcase of the actual art, not a compact reference list. */
+  .big-title-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0; }
+  .big-title-card { background: var(--panel2); border: 1px solid #2c2e36; border-radius: 10px; padding: 10px; text-align: center; }
+  .big-title-art { width: 100%; height: 130px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 10px; }
+  .big-title-card h4 { margin: 0 0 4px; font-size: 13px; color: #fff; }
+  .big-title-rarity { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; }
+  .big-title-rarity.common { color: #9a9a9a; }
+  .big-title-rarity.uncommon { color: #2ecc71; }
+  .big-title-rarity.rare { color: #2f80ed; }
+  .big-title-rarity.mythic { color: #ffd700; }
+
+  /* Milos Legends: same rarity-coded border treatment (and mythic glow) as the live badge chip. */
+  @keyframes mlGlowPulseYellow { 0% { box-shadow: 0 0 10px 2px #ffd700, 0 0 20px 4px #ffd700; } 100% { box-shadow: 0 0 20px 5px #ffd700, 0 0 38px 10px #ffd700; } }
+  @keyframes mlGlowPulsePink { 0% { box-shadow: 0 0 10px 2px #ff2b9e, 0 0 20px 4px #ff2b9e; } 100% { box-shadow: 0 0 20px 5px #ff2b9e, 0 0 38px 10px #ff2b9e; } }
+  .ml-art-common { border: 3px solid #9a9a9a; }
+  .ml-art-khylil { border: 3px solid #2ecc40; }
+  .ml-art-hawken { border: 3px solid #ffd700; }
+  .ml-art-superjail { border: 3px solid #ff3b3b; }
+  .ml-art-mythic-yellow { border: 3px solid #ffd700; animation: mlGlowPulseYellow 1.3s ease-in-out infinite alternate; }
+  .ml-art-mythic-pink { border: 3px solid #ff2b9e; animation: mlGlowPulsePink 1.3s ease-in-out infinite alternate; }
+
+  @media (max-width: 640px) {
+    .big-title-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
   /* ---------- GOOD (R) branding ---------- */
   .good-section {
     background: linear-gradient(160deg, #00001a, #000033 40%, #0000ff 200%);
@@ -425,22 +452,114 @@
     <div class="card">
       <h3>Leems Larudo x GOOD® <span class="price">$50,000</span></h3>
       <p>A direct collab badge between Leems Larudo and GOOD®.</p>
+      <div class="big-title-grid">
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: linear-gradient(180deg, #005a96, #cbe0f5), url('../assets/titles/llg/sky-common.png');"></div>
+          <h4>Good Sky Common</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: linear-gradient(180deg, #005a96, #cbe0f5), url('../assets/titles/llg/sky-registered.png');"></div>
+          <h4>Sky Registered</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: linear-gradient(180deg, #005a96, #cbe0f5), url('../assets/titles/llg/g-registered.png');"></div>
+          <h4>G Registered</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: linear-gradient(180deg, #005a96, #cbe0f5), url('../assets/titles/llg/happy.png');"></div>
+          <h4>Happy</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: url('../assets/titles/llg/registered-sky-alt.png');"></div>
+          <h4>Registered Sky Alt</h4>
+          <span class="big-title-rarity uncommon">Uncommon</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: url('../assets/titles/llg/happy-alt.png');"></div>
+          <h4>Happy Alt</h4>
+          <span class="big-title-rarity uncommon">Uncommon</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: url('../assets/titles/llg/registered-alt.png');"></div>
+          <h4>Good Registered Alt</h4>
+          <span class="big-title-rarity rare">Rare</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: url('../assets/titles/llg/typeface.png');"></div>
+          <h4>Good Typeface</h4>
+          <span class="big-title-rarity rare">Rare</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: url('../assets/titles/llg/impossible.png');"></div>
+          <h4>Impossible</h4>
+          <span class="big-title-rarity mythic">Mythic &mdash; 0.05%</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art" style="background-image: url('../assets/titles/llg/special-font.png');"></div>
+          <h4>GOOD® Special Font</h4>
+          <span class="big-title-rarity mythic">Mythic &mdash; 0.05%</span>
+        </div>
+      </div>
     </div>
 
     <div class="card">
       <h3>MILOS Legends <span class="price">$20,000</span></h3>
       <p>A full roster crate of New Milos City's most recognizable characters:</p>
-      <div class="legends-grid">
-        <div class="legend-chip">Krogger</div>
-        <div class="legend-chip">Elite Unit</div>
-        <div class="legend-chip">The Special Unit</div>
-        <div class="legend-chip">Mr. Serious</div>
-        <div class="legend-chip">The Otaku</div>
-        <div class="legend-chip">Pile'it the Pilot</div>
-        <div class="legend-chip">Connie the Boy Toy</div>
-        <div class="legend-chip">Hawken Runquist</div>
-        <div class="legend-chip">Superjail Warden</div>
-        <div class="legend-chip">Khylil</div>
+      <div class="big-title-grid">
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-common" style="background-image: url('../assets/titles/milos-legends/connie.png');"></div>
+          <h4>Connie the Boytoy</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-common" style="background-image: url('../assets/titles/milos-legends/elite-unit.png');"></div>
+          <h4>ELITE Unit</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-common" style="background-image: url('../assets/titles/milos-legends/mr-serious.png');"></div>
+          <h4>Mr. Serious</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-common" style="background-image: url('../assets/titles/milos-legends/otaku.png');"></div>
+          <h4>The Otaku</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-common" style="background-image: url('../assets/titles/milos-legends/pileit.png');"></div>
+          <h4>Pile'it the Pilot</h4>
+          <span class="big-title-rarity common">Common</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-khylil" style="background-image: url('../assets/titles/milos-legends/khylil.png');"></div>
+          <h4>Khylil Draine</h4>
+          <span class="big-title-rarity uncommon">Uncommon</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-hawken" style="background-image: url('../assets/titles/milos-legends/hawken.png');"></div>
+          <h4>Hawken Runquist</h4>
+          <span class="big-title-rarity uncommon">Uncommon</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-superjail" style="background-image: url('../assets/titles/milos-legends/superjail-warden.png');"></div>
+          <h4>Superjail Warden</h4>
+          <span class="big-title-rarity uncommon">Uncommon</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-mythic-yellow" style="background-image: url('../assets/titles/milos-legends/special-unit.png');"></div>
+          <h4>Special Unit</h4>
+          <span class="big-title-rarity mythic">Mythic &mdash; 0.05%</span>
+        </div>
+        <div class="big-title-card">
+          <div class="big-title-art ml-art-mythic-pink" style="background-image: url('../assets/titles/milos-legends/krogger.png');"></div>
+          <h4>Krogger</h4>
+          <span class="big-title-rarity mythic">Mythic &mdash; 0.05%</span>
+        </div>
       </div>
     </div>
   </div>
