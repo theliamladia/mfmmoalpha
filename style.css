@@ -2016,11 +2016,17 @@ button:disabled {
 .badge-slot .badge-chip {
   flex-shrink: 0;
 }
-/* The title/rank text itself is the one element allowed to shrink+truncate --
-   badge-chip, chevron and level badge must never be the thing that gives up
-   space, or they disappear off the sidebar edge (see #sidebar width note below). */
-.badge-slot > *:not(.badge-chip) {
+.badge-slot > * {
   min-width: 0;
+}
+/* Only a plain (font-rendered) title needs truncating -- its .title-badge has no fixed width, so a
+   very long name can grow wide enough to push the chevron/level badge off the sidebar. A fixed-size
+   art badge (.title-badge:has(.title-text-hidden), 120x40, see the rule below) must be excluded here:
+   some of these (RED CRATE's Trump/Biden Auto, etc.) have a box-shadow glow that extends past their
+   own border box, and overflow:hidden on an ancestor clips that glow off at the ancestor's edge even
+   when the badge itself fits fine -- that's what was cutting the badge and its glow off in the
+   sidebar. Scoping this to plain titles only keeps the truncation without ever touching a glow. */
+.badge-slot .title-badge:not(:has(.title-text-hidden)) {
   max-width: 110px;
   overflow: hidden;
   text-overflow: ellipsis;

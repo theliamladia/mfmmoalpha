@@ -188,15 +188,16 @@ function tickNmgSlotsUI() {
 // ---------- Submit flow ----------
 
 function nmgSubmitCandidates() {
-  // Only rarity-bearing, not-already-graded stacks (mirrors the server's own eligibility check,
-  // NMG_ELIGIBLE_BASE_TITLE_IDS in mfmmoserver/gameLogic.js). No separate "already in a slot"
-  // tracking needed here -- every submit/reveal response overwrites `character` with the server's
-  // authoritative inventory, which already reflects the decremented qty, so a stack with copies
-  // still remaining after a submission correctly stays pickable for its remaining qty.
+  // Every owned title is gradeable (mirrors the server's own eligibility check -- isCosmeticInventoryId
+  // in mfmmoserver/gameLogic.js -- which is permissive for any title/crate id by default instead of a
+  // manually maintained allowlist). No separate "already in a slot" tracking needed here -- every
+  // submit/reveal response overwrites `character` with the server's authoritative inventory, which
+  // already reflects the decremented qty, so a stack with copies still remaining after a submission
+  // correctly stays pickable for its remaining qty.
   return character.inventory
     .filter((stack) => stack.qty > 0)
     .map((stack) => getItemDef(stack.id))
-    .filter((t) => t && t.type === 'title' && t.rarity && !t.nmgGrade);
+    .filter((t) => t && t.type === 'title' && !t.nmgGrade);
 }
 
 function openNmgSubmitModal() {
