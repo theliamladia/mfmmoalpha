@@ -419,3 +419,83 @@ const nmgMarketTabBtn = document.querySelector('.market-tab-btn[data-shop="nmg"]
 if (nmgMarketTabBtn) {
   nmgMarketTabBtn.addEventListener('click', () => refreshNmgState());
 }
+
+// ---------- CosmetixxMarket ----------
+// 5 system-generated graded-title slabs, shared across every player, rotating every 24h -- server
+// owns generation/pricing entirely (see mfmmoserver's /cosmetixx-market/state), same trust boundary
+// as a real NMG grade roll. Rendered with the exact same nmgSlabHtml() used for owned slabs --
+// getItemDef() resolves any `${baseId}_nmg${grade}` id from the id string alone, regardless of
+// whether the viewer owns it, so no separate rendering path is needed here.
+const cosmetixxMarketGrid = document.getElementById('cosmetixxMarketGrid');
+const cosmetixxMarketCountdown = document.getElementById('cosmetixxMarketCountdown');
+let cosmetixxMarketCache = { slots: [], nextRotationAt: 0 };
+
+async function refreshCosmetixxMarket() {
+  if (!cosmetixxMarketGrid) return;
+  try {
+    cosmetixxMarketCache = await apiCosmetixxMarketState();
+  } catch {
+    // Best-effort -- keep showing the last known state if the poll fails.
+  }
+  buildCosmetixxMarketGrid();
+}
+
+function buildCosmetixxMarketGrid() {
+  if (!cosmetixxMarketGrid) return;
+  const { slots } = cosmetixxMarketCache;
+  if (!slots || !slots.length) {
+    cosmetixxMarketGrid.innerHTML = '<p class="equip-picker-empty">Loading today\'s slabs...</p>';
+    return;
+  }
+
+  cosmetixxMarketGrid.innerHTML = slots.map((slot) => {
+    const def = getItemDef(`${slot.titleId}_nmg${slot.grade}`);
+    if (!def) return '';
+    return `
+      <div class="profile-slab-slot">
+        ${nmgSlabHtml(def)}
+        <p class="profile-slab-market-price">$${slot.price.toLocaleString()}</p>
+        <div class="profile-slab-slot-actions">
+          ${slot.sold
+            ? '<button class="secondary-btn" disabled>SOLD</button>'
+            : `<button data-cosmetixx-market-buy="${slot.id}">Buy</button>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  cosmetixxMarketGrid.querySelectorAll('button[data-cosmetixx-market-buy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Buy this slab?')) return;
+      btn.disabled = true;
+      try {
+        const result = await apiCosmetixxMarketBuy(Number(btn.dataset.cosmetixxMarketBuy));
+        character = result.character;
+        save();
+        renderAll();
+        await refreshCosmetixxMarket();
+      } catch (err) {
+        alert(err.reason || 'Could not reach the server.');
+        btn.disabled = false;
+      }
+    });
+  });
+
+  tickCosmetixxMarketUI();
+}
+
+function tickCosmetixxMarketUI() {
+  if (!cosmetixxMarketCountdown || !cosmetixxMarketCache.nextRotationAt) return;
+  const remaining = cosmetixxMarketCache.nextRotationAt - (Date.now() + clockOffsetMs);
+  if (remaining <= 0) {
+    refreshCosmetixxMarket();
+    return;
+  }
+  cosmetixxMarketCountdown.textContent = `Refreshes in ${nmgDurationLabel(remaining)}`;
+}
+
+// Lazy-load on the Cosmetixxx tab click, same reasoning as the NMG tab above.
+const cosmetixxMarketTabBtn = document.querySelector('.market-tab-btn[data-shop="titles"]');
+if (cosmetixxMarketTabBtn) {
+  cosmetixxMarketTabBtn.addEventListener('click', () => refreshCosmetixxMarket());
+}

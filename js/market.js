@@ -98,6 +98,7 @@ function tickCooldownUI() {
   if (typeof tickEnjoyedUI === 'function') tickEnjoyedUI();
   if (typeof tickInvestorL2CountdownUI === 'function') tickInvestorL2CountdownUI();
   if (typeof tickNmgSlotsUI === 'function') tickNmgSlotsUI();
+  if (typeof tickCosmetixxMarketUI === 'function') tickCosmetixxMarketUI();
   if (typeof tickCuriosCountdownUI === 'function') tickCuriosCountdownUI();
   if (!shopEls.gym.classList.contains('hidden')) renderGym();
 }

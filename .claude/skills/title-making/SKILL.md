@@ -125,3 +125,9 @@ spin animation and results reveal for every crate — no per-crate modal markup 
 - [ ] Local smoke test: open the crate, spin qty=1 and qty=5, confirm the item lands in Inventory >
       Cosmetics, the Switch Title dropdown, and the Profile banner/showcase picker, and that hidden-name
       badges render at a consistent size next to other titles in the same list
+- [ ] If `COSMETIXX_MARKET_TITLES` exists (`mfmmoserver/gameLogic.js`) and this crate isn't archived
+      (Open Beta / GOOD Season 1 are the only current exclusions), mirror the new titles' `{id, weight,
+      rarity}` into it, tagged with the crate's cost — CosmetixxMarket's server-side pricing has no
+      title catalog of its own, so a crate skipped here is a crate that can never appear in the
+      rotation. This is the exact "forgot to update the mirror" mistake that slipped through for both
+      Milos Legends and Leems Larudo x GOOD on the old NMG eligibility list.

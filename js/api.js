@@ -712,3 +712,9 @@ function apiNmgSubmit(stackId, tier) {
 function apiNmgReveal(slotId) {
   return apiRequest('/nmg/reveal', { method: 'POST', body: JSON.stringify({ slotId }) });
 }
+function apiCosmetixxMarketState() {
+  return apiRequest('/cosmetixx-market/state');
+}
+function apiCosmetixxMarketBuy(slotId) {
+  return apiRequest('/cosmetixx-market/buy', { method: 'POST', body: JSON.stringify({ slotId }) });
+}
