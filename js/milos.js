@@ -21,9 +21,14 @@ let onlinePlayersCache = [];
 
 function renderPlayerList() {
   const display = getDisplayTitle();
+  // titleHoverMarkup() only renders the title badge -- unlike displayBadgeMarkupFor() (used for
+  // every OTHER player's row below), it never prepends the Balaclava Badge chip, so this "you" row
+  // needs the same explicit badgeChipMarkup(character) prefix renderRankBadge() uses for the
+  // sidebar, or your own equipped badge never shows up in your own Players Online list.
+  const badgeChip = typeof badgeChipMarkup === 'function' ? badgeChipMarkup(character) : '';
   const badgeMarkup = display
-    ? titleHoverMarkup(display)
-    : `<span class="badge rank-badge">${computeRank()}</span>`;
+    ? badgeChip + titleHoverMarkup(display)
+    : badgeChip + `<span class="badge rank-badge">${computeRank()}</span>`;
   const fullName = `${character.firstName} ${character.lastName}`;
   const styledName = styledNameHtml(character, fullName);
   const youRow = `
