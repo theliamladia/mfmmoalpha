@@ -4914,6 +4914,26 @@ button:disabled {
 }
 
 /* --- Profiles --- */
+.profile-vision-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.profile-vision-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--border-default);
+  background-color: var(--surface-3);
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
 .profile-banner {
   position: relative;
   height: 180px;

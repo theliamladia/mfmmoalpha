@@ -986,6 +986,7 @@ const invcatSubpages = {
   cosmetics: document.getElementById('invcat-cosmetics'),
   graded: document.getElementById('invcat-graded'),
   badges: document.getElementById('invcat-badges'),
+  visions: document.getElementById('invcat-visions'),
 };
 
 invcatTabBtns.forEach((btn) => {

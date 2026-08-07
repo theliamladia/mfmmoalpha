@@ -97,6 +97,7 @@ function renderVisionsGrid() {
         <div class="title-preview"><span class="title-badge ${def.cssClass}"><span class="title-text">${escapeHtml(def.name)}</span></span></div>
         <h3>${escapeHtml(def.name)}</h3>
         <p>${escapeHtml(def.how)}</p>
+        <p>&times; ${stack.qty}</p>
         <button data-equip-vision="${stack.id}" class="${equipped ? 'active-hustle' : ''}">${equipped ? 'Equipped' : 'Equip'}</button>
       </div>
     `;

@@ -694,12 +694,17 @@ const crateResultMultiList = document.getElementById('crateResultMultiList');
 // playing it N times in a row would just be N x 4.5s of waiting -- see spinCrate).
 function showCrateResult(results, alreadyOwnedFlags) {
   const isMulti = results.length > 1;
-  crateResultTitleId = isMulti ? null : results[0].id;
+  // Visions aren't titles (see the getItemDef vision branch in core.js) -- doEquipTitle() has no
+  // idea what a Vision id even is, so offering "Equip Title" on a single-Vision win doesn't just
+  // read as confusing, clicking it actually sets character.titles.equipped to a Vision id. Treat a
+  // vision result the same as a multi-result for this one button: never offer it.
+  const isVision = !isMulti && results[0].type === 'vision';
+  crateResultTitleId = isMulti || isVision ? null : results[0].id;
 
   crateResultBadge.classList.toggle('hidden', isMulti);
   crateResultNote.classList.toggle('hidden', isMulti);
   crateResultMultiList.classList.toggle('hidden', !isMulti);
-  btnCrateResultEquip.classList.toggle('hidden', isMulti);
+  btnCrateResultEquip.classList.toggle('hidden', isMulti || isVision);
 
   if (isMulti) {
     crateResultMultiList.innerHTML = results.map((title, i) => {

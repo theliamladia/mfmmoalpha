@@ -5,6 +5,10 @@ const PROFILE_SLAB_MARKET_MAX = 6;
 
 const profileNotFound = document.getElementById('profileNotFound');
 const profileContent = document.getElementById('profileContent');
+const profileVisionRow = document.getElementById('profileVisionRow');
+const profileVisionSwatch = document.getElementById('profileVisionSwatch');
+const profileVisionLabel = document.getElementById('profileVisionLabel');
+const btnProfileVisionChange = document.getElementById('btnProfileVisionChange');
 const profileBannerEl = document.getElementById('profileBanner');
 const btnProfileShuffleBanner = document.getElementById('btnProfileShuffleBanner');
 const profileNameEl = document.getElementById('profileName');
@@ -112,6 +116,59 @@ function viewProfile(username) {
   switchPage('profile');
 }
 
+// Every owned Vision def for an arbitrary character -- same "read inventory stacks" shape as
+// profileOwnedTitleDefs below, just against VISIONS_TITLES instead of the title catalogs (Visions
+// aren't titles, see the getItemDef vision branch in core.js, so they need their own lookup here).
+function profileOwnedVisionDefs(char) {
+  return (char.inventory || [])
+    .filter((stack) => stack.qty > 0)
+    .map((stack) => VISIONS_TITLES.find((v) => v.id === stack.id))
+    .filter(Boolean);
+}
+
+function renderProfileVisionRow(viewedChar, isOwner) {
+  if (!profileVisionRow) return;
+  const equippedId = viewedChar.visions && viewedChar.visions.equipped;
+  const def = equippedId ? VISIONS_TITLES.find((v) => v.id === equippedId) : null;
+  profileVisionSwatch.className = `profile-vision-swatch${def ? ` ${def.cssClass}` : ''}`;
+  profileVisionLabel.textContent = def ? `🌀 Vision: ${def.name}` : '🌀 No Vision equipped';
+  btnProfileVisionChange.classList.toggle('hidden', !isOwner);
+}
+
+if (btnProfileVisionChange) {
+  btnProfileVisionChange.addEventListener('click', () => {
+    if (!profileViewCache) return;
+    const owned = profileOwnedVisionDefs(profileViewCache.character);
+    openProfilePicker('Change your Vision');
+    const noneRow = `<div class="title-dropdown-item" data-pick-vision="none">None</div>`;
+    profileShowcasePickerList.innerHTML = noneRow + (owned.length
+      ? owned.map((v) => `
+          <div class="title-dropdown-item" data-pick-vision="${v.id}">
+            <span class="title-badge ${v.cssClass}"><span class="title-text">${escapeHtml(v.name)}</span></span>
+          </div>
+        `).join('')
+      : '<p class="equip-picker-empty">No Visions yet. Spin one in GOOD®.</p>');
+
+    profileShowcasePickerList.querySelectorAll('[data-pick-vision]').forEach((el) => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.pickVision;
+        if (!character.visions) character.visions = { equipped: null };
+        character.visions.equipped = id === 'none' ? null : id;
+        save();
+        // profileViewCache.character is always its own fetched-from-server copy (even for the
+        // owner's own profile, see loadProfile above) -- kept in sync directly here instead of
+        // re-fetching, since equipping a Vision is purely client-state with no server route of its
+        // own to await first (unlike e.g. the Portfolio Showcase actions, which really do need the
+        // round trip because the server made the actual change).
+        profileViewCache.character.visions = { ...(profileViewCache.character.visions || {}), equipped: character.visions.equipped };
+        profileShowcasePicker.classList.add('hidden');
+        renderAll();
+        renderProfile();
+      });
+    });
+  });
+}
+
 async function loadProfile(username, page) {
   try {
     const result = await apiGetProfile(username, page || 1);
@@ -136,6 +193,7 @@ function renderProfile() {
   // visiting someone else's profile shows THEIR equipped Vision scoped to just this page, while
   // the rest of your own app view stays on your own theme (see applyOwnVisionTheme in renderAll).
   if (typeof applyProfileVisionTheme === 'function') applyProfileVisionTheme(viewedChar);
+  renderProfileVisionRow(viewedChar, isOwner);
   const privacy = profileState.privacy || { cash: false, fc: false, portfolio: false };
 
   const bannerTitle = profileBannerTitle(viewedChar);

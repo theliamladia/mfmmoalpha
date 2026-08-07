@@ -390,8 +390,6 @@
             </div>
             <p id="visionsSpinMessage"></p>
 
-            <div id="visionsGrid" class="hustle-grid"></div>
-
             <h2 class="good-sub-title" style="margin-top:30px;">&#127942; GOOD&reg; Season 1</h2>
             <div class="good-card">
               <p>Archived. Was a spin for exclusive GOOD&reg; Season 1 flex titles.</p>
@@ -1338,6 +1336,12 @@
           <p>That player doesn't exist.</p>
         </div>
         <div id="profileContent" class="hidden">
+          <div id="profileVisionRow" class="profile-vision-row">
+            <span id="profileVisionSwatch" class="profile-vision-swatch"></span>
+            <span id="profileVisionLabel"></span>
+            <button id="btnProfileVisionChange" class="secondary-btn hidden">Change Vision</button>
+          </div>
+
           <div id="profileBanner" class="profile-banner">
             <button id="btnProfileShuffleBanner" class="profile-banner-shuffle secondary-btn hidden" title="Change profile banner">🔄</button>
           </div>
@@ -1429,6 +1433,7 @@
           <button class="invcat-tab-btn" data-invcat="cosmetics">🎖️ Cosmetics</button>
           <button class="invcat-tab-btn" data-invcat="graded">🏅 Graded Titles</button>
           <button class="invcat-tab-btn" data-invcat="badges">🥷 Badges</button>
+          <button class="invcat-tab-btn" data-invcat="visions">🌀 Visions</button>
         </div>
 
         <div id="inventoryLog" class="log log-single-line"></div>
@@ -1452,6 +1457,10 @@
             <button id="btnBuyBadgeCrate">Buy ($960)</button>
           </div>
           <div class="hustle-grid" id="badgesGrid"></div>
+        </div>
+        <div id="invcat-visions" class="invcat-subpage hidden">
+          <p class="item-subheading">Reskins the theme of your entire game AND your profile. Spin for new ones in GOOD&reg; (Milos Market).</p>
+          <div id="visionsGrid" class="hustle-grid"></div>
         </div>
 
         <div class="hustle-card trade-card">
