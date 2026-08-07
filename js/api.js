@@ -354,6 +354,9 @@ function apiAdminGrantCash(username, amount) {
 function apiAdminNmgFastForwardAll() {
   return apiRequest('/admin/nmg-fast-forward-all', { method: 'POST' });
 }
+function apiAdminCosmetixxMarketRegen() {
+  return apiRequest('/admin/cosmetixx-market-regen', { method: 'POST' });
+}
 
 function apiAdminTransactions({ username, beforeId } = {}) {
   const params = new URLSearchParams();

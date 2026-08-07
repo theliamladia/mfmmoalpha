@@ -285,6 +285,23 @@ btnAdminNmgFastForward.addEventListener('click', async () => {
   }
 });
 
+// ---------- CosmetixxMarket: force regenerate ----------
+// Regen is normally lazy (next state request after 24h) and never retroactive -- a pricing/catalog
+// change that lands mid-rotation doesn't apply until the batch naturally expires. This forces it
+// immediately instead of waiting out the rest of the window.
+const btnAdminCosmetixxMarketRegen = document.getElementById('btnAdminCosmetixxMarketRegen');
+const adminCosmetixxMarketRegenResult = document.getElementById('adminCosmetixxMarketRegenResult');
+
+btnAdminCosmetixxMarketRegen.addEventListener('click', async () => {
+  try {
+    const result = await apiAdminCosmetixxMarketRegen();
+    adminCosmetixxMarketRegenResult.innerHTML = `<p class="gain">${result.message}</p>`;
+    if (typeof refreshCosmetixxMarket === 'function') refreshCosmetixxMarket();
+  } catch (err) {
+    adminCosmetixxMarketRegenResult.innerHTML = `<p class="loss">${err.reason || 'Could not reach the server.'}</p>`;
+  }
+});
+
 // ---------- Title Maker ----------
 // Client-side only, like the rest of this admin menu (Give ADMIN Title, stat editors) -- creates a
 // full title definition (not just a name) and stores it directly on this character's own save
