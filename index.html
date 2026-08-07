@@ -47,6 +47,14 @@
   </div>
 </div>
 
+<!-- SYNC CONFLICT TOAST -- non-blocking replacement for the old alert() shown when a rapid-fire
+     action races a /character/sync save into a 409 (see flushCharacterSync in js/core.js). An
+     alert() halts the whole page until dismissed, which during rapid-clicking read as the game
+     freezing; this just posts a message and auto-dismisses so play can continue immediately. -->
+<div id="syncConflictToast" class="sync-conflict-toast hidden">
+  <p id="syncConflictToastText"></p>
+</div>
+
 <!-- LOGIN / REGISTER -->
 <section id="screen-auth" class="screen hidden">
   <div class="panel">

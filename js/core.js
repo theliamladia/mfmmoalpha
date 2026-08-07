@@ -903,6 +903,20 @@ function save() {
 // this one promise instead, and re-checks for a newer edit once it settles (save() can queue
 // another one while the first request was already on the wire, which that request's own snapshot
 // of `character` can't have included).
+const syncConflictToast = document.getElementById('syncConflictToast');
+const syncConflictToastText = document.getElementById('syncConflictToastText');
+let syncConflictToastTimer = null;
+
+// Non-blocking replacement for alert() -- a rapid-click race landing here mid-hustle used to pop a
+// native alert() that halts the whole page (rendering, timers, everything) until dismissed, which
+// read as the game freezing. This just posts the message and auto-dismisses.
+function showSyncConflictToast(text) {
+  syncConflictToastText.textContent = text;
+  syncConflictToast.classList.remove('hidden');
+  clearTimeout(syncConflictToastTimer);
+  syncConflictToastTimer = setTimeout(() => syncConflictToast.classList.add('hidden'), 5000);
+}
+
 function flushCharacterSync() {
   if (inFlightCharacterSync) return inFlightCharacterSync.then(flushCharacterSync);
   if (!serverSyncPending) return Promise.resolve();
@@ -917,7 +931,7 @@ function flushCharacterSync() {
         const fresh = await apiMe();
         character = fresh.character;
         renderAll();
-        alert("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
+        showSyncConflictToast("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
       } catch { /* best-effort */ }
     }
   });

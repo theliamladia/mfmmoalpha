@@ -248,6 +248,34 @@ button:disabled {
   max-width: 640px;
 }
 
+/* Non-blocking toast for the sync-conflict message (see index.html) -- unlike alert(), this
+   doesn't halt JS execution or page rendering, so it can't read as the game freezing. */
+.sync-conflict-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9998;
+  max-width: 420px;
+  width: calc(100vw - 32px);
+  background: var(--surface-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-container);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.sync-conflict-toast p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.sync-conflict-toast.hidden {
+  display: none;
+}
+
 .maintenance-emoji {
   font-size: 48px;
   margin-bottom: 18px;
