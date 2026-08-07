@@ -867,9 +867,14 @@ button:disabled {
    stretch the badge wider than a short one (e.g. "Bush"). Fixed width + the base rule's
    overflow:hidden clips that invisible overflow instead of letting it grow the box. */
 .title-badge[class*="title-anima-"],
-.title-badge[class*="title-red-"],
-.title-badge[class*="title-blue-"],
-.title-badge[class*="title-llg-"] {
+/* Any art-only badge (hideNameOnBadge -- Anima, RED/BLUE, LLG, Milos Legends, etc.) needs a fixed
+   size regardless of family: .title-text-hidden is visibility:hidden, not display:none, so the
+   real (invisible) name still reserves its own text width inside the inline-block .title-badge --
+   different titles have different-length names, so without this every art chip in a list (like the
+   Switch Title dropdown) ends up a different width purely from its hidden text length. :has() lets
+   this apply to every current and future hidden-name family in one rule instead of needing a new
+   [class*="title-x-"] entry added here every time a new mystery-pull crate ships. */
+.title-badge:has(.title-text-hidden) {
   width: 120px;
   height: 40px;
 }
