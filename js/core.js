@@ -511,16 +511,16 @@ const VISIONS_TITLES = [
 // Larudo x Good is in GOOD®").
 const MILOS_LEGENDS_CRATE_COST = 20000;
 const MILOS_LEGENDS_TITLES = [
-  { id: 'mlConnie', name: 'Connie the Boytoy', cssClass: 'title-ml-connie', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
-  { id: 'mlEliteUnit', name: 'ELITE Unit', cssClass: 'title-ml-elite-unit', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
-  { id: 'mlMrSerious', name: 'Mr. Serious', cssClass: 'title-ml-mr-serious', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
-  { id: 'mlOtaku', name: 'The Otaku', cssClass: 'title-ml-otaku', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
-  { id: 'mlPileit', name: "Pile'it the Pilot", cssClass: 'title-ml-pileit', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
-  { id: 'mlKhylil', name: 'Khylil Draine', cssClass: 'title-ml-khylil', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
-  { id: 'mlHawken', name: 'Hawken Runquist', cssClass: 'title-ml-hawken', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
-  { id: 'mlSuperjailWarden', name: 'Superjail Warden', cssClass: 'title-ml-superjail-warden', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
-  { id: 'mlSpecialUnit', name: 'Special Unit', cssClass: 'title-ml-special-unit', weight: 0.05, rarity: 'mythic', how: 'Won from a Milos Legends 1 spin (mythic! 0.05% odds).' },
-  { id: 'mlKrogger', name: 'Krogger', cssClass: 'title-ml-krogger', weight: 0.05, rarity: 'mythic', how: 'Won from a Milos Legends 1 spin (mythic! 0.05% odds).' },
+  { id: 'mlConnie', name: 'Connie the Boytoy', hideNameOnBadge: true, cssClass: 'title-ml-connie', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlEliteUnit', name: 'ELITE Unit', hideNameOnBadge: true, cssClass: 'title-ml-elite-unit', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlMrSerious', name: 'Mr. Serious', hideNameOnBadge: true, cssClass: 'title-ml-mr-serious', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlOtaku', name: 'The Otaku', hideNameOnBadge: true, cssClass: 'title-ml-otaku', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlPileit', name: "Pile'it the Pilot", hideNameOnBadge: true, cssClass: 'title-ml-pileit', weight: 15, rarity: 'common', how: 'Won from a Milos Legends 1 spin (common).' },
+  { id: 'mlKhylil', name: 'Khylil Draine', hideNameOnBadge: true, cssClass: 'title-ml-khylil', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
+  { id: 'mlHawken', name: 'Hawken Runquist', hideNameOnBadge: true, cssClass: 'title-ml-hawken', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
+  { id: 'mlSuperjailWarden', name: 'Superjail Warden', hideNameOnBadge: true, cssClass: 'title-ml-superjail-warden', weight: 8.3, rarity: 'uncommon', how: 'Won from a Milos Legends 1 spin (uncommon).' },
+  { id: 'mlSpecialUnit', name: 'Special Unit', hideNameOnBadge: true, cssClass: 'title-ml-special-unit', weight: 0.05, rarity: 'mythic', how: 'Won from a Milos Legends 1 spin (mythic! 0.05% odds).' },
+  { id: 'mlKrogger', name: 'Krogger', hideNameOnBadge: true, cssClass: 'title-ml-krogger', weight: 0.05, rarity: 'mythic', how: 'Won from a Milos Legends 1 spin (mythic! 0.05% odds).' },
 ];
 
 const RENAME_COST = 10000;

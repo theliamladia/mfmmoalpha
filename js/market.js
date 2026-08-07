@@ -868,6 +868,24 @@ async function announceCrateWin(crate, title) {
 // which crate or button triggered it.
 let crateSpinInFlight = false;
 
+const crateSpinModal = document.getElementById('crateSpinModal');
+const crateSpinModalMessage = document.getElementById('crateSpinModalMessage');
+
+function openCrateSpinModal() {
+  crateSpinModal.classList.remove('hidden');
+}
+
+function closeCrateSpinModal() {
+  crateSpinModal.classList.add('hidden');
+}
+
+// Mirrors the status text onto both the crate's own on-page line (still read by a couple of other
+// spots) and the modal the player is actually looking at while a spin is in progress.
+function setSpinMessage(messageEl, text) {
+  messageEl.textContent = text;
+  crateSpinModalMessage.textContent = text;
+}
+
 async function spinCrate(crate, buttons, messageEl, opts = {}) {
   if (character.variety >= 75) {
     alert('Your Variety is too high to buy cosmetics. Renounce it at the Morals Center first.');
@@ -897,34 +915,41 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
   crateSpinInFlight = true;
   lastSpunCrateContext = { crate, buttons, messageEl, qty };
   buttons.forEach((b) => { b.disabled = true; });
-  messageEl.textContent = crate.limited ? 'Reserving your crate...' : 'Opening crate...';
+  openCrateSpinModal();
+  setSpinMessage(messageEl, crate.limited ? 'Reserving your crate...' : 'Opening crate...');
 
   const start = await startCrateSpin(crate, qty);
   if (!start.ok) {
     alert(start.reason);
-    messageEl.textContent = '';
+    setSpinMessage(messageEl, '');
     buttons.forEach((b) => { b.disabled = false; });
     crateSpinInFlight = false;
+    closeCrateSpinModal();
     return;
   }
   save();
   renderAll();
 
-  messageEl.textContent = 'Opening crate...';
+  setSpinMessage(messageEl, 'Opening crate...');
+
+  // Granted incrementally as each reel lands (see the qty<=CRATE_ANIMATE_MAX_QTY branch below), not
+  // batched here -- this array just accumulates what doGrantCrateWins reported along the way so
+  // finishMultiOpen can still show the full results list at the end.
+  const alreadyOwnedFlags = [];
 
   const finishMultiOpen = () => {
-    const alreadyOwnedFlags = doGrantCrateWins(start.results.map((t) => t.id));
     start.results.forEach((title) => {
       if (isCrateAnnounceWorthy(crate, title)) announceCrateWin(crate, title);
     });
     const msg = `Opened ${crate.name} ${qty}x! See results below.`;
-    messageEl.textContent = msg;
+    setSpinMessage(messageEl, msg);
     logTo(titleLog, msg, 'gain');
     save();
     buildTitleGrid();
     renderAll();
     buttons.forEach((b) => { b.disabled = false; });
     crateSpinInFlight = false;
+    closeCrateSpinModal();
     showCrateResult(start.results, alreadyOwnedFlags);
   };
 
@@ -932,30 +957,39 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
     const won = start.results[0];
     runCrateAnimation(crate, won, () => {
       const [alreadyOwned] = doGrantCrateWins([won.id]);
+      alreadyOwnedFlags.push(alreadyOwned);
       if (isCrateAnnounceWorthy(crate, won)) announceCrateWin(crate, won);
       const msg = alreadyOwned
         ? `Spin landed on ${itemLabel(won)} — already owned! Another copy was added to your Inventory to trade.`
         : `Spin landed on ${itemLabel(won)}! Added to your Inventory.`;
-      messageEl.textContent = msg;
+      setSpinMessage(messageEl, msg);
       logTo(titleLog, msg, 'gain');
       save();
       buildTitleGrid();
       renderAll();
       buttons.forEach((b) => { b.disabled = false; });
       crateSpinInFlight = false;
-      showCrateResult([won], [alreadyOwned]);
+      closeCrateSpinModal();
+      showCrateResult([won], alreadyOwnedFlags);
     });
     return;
   }
 
   if (qty <= CRATE_ANIMATE_MAX_QTY) {
-    // Small batches still get the reel animation, played once per roll in sequence, before the
-    // results list reveals -- unlike a single spin, granting/messaging only happens once at the end.
+    // Grant + save each result the instant its own reel lands, rather than batching every grant
+    // into finishMultiOpen at the very end -- a multi-open's reel sequence runs ~5s per item, so
+    // batching left a window (the whole sequence, several tens of seconds for a 5x open) where cash
+    // was already spent but nothing had reached inventory yet. If anything interrupted that window
+    // (this is also why the reel is now a blocking modal instead of sitting inline in the page --
+    // see crateSpinModal), only the copy still mid-flight was ever at risk, not the whole batch.
     let i = 0;
     const playNext = () => {
       if (i >= start.results.length) { finishMultiOpen(); return; }
-      messageEl.textContent = `Opening crate ${i + 1}/${qty}...`;
+      setSpinMessage(messageEl, `Opening crate ${i + 1}/${qty}...`);
       runCrateAnimation(crate, start.results[i], () => {
+        const [alreadyOwned] = doGrantCrateWins([start.results[i].id]);
+        alreadyOwnedFlags.push(alreadyOwned);
+        save();
         i += 1;
         playNext();
       });
@@ -964,8 +998,10 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
     return;
   }
 
-  // Quick Open (qty > CRATE_ANIMATE_MAX_QTY) skips the slot-reel animation entirely -- playing it
-  // qty times back to back would just be a long wait for no benefit, so results resolve instantly.
+  // Quick Open (qty > CRATE_ANIMATE_MAX_QTY) skips the slot-reel animation entirely and resolves in
+  // one synchronous pass -- no async gap for anything to interrupt, so a single batch grant here is
+  // already safe (unlike the animated multi-open path above).
+  alreadyOwnedFlags.push(...doGrantCrateWins(start.results.map((t) => t.id)));
   finishMultiOpen();
 }
 

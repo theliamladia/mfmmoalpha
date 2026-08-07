@@ -1824,8 +1824,27 @@ button:disabled {
 }
 
 /* --- Crate opening animation --- */
+/* Wider than the default .modal-box (380px) so the reel viewport has room to actually show a
+   strip of items -- this used to sit inline in the page at full content width, now it's a modal
+   that blocks the rest of the page (nav, other buttons) for the duration of the spin, closing off
+   the "click away mid-animation" window that could interrupt a multi-open before every item was
+   granted. See the incremental per-reel grant in spinCrate() (js/market.js) for the other half of
+   that fix. */
+.modal-box.crate-spin-modal-box {
+  width: 560px;
+  max-width: 92vw;
+  text-align: center;
+}
+
+.crate-spin-modal-message {
+  margin: 14px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  min-height: 1.4em;
+}
+
 .crate-reel-wrap {
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .crate-reel-viewport {
@@ -1922,9 +1941,15 @@ button:disabled {
 .badges {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   margin-bottom: 10px;
+}
+
+.badges #btnTitleChevron,
+.badges #levelBadge {
+  flex-shrink: 0;
 }
 
 .badge {
@@ -1953,9 +1978,19 @@ button:disabled {
   align-items: center;
   gap: 4px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 .badge-slot .badge-chip {
   flex-shrink: 0;
+}
+/* The title/rank text itself is the one element allowed to shrink+truncate --
+   badge-chip, chevron and level badge must never be the thing that gives up
+   space, or they disappear off the sidebar edge (see #sidebar width note below). */
+.badge-slot > *:not(.badge-chip) {
+  min-width: 0;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #looksTier {
@@ -2029,7 +2064,7 @@ button:disabled {
 }
 
 #sidebar {
-  width: 232px;
+  width: 264px;
   flex-shrink: 0;
   background: var(--surface-2);
   border-right: 1px solid var(--border-default);
