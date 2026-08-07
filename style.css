@@ -2011,7 +2011,11 @@ button:disabled {
   align-items: center;
   gap: 4px;
   min-width: 0;
-  flex: 1 1 auto;
+  /* flex-grow:0 -- badge-slot must never grow to fill leftover row space. With flex-grow:1, the
+     moment the level badge wrapped to its own line (see .badges flex-wrap below), badge-slot was
+     the only item left on the first row and stretched to fill it, dragging the chevron along with
+     it far to the right of where the badge itself actually ends. */
+  flex: 0 1 auto;
 }
 .badge-slot .badge-chip {
   flex-shrink: 0;
@@ -2103,7 +2107,7 @@ button:disabled {
 }
 
 #sidebar {
-  width: 264px;
+  width: 300px;
   flex-shrink: 0;
   background: var(--surface-2);
   border-right: 1px solid var(--border-default);
