@@ -208,11 +208,16 @@ const BAD_JOB_BUST_BASE = 0.08; // bust chance at base rank (0 skill)
 const BAD_JOB_BUST_MIN = 0.02; // bust chance at maxed-out skill
 const BAD_JOB_JAIL_YEARS = 1;
 
+// Rebalanced -- mirrors mfmmoserver/gameLogic.js's DRUG_ITEMS_BY_ID exactly (that copy is the real
+// authority, /hustle/sell-drugs is server-authoritative; this one is display-only). wholesaleCost
+// +25%, sellMin/sellMax -10%, and jail time (see drugJailEscalationMultiplier in js/milos.js) now
+// also escalates with lifetime units sold instead of staying flat -- was exploitable by spamming
+// qty=1 sales to keep both risk and sentence length cheap forever.
 const DRUG_ITEMS = [
-  { id: 'drugWeed', name: '🌿 Weed', type: 'drug', wholesaleCost: 20, sellMin: 30, sellMax: 50, jailYearsPerUnit: 0.2, riskBase: 0.05, riskPerUnit: 0.02 },
-  { id: 'drugPills', name: '💊 Pills', type: 'drug', wholesaleCost: 60, sellMin: 90, sellMax: 140, jailYearsPerUnit: 0.5, riskBase: 0.12, riskPerUnit: 0.03 },
-  { id: 'drugMeth', name: '🧪 Meth', type: 'drug', wholesaleCost: 100, sellMin: 160, sellMax: 260, jailYearsPerUnit: 1.5, riskBase: 0.25, riskPerUnit: 0.05 },
-  { id: 'drugCoke', name: '❄️ Cocaine', type: 'drug', wholesaleCost: 150, sellMin: 220, sellMax: 320, jailYearsPerUnit: 1, riskBase: 0.2, riskPerUnit: 0.04 },
+  { id: 'drugWeed', name: '🌿 Weed', type: 'drug', wholesaleCost: 25, sellMin: 27, sellMax: 45, jailYearsPerUnit: 0.2, riskBase: 0.05, riskPerUnit: 0.02 },
+  { id: 'drugPills', name: '💊 Pills', type: 'drug', wholesaleCost: 75, sellMin: 81, sellMax: 126, jailYearsPerUnit: 0.5, riskBase: 0.12, riskPerUnit: 0.03 },
+  { id: 'drugMeth', name: '🧪 Meth', type: 'drug', wholesaleCost: 125, sellMin: 144, sellMax: 234, jailYearsPerUnit: 1.5, riskBase: 0.25, riskPerUnit: 0.05 },
+  { id: 'drugCoke', name: '❄️ Cocaine', type: 'drug', wholesaleCost: 190, sellMin: 198, sellMax: 288, jailYearsPerUnit: 1, riskBase: 0.2, riskPerUnit: 0.04 },
 ];
 const DRUG_ITEMS_BY_ID = {};
 DRUG_ITEMS.forEach((d) => { DRUG_ITEMS_BY_ID[d.id] = d; });
@@ -256,6 +261,15 @@ const CRIME_STREAK_MAX = 12; // cap on how much a record can escalate a sentence
 const COMMUNITY_SERVICE_COOLDOWN_MS = 60000;
 const COMMUNITY_SERVICE_BASE_COST = 750; // scales with current streak
 const COMMUNITY_SERVICE_STREAK_REDUCTION = 4;
+// Mirrors the server's communityServiceCost() exactly -- display-only, /crime/community-service is
+// server-authoritative. Steeper than flat-linear: the higher your pending punitive sentence
+// (crimeRecord.streak) already is, the more washing it down costs per streak point, not just more
+// in step with it. Unchanged at streak=0.
+const COMMUNITY_SERVICE_ESCALATION_RATE = 0.15;
+
+function communityServiceCost(streak) {
+  return Math.round(COMMUNITY_SERVICE_BASE_COST * (1 + streak) * (1 + streak * COMMUNITY_SERVICE_ESCALATION_RATE));
+}
 
 function crimeFailChance(tier) {
   const statScore = (character.stats.speed + character.stats.attack) / 200; // 0..1 at 100/100

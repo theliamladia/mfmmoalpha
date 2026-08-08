@@ -654,6 +654,19 @@ function sellDrugsRevenueMultiplier() {
   return 1 + looksScore * DRUG_SELL_LOOKS_BONUS_MAX;
 }
 
+// Mirrors the server's drugJailEscalationMultiplier() exactly, purely for this odds preview -- the
+// real roll/sentence still happens server-side. Shown so the growing consequence of grinding sales
+// is visible BEFORE you commit to a sale, not just discovered after getting busted.
+const DRUG_JAIL_ESCALATION_STEP_UNITS = 100;
+const DRUG_JAIL_ESCALATION_PER_STEP = 0.25;
+const DRUG_JAIL_ESCALATION_MAX_MULT = 6;
+
+function drugJailEscalationMultiplier() {
+  const unitsSold = (character.drugDealer && character.drugDealer.unitsSold) || 0;
+  const steps = Math.floor(unitsSold / DRUG_JAIL_ESCALATION_STEP_UNITS);
+  return Math.min(DRUG_JAIL_ESCALATION_MAX_MULT, 1 + steps * DRUG_JAIL_ESCALATION_PER_STEP);
+}
+
 function renderDrugSellOdds() {
   if (!drugSellOddsLine) return;
   const drug = DRUG_ITEMS_BY_ID[drugSellSelect.value];
@@ -662,7 +675,10 @@ function renderDrugSellOdds() {
   const risk = sellDrugsRiskChance(drug, qty);
   const bonusPct = Math.round((sellDrugsRevenueMultiplier() - 1) * 100);
   const bonusNote = bonusPct > 0 ? ` &mdash; Looks revenue bonus: <b>+${bonusPct}%</b>` : '';
-  drugSellOddsLine.innerHTML = `Odds of getting caught: <b>${Math.round(risk * 100)}%</b> (Speed/Attack lower this)${bonusNote}.`;
+  const escalation = drugJailEscalationMultiplier();
+  const years = Math.max(1, Math.round(drug.jailYearsPerUnit * qty * escalation));
+  const escalationNote = escalation > 1 ? ` (escalated <b>${escalation.toFixed(2)}x</b> from your sales history)` : '';
+  drugSellOddsLine.innerHTML = `Odds of getting caught: <b>${Math.round(risk * 100)}%</b> (Speed/Attack lower this)${bonusNote}. If caught: <b>${years} year(s)</b>${escalationNote}.`;
 }
 
 drugSellSelect.addEventListener('change', () => { renderMilos(); renderDrugSellOdds(); });
@@ -786,7 +802,7 @@ function tickCrimeUI() {
 
   if (!btnCommunityService) return;
   const remaining = getRemainingCooldown('communityService', COMMUNITY_SERVICE_COOLDOWN_MS);
-  const cost = COMMUNITY_SERVICE_BASE_COST * (1 + character.crimeRecord.streak);
+  const cost = communityServiceCost(character.crimeRecord.streak);
   btnCommunityService.disabled = character.jail.inJail || character.crimeRecord.streak <= 0 || remaining > 0;
   btnCommunityService.textContent = remaining > 0
     ? `Community Service (${Math.ceil(remaining / 1000)}s)`
