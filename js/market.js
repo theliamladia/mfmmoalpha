@@ -46,7 +46,19 @@ function getRemainingCooldown(action, durationMs = COOLDOWN_MS) {
 // renders whatever character/messages come back, same shape as the old local doHustle().
 const HUSTLE_API = { work: apiWork, slut: apiSlut, crime: apiCrime };
 
+// The client-side cooldown gate can't stop rapid clicks on its own: getRemainingCooldown() reads
+// character.cooldowns[type], which only changes when a response lands, so for the whole round trip
+// the gate reads 0 and every click passes. Worse, tickCooldownUI (every 250ms) recomputes
+// btn.disabled from that same cooldown, so it RE-ENABLES the button mid-flight and the handler's
+// own `btn.disabled = true` is undone within a quarter second. The result was a burst of
+// concurrent server-authoritative requests per rapid click, which desynchronizes characterRev and
+// manufactures the /character/sync 409s. This set is the real in-flight guard; the tick loop below
+// honours it too.
+const hustleInFlight = new Set();
+
 async function runHustleViaServer(type, btn) {
+  if (hustleInFlight.has(type)) return;
+  hustleInFlight.add(type);
   btn.disabled = true;
   try {
     const result = await HUSTLE_API[type]();
@@ -66,6 +78,10 @@ async function runHustleViaServer(type, btn) {
     renderAll();
   } catch (err) {
     logMessage(err.reason || 'Could not reach the server.', 'loss');
+  } finally {
+    // finally, not the end of try -- the `result.jailed` branch above returns early, and the catch
+    // path must release the guard too, or the button would stay dead until reload.
+    hustleInFlight.delete(type);
   }
 }
 
@@ -86,7 +102,9 @@ function tickCooldownUI() {
   hustleButtons.forEach((btn) => {
     const type = btn.dataset.hustle;
     const remaining = getRemainingCooldown(type);
-    btn.disabled = remaining > 0;
+    // hustleInFlight, or this tick would re-enable the button while its request is still on the
+    // wire (the cooldown it reads can't update until that response lands).
+    btn.disabled = remaining > 0 || hustleInFlight.has(type);
     const label = `${HUSTLE_EMOJI[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}`.trim();
     btn.textContent = remaining > 0 ? `${label} (${Math.ceil(remaining / 1000)}s)` : label;
   });
@@ -205,7 +223,7 @@ async function runRoidEscapeViaServer() {
     save();
     renderAll();
   } catch (err) {
-    alert(err.reason || 'Could not reach the server.');
+    notify(err.reason || 'Could not reach the server.');
   }
 }
 
@@ -261,7 +279,7 @@ async function buyFood(itemId) {
     save();
     renderAll();
   } catch (err) {
-    alert(err.reason || 'Could not reach the server.');
+    notify(err.reason || 'Could not reach the server.');
   }
 }
 
@@ -301,7 +319,7 @@ async function buyMaxx(itemId) {
     save();
     renderAll();
   } catch (err) {
-    alert(err.reason || 'Could not reach the server.');
+    notify(err.reason || 'Could not reach the server.');
   }
 }
 
@@ -504,7 +522,7 @@ function doBuyTitle(title) {
 
 function buyTitle(title) {
   const result = doBuyTitle(title);
-  if (!result.ok) { if (result.reason) alert(result.reason); return; }
+  if (!result.ok) { if (result.reason) notify(result.reason); return; }
   logTo(titleLog, result.message, result.cls);
   save();
   buildTitleGrid();
@@ -894,11 +912,11 @@ function setSpinMessage(messageEl, text) {
 
 async function spinCrate(crate, buttons, messageEl, opts = {}) {
   if (character.variety >= 75) {
-    alert('Your Variety is too high to buy cosmetics. Renounce it at the Morals Center first.');
+    notify('Your Variety is too high to buy cosmetics. Renounce it at the Morals Center first.');
     return;
   }
   if (crateSpinInFlight) {
-    alert('A crate is already spinning -- wait for it to finish first.');
+    notify('A crate is already spinning -- wait for it to finish first.');
     return;
   }
 
@@ -907,7 +925,7 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
   const totalCost = crate.cost * qty;
 
   if (character.cash < totalCost) {
-    alert('Not enough Floydbucks.');
+    notify('Not enough Floydbucks.');
     return;
   }
   if (!skipConfirm) {
@@ -926,7 +944,7 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
 
   const start = await startCrateSpin(crate, qty);
   if (!start.ok) {
-    alert(start.reason);
+    notify(start.reason);
     setSpinMessage(messageEl, '');
     buttons.forEach((b) => { b.disabled = false; });
     crateSpinInFlight = false;

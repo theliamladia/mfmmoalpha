@@ -285,7 +285,7 @@ function buildGoodJobsUI() {
           save();
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       });
     });
@@ -341,7 +341,7 @@ function buildGoodJobsUI() {
           save();
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       });
     });
@@ -356,7 +356,7 @@ function buildGoodJobsUI() {
         save();
         renderAll();
       } catch (err) {
-        if (err.reason) alert(err.reason);
+        if (err.reason) notify(err.reason);
       }
     });
   });
@@ -370,7 +370,7 @@ function buildGoodJobsUI() {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   });
 }
@@ -455,7 +455,7 @@ function buildBadJobsUI() {
           save();
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       });
     });
@@ -508,7 +508,7 @@ function buildBadJobsUI() {
           }
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       });
     });
@@ -523,7 +523,7 @@ function buildBadJobsUI() {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   });
 }
@@ -587,7 +587,7 @@ function buildDealerUI() {
           save();
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       });
     });
@@ -606,7 +606,7 @@ function buildDealerUI() {
           save();
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       });
     });
@@ -709,7 +709,7 @@ btnSellDrugs.addEventListener('click', () => {
       }
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   });
 });
@@ -731,7 +731,7 @@ btnRobbery.addEventListener('click', () => {
       }
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   });
 });
@@ -784,7 +784,7 @@ function buildCrimeUI() {
           }
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       });
     });
@@ -818,7 +818,7 @@ btnCommunityService.addEventListener('click', async () => {
     save();
     renderAll();
   } catch (err) {
-    if (err.reason) alert(err.reason);
+    if (err.reason) notify(err.reason);
   }
 });
 
@@ -1118,7 +1118,7 @@ btnFindFight.addEventListener('click', () => {
       save();
       renderCombat();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   });
 });
@@ -1182,7 +1182,7 @@ async function handleCombatAction(action) {
     save();
     renderCombat();
   } catch (err) {
-    if (err.reason) alert(err.reason);
+    if (err.reason) notify(err.reason);
   }
 }
 
@@ -1199,7 +1199,7 @@ btnFlee.addEventListener('click', async () => {
     save();
     renderCombat();
   } catch (err) {
-    if (err.reason) alert(err.reason);
+    if (err.reason) notify(err.reason);
   }
 });
 
@@ -1267,7 +1267,7 @@ async function sendChatMessage() {
     chatMessagesCache = result.messages;
     renderChatMessages();
   } catch (err) {
-    if (err.reason) alert(err.reason);
+    if (err.reason) notify(err.reason);
   }
 }
 
@@ -1356,16 +1356,33 @@ function doIllegalGearCheck() {
   return { caught: true, message: `Caught illegally armed! Forfeited: ${forfeited.join(', ')}. Sentenced to ${JAIL_YEARS_WEAPON} years.`, cls: 'loss' };
 }
 
-function attemptMilosAction(actionFn, logEl) {
-  const targetLog = logEl || milosLog;
-  const result = doIllegalGearCheck();
-  if (result.caught) {
-    logTo(targetLog, result.message, result.cls);
-    save();
-    goToJail(true);
-    return;
+// Single in-flight guard covering every Bad Hustle action -- 13+ call sites funnel through here,
+// and none of them had one. Two separate problems this fixes:
+//   1. doIllegalGearCheck() below is a NON-idempotent client-side mutation (a 50/50 roll that
+//      confiscates inventory and nulls equipment slots). Fire-and-forget rapid clicking ran it once
+//      per click, so a burst could strip gear several times over for a single intended action.
+//   2. actionFn() was called without await and without returning its promise, so no caller could
+//      ever serialize on it -- N rapid clicks started N fully independent request chains, which is
+//      what desynchronizes characterRev and manufactures the /character/sync 409s that used to
+//      deadlock the whole client (see recoverFromStaleSync in js/core.js).
+let milosActionInFlight = false;
+
+async function attemptMilosAction(actionFn, logEl) {
+  if (milosActionInFlight) return;
+  milosActionInFlight = true;
+  try {
+    const targetLog = logEl || milosLog;
+    const result = doIllegalGearCheck();
+    if (result.caught) {
+      logTo(targetLog, result.message, result.cls);
+      save();
+      goToJail(true);
+      return;
+    }
+    await actionFn();
+  } finally {
+    milosActionInFlight = false;
   }
-  actionFn();
 }
 
 // ---------- City Hall ----------
@@ -1404,7 +1421,7 @@ btnCityHallRename.addEventListener('click', () => {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   }, cityHallLog);
 });
@@ -1421,7 +1438,7 @@ btnMarriagePropose.addEventListener('click', () => {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   }, cityHallLog);
 });
@@ -1479,7 +1496,7 @@ btnStartGunSafety.addEventListener('click', () => {
         save();
         renderAll();
       } catch (err) {
-        if (err.reason) alert(err.reason);
+        if (err.reason) notify(err.reason);
       }
     });
   }, cityHallLog);
@@ -1525,7 +1542,7 @@ function buildGunClubGrids() {
           save();
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       }, gunClubLog);
     });
@@ -1567,7 +1584,7 @@ function buildMeleeGrid() {
         save();
         renderAll();
       } catch (err) {
-        if (err.reason) alert(err.reason);
+        if (err.reason) notify(err.reason);
       }
     });
   });
@@ -1594,7 +1611,7 @@ function buildArmorGrid() {
         save();
         renderAll();
       } catch (err) {
-        if (err.reason) alert(err.reason);
+        if (err.reason) notify(err.reason);
       }
     });
   });
@@ -1623,7 +1640,7 @@ function buildAmmoGrid() {
           save();
           renderAll();
         } catch (err) {
-          if (err.reason) alert(err.reason);
+          if (err.reason) notify(err.reason);
         }
       }, gunClubLog);
     });
@@ -1654,7 +1671,7 @@ btnConcealedFreeWait.addEventListener('click', () => {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   }, gunClubLog);
 });
@@ -1713,7 +1730,7 @@ btnRangeShoot.addEventListener('click', () => {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   }, rangeLog);
 });
@@ -1730,7 +1747,7 @@ btnRangeDraw.addEventListener('click', () => {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   }, rangeLog);
 });
@@ -1747,7 +1764,7 @@ btnRangeReload.addEventListener('click', () => {
       save();
       renderAll();
     } catch (err) {
-      if (err.reason) alert(err.reason);
+      if (err.reason) notify(err.reason);
     }
   }, rangeLog);
 });

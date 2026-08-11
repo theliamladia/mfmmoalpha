@@ -48,9 +48,17 @@ function doBankBillingCycle() {
 function processBankBilling() {
   const bank = character.bank;
   if (character.jail.inJail) return;
+  // Billing only actually happens once every 24h, but this runs from renderAll() on EVERY render.
+  // The trailing save() used to be unconditional, so every render re-armed serverSyncPending and
+  // queued another /character/sync -- keeping a sync perpetually in flight (which is what kept the
+  // stale-sync deadlock window permanently open), doubling request volume, and permanently
+  // disabling resyncRevAfterResume (which early-returns whenever serverSyncPending is true).
+  // Now guarded like its siblings processMoralsCenter() and processInvestorL2Billing().
+  let billedAny = false;
   while (Date.now() - bank.lastBillTs >= BANK_BILLING_INTERVAL_MS) {
     const result = doBankBillingCycle();
     if (!result.billed) continue;
+    billedAny = true;
     logTo(bankLog, result.message, result.cls);
     if (result.jailed) {
       save();
@@ -58,7 +66,7 @@ function processBankBilling() {
       return;
     }
   }
-  save();
+  if (billedAny) save();
 }
 
 function renderBank() {

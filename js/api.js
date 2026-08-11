@@ -46,8 +46,13 @@ async function apiRequest(path, options = {}) {
   }
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw data;
+  // Read the rev BEFORE throwing. An error response still carries the authoritative rev, and
+  // dropping it is what made a single conflict permanent: characterRev stayed at the stale value,
+  // so every later /character/sync re-sent the same expectedRev and 409'd again, forever. The
+  // conflict body reports it as `currentRev` rather than `rev`, so accept either spelling.
   if (typeof data.rev === 'number') characterRev = data.rev;
+  else if (typeof data.currentRev === 'number') characterRev = data.currentRev;
+  if (!res.ok) throw data;
   return data;
 }
 

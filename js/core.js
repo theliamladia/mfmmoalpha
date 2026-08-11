@@ -931,25 +931,65 @@ function showSyncConflictToast(text) {
   syncConflictToastTimer = setTimeout(() => syncConflictToast.classList.add('hidden'), 5000);
 }
 
+// Non-blocking stand-in for alert() on the rapid-clickable action paths. A native alert() halts the
+// main thread outright -- no rendering, no setInterval ticks, no promise continuations -- until it
+// is dismissed. Rapid clicking produces a burst of server rejections ("still on cooldown", "not
+// enough Floydbucks"), and one blocking dialog per rejection stacks into a wall of modals that
+// reads as the game freezing. Reuses the same toast element, and later messages simply replace
+// earlier ones instead of queueing.
+function notify(text) {
+  if (!text) return;
+  showSyncConflictToast(text);
+}
+
+let staleSyncRecoveryInFlight = false;
+
+// Reloads authoritative state after the server rejected our sync as stale (a second tab/device
+// saved a newer version) -- rather than silently clobbering it, which is the exact bug that once
+// cost a player their FC and titles.
+//
+// CRITICAL: this must never be awaited from inside flushCharacterSync's own .catch. apiMe() goes
+// through apiRequest('/me'), which does `await flushCharacterSync()`. While that catch handler is
+// still running, `inFlightCharacterSync` is necessarily still set -- its .finally cannot have run
+// yet, because the promise it's attached to is the very one this handler is settling. So
+// flushCharacterSync would return `inFlightCharacterSync.then(...)`, a promise that can only
+// settle once this handler finishes: the handler ends up waiting on itself.
+//
+// That circular await was the rapid-click freeze. It deadlocked permanently, and because
+// `inFlightCharacterSync` then never cleared, EVERY subsequent apiRequest blocked on it too --
+// every button, every poll -- so the whole game froze until a page reload. Rapid clicking was
+// merely the trigger: concurrent requests desynchronize characterRev, which produces the 409 that
+// enters this path. Recovery is now chained strictly after the gate is released (see below).
+async function recoverFromStaleSync() {
+  if (staleSyncRecoveryInFlight) return;
+  staleSyncRecoveryInFlight = true;
+  try {
+    const fresh = await apiMe();
+    character = fresh.character;
+    if (typeof fresh.rev === 'number') characterRev = fresh.rev;
+    renderAll();
+    showSyncConflictToast("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
+  } catch { /* best-effort */ } finally {
+    staleSyncRecoveryInFlight = false;
+  }
+}
+
 function flushCharacterSync() {
   if (inFlightCharacterSync) return inFlightCharacterSync.then(flushCharacterSync);
   if (!serverSyncPending) return Promise.resolve();
   clearTimeout(serverSyncTimer);
   serverSyncPending = false;
-  const attempt = apiSyncCharacter(character).catch(async (err) => {
-    // A second tab/device already saved a newer version since we last fetched -- rather than
-    // silently clobbering it (the exact bug that once cost a player their FC and titles),
-    // reload the real current state and let the user know why their local changes didn't stick.
-    if (err && err.reason === 'stale_sync') {
-      try {
-        const fresh = await apiMe();
-        character = fresh.character;
-        renderAll();
-        showSyncConflictToast("Your progress here conflicted with another tab/device and couldn't be saved, so this session was reloaded to the latest saved state.");
-      } catch { /* best-effort */ }
-    }
+  // This catch stays SYNCHRONOUS and only records the conflict -- it must not await anything that
+  // routes through apiRequest(), or it deadlocks against its own gate (see recoverFromStaleSync).
+  let sawStaleSync = false;
+  const attempt = apiSyncCharacter(character).catch((err) => {
+    if (err && err.reason === 'stale_sync') sawStaleSync = true;
   });
   inFlightCharacterSync = attempt.finally(() => { inFlightCharacterSync = null; });
+  // Chained on the post-.finally promise: the .finally callback (which clears the gate) is
+  // guaranteed to run before this .then callback, so recoverFromStaleSync's apiMe() passes through
+  // flushCharacterSync freely instead of blocking on a promise that is waiting for it.
+  inFlightCharacterSync.then(() => { if (sawStaleSync) recoverFromStaleSync(); });
   return inFlightCharacterSync;
 }
 

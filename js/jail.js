@@ -154,7 +154,7 @@ btnLawyer.addEventListener('click', async () => {
     character = result.character;
     releaseFromJail();
   } catch (err) {
-    if (err.reason) alert(err.reason);
+    if (err.reason) notify(err.reason);
     // The request failed (or was rejected server-side) -- resume the local ticker from where it
     // left off instead of leaving the player stuck with a frozen progress bar and no way to serve.
     if (character.jail && character.jail.inJail) startServing(false);
@@ -178,7 +178,7 @@ btnJailWorkout.addEventListener('click', async () => {
     save();
     renderAll();
   } catch (err) {
-    if (err.reason) alert(err.reason);
+    if (err.reason) notify(err.reason);
   }
 });
 
@@ -191,7 +191,7 @@ btnJailFight.addEventListener('click', async () => {
     save();
     renderAll();
   } catch (err) {
-    if (err.reason) alert(err.reason);
+    if (err.reason) notify(err.reason);
   }
 });
 
@@ -222,7 +222,7 @@ function buildJailContrabandGrid() {
         save();
         renderAll();
       } catch (err) {
-        if (err.reason) alert(err.reason);
+        if (err.reason) notify(err.reason);
       }
     });
   });
@@ -255,7 +255,7 @@ document.getElementById('btnReset').addEventListener('click', async () => {
   try {
     await apiResetCharacter();
   } catch (err) {
-    alert(err.reason || 'Could not reach the server.');
+    notify(err.reason || 'Could not reach the server.');
     return;
   }
   localStorage.removeItem(STORAGE_KEY);
