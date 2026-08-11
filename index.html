@@ -154,16 +154,21 @@
           <div id="titleDropdown" class="title-dropdown hidden"></div>
           <span id="levelBadge" class="badge">Lvl 1</span>
         </div>
+        <!-- Cash is the single most-read number in the game; promoted out of the stat run into its
+             own emphasized row instead of being one line among ten. -->
+        <div class="sidebar-wallet">
+          <span class="sidebar-wallet-label">💵 Floydbucks</span>
+          <b id="cash">0</b>
+        </div>
         <div class="stat-grid">
-          <span>❤️ HP <b id="statHealth"></b></span>
-          <span>⚔️ ATK <b id="statAttack"></b></span>
-          <span>💨 SPD <b id="statSpeed"></b></span>
-          <span>🛡️ DEF <b id="statDefense"></b></span>
+          <span class="stat-cell">❤️ HP <b id="statHealth"></b><span class="stat-meter"><i id="meterHealth"></i></span></span>
+          <span class="stat-cell">⚔️ ATK <b id="statAttack"></b><span class="stat-meter"><i id="meterAttack"></i></span></span>
+          <span class="stat-cell">💨 SPD <b id="statSpeed"></b><span class="stat-meter"><i id="meterSpeed"></i></span></span>
+          <span class="stat-cell">🛡️ DEF <b id="statDefense"></b><span class="stat-meter"><i id="meterDefense"></i></span></span>
         </div>
         <div class="stat-line">💅 LOOKS <b id="statLooks"></b> <i id="looksTier"></i></div>
         <div class="stat-line">⚖️ ALLIANCE <i id="statAlliance"></i></div>
         <div class="stat-line">📏 Height <b id="statHeight"></b> &nbsp; ⚖️ Weight <b id="statWeight"></b></div>
-        <div class="stat-line cash">💵 Floydbucks: <b id="cash">0</b></div>
         <div class="stat-line" id="varietyStatLine">🌈 VARIETY <b id="statVariety">0%</b> <i id="varietyTierLabel"></i></div>
         <div class="stat-line" id="secumaxStatLine">🛡️ Secumax: <b id="secumaxStatusLabel">None</b></div>
       </div>

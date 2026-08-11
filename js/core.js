@@ -1333,6 +1333,13 @@ function renderAll() {
   levelBadgeEl.textContent = `⭐ Lvl ${computeLevel()}`;
 
   const s = character.stats;
+  // Meter fills for the four core stats -- purely presentational, driven off the same values as the
+  // numbers beside them, so they can never disagree with the text.
+  setStatMeter('meterHealth', s.health);
+  setStatMeter('meterAttack', s.attack);
+  setStatMeter('meterSpeed', s.speed);
+  setStatMeter('meterDefense', s.defense);
+
   statHealthEl.textContent = round1(s.health);
   statAttackEl.textContent = round1(s.attack);
   statSpeedEl.textContent = round1(s.speed);
@@ -1341,10 +1348,10 @@ function renderAll() {
   looksTierEl.textContent = `(${looksTier(s.looks)})`;
   statHeightEl.textContent = formatHeight(character.height);
   statWeightEl.textContent = `${round1(150 + character.fatGained + character.muscleGained)} lbs`;
-  cashEl.textContent = character.cash.toFixed(2);
-  casinoChipCounterEl.textContent = Math.floor(character.chips);
-  walletCashEl.textContent = character.cash.toFixed(2);
-  walletChipsEl.textContent = Math.floor(character.chips);
+  cashEl.textContent = formatMoney(character.cash);
+  casinoChipCounterEl.textContent = formatChips(character.chips);
+  walletCashEl.textContent = formatMoney(character.cash);
+  walletChipsEl.textContent = formatChips(character.chips);
   statAllianceEl.textContent = allianceLabel(character.alliance);
   if (typeof renderVarietyStatus === 'function') renderVarietyStatus();
   if (typeof renderSecumaxStatus === 'function') renderSecumaxStatus();
@@ -1410,6 +1417,24 @@ function renderArrestRecord() {
       <span>${new Date(entry.ts).toLocaleString()}</span>
     </div>
   `).join('');
+}
+
+function setStatMeter(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.width = `${Math.max(0, Math.min(100, (value / STAT_CAP) * 100))}%`;
+}
+
+// Money/chips formatting. character.cash used to render as a bare `452310.55` in the sidebar and
+// the wallet widget while every shop price in the game used toLocaleString() -- the most-read
+// number in the game was the one hardest to read. Matches the convention already used in
+// js/stockMarket.js.
+function formatMoney(n) {
+  return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatChips(n) {
+  return Math.floor(n || 0).toLocaleString();
 }
 
 function logTo(el, text, cls) {

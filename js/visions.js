@@ -39,7 +39,32 @@ const VISION_CSS_VAR_MAP = {
   textPrimary: '--text-primary', textSecondary: '--text-secondary', textMuted: '--text-muted', textDisabled: '--text-disabled',
   accent: '--accent', accentHover: '--accent-hover', accentActive: '--accent-active', accentForeground: '--accent-foreground',
   accentSoftBg: '--accent-soft-bg', accentSoftBorder: '--accent-soft-border',
+  surfaceRaised: '--surface-raised', surfaceNeutral: '--surface-neutral',
 };
+
+// --surface-raised / --surface-neutral are intermediate chrome tones (panels, modal boxes, the
+// secondary-button family). They're DERIVED from each palette's existing surfaces rather than
+// hand-authored 17 more times: they only ever need to sit between the surfaces a palette already
+// defines, so deriving them keeps every current and future Vision automatically consistent and
+// removes 34 hand-tuned values that could drift.
+//
+// --success / --danger are deliberately NOT themed per-Vision. Green-means-gain and red-means-loss
+// is load-bearing information, not decoration -- recoloring it to fit a palette would make a
+// "you lost $400" line stop reading as bad news. They stay at their :root values under every Vision.
+function mixHex(a, b, t) {
+  const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [r1, g1, b1] = p(a);
+  const [r2, g2, b2] = p(b);
+  const c = (x, y) => Math.round(x + (y - x) * t).toString(16).padStart(2, '0');
+  return `#${c(r1, r2)}${c(g1, g2)}${c(b1, b2)}`;
+}
+
+function derivedVisionTokens(palette) {
+  return {
+    surfaceRaised: mixHex(palette.surface2, palette.surface4, 0.5),
+    surfaceNeutral: mixHex(palette.surface4, palette.textDisabled, 0.25),
+  };
+}
 
 // Applies (or clears, if visionId is falsy/unknown) one Vision's full token override onto `el`.
 // Inline styles win over any stylesheet rule for that same element by CSS's own cascade rules, and
@@ -53,8 +78,11 @@ function applyVisionCssVars(el, visionId) {
     Object.values(VISION_CSS_VAR_MAP).forEach((cssVar) => el.style.removeProperty(cssVar));
     return;
   }
+  // Derived tokens are merged in on top of the hand-authored palette, so a palette can still
+  // override one explicitly just by declaring it (none currently do).
+  const resolved = { ...derivedVisionTokens(palette), ...palette };
   Object.entries(VISION_CSS_VAR_MAP).forEach(([key, cssVar]) => {
-    if (palette[key]) el.style.setProperty(cssVar, palette[key]);
+    if (resolved[key]) el.style.setProperty(cssVar, resolved[key]);
   });
 }
 

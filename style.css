@@ -26,7 +26,35 @@
   --accent-soft-bg: rgba(242, 201, 76, 0.12);
   --accent-soft-border: rgba(242, 201, 76, 0.28);
 
+  /* Raised/neutral chrome surfaces that predate the token system -- used by .panel, .modal-box and
+     the secondary-button family. Tokenized so VISIONS reskins them too (see js/visions.js). */
+  --surface-raised: #262832;
+  --surface-neutral: #3d3f48;
+
+  /* State colors. Previously hardcoded at ~40 sites, which meant an equipped Vision left every
+     gain/loss/error message in the base yellow-grey theme. NOTE: deliberately excludes #2ecc71 and
+     #2f80ed -- those are majority *art* (gem titles, name styles), not chrome. */
+  --success: #6fcf97;
+  --danger: #e05c5c;
+
+  /* Spacing + type scales, replacing ad-hoc 4/6/8/10/12/18/22px and 11/12/13/14px values. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+  --text-xl: 20px;
+
   --radius-container: 24px;
+  /* Cards get their own, tighter radius. 24px on a 220px card reads soft/dated; 14px keeps the
+     friendly feel while looking current. Panels/modals keep --radius-container. */
+  --radius-card: 14px;
   --radius-pill: 18px;
   --radius-sm: 8px;
 
@@ -85,7 +113,7 @@ h3 {
 }
 
 .panel {
-  background: linear-gradient(160deg, #262832, var(--surface-2));
+  background: linear-gradient(160deg, var(--surface-raised), var(--surface-2));
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-container);
   padding: 36px 40px;
@@ -98,7 +126,7 @@ h3 {
   margin: 0 0 6px;
   font-size: 42px;
   letter-spacing: 0.04em;
-  color: #f2c94c;
+  color: var(--accent);
   text-shadow: 0 0 24px rgba(242, 201, 76, 0.35);
 }
 
@@ -107,7 +135,7 @@ h3 {
   font-size: 15px;
   font-family: var(--font-body);
   font-weight: 500;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 .panel label {
@@ -115,7 +143,7 @@ h3 {
   margin-bottom: 14px;
   font-size: 13px;
   font-weight: 600;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .panel input[type="text"],
@@ -149,7 +177,7 @@ h3 {
 .derived-preview {
   font-size: 13px;
   line-height: 1.6;
-  color: #9a9ca6;
+  color: var(--text-muted);
   margin-bottom: 20px;
   padding: 12px 14px;
   background: rgba(242, 201, 76, 0.06);
@@ -158,7 +186,7 @@ h3 {
 }
 
 .error {
-  color: #e05c5c;
+  color: var(--danger);
   font-size: 13px;
   min-height: 18px;
 }
@@ -190,6 +218,13 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* A request is on the wire. Distinct from plain :disabled (cooldown) so "waiting on the server"
+   doesn't look identical to "not allowed yet". */
+button.is-pending {
+  opacity: 0.75;
+  cursor: progress;
+}
+
 #btnCreate {
   width: 100%;
   padding: 13px;
@@ -207,12 +242,12 @@ button:disabled {
 }
 
 .pause-banner {
-  background: #e05c5c;
-  color: #1b1d22;
+  background: var(--danger);
+  color: var(--surface-1);
 }
 
 .modifier-banner-peace {
-  background: #6fcf97;
+  background: var(--success);
   color: #14251c;
 }
 
@@ -285,13 +320,13 @@ button:disabled {
   font-family: var(--font-display);
   font-size: 44px;
   letter-spacing: 0.06em;
-  color: #e05c5c;
+  color: var(--danger);
   margin: 0 0 14px;
 }
 
 .maintenance-box p {
   font-size: 18px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   margin: 0 0 8px;
   letter-spacing: 0.03em;
 }
@@ -307,7 +342,7 @@ button:disabled {
 }
 
 .slimed-overlay #slimedCountdown {
-  color: #e8e8ea;
+  color: var(--text-primary);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -324,16 +359,16 @@ button:disabled {
   justify-content: space-between;
   gap: 12px;
   padding: 6px 10px;
-  background: #1b1d22;
-  border: 1px solid #2a2c34;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-4);
   border-radius: 6px;
   margin-bottom: 6px;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .slimed-record-empty {
-  color: #6f7178;
+  color: var(--text-disabled);
   font-size: 13px;
   text-align: center;
 }
@@ -356,7 +391,7 @@ button:disabled {
 
 .slime-duel-roll-label {
   font-size: 12px;
-  color: #9a9ca6;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -364,7 +399,7 @@ button:disabled {
 .slime-duel-roll-value {
   font-size: 40px;
   font-weight: 700;
-  color: #f2c94c;
+  color: var(--accent);
   min-width: 60px;
   text-align: center;
 }
@@ -372,7 +407,7 @@ button:disabled {
 .slime-duel-roll-vs {
   font-size: 14px;
   font-weight: 700;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 /* --- Game screen --- */
@@ -396,14 +431,14 @@ button:disabled {
 .chevron-btn {
   background: none;
   border: none;
-  color: #9a9ca6;
+  color: var(--text-muted);
   cursor: pointer;
   font-size: 10px;
   padding: 2px 2px;
 }
 
 .chevron-btn:hover {
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .title-dropdown {
@@ -411,8 +446,8 @@ button:disabled {
   top: calc(100% + 8px);
   left: 0;
   z-index: 50;
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 8px;
   min-width: 200px;
@@ -427,7 +462,7 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 .title-dropdown-group-label:first-child {
@@ -445,15 +480,15 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 .title-dropdown-group-header:hover {
-  background: #2a2c34;
+  background: var(--surface-4);
 }
 
 .title-dropdown-group-header.has-equipped {
-  color: #f2c94c;
+  color: var(--accent);
 }
 
 .title-dropdown-group-header span:first-child {
@@ -467,13 +502,13 @@ button:disabled {
 .title-dropdown-group-count {
   font-size: 10px;
   font-weight: 400;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 .title-dropdown-group-chevron {
   display: inline-block;
   transition: transform 0.15s ease;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 .title-dropdown-group-chevron.open {
@@ -485,25 +520,25 @@ button:disabled {
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .title-dropdown-item:hover {
-  background: #2a2c34;
+  background: var(--surface-4);
 }
 
 .title-dropdown-item.equipped {
-  background: #2a2c34;
-  color: #f2c94c;
+  background: var(--surface-4);
+  color: var(--accent);
 }
 
 .title-dropdown-empty {
   padding: 8px 10px;
   font-size: 12px;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 /* --- Titles --- */
@@ -1364,7 +1399,7 @@ button:disabled {
 .feature-banner-text p {
   margin: 0;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1768,23 +1803,23 @@ button:disabled {
 
 .archived-crates-heading {
   margin: 20px 0 4px;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 .feature-banner.archived-banner {
   background: #1c1c1c;
-  border-color: #35373f;
+  border-color: var(--border-default);
   opacity: 0.75;
 }
 
 .archived-banner .feature-banner-text h3 {
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 #betaSpinMessage {
   margin-bottom: 14px;
   font-weight: 600;
-  color: #f2c94c;
+  color: var(--accent);
   min-height: 18px;
 }
 
@@ -1802,8 +1837,8 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
 }
 
@@ -1815,7 +1850,7 @@ button:disabled {
 
 .crate-result-note {
   text-align: center;
-  color: #b9bbc4;
+  color: var(--text-secondary);
   margin-bottom: 16px;
 }
 
@@ -1840,19 +1875,19 @@ button:disabled {
   justify-content: space-between;
   gap: 10px;
   padding: 8px 12px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
 }
 
 .crate-result-multi-note {
-  color: #b9bbc4;
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
 .crate-odds-pct {
   font-weight: 700;
-  color: #f2c94c;
+  color: var(--accent);
   font-size: 14px;
 }
 
@@ -1886,7 +1921,7 @@ button:disabled {
   height: 110px;
   overflow: hidden;
   border-radius: 8px;
-  border: 1px solid #35373f;
+  border: 1px solid var(--border-default);
   background: #14151a;
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
@@ -1898,7 +1933,7 @@ button:disabled {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #f2c94c;
+  background: var(--accent);
   transform: translateX(-50%);
   z-index: 5;
   box-shadow: 0 0 10px rgba(242, 201, 76, 0.8);
@@ -1923,14 +1958,14 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .crate-reel-item.landed {
-  border-color: #f2c94c;
+  border-color: var(--accent);
   box-shadow: 0 0 16px rgba(242, 201, 76, 0.6);
 }
 
@@ -1946,8 +1981,8 @@ button:disabled {
   top: calc(100% + 8px);
   left: 0;
   z-index: 60;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 10px 14px;
   min-width: 200px;
@@ -1962,13 +1997,13 @@ button:disabled {
   margin: 0 0 4px;
   font-size: 13px;
   font-weight: 700;
-  color: #f2c94c;
+  color: var(--accent);
 }
 
 .title-info-how {
   margin: 0;
   font-size: 12px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .badges {
@@ -2037,19 +2072,19 @@ button:disabled {
 }
 
 #looksTier {
-  color: #f2c94c;
+  color: var(--accent);
   font-style: normal;
   font-size: 11px;
 }
 
 #statAlliance {
-  color: #f2c94c;
+  color: var(--accent);
   font-style: normal;
   font-weight: 700;
 }
 
 .cash b {
-  color: #6fcf97;
+  color: var(--success);
 }
 
 .chips b {
@@ -2064,8 +2099,8 @@ button:disabled {
 
 
 #btnReset, #btnAdmin {
-  background: #3d3f48;
-  color: #e8e8ea;
+  background: var(--surface-neutral);
+  color: var(--text-primary);
   padding: 8px 16px;
   font-size: 13px;
   border-radius: 20px;
@@ -2073,7 +2108,7 @@ button:disabled {
 
 #btnAdmin {
   background: #4a3a1f;
-  color: #f2c94c;
+  color: var(--accent);
 }
 
 #screen-game {
@@ -2124,15 +2159,67 @@ button:disabled {
   color: var(--text-muted);
 }
 
+/* Cash promoted out of the ten-line stat run into its own emphasized row -- it's the number players
+   check most and it used to be visually identical to "Height". */
+.sidebar-wallet {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+  background: var(--surface-1);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+}
+
+.sidebar-wallet-label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.sidebar-wallet b {
+  font-size: var(--text-lg);
+  color: var(--success);
+  font-variant-numeric: tabular-nums;
+}
+
 .stat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px 8px;
-  margin-bottom: 8px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+/* Each core stat gets a thin meter so relative progress is readable at a glance instead of having
+   to compare four bare numbers. Width is set from renderAll() against STAT_CAP. */
+.stat-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stat-meter {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.stat-meter i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.3s ease;
 }
 
 .stat-line {
-  margin: 4px 0;
+  margin: var(--space-1) 0;
 }
 
 #secumaxStatLine {
@@ -2206,9 +2293,9 @@ button:disabled {
 }
 
 #characterSidePanel::-webkit-scrollbar-thumb {
-  background: #45474f;
+  background: var(--border-strong);
   border-radius: 8px;
-  border: 2px solid #1e2027;
+  border: 2px solid var(--surface-2);
 }
 
 #characterSidePanel::-webkit-scrollbar-thumb:hover {
@@ -2278,26 +2365,40 @@ button:disabled {
   margin-top: 0;
 }
 
+/* Was `display:flex; flex-wrap:wrap` with fixed 230px cards, which left a ragged trailing gap on
+   every grid in the game (43 grids, 86 cards). Auto-fill grid tracks fill the row evenly instead
+   and stay responsive without a media query. */
 .hustle-grid {
-  display: flex;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin: 18px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+  align-items: stretch;
 }
 
 .hustle-card {
-  background: var(--surface-3);
+  /* Top-lit gradient rather than a flat fill -- reads as a raised surface under the dark theme,
+     and still resolves entirely through tokens so VISIONS reskins it. */
+  background: linear-gradient(180deg, var(--surface-4), var(--surface-3) 60%);
   border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-container);
-  padding: 18px;
-  width: 230px;
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .hustle-card:hover {
   border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Push each card's primary action to the bottom edge so buttons line up across a row even when the
+   description text runs to different lengths -- the main thing that made these grids look untidy. */
+.hustle-card > button:last-child {
+  margin-top: auto;
 }
 
 .hustle-card h3 {
@@ -2320,7 +2421,7 @@ button:disabled {
 }
 
 .hustle-btn.active-hustle {
-  background: #6fcf97;
+  background: var(--success);
 }
 
 .status-box {
@@ -2333,7 +2434,7 @@ button:disabled {
 }
 
 .progress-outer {
-  background: #1b1d22;
+  background: var(--surface-1);
   border-radius: 6px;
   height: 10px;
   margin: 10px 0;
@@ -2341,10 +2442,17 @@ button:disabled {
 }
 
 .progress-inner {
-  background: #f2c94c;
+  background: var(--accent);
   height: 100%;
   width: 0%;
   transition: width 0.1s linear;
+}
+
+/* An activity log with nothing in it used to render as an empty bordered 42px box -- on a fresh
+   character that's dead visual weight on almost every page. :empty collapses it until the first
+   entry arrives (logTo prepends children, so :empty is exactly the right signal). */
+.log:empty {
+  display: none;
 }
 
 .log {
@@ -2352,8 +2460,8 @@ button:disabled {
   max-width: 460px;
   max-height: 220px;
   overflow-y: auto;
-  background: #17181c;
-  border: 1px solid #35373f;
+  background: var(--surface-0);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 13px;
@@ -2361,11 +2469,11 @@ button:disabled {
 
 .log p {
   margin: 4px 0;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
-.log p.gain { color: #6fcf97; }
-.log p.loss { color: #e05c5c; }
+.log p.gain { color: var(--success); }
+.log p.loss { color: var(--danger); }
 
 .log-single-line {
   margin-top: 12px;
@@ -2443,19 +2551,19 @@ button:disabled {
 }
 
 .bj-player.bj-hand-active {
-  outline: 2px solid #6fcf97;
+  outline: 2px solid var(--success);
   outline-offset: 4px;
   border-radius: 8px;
 }
 
 .shop p {
-  color: #9a9ca6;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
 .roid-banner {
   background: #3a1f22;
-  border: 1px solid #e05c5c;
+  border: 1px solid var(--danger);
   border-radius: 8px;
   padding: 14px 16px;
   margin-bottom: 16px;
@@ -2494,11 +2602,11 @@ button:disabled {
 .bj-dealer h4, .bj-player h4 {
   margin: 0 0 6px;
   font-size: 14px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .bj-dealer h4 span, .bj-player h4 span {
-  color: #f2c94c;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -2510,7 +2618,7 @@ button:disabled {
 
 .card {
   background: #fff;
-  color: #1b1d22;
+  color: var(--surface-1);
   border-radius: 5px;
   padding: 8px 12px;
   font-weight: 700;
@@ -2520,8 +2628,8 @@ button:disabled {
 }
 
 .card.back {
-  background: #3d3f48;
-  color: #9a9ca6;
+  background: var(--surface-neutral);
+  color: var(--text-muted);
 }
 
 .bj-controls {
@@ -2533,7 +2641,7 @@ button:disabled {
 }
 
 #bjMessage, #slotMessage {
-  color: #f2c94c;
+  color: var(--accent);
   font-weight: 600;
   min-height: 20px;
 }
@@ -2545,8 +2653,8 @@ button:disabled {
 }
 
 .reel {
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   width: 80px;
   height: 80px;
@@ -2655,10 +2763,10 @@ button:disabled {
   display: block;
   width: 100%;
   padding: 8px 10px;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-neutral);
   border-radius: 6px;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .milos-subpage {
@@ -2677,32 +2785,32 @@ button:disabled {
 
 .combatant h4 {
   margin: 0 0 8px;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .hp-bar-outer {
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
   height: 14px;
   overflow: hidden;
 }
 
 .hp-bar-inner {
-  background: #6fcf97;
+  background: var(--success);
   height: 100%;
   width: 100%;
   transition: width 0.2s ease;
 }
 
 .hp-bar-inner.enemy {
-  background: #e05c5c;
+  background: var(--danger);
 }
 
 .combatant p {
   margin: 6px 0 0;
   font-size: 13px;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 .combat-controls {
@@ -2823,11 +2931,11 @@ button:disabled {
 .investor-l2-cooldown {
   margin-top: 16px;
   padding: 12px 16px;
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   font-size: 13px;
-  color: #9a9ca6;
+  color: var(--text-muted);
   text-align: center;
 }
 
@@ -2928,8 +3036,8 @@ button:disabled {
   justify-content: space-between;
   gap: 12px;
   padding: 8px 10px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
   font-size: 13px;
 }
@@ -2959,22 +3067,22 @@ button:disabled {
 .stock-price {
   font-size: 20px;
   font-weight: 700;
-  color: #f2c94c;
+  color: var(--accent);
   margin: 6px 0;
   transition: color 0.3s ease;
 }
 
 .stock-price-flash-up {
-  color: #6fcf97 !important;
+  color: var(--success) !important;
 }
 
 .stock-price-flash-down {
-  color: #e05c5c !important;
+  color: var(--danger) !important;
 }
 
 .stock-holding-note {
   font-size: 12px;
-  color: #9a9ca6;
+  color: var(--text-muted);
   margin: 0 0 10px;
 }
 
@@ -2985,7 +3093,7 @@ button:disabled {
 
 .stock-tax-note {
   font-size: 11px;
-  color: #6f7178;
+  color: var(--text-disabled);
   margin: 4px 0 12px;
   min-height: 14px;
 }
@@ -2993,15 +3101,15 @@ button:disabled {
 .stock-qty-input {
   width: 70px;
   padding: 8px 10px;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-neutral);
   border-radius: 6px;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .side-panel {
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 14px 16px;
 }
@@ -3009,7 +3117,7 @@ button:disabled {
 .side-panel h3 {
   margin: 0 0 10px;
   font-size: 14px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 #playerListEl {
@@ -3024,7 +3132,7 @@ button:disabled {
   align-items: center;
   gap: 8px;
   padding: 4px 0;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 #playerListEl li::before {
@@ -3032,7 +3140,7 @@ button:disabled {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #6fcf97;
+  background: var(--success);
   flex-shrink: 0;
 }
 
@@ -3070,8 +3178,8 @@ button:disabled {
      of a gap comes from padding-top instead, which stays part of the same hoverable box. */
   padding: 6px 0 10px;
   z-index: 10;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   min-width: 260px;
   overflow: hidden;
@@ -3081,7 +3189,7 @@ button:disabled {
 .player-hover-card p {
   margin: 3px 0;
   font-size: 12px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .player-row:hover .player-hover-card,
@@ -3118,7 +3226,7 @@ button:disabled {
 
 .chat-note {
   font-size: 12px;
-  color: #6f7178;
+  color: var(--text-disabled);
   margin: 0 0 10px;
 }
 
@@ -3126,8 +3234,8 @@ button:disabled {
   max-height: 200px;
   min-height: 60px;
   overflow-y: auto;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
   padding: 6px;
   font-size: 13px;
@@ -3154,7 +3262,7 @@ button:disabled {
   flex-shrink: 0;
   font-size: 11px;
   font-weight: 700;
-  color: #6f7178;
+  color: var(--text-disabled);
   white-space: nowrap;
 }
 
@@ -3167,16 +3275,16 @@ button:disabled {
 
 .chat-message-name {
   font-weight: 700;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .chat-message-sep {
-  color: #6f7178;
+  color: var(--text-disabled);
   margin-right: 4px;
 }
 
 .chat-message-text {
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .chat-input-row {
@@ -3187,10 +3295,10 @@ button:disabled {
 .chat-input-row input {
   flex: 1;
   padding: 8px 10px;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-neutral);
   border-radius: 6px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   min-width: 0;
 }
 
@@ -3206,7 +3314,7 @@ button:disabled {
 }
 
 .modal-box {
-  background: linear-gradient(160deg, #262832, var(--surface-2));
+  background: linear-gradient(160deg, var(--surface-raised), var(--surface-2));
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-container);
   padding: 26px 30px;
@@ -3224,7 +3332,7 @@ button:disabled {
 }
 
 .modal-box.modal-destructive h3 {
-  color: #e05c5c;
+  color: var(--danger);
 }
 
 .modal-box p {
@@ -3233,34 +3341,34 @@ button:disabled {
 }
 
 .modal-box p.gain {
-  color: #6fcf97;
+  color: var(--success);
   font-weight: 600;
 }
 
 .modal-box p.loss {
-  color: #e05c5c;
+  color: var(--danger);
   font-weight: 600;
 }
 
 /* Generic gain/loss coloring for any element (not just .log/.modal-box p) -- the stock portfolio
    rows and performance log use these on plain spans. */
 .gain {
-  color: #6fcf97;
+  color: var(--success);
   font-weight: 600;
 }
 
 .loss {
-  color: #e05c5c;
+  color: var(--danger);
   font-weight: 600;
 }
 
 .stock-selector {
   width: 100%;
   padding: 10px 12px;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-neutral);
   border-radius: 6px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   margin-bottom: 14px;
   font-size: 14px;
 }
@@ -3274,8 +3382,8 @@ button:disabled {
 }
 
 .stock-detail-card {
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 18px 20px;
   flex: 0 0 340px;
@@ -3283,8 +3391,8 @@ button:disabled {
 }
 
 .stock-chart-card {
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 18px 20px;
   flex: 1 1 380px;
@@ -3298,9 +3406,9 @@ button:disabled {
 }
 
 .stock-timeframe-btn {
-  background: #1b1d22;
-  color: #b9bbc4;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 16px;
   padding: 6px 14px;
   font-size: 12px;
@@ -3327,7 +3435,7 @@ button:disabled {
 .stock-detail-symbol {
   font-size: 20px;
   font-weight: 700;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .stock-performance-summary {
@@ -3348,15 +3456,15 @@ button:disabled {
   flex-direction: column;
   gap: 2px;
   padding: 8px 10px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
   font-size: 13px;
 }
 
 .stock-tx-date {
   font-size: 11px;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 .report-resolve-row {
@@ -3371,7 +3479,7 @@ button:disabled {
 .report-resolved-badge {
   display: inline-block;
   font-size: 12px;
-  color: #6fcf97;
+  color: var(--success);
 }
 
 .stock-transaction-pagination {
@@ -3381,7 +3489,7 @@ button:disabled {
   gap: 10px;
   margin-bottom: 14px;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .checkbox-label {
@@ -3389,7 +3497,7 @@ button:disabled {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #9a9ca6;
+  color: var(--text-muted);
   margin: 14px 0 18px;
   cursor: pointer;
 }
@@ -3414,14 +3522,34 @@ button:disabled {
   flex: 1;
 }
 
+/* Three button tiers. Previously every <button> defaulted to solid accent, so a dense page read as
+   a wall of yellow and nothing stood out as "the" action. Primary stays the base `button` rule
+   (one per card/section); secondary is a bordered neutral; ghost is text-only for tertiary actions
+   like View / Close / Cancel. */
 .secondary-btn {
-  background: var(--surface-4);
+  background: var(--surface-neutral);
   color: var(--text-primary);
+  border: 1px solid var(--border-default);
 }
 
 .secondary-btn:hover:not(:disabled) {
   background: var(--surface-4);
-  filter: brightness(1.2);
+  border-color: var(--border-strong);
+  filter: none;
+}
+
+.ghost-btn {
+  background: none;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+
+.ghost-btn:hover:not(:disabled) {
+  background: var(--accent-soft-bg);
+  border-color: var(--accent-soft-border);
+  color: var(--text-primary);
+  transform: none;
 }
 
 .admin-box {
@@ -3432,7 +3560,7 @@ button:disabled {
 }
 
 .admin-box h3 {
-  color: #f2c94c;
+  color: var(--accent);
 }
 
 .admin-close-x {
@@ -3443,8 +3571,8 @@ button:disabled {
   height: 32px;
   padding: 0;
   border-radius: 50%;
-  background: #3d3f48;
-  color: #e8e8ea;
+  background: var(--surface-neutral);
+  color: var(--text-primary);
   font-size: 20px;
   line-height: 1;
   display: flex;
@@ -3465,29 +3593,29 @@ button:disabled {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
   flex: 1;
 }
 
 .admin-row input {
   width: 90px;
   padding: 6px 8px;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-neutral);
   border-radius: 6px;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .admin-block {
   margin: 14px 0;
   padding-top: 12px;
-  border-top: 1px solid #35373f;
+  border-top: 1px solid var(--border-default);
 }
 
 .admin-block p {
   margin: 0 0 8px;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 /* --- Admin: Transaction Log dashboard --- */
@@ -3507,20 +3635,20 @@ button:disabled {
   flex-direction: column;
   gap: 4px;
   padding: 12px 14px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
 }
 
 .txlog-tile-label {
   font-size: 12px;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 .txlog-tile-value {
   font-size: 20px;
   font-weight: 700;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .txlog-tile-value.gain {
@@ -3528,7 +3656,7 @@ button:disabled {
 }
 
 .txlog-tile-value.loss {
-  color: #e05c5c;
+  color: var(--danger);
 }
 
 .txlog-charts {
@@ -3542,7 +3670,7 @@ button:disabled {
   margin: 0 0 8px;
   font-size: 13px;
   font-weight: 700;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .txlog-bars {
@@ -3560,15 +3688,15 @@ button:disabled {
 }
 
 .txlog-bar-label {
-  color: #b9bbc4;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .txlog-bar-track {
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 4px;
   height: 14px;
   overflow: hidden;
@@ -3588,7 +3716,7 @@ button:disabled {
 }
 
 .txlog-bar-value {
-  color: #e8e8ea;
+  color: var(--text-primary);
   text-align: right;
   white-space: nowrap;
 }
@@ -3596,7 +3724,7 @@ button:disabled {
 .txlog-block {
   margin: 14px 0;
   padding-top: 12px;
-  border-top: 1px solid #35373f;
+  border-top: 1px solid var(--border-default);
 }
 
 .txlog-table {
@@ -3614,8 +3742,8 @@ button:disabled {
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
   font-size: 12px;
 }
@@ -3625,14 +3753,14 @@ button:disabled {
 }
 
 .txlog-row-name {
-  color: #e8e8ea;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .txlog-row-action {
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .txlog-row-delta {
@@ -3645,12 +3773,12 @@ button:disabled {
 }
 
 .txlog-row-delta.loss {
-  color: #e05c5c;
+  color: var(--danger);
 }
 
 .txlog-row-balance {
   text-align: right;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 .txlog-empty {
@@ -3665,8 +3793,8 @@ button:disabled {
 }
 
 .admin-alliance-buttons button {
-  background: #3d3f48;
-  color: #e8e8ea;
+  background: var(--surface-neutral);
+  color: var(--text-primary);
   font-size: 12px;
   padding: 6px 10px;
 }
@@ -3678,8 +3806,8 @@ button:disabled {
 }
 
 .admin-button-row button {
-  background: #3d3f48;
-  color: #e8e8ea;
+  background: var(--surface-neutral);
+  color: var(--text-primary);
   font-size: 12px;
   padding: 6px 10px;
 }
@@ -3692,7 +3820,7 @@ button:disabled {
 #adminInvCheckResult {
   margin-top: 10px;
   font-size: 12px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 #adminInvCheckResult .arrest-record-row {
@@ -3706,8 +3834,8 @@ button:disabled {
 
 .admin-misc button {
   flex: 1;
-  background: #3d3f48;
-  color: #e8e8ea;
+  background: var(--surface-neutral);
+  color: var(--text-primary);
 }
 
 .admin-close {
@@ -3718,7 +3846,7 @@ button:disabled {
 /* --- Legal / law banner --- */
 .law-banner {
   background: linear-gradient(135deg, #4a1414, #6b1d1d);
-  border: 1px solid #e05c5c;
+  border: 1px solid var(--danger);
   border-radius: 8px;
   padding: 14px 18px;
   margin-bottom: 16px;
@@ -3823,16 +3951,16 @@ button:disabled {
 .gunclub-section-title {
   margin: 20px 0 8px;
   font-size: 14px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .gunclub-section-title.bad-hustle-title {
-  color: #e05c5c;
+  color: var(--danger);
 }
 
 .hustle-divider {
   border: none;
-  border-top: 1px solid #35373f;
+  border-top: 1px solid var(--border-default);
   margin: 14px 0;
 }
 
@@ -3849,8 +3977,8 @@ button:disabled {
 }
 
 .wiki-entry {
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 14px 16px;
   margin-bottom: 12px;
@@ -3862,13 +3990,13 @@ button:disabled {
 
 .wiki-entry p {
   margin: 0;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 /* --- Updates --- */
 .update-entry {
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 14px 18px;
   margin-bottom: 14px;
@@ -3884,12 +4012,12 @@ button:disabled {
 
 .update-entry-header h3 {
   margin: 0;
-  color: #f2c94c;
+  color: var(--accent);
 }
 
 .update-date {
   font-size: 12px;
-  color: #6f7178;
+  color: var(--text-disabled);
   white-space: nowrap;
 }
 
@@ -3899,7 +4027,7 @@ button:disabled {
 }
 
 .update-entry li {
-  color: #b9bbc4;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 6px;
@@ -3914,8 +4042,8 @@ button:disabled {
   margin-left: 6px;
   padding: 3px 10px;
   border-radius: 6px;
-  background: #f2c94c;
-  color: #17181c;
+  background: var(--accent);
+  color: var(--surface-0);
   font-weight: 700;
   font-size: 12px;
   text-decoration: none;
@@ -3944,12 +4072,12 @@ button:disabled {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .arrest-record-empty {
@@ -3967,10 +4095,10 @@ button:disabled {
   width: 100%;
   padding: 8px 10px;
   margin-bottom: 8px;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-neutral);
   border-radius: 6px;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .equipment-board {
@@ -3980,8 +4108,8 @@ button:disabled {
   gap: 14px;
   justify-content: center;
   padding: 30px 0;
-  background: radial-gradient(ellipse at center, #24262e 0%, #1b1d22 70%);
-  border: 1px solid #35373f;
+  background: radial-gradient(ellipse at center, var(--surface-3) 0%, var(--surface-1) 70%);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
 }
 
@@ -3991,8 +4119,8 @@ button:disabled {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  background: #24262e;
-  border: 1px dashed #3d3f48;
+  background: var(--surface-3);
+  border: 1px dashed var(--surface-neutral);
   border-radius: 8px;
   cursor: pointer;
   padding: 8px;
@@ -4000,19 +4128,19 @@ button:disabled {
 }
 
 .equip-slot:hover {
-  border-color: #f2c94c;
+  border-color: var(--accent);
 }
 
 .equip-slot-label {
   font-size: 10px;
   font-weight: 700;
-  color: #6f7178;
+  color: var(--text-disabled);
   letter-spacing: 0.03em;
 }
 
 .equip-slot-item {
   font-size: 12px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -4039,20 +4167,20 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  background: #1b1d22;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   cursor: pointer;
 }
 
 .equip-picker-item:hover {
-  border-color: #f2c94c;
+  border-color: var(--accent);
 }
 
 .equip-picker-empty {
   padding: 10px 14px;
   font-size: 13px;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 .job-card {
@@ -4084,7 +4212,7 @@ button:disabled {
 }
 
 .job-rank-title {
-  color: #f2c94c;
+  color: var(--accent);
 }
 
 /* --- Skills tab --- */
@@ -4105,7 +4233,7 @@ button:disabled {
 .skill-bar-label {
   width: 150px;
   flex-shrink: 0;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .skill-bar-outer {
@@ -4117,7 +4245,7 @@ button:disabled {
   width: 80px;
   flex-shrink: 0;
   text-align: right;
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 /* --- Alignment tab --- */
@@ -4132,7 +4260,7 @@ button:disabled {
   height: 14px;
   border-radius: 7px;
   margin: 16px 0 8px;
-  background: linear-gradient(90deg, #56ccf2 0%, #6fcf97 25%, #9a9ca6 50%, #e0b85c 75%, #e05c5c 100%);
+  background: linear-gradient(90deg, #56ccf2 0%, var(--success) 25%, var(--text-muted) 50%, #e0b85c 75%, var(--danger) 100%);
 }
 
 .alignment-marker {
@@ -4151,7 +4279,7 @@ button:disabled {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 /* --- Milos Trading Network --- */
@@ -4168,11 +4296,11 @@ button:disabled {
 .mtn-item-picker-btn {
   width: 100%;
   text-align: left;
-  background: #1b1d22;
-  border: 1px solid #3d3f48;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-neutral);
   border-radius: 6px;
   padding: 10px 12px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   font-size: 13px;
 }
 
@@ -4182,8 +4310,8 @@ button:disabled {
   left: 0;
   right: 0;
   z-index: 20;
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 10px;
   max-height: 340px;
@@ -4199,9 +4327,9 @@ button:disabled {
 }
 
 .mtn-item-picker-tab {
-  background: #1b1d22;
-  color: #b9bbc4;
-  border: 1px solid #35373f;
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 14px;
   padding: 5px 11px;
   font-size: 12px;
@@ -4217,7 +4345,7 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #6f7178;
+  color: var(--text-disabled);
   margin: 12px 0 4px;
 }
 
@@ -4246,11 +4374,11 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 .crate-cosmetics-section {
-  border: 1px solid #35373f;
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   margin-bottom: 12px;
   overflow: hidden;
@@ -4262,8 +4390,8 @@ button:disabled {
   justify-content: space-between;
   gap: 10px;
   width: 100%;
-  background: #24262e;
-  color: #e8e8ea;
+  background: var(--surface-3);
+  color: var(--text-primary);
   padding: 14px 16px;
   font-size: 15px;
   font-weight: 700;
@@ -4271,7 +4399,7 @@ button:disabled {
 }
 
 .crate-cosmetics-count {
-  color: #9a9ca6;
+  color: var(--text-muted);
   font-size: 12px;
   font-weight: 600;
   margin-left: auto;
@@ -4279,12 +4407,12 @@ button:disabled {
 }
 
 .crate-cosmetics-caret {
-  color: #9a9ca6;
+  color: var(--text-muted);
 }
 
 .crate-cosmetics-body {
   padding: 16px;
-  border-top: 1px solid #35373f;
+  border-top: 1px solid var(--border-default);
 }
 
 .crate-cosmetics-subtabs {
@@ -4324,13 +4452,13 @@ button:disabled {
 .quiz-question {
   margin-bottom: 16px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #35373f;
+  border-bottom: 1px solid var(--border-default);
 }
 
 .quiz-question p {
   margin: 0 0 8px;
   font-size: 13px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -4339,14 +4467,14 @@ button:disabled {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
   padding: 4px 0;
   cursor: pointer;
 }
 
 #quizResult {
   font-weight: 700;
-  color: #f2c94c;
+  color: var(--accent);
   min-height: 18px;
 }
 
@@ -4584,7 +4712,7 @@ button:disabled {
 }
 
 .coinflip-side-btn.active {
-  background: #6fcf97;
+  background: var(--success);
   color: #16181d;
 }
 
@@ -4621,7 +4749,7 @@ button:disabled {
 }
 
 .roulette-status-row b {
-  color: #f2c94c;
+  color: var(--accent);
 }
 
 .roulette-wheel {
@@ -4653,11 +4781,11 @@ button:disabled {
 }
 
 .roulette-number-btn.roulette-red { background: #a93b3b; }
-.roulette-number-btn.roulette-black { background: #262832; }
+.roulette-number-btn.roulette-black { background: var(--surface-raised); }
 .roulette-number-btn.roulette-green { background: #2f7d4f; grid-column: span 12; }
 
 .roulette-number-btn.selected {
-  outline: 2px solid #6fcf97;
+  outline: 2px solid var(--success);
   outline-offset: -2px;
 }
 
@@ -4669,7 +4797,7 @@ button:disabled {
 }
 
 .roulette-bet-btn {
-  background: #262832;
+  background: var(--surface-raised);
   border: 1px solid #383a44;
   border-radius: 8px;
   padding: 6px 12px;
@@ -4678,7 +4806,7 @@ button:disabled {
 }
 
 .roulette-bet-btn.selected {
-  border-color: #6fcf97;
+  border-color: var(--success);
   background: #303543;
 }
 
@@ -4688,8 +4816,8 @@ button:disabled {
 }
 
 #btnNotifBell {
-  background: #3d3f48;
-  color: #e8e8ea;
+  background: var(--surface-neutral);
+  color: var(--text-primary);
   padding: 8px 12px;
   font-size: 16px;
   border-radius: 20px;
@@ -4704,7 +4832,7 @@ button:disabled {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #e05c5c;
+  background: var(--danger);
   box-shadow: 0 0 0 2px #26272e;
 }
 
@@ -4715,7 +4843,7 @@ button:disabled {
   width: 300px;
   max-height: 360px;
   overflow-y: auto;
-  background: linear-gradient(160deg, #262832, #1e2027);
+  background: linear-gradient(160deg, var(--surface-raised), var(--surface-2));
   border: 1px solid #383a44;
   border-radius: 12px;
   padding: 14px 16px;
@@ -4725,7 +4853,7 @@ button:disabled {
 
 .notif-dropdown h4 {
   margin: 0 0 10px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -4745,12 +4873,12 @@ button:disabled {
 
 .notif-item p {
   margin: 0 0 2px;
-  color: #e8e8ea;
+  color: var(--text-primary);
   font-size: 13px;
 }
 
 .notif-item.notif-unseen p {
-  color: #6fcf97;
+  color: var(--success);
 }
 
 .notif-time {
@@ -4839,20 +4967,20 @@ button:disabled {
   display: grid;
   grid-template-columns: 48px 1fr auto;
   align-items: center;
-  background: #262832;
+  background: var(--surface-raised);
   border: 1px solid #383a44;
   border-radius: 10px;
   padding: 10px 14px;
 }
 
 .leaderboard-row-first {
-  border-color: #f2c94c;
-  background: linear-gradient(90deg, #2e2a1a, #262832);
+  border-color: var(--accent);
+  background: linear-gradient(90deg, #2e2a1a, var(--surface-raised));
 }
 
 .leaderboard-rank {
   font-weight: 700;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .leaderboard-name {
@@ -4861,7 +4989,7 @@ button:disabled {
 }
 
 .leaderboard-value {
-  color: #6fcf97;
+  color: var(--success);
   font-weight: 700;
 }
 
@@ -4894,23 +5022,23 @@ button:disabled {
 .hustle-toast {
   margin: 4px 0 18px;
   padding: 12px 16px;
-  background: #262832;
+  background: var(--surface-raised);
   border: 1px solid #383a44;
-  border-left: 4px solid #f2c94c;
+  border-left: 4px solid var(--accent);
   border-radius: 8px;
   font-weight: 700;
   font-size: 15px;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 .hustle-toast.gain {
-  border-left-color: #6fcf97;
-  color: #6fcf97;
+  border-left-color: var(--success);
+  color: var(--success);
 }
 
 .hustle-toast.loss {
-  border-left-color: #e05c5c;
-  color: #e05c5c;
+  border-left-color: var(--danger);
+  color: var(--danger);
 }
 
 /* --- Profiles --- */
@@ -4942,8 +5070,8 @@ button:disabled {
      .title-anima-hyper-gear5) sets its background-image directly on this same element, and since
      this rule comes later in the file at equal specificity, a `background:` shorthand here would
      reset that image back to none. background-color only touches the fallback color. */
-  background-color: #24262e;
-  border: 1px solid #35373f;
+  background-color: var(--surface-3);
+  border: 1px solid var(--border-default);
   background-size: cover;
   background-position: center;
   margin-bottom: 18px;
@@ -4981,9 +5109,9 @@ button:disabled {
 }
 
 .profile-status-btn {
-  background: #262832;
+  background: var(--surface-raised);
   border: 1px solid #383a44;
-  color: #9a9ca6;
+  color: var(--text-muted);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 13px;
@@ -4992,7 +5120,7 @@ button:disabled {
 
 .profile-status-text {
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
   font-style: italic;
   width: 100%;
 }
@@ -5011,12 +5139,12 @@ button:disabled {
 }
 
 .profile-stat-pill {
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 13px;
-  color: #b9bbc4;
+  color: var(--text-secondary);
 }
 
 .profile-privacy-toggle {
@@ -5071,7 +5199,7 @@ button:disabled {
   margin: 0;
   font-weight: 700;
   font-size: 13px;
-  color: #e8e8ea;
+  color: var(--text-primary);
 }
 
 #profileShowcasePicker {
@@ -5134,7 +5262,7 @@ button:disabled {
 }
 
 .profile-wall-post-btn {
-  background: #6fcf97;
+  background: var(--success);
   color: #16321f;
   border: none;
   border-radius: 8px;
@@ -5151,8 +5279,8 @@ button:disabled {
 }
 
 .profile-wall-post {
-  background: #24262e;
-  border: 1px solid #35373f;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 10px 14px;
 }
@@ -5166,7 +5294,7 @@ button:disabled {
 
 .profile-wall-post-date {
   font-size: 11px;
-  color: #6f7178;
+  color: var(--text-disabled);
 }
 
 .profile-wall-delete {

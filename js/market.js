@@ -104,9 +104,14 @@ function tickCooldownUI() {
     const remaining = getRemainingCooldown(type);
     // hustleInFlight, or this tick would re-enable the button while its request is still on the
     // wire (the cooldown it reads can't update until that response lands).
-    btn.disabled = remaining > 0 || hustleInFlight.has(type);
+    const pending = hustleInFlight.has(type);
+    btn.disabled = remaining > 0 || pending;
     const label = `${HUSTLE_EMOJI[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}`.trim();
-    btn.textContent = remaining > 0 ? `${label} (${Math.ceil(remaining / 1000)}s)` : label;
+    // Surface the in-flight guard instead of just silently swallowing the click -- otherwise a
+    // rapid-clicker gets no feedback at all for the clicks the guard drops.
+    btn.classList.toggle('is-pending', pending);
+    if (pending) btn.textContent = `${label}…`;
+    else btn.textContent = remaining > 0 ? `${label} (${Math.ceil(remaining / 1000)}s)` : label;
   });
   tickMilosCooldownUI();
   tickBankCountdown();
