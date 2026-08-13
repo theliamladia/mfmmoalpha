@@ -914,6 +914,95 @@ button.is-pending {
   height: 40px;
 }
 
+/* ---------- Foil Ascension ---------- */
+/* `title-foil` is a GENERIC overlay applied alongside whatever art class the base title already
+   has (see the _foil branch in getItemDef, js/core.js) -- one rule covers every current and future
+   title, no per-title foil art needed.
+
+   Colors here are HARDCODED, not var(--token), on purpose: this is title ART, and per this repo's
+   convention VISIONS reskins UI chrome only and must never be able to recolor a cosmetic a player
+   paid for. The sweep is a ::after pseudo-element rather than a background layer so it composites
+   on top of a background-image art class without replacing it.
+
+   position:relative is applied to the badge itself so the absolutely-positioned sweep is clipped
+   by the badge's existing overflow:hidden. */
+.title-badge.title-foil {
+  position: relative;
+  box-shadow: 0 0 8px rgba(190, 230, 255, 0.55), inset 0 0 6px rgba(255, 255, 255, 0.25);
+}
+
+.title-badge.title-foil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 190, 240, 0.35) 42%,
+    rgba(190, 235, 255, 0.65) 50%,
+    rgba(215, 255, 200, 0.35) 58%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  background-size: 260% 100%;
+  mix-blend-mode: screen;
+  animation: title-foil-sweep 2.8s linear infinite;
+  /* Constant iridescent hairline on top of the moving sweep, so a foil is still identifiable in a
+     still frame (and under prefers-reduced-motion). Lives on the ::after rather than the badge
+     itself because several base art classes set their own box-shadow glow at equal-or-higher
+     specificity and would otherwise win. */
+  box-shadow: inset 0 0 0 1px rgba(215, 245, 255, 0.6), inset 0 0 7px rgba(255, 200, 245, 0.3);
+  border-radius: inherit;
+}
+
+@keyframes title-foil-sweep {
+  from { background-position: 160% 0; }
+  to { background-position: -60% 0; }
+}
+
+/* The shimmer is decorative; honour a reduced-motion preference by parking the sweep mid-badge so
+   the foil still reads as foil without animating. */
+@media (prefers-reduced-motion: reduce) {
+  .title-badge.title-foil::after {
+    animation: none;
+    background-position: 50% 0;
+  }
+}
+
+/* The Profile banner renders a title's cssClass onto its own element (renderProfileBanner,
+   js/profile.js), so an equipped Foil shimmers there too -- but that element has neither
+   .title-badge's overflow:hidden nor its position:relative, so the sweep needs both here or it
+   would escape the banner's rounded corners. */
+.profile-banner.title-foil {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-banner.title-foil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 190, 240, 0.28) 42%,
+    rgba(190, 235, 255, 0.5) 50%,
+    rgba(215, 255, 200, 0.28) 58%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  background-size: 260% 100%;
+  mix-blend-mode: screen;
+  animation: title-foil-sweep 2.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-banner.title-foil::after {
+    animation: none;
+    background-position: 50% 0;
+  }
+}
+
 .title-anima-common-goku,
 .title-anima-common-zoro,
 .title-anima-common-hatsune {
@@ -4190,10 +4279,13 @@ button.is-pending {
 
 .job-skill-row {
   display: flex;
-  flex-wrap: nowrap;
+  /* Was nowrap, back when each row held one button. With the x10 Shift button beside it the pair
+     no longer fits at the narrow column widths this card renders at, so the batch button is allowed
+     to drop to its own line rather than overflowing the card. */
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 6px 16px;
   padding: 6px 0;
   font-size: 13px;
 }
@@ -4205,6 +4297,36 @@ button.is-pending {
 .job-skill-row button {
   flex-shrink: 0;
   min-width: 92px;
+}
+
+/* The x10 batch button sits beside the plain Work button as a smaller secondary action -- gap-8
+   pushes it away from the skill label so the pair reads as one control group. */
+.job-skill-row button + button {
+  margin-left: auto;
+  min-width: 78px;
+  font-size: 12px;
+}
+
+/* Da Skreetz cards: the plain hustle button and its x5 sibling share one row. */
+.hustle-btn-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.hustle-btn-row .hustle-btn {
+  flex: 1 1 auto;
+}
+
+/* .hustle-btn is width:100% for the single-button card layout -- inside the row that would make
+   the x5 sibling claim the whole line, so both need width:auto and the flex ratios below. */
+.hustle-btn-row .hustle-btn {
+  width: auto;
+}
+
+.hustle-btn-row .hustle-btn.secondary-btn {
+  flex: 0 0 auto;
+  min-width: 64px;
 }
 
 .job-payout-line {

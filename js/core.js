@@ -724,6 +724,21 @@ function badgeChipMarkup(char) {
 // self-describing. This is the client's single source of truth for label/color display; the
 // server's own copy (gameLogic.js NMG_GRADE_WEIGHTS) only needs the numeric odds, never these.
 const NMG_ID_RE = /^(.+)_nmg(\d{1,2})$/;
+
+// ---------- Foil Ascension ----------
+// Burn 3 copies of one plain title + $25,000 at Cosmetixxx -> 1 Foil (see js/market.js
+// foilAscendTitle). Synthesized from the id exactly like prestige and NMG are -- id shape
+// `${baseId}_foil`, e.g. mlKrogger_foil = "Foil Krogger".
+//
+// The suffix is a literal word, with no trailing digits, so it can never be mistaken for either of
+// the other two synthesized shapes: PRESTIGE_ID_RE needs `_p` + digits and NMG_ID_RE needs `_nmg` +
+// digits. Both regexes are hand-mirrored server-side (NMG_PRESTIGE_ID_RE / NMG_GRADED_ID_RE in
+// mfmmoserver/gameLogic.js) with the same digit requirement, so the non-collision holds on both
+// sides. Foils are only ever minted from a plain ungraded, un-prestiged stack, so a foil id never
+// wraps one of the other shapes either.
+const FOIL_ID_RE = /^(.+)_foil$/;
+const FOIL_ASCENSION_COPIES = 3;
+const FOIL_ASCENSION_COST = 25000;
 const NMG_GRADE_TIERS = {
   10: { label: 'Elite', color: '#f7d51d' },
   9: { label: 'Mint', color: '#ffffff' },
@@ -792,6 +807,29 @@ function getItemDef(itemId, char = character) {
       nonEquippable: true,
       nmgGrade: grade,
       nmgBaseId: baseId,
+    };
+  }
+
+  // Foil: base art plus a shimmer overlay. `cssClass` keeps the base title's art class and gains
+  // the generic `title-foil` class alongside it (the shimmer is a ::after sweep layered over
+  // whatever art is underneath -- see style.css), so no per-title foil art is ever needed. Ordering
+  // versus the prestige/NMG branches above is not load-bearing (the three id shapes are mutually
+  // exclusive), but it must come before the plain-title lookup at the bottom, which would otherwise
+  // fail to resolve a foil id and return null everywhere.
+  const foilMatch = FOIL_ID_RE.exec(itemId);
+  if (foilMatch) {
+    const baseId = foilMatch[1];
+    const baseTitle = allTitleDefsFor(char).find((t) => t.id === baseId);
+    if (!baseTitle) return null;
+    return {
+      ...baseTitle,
+      id: itemId,
+      name: `Foil ${baseTitle.name}`,
+      cssClass: `${baseTitle.cssClass || ''} title-foil`.trim(),
+      how: `${baseTitle.how} (Foil Ascension: forged from ${FOIL_ASCENSION_COPIES} copies.)`,
+      type: 'title',
+      foil: true,
+      foilBaseId: baseId,
     };
   }
 

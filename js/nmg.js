@@ -197,7 +197,8 @@ function nmgSubmitCandidates() {
   return character.inventory
     .filter((stack) => stack.qty > 0)
     .map((stack) => getItemDef(stack.id))
-    .filter((t) => t && t.type === 'title' && !t.nmgGrade);
+    // Foils are excluded from grading (kept simple -- mirrored server-side in /nmg/submit).
+    .filter((t) => t && t.type === 'title' && !t.nmgGrade && !t.foil);
 }
 
 function openNmgSubmitModal() {
@@ -339,6 +340,102 @@ if (btnNmgCrackOpen) {
 if (btnNmgCrackClose) {
   btnNmgCrackClose.addEventListener('click', () => {
     nmgCrackModal.classList.add('hidden');
+  });
+}
+
+// ---------- Regrade flow ----------
+// Resubmit an already-graded slab for a fresh roll. Structurally identical to the submit flow above
+// (picker step -> tier step -> server call -> the slot grid), and the reveal is literally the same
+// modal: the server stores the slab's PRE-grade id in the slot row, so /nmg/reveal mints
+// `${preGradeId}_nmg${newGrade}` through its existing code path with no branching at all.
+//
+// Fees mirror NMG_REGRADE_FEES in mfmmoserver/gameLogic.js, which is authoritative for what's
+// actually charged. Owner's constraint: a regrade must beat cracking the slab ($50,000) and
+// resubmitting it at the same tier. Each fee is 60% of (crack + tier cost):
+//   3hr    $33,000  vs  $55,000 crack+resubmit
+//   1hr    $36,000  vs  $60,000
+//   10min  $42,000  vs  $70,000
+const NMG_REGRADE_FEES = { '3hr': 33000, '1hr': 36000, '10min': 42000 };
+const NMG_TIER_LABELS = { '3hr': '3 Hour Turnaround', '1hr': '1 Hour Turnaround', '10min': '10 Minute Turnaround' };
+
+const btnNmgRegradeOpen = document.getElementById('btnNmgRegradeOpen');
+const nmgRegradeModal = document.getElementById('nmgRegradeModal');
+const nmgRegradePickerStep = document.getElementById('nmgRegradePickerStep');
+const nmgRegradePickerList = document.getElementById('nmgRegradePickerList');
+const nmgRegradeTierStep = document.getElementById('nmgRegradeTierStep');
+const nmgRegradeTierOptions = document.getElementById('nmgRegradeTierOptions');
+const nmgRegradeSelectedTitleName = document.getElementById('nmgRegradeSelectedTitleName');
+const btnNmgRegradeBack = document.getElementById('btnNmgRegradeBack');
+const btnNmgRegradeConfirm = document.getElementById('btnNmgRegradeConfirm');
+const btnNmgRegradeClose = document.getElementById('btnNmgRegradeClose');
+
+let nmgRegradeSelectedStackId = null;
+let nmgRegradeSelectedTier = null;
+
+// Same candidate set as Crack -- any graded slab actually in inventory. A slab listed on the Player
+// Market is already out of character.inventory (see doCreateListing), so it can't reach this list,
+// which is exactly why the server needs no listing cleanup on regrade either.
+function nmgRegradeCandidates() {
+  return crackNmgCandidates();
+}
+
+function buildNmgRegradeTierOptions() {
+  nmgRegradeTierOptions.innerHTML = Object.keys(NMG_REGRADE_FEES).map((tier) => `
+    <button class="nmg-tier-btn nmg-regrade-tier-btn" data-tier="${tier}">${NMG_TIER_LABELS[tier]}<br>$${NMG_REGRADE_FEES[tier].toLocaleString()}</button>
+  `).join('');
+  nmgRegradeTierOptions.querySelectorAll('.nmg-regrade-tier-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      nmgRegradeSelectedTier = btn.dataset.tier;
+      nmgRegradeTierOptions.querySelectorAll('.nmg-regrade-tier-btn').forEach((b) => b.classList.toggle('active', b === btn));
+      btnNmgRegradeConfirm.disabled = false;
+    });
+  });
+}
+
+function openNmgRegradeModal() {
+  nmgRegradeSelectedStackId = null;
+  nmgRegradeSelectedTier = null;
+  nmgRegradeTierStep.classList.add('hidden');
+  nmgRegradePickerStep.classList.remove('hidden');
+  btnNmgRegradeConfirm.disabled = true;
+  buildNmgRegradeTierOptions();
+  renderGroupedTitlePicker(nmgRegradeCandidates(), (titleId) => {
+    nmgRegradeSelectedStackId = titleId;
+    const item = getItemDef(titleId);
+    nmgRegradeSelectedTitleName.textContent = item ? itemLabel(item) : titleId;
+    nmgRegradePickerStep.classList.add('hidden');
+    nmgRegradeTierStep.classList.remove('hidden');
+  }, null, nmgRegradePickerList);
+  nmgRegradeModal.classList.remove('hidden');
+}
+
+if (btnNmgRegradeOpen) btnNmgRegradeOpen.addEventListener('click', () => openNmgRegradeModal());
+if (btnNmgRegradeClose) btnNmgRegradeClose.addEventListener('click', () => nmgRegradeModal.classList.add('hidden'));
+if (btnNmgRegradeBack) {
+  btnNmgRegradeBack.addEventListener('click', () => {
+    nmgRegradeTierStep.classList.add('hidden');
+    nmgRegradePickerStep.classList.remove('hidden');
+  });
+}
+if (btnNmgRegradeConfirm) {
+  btnNmgRegradeConfirm.addEventListener('click', async () => {
+    if (!nmgRegradeSelectedStackId || !nmgRegradeSelectedTier) return;
+    const item = getItemDef(nmgRegradeSelectedStackId);
+    const fee = NMG_REGRADE_FEES[nmgRegradeSelectedTier];
+    if (!confirm(`Regrade ${itemLabel(item)} for $${fee.toLocaleString()}? The current grade (${item.nmgGrade}) is destroyed and replaced by a fresh roll -- it can come back LOWER. This cannot be undone.`)) return;
+    btnNmgRegradeConfirm.disabled = true;
+    try {
+      const result = await apiNmgRegrade(nmgRegradeSelectedStackId, nmgRegradeSelectedTier);
+      character = result.character;
+      save();
+      renderAll();
+      nmgRegradeModal.classList.add('hidden');
+      logTo(nmgLog, `Slab sent back for regrading (was grade ${result.previousGrade}).`, 'gain');
+      await refreshNmgState();
+    } catch (err) {
+      logTo(nmgLog, err.reason || 'Could not reach the server.', 'loss');
+      btnNmgRegradeConfirm.disabled = false;
+    }
   });
 }
 

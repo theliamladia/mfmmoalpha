@@ -113,6 +113,30 @@ reason for a standalone banner, per this repo's placement convention):
 The shared `#crateSpinModal`/`#crateResultModal` overlays (already in `index.html`) handle the actual
 spin animation and results reveal for every crate — no per-crate modal markup needed.
 
+## 4b. Synthesized id suffixes — check before inventing a new one
+
+Three id shapes are synthesized on the fly from a base title id rather than existing in any catalog.
+`getItemDef()` (js/core.js) has one branch per shape, and each one is hand-mirrored server-side:
+
+| Shape | Client regex (core.js) | Server mirror (gameLogic.js) | Made by |
+|---|---|---|---|
+| `${baseId}_p${level}` | `PRESTIGE_ID_RE` | `NMG_PRESTIGE_ID_RE` | Prestige (js/inventory.js) |
+| `${baseId}_nmg${grade}` | `NMG_ID_RE` | `NMG_GRADED_ID_RE` | NMG reveal (server) |
+| `${baseId}_foil` | `FOIL_ID_RE` | `FOIL_ID_RE` | Foil Ascension (server) |
+
+**Foil is the one shape that needs no per-title work** — `title-foil` is a generic CSS overlay class
+appended to whatever `cssClass` the base title already has, so every current and future title gets a
+working Foil for free. Nothing to add per crate.
+
+If you ever add a **fourth** suffix, check it against all six regexes above (both sides), and note
+that the prestige/NMG regexes both require digits after their marker while `_foil` is a bare word —
+that's exactly what keeps them disjoint. A new suffix ending in digits is the dangerous case.
+
+Foils are deliberately **excluded** from Prestige (js/inventory.js `prestigeTitle`/`canPrestige`),
+from NMG submission (js/nmg.js `nmgSubmitCandidates` + the server's `/nmg/submit`), and from
+`COSMETIXX_MARKET_TITLES` — that array is a hand-maintained list of plain base ids that the server
+mints slabs from, so a foil id can only ever appear there if someone types one in. Don't.
+
 ## 5. Sanity checklist before calling it done
 
 - [ ] Every id in the new array is unique repo-wide (`grep -n "'yourIdPrefix" js/core.js`)

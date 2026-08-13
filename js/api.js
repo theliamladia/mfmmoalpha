@@ -68,16 +68,18 @@ function apiMe() {
   return apiRequest('/me');
 }
 
-function apiWork() {
-  return apiRequest('/hustle/work', { method: 'POST' });
+// `count` is the batch size for the x5 buttons (1 when omitted). The server clamps it -- see
+// clampBatchCount in mfmmoserver/gameLogic.js -- so this is a request, not an instruction.
+function apiWork(count) {
+  return apiRequest('/hustle/work', { method: 'POST', body: JSON.stringify({ count: count || 1 }) });
 }
 
-function apiSlut() {
-  return apiRequest('/hustle/slut', { method: 'POST' });
+function apiSlut(count) {
+  return apiRequest('/hustle/slut', { method: 'POST', body: JSON.stringify({ count: count || 1 }) });
 }
 
-function apiCrime() {
-  return apiRequest('/hustle/crime', { method: 'POST' });
+function apiCrime(count) {
+  return apiRequest('/hustle/crime', { method: 'POST', body: JSON.stringify({ count: count || 1 }) });
 }
 
 function apiWorkout() {
@@ -188,8 +190,9 @@ function apiResignGoodJob() {
   return apiRequest('/jobs/good/resign', { method: 'POST' });
 }
 
-function apiGoodJobWork(skillKey) {
-  return apiRequest('/jobs/good/work', { method: 'POST', body: JSON.stringify({ skillKey }) });
+// `count` is the x10 Work Shift batch size (1 when omitted); clamped 1-10 server-side.
+function apiGoodJobWork(skillKey, count) {
+  return apiRequest('/jobs/good/work', { method: 'POST', body: JSON.stringify({ skillKey, count: count || 1 }) });
 }
 
 function apiApplyBadJob(jobId) {
@@ -200,8 +203,8 @@ function apiResignBadJob() {
   return apiRequest('/jobs/bad/resign', { method: 'POST' });
 }
 
-function apiBadJobWork(skillKey) {
-  return apiRequest('/jobs/bad/work', { method: 'POST', body: JSON.stringify({ skillKey }) });
+function apiBadJobWork(skillKey, count) {
+  return apiRequest('/jobs/bad/work', { method: 'POST', body: JSON.stringify({ skillKey, count: count || 1 }) });
 }
 
 function apiBuyGear(itemId) {
@@ -719,6 +722,14 @@ function apiNmgSubmit(stackId, tier) {
 }
 function apiNmgReveal(slotId) {
   return apiRequest('/nmg/reveal', { method: 'POST', body: JSON.stringify({ slotId }) });
+}
+// Regrade reuses the /nmg/reveal flow verbatim -- the server stores the slab's pre-grade id in the
+// slot, so revealing it mints `${preGradeId}_nmg${newGrade}` through the exact same path.
+function apiNmgRegrade(stackId, tier) {
+  return apiRequest('/nmg/regrade', { method: 'POST', body: JSON.stringify({ stackId, tier }) });
+}
+function apiFoilAscension(stackId) {
+  return apiRequest('/cosmetics/foil-ascension', { method: 'POST', body: JSON.stringify({ stackId }) });
 }
 function apiCosmetixxMarketState() {
   return apiRequest('/cosmetixx-market/state');

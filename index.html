@@ -190,22 +190,31 @@
 
       <div id="page-streets" class="page hidden">
         <h2>🛣️ Da Skreetz</h2>
-        <p>Each hustle pays out instantly, then needs 10 seconds to cool down.</p>
+        <p>Each hustle pays out instantly, then needs 10 seconds to cool down. The &times;5 button runs five independent attempts back to back for five times the cooldown &mdash; identical earnings per second, far fewer clicks.</p>
         <div class="hustle-grid">
           <div class="hustle-card">
             <h3>💼 Work</h3>
-            <p>2-10 Floydbucks per click. Safe.</p>
-            <button class="hustle-btn" data-hustle="work">Work</button>
+            <p>10-30 Floydbucks per click. Safe.</p>
+            <div class="hustle-btn-row">
+              <button class="hustle-btn" data-hustle="work">Work</button>
+              <button class="hustle-btn secondary-btn" data-hustle="work" data-hustle-count="5">&times;5</button>
+            </div>
           </div>
           <div class="hustle-card">
             <h3>💋 Slut</h3>
             <p>5-60 Floydbucks per click. 30% chance to get robbed for the same amount. Nudges your Alliance toward Bad.</p>
-            <button class="hustle-btn" data-hustle="slut">Slut</button>
+            <div class="hustle-btn-row">
+              <button class="hustle-btn" data-hustle="slut">Slut</button>
+              <button class="hustle-btn secondary-btn" data-hustle="slut" data-hustle-count="5">&times;5</button>
+            </div>
           </div>
           <div class="hustle-card">
             <h3>🔪 Crime</h3>
-            <p>100-1000 Floydbucks per click. 30% chance to land in Jail. Nudges your Alliance toward Bad &mdash; and every time you're caught, your criminal record makes the next sentence longer (see New Milos City &rarr; Crime for Community Service).</p>
-            <button class="hustle-btn" data-hustle="crime">Crime</button>
+            <p>80-400 Floydbucks per click. 30% chance to land in Jail &mdash; and the NMPD seizes 15% of the cash you're carrying when they book you (money in the Bank is safe). Nudges your Alliance toward Bad, and every time you're caught your criminal record makes the next sentence longer (see New Milos City &rarr; Crime for Community Service). A &times;5 run stops at the first bust.</p>
+            <div class="hustle-btn-row">
+              <button class="hustle-btn" data-hustle="crime">Crime</button>
+              <button class="hustle-btn secondary-btn" data-hustle="crime" data-hustle-count="5">&times;5</button>
+            </div>
           </div>
         </div>
 
@@ -298,6 +307,15 @@
             <div id="cosmetixxMarketGrid" class="profile-slab-grid"></div>
           </div>
 
+          <div class="hustle-card profile-slab-section-card">
+            <h3>&#10024; Foil Ascension</h3>
+            <p class="item-subheading">Burn <b>3 copies</b> of the same title plus <b>$25,000</b> to forge one Foil version &mdash; the same art under a moving shimmer. Any crate qualifies, archived ones included. The 3 copies are destroyed permanently.</p>
+            <p class="item-subheading">Foils are equippable like any title, but cannot be prestiged or submitted to New Milos Grading.</p>
+            <div id="foilAscensionEligible" class="profile-slab-grid"></div>
+            <button id="btnFoilAscensionOpen">Choose a Title to Ascend</button>
+            <div id="foilLog" class="log log-single-line"></div>
+          </div>
+
           <h3 class="archived-crates-heading">&#128465;&#65039; Archived Crates</h3>
           <p>No longer purchasable &mdash; view-only odds. Titles you already own stay exactly as they are and remain tradeable.</p>
 
@@ -358,6 +376,10 @@
           <h3 class="gunclub-section-title">🔨 Crack a Slab</h3>
           <p>Remove the grade from a graded title in your inventory, returning it to its equippable form. This cannot be undone.</p>
           <button id="btnNmgCrackOpen">Crack a Title ($50,000)</button>
+
+          <h3 class="gunclub-section-title">&#9851; Regrade a Slab</h3>
+          <p>Not happy with a grade? Send the slab back through New Milos Grading for a fresh 1-10 roll. It takes a grading slot for the usual turnaround, and costs less than cracking the slab and resubmitting it. <b class="loss">The new grade replaces the old one and can be LOWER.</b></p>
+          <button id="btnNmgRegradeOpen">Regrade a Slab</button>
         </div>
 
         <div id="shop-good" class="shop hidden">
@@ -1883,6 +1905,26 @@
     </div>
   </div>
 
+  <div id="nmgRegradeModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>&#9851; Regrade a Slab</h3>
+      <div id="nmgRegradePickerStep">
+        <p class="section-desc">Pick a graded slab you own. The slab is consumed on submission and comes back with a brand-new grade.</p>
+        <div id="nmgRegradePickerList" class="equip-picker-list"></div>
+      </div>
+      <div id="nmgRegradeTierStep" class="hidden">
+        <p>Regrading: <b id="nmgRegradeSelectedTitleName"></b></p>
+        <p class="loss"><b>&#9888;&#65039; The new grade can be higher, lower, or the same. The current grade is gone either way.</b></p>
+        <div class="nmg-tier-options" id="nmgRegradeTierOptions"></div>
+        <div class="modal-actions">
+          <button id="btnNmgRegradeBack" class="secondary-btn">Back</button>
+          <button id="btnNmgRegradeConfirm" disabled>Submit for Regrade</button>
+        </div>
+      </div>
+      <button id="btnNmgRegradeClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
   <div id="nmgSubmitModal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3>🏅 Submit a Title for Grading</h3>
@@ -1914,6 +1956,35 @@
       <div class="modal-actions">
         <button id="btnNmgRevealOk" class="hidden">OK</button>
       </div>
+    </div>
+  </div>
+
+  <div id="foilAscensionModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>&#10024; Foil Ascension</h3>
+      <p>Pick a title you own at least 3 copies of. Prestiged titles, graded slabs, and existing Foils are not eligible.</p>
+      <div id="foilAscensionPickerList" class="equip-picker-list"></div>
+      <button id="btnFoilAscensionClose" class="secondary-btn admin-close">Close</button>
+    </div>
+  </div>
+
+  <div id="foilAscensionConfirmModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>&#10024; Confirm Foil Ascension</h3>
+      <div id="foilAscensionConfirmPreview" class="title-preview"></div>
+      <p id="foilAscensionConfirmText"></p>
+      <p class="loss"><b>3 copies will be destroyed permanently. This cannot be undone.</b></p>
+      <button id="btnFoilAscensionConfirm">Forge the Foil</button>
+      <button id="btnFoilAscensionCancel" class="secondary-btn admin-close">Cancel</button>
+    </div>
+  </div>
+
+  <div id="foilAscensionResultModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>&#10024; Foil Forged</h3>
+      <div id="foilAscensionResultPreview" class="title-preview"></div>
+      <p id="foilAscensionResultText"></p>
+      <button id="btnFoilAscensionResultOk">Nice</button>
     </div>
   </div>
 

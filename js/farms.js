@@ -5,6 +5,14 @@ const FARM_PREP_COST = 1200;
 const FARM_SEED_COST_BY_DRUG = { drugWeed: 150, drugCoke: 1200 };
 const FARM_SECURITY_MAX_TIER = 5;
 const FARM_MAX_QTY = 4;
+// Mirrors FARM_PACKAGE_UNITS_BY_DRUG in mfmmoserver/gameLogic.js -- the server is authoritative for
+// what actually lands in your inventory. Each harvested package is a BRICK worth this many street
+// units; before this, a harvest granted 1 unit per package, which made every farm run a guaranteed
+// loss.
+const FARM_PACKAGE_UNITS_BY_DRUG = { drugWeed: 20, drugCoke: 12 };
+function farmPackageUnits(drugId) {
+  return FARM_PACKAGE_UNITS_BY_DRUG[drugId] || 10;
+}
 
 const farmsLockedNote = document.getElementById('farmsLockedNote');
 const farmsUnlockedContent = document.getElementById('farmsUnlockedContent');
@@ -38,7 +46,7 @@ const FARM_STAGE_VERB = { growing: 'Growing', packaging: 'Packaging', shipping: 
 // device clock drifts doesn't see a wildly wrong countdown.
 function farmStageLabel(plot) {
   if (plot.stage === 'empty') return plot.prepped ? 'Prepped -- ready to plant' : 'Empty -- till/water/fertilize first';
-  const qtyPrefix = plot.qty ? `${plot.qty}x package${plot.qty > 1 ? 's' : ''} -- ` : '';
+  const qtyPrefix = plot.qty ? `${plot.qty} brick${plot.qty > 1 ? 's' : ''} (${plot.qty * farmPackageUnits(plot.drugType)} units) -- ` : '';
   if (plot.stage === 'ready') return `${qtyPrefix}Ready to collect!`;
   const remaining = plot.stageReadyAt - (Date.now() + clockOffsetMs);
   // Local countdown can hit zero slightly before the next refreshFarms() poll confirms the real
@@ -56,12 +64,12 @@ function farmPlotCardHtml(plot) {
   }
   if (plot.stage === 'empty' && plot.prepped) {
     const qtyOptions = Array.from({ length: FARM_MAX_QTY }, (_, i) => i + 1)
-      .map((n) => `<option value="${n}">${n} package${n > 1 ? 's' : ''}</option>`)
+      .map((n) => `<option value="${n}">${n} brick${n > 1 ? 's' : ''}</option>`)
       .join('');
     actions.push(`
       <select data-farm-seed-select="${plot.id}">
-        <option value="drugWeed">🌿 Weed seed ($${FARM_SEED_COST_BY_DRUG.drugWeed.toLocaleString()} each)</option>
-        <option value="drugCoke">❄️ Cocaine seed ($${FARM_SEED_COST_BY_DRUG.drugCoke.toLocaleString()} each)</option>
+        <option value="drugWeed">🌿 Weed seed ($${FARM_SEED_COST_BY_DRUG.drugWeed.toLocaleString()} each &rarr; ${FARM_PACKAGE_UNITS_BY_DRUG.drugWeed} units)</option>
+        <option value="drugCoke">❄️ Cocaine seed ($${FARM_SEED_COST_BY_DRUG.drugCoke.toLocaleString()} each &rarr; ${FARM_PACKAGE_UNITS_BY_DRUG.drugCoke} units)</option>
       </select>
       <select data-farm-qty-select="${plot.id}">${qtyOptions}</select>
       <button data-farm-plant="${plot.id}">Plant Seeds</button>

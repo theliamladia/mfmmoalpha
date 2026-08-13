@@ -38,7 +38,10 @@ function titleStackCardHtml(stack) {
   // double-suffixed id (`..._nmg7_p1`). Graded stacks shouldn't reach this card at all in practice
   // (renderCosmeticsGrid() excludes them, they render via the Graded Titles tab instead) but this
   // stays defensive since titleStackCardHtml() has no other guarantee about its caller.
-  const canPrestige = item.rarity && !item.nmgGrade && stack.qty >= prestigeThreshold && !llgPrestigeCapReached(parsePrestigeId(stack.id).baseId, level);
+  // Foils are excluded for the same reason graded slabs are: a prestiged foil would produce a
+  // double-suffixed `..._foil_p1` id that nothing knows how to resolve. Kept deliberately simple --
+  // a Foil is a terminal form.
+  const canPrestige = item.rarity && !item.nmgGrade && !item.foil && stack.qty >= prestigeThreshold && !llgPrestigeCapReached(parsePrestigeId(stack.id).baseId, level);
   return `
     <div class="hustle-card">
       <h3>${itemLabel(item)}</h3>
@@ -246,7 +249,7 @@ function sellTitle(stackId) {
 
 function prestigeTitle(stackId) {
   const item = getItemDef(stackId);
-  if (!item || !item.rarity || item.nmgGrade) return;
+  if (!item || !item.rarity || item.nmgGrade || item.foil) return;
   const { baseId, level } = parsePrestigeId(stackId);
   const threshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
   if (inventoryQty(stackId) < threshold) return;

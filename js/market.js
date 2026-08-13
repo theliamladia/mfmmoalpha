@@ -56,12 +56,15 @@ const HUSTLE_API = { work: apiWork, slut: apiSlut, crime: apiCrime };
 // honours it too.
 const hustleInFlight = new Set();
 
-async function runHustleViaServer(type, btn) {
+// `count` is the x5 batch size (1 for the plain button). The in-flight guard is keyed on `type`,
+// not on the individual button, so the plain and x5 buttons for one hustle correctly lock each
+// other out -- they share a cooldown and a server-side action.
+async function runHustleViaServer(type, btn, count = 1) {
   if (hustleInFlight.has(type)) return;
   hustleInFlight.add(type);
   btn.disabled = true;
   try {
-    const result = await HUSTLE_API[type]();
+    const result = await HUSTLE_API[type](count);
     character = result.character;
     const entries = result.messages || [{ message: result.message, cls: result.cls }];
     entries.forEach((e) => logMessage(e.message, e.cls));
@@ -89,7 +92,7 @@ hustleButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
     const type = btn.dataset.hustle;
     if (getRemainingCooldown(type) > 0) return;
-    runHustleViaServer(type, btn);
+    runHustleViaServer(type, btn, Number(btn.dataset.hustleCount) || 1);
   });
 });
 
@@ -106,7 +109,12 @@ function tickCooldownUI() {
     // wire (the cooldown it reads can't update until that response lands).
     const pending = hustleInFlight.has(type);
     btn.disabled = remaining > 0 || pending;
-    const label = `${HUSTLE_EMOJI[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}`.trim();
+    // The x5 batch button keeps its own compact label rather than the emoji + verb one -- it sits
+    // right next to the full-size button, which already says which hustle this is.
+    const batchCount = Number(btn.dataset.hustleCount) || 1;
+    const label = batchCount > 1
+      ? `\u00d7${batchCount}`
+      : `${HUSTLE_EMOJI[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}`.trim();
     // Surface the in-flight guard instead of just silently swallowing the click -- otherwise a
     // rapid-clicker gets no feedback at all for the clicks the guard drops.
     btn.classList.toggle('is-pending', pending);
@@ -393,7 +401,10 @@ function titleCrateGroupLabel(title) {
   // just fall through to "Other Titles" (the full `${baseId}_nmg${grade}` id never matches any
   // crate's id Set).
   if (title.nmgGrade) return NMG_GRADED_LABEL;
-  const baseId = title.prestigeBaseId || title.id;
+  // Foils stay grouped with their source crate (foilBaseId), not in a section of their own -- the
+  // shimmer already marks them out visually, and splitting them off would scatter a crate's titles
+  // across two sections of the Switch Title dropdown.
+  const baseId = title.foilBaseId || title.prestigeBaseId || title.id;
   const group = TITLE_CRATE_GROUPS.find((g) => g.ids.has(baseId));
   return group ? group.label : OTHER_TITLES_LABEL;
 }
@@ -1042,3 +1053,114 @@ btnLlgSpin.addEventListener('click', () => spinCrate(CRATE_LLG, [btnLlgSpin, btn
 btnVisionsSpin.addEventListener('click', () => spinCrate(CRATE_VISIONS, [btnVisionsSpin, btnViewVisionsCrate], visionsSpinMessage));
 btnMlSpin.addEventListener('click', () => spinCrate(CRATE_MILOS_LEGENDS, [btnMlSpin, btnViewMlCrate], mlSpinMessage));
 
+
+// ---------- Foil Ascension (Cosmetixxx) ----------
+// Burn 3 copies of one plain title + $25,000 -> 1 `${baseId}_foil`. Fully server-authoritative
+// (POST /cosmetics/foil-ascension, doFoilAscension in mfmmoserver/gameLogic.js) rather than the
+// client-side/trust-based precedent Sell/Prestige/Crack follow -- this one both destroys inventory
+// AND mints a brand-new id shape, so it gets a real route.
+const foilAscensionModal = document.getElementById('foilAscensionModal');
+const foilAscensionPickerList = document.getElementById('foilAscensionPickerList');
+const btnFoilAscensionOpen = document.getElementById('btnFoilAscensionOpen');
+const btnFoilAscensionClose = document.getElementById('btnFoilAscensionClose');
+const foilAscensionConfirmModal = document.getElementById('foilAscensionConfirmModal');
+const foilAscensionConfirmPreview = document.getElementById('foilAscensionConfirmPreview');
+const foilAscensionConfirmText = document.getElementById('foilAscensionConfirmText');
+const btnFoilAscensionConfirm = document.getElementById('btnFoilAscensionConfirm');
+const btnFoilAscensionCancel = document.getElementById('btnFoilAscensionCancel');
+const foilAscensionResultModal = document.getElementById('foilAscensionResultModal');
+const foilAscensionResultPreview = document.getElementById('foilAscensionResultPreview');
+const foilAscensionResultText = document.getElementById('foilAscensionResultText');
+const btnFoilAscensionResultOk = document.getElementById('btnFoilAscensionResultOk');
+const foilAscensionEligible = document.getElementById('foilAscensionEligible');
+const foilLog = document.getElementById('foilLog');
+
+let foilAscensionSelectedId = null;
+
+// Mirrors doFoilAscension's own eligibility rules exactly: a plain (un-prestiged, ungraded,
+// non-foil) crate-title stack with at least 3 copies. Restricted to CRATE_TITLE_IDS rather than any
+// rarity-bearing title so custom titles -- which have no cssClass for the shimmer to layer over --
+// can't reach the forge. Archived crates are deliberately INCLUDED: burning that supply is the
+// entire point of the feature.
+function foilAscensionCandidates() {
+  return character.inventory
+    .filter((stack) => stack.qty >= FOIL_ASCENSION_COPIES)
+    .filter((stack) => CRATE_TITLE_IDS.has(stack.id))
+    .map((stack) => getItemDef(stack.id))
+    .filter((t) => t && t.type === 'title' && !t.nmgGrade && !t.foil && !t.prestigeLevel && !t.custom);
+}
+
+function renderFoilAscensionEligible() {
+  if (!foilAscensionEligible) return;
+  const owned = character.inventory
+    .filter((stack) => stack.qty > 0)
+    .map((stack) => getItemDef(stack.id))
+    .filter((t) => t && t.foil);
+  foilAscensionEligible.innerHTML = owned.length
+    ? owned.map((t) => `<div class="title-preview">${titleBadgeMarkup(t)}</div>`).join('')
+    : '<p class="equip-picker-empty">No Foils yet.</p>';
+  if (btnFoilAscensionOpen) {
+    const count = foilAscensionCandidates().length;
+    btnFoilAscensionOpen.disabled = count === 0;
+    btnFoilAscensionOpen.textContent = count === 0
+      ? 'No title with 3+ copies yet'
+      : `Choose a Title to Ascend (${count} eligible)`;
+  }
+}
+
+function openFoilAscensionModal() {
+  renderGroupedTitlePicker(foilAscensionCandidates(), (titleId) => {
+    foilAscensionModal.classList.add('hidden');
+    openFoilAscensionConfirm(titleId);
+  }, null, foilAscensionPickerList);
+  foilAscensionModal.classList.remove('hidden');
+}
+
+function openFoilAscensionConfirm(titleId) {
+  const item = getItemDef(titleId);
+  if (!item) return;
+  foilAscensionSelectedId = titleId;
+  const foilPreview = getItemDef(`${titleId}_foil`);
+  foilAscensionConfirmPreview.innerHTML = foilPreview ? titleBadgeMarkup(foilPreview) : '';
+  foilAscensionConfirmText.innerHTML = `Forge <b>${escapeHtml(itemLabel(foilPreview || item))}</b> for <b>$${FOIL_ASCENSION_COST.toLocaleString()}</b>? You own ${inventoryQty(titleId)}x ${escapeHtml(itemLabel(item))}.`;
+  btnFoilAscensionConfirm.disabled = false;
+  foilAscensionConfirmModal.classList.remove('hidden');
+}
+
+async function runFoilAscension() {
+  if (!foilAscensionSelectedId) return;
+  btnFoilAscensionConfirm.disabled = true;
+  try {
+    const result = await apiFoilAscension(foilAscensionSelectedId);
+    character = result.character;
+    save();
+    foilAscensionConfirmModal.classList.add('hidden');
+    const foilDef = getItemDef(result.foilId);
+    foilAscensionResultPreview.innerHTML = foilDef ? titleBadgeMarkup(foilDef) : '';
+    foilAscensionResultText.textContent = foilDef ? `${itemLabel(foilDef)} is yours. Equip it from Switch Title.` : 'Foil forged.';
+    foilAscensionResultModal.classList.remove('hidden');
+    logTo(foilLog, result.message, 'gain');
+    renderAll();
+    renderFoilAscensionEligible();
+  } catch (err) {
+    logTo(foilLog, err.reason || 'Could not reach the server.', 'loss');
+    btnFoilAscensionConfirm.disabled = false;
+  } finally {
+    foilAscensionSelectedId = null;
+  }
+}
+
+if (btnFoilAscensionOpen) btnFoilAscensionOpen.addEventListener('click', () => openFoilAscensionModal());
+if (btnFoilAscensionClose) btnFoilAscensionClose.addEventListener('click', () => foilAscensionModal.classList.add('hidden'));
+if (btnFoilAscensionCancel) {
+  btnFoilAscensionCancel.addEventListener('click', () => {
+    foilAscensionSelectedId = null;
+    foilAscensionConfirmModal.classList.add('hidden');
+  });
+}
+if (btnFoilAscensionConfirm) btnFoilAscensionConfirm.addEventListener('click', () => runFoilAscension());
+if (btnFoilAscensionResultOk) btnFoilAscensionResultOk.addEventListener('click', () => foilAscensionResultModal.classList.add('hidden'));
+
+// Same lazy-render-on-tab-click idiom as the NMG and CosmetixxMarket sections.
+const foilCosmetixxTabBtn = document.querySelector('.market-tab-btn[data-shop="titles"]');
+if (foilCosmetixxTabBtn) foilCosmetixxTabBtn.addEventListener('click', () => renderFoilAscensionEligible());

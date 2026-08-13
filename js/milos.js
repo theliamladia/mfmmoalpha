@@ -317,10 +317,12 @@ function buildGoodJobsUI() {
       ${perkLine}
       ${ceoLine}
       <p>Each button below pays out and trains that skill. Higher Looks trains skills faster. Promotions raise both your pay and your cooldown speed &mdash; the grind gets a lot better at the top.</p>
+      <p class="job-payout-line">&times;10 Shift works ten times in one click for ten times the cooldown &mdash; exactly the same pay and skill gain per second, just fewer clicks.</p>
       ${job.skills.map((sk, i) => `
         <div class="job-skill-row">
           <span>${sk.label}: <b>${s[sk.key].toFixed(2)}</b>/100</span>
           <button data-work-good="${sk.key}" data-cooldown="jobSkill${i + 1}">Work</button>
+          <button data-work-good="${sk.key}" data-cooldown="jobSkill${i + 1}" data-work-count="10" class="secondary-btn">&times;10 Shift</button>
         </div>
       `).join('')}
       ${job.id === 'wrestler' && perkUnlocked ? buildWrestlingGearStoreHtml() : ''}
@@ -335,7 +337,7 @@ function buildGoodJobsUI() {
       if (getRemainingCooldown(cooldownKey, goodJobRank().cooldownMs) > 0) return;
       attemptMilosAction(async () => {
         try {
-          const result = await apiGoodJobWork(btn.dataset.workGood);
+          const result = await apiGoodJobWork(btn.dataset.workGood, Number(btn.dataset.workCount) || 1);
           character = result.character;
           result.messages.forEach((m) => logTo(milosLog, m.message, m.cls));
           save();
@@ -400,7 +402,11 @@ function tickGoodJobsUI() {
     const cooldownKey = btn.dataset.cooldown;
     const remaining = getRemainingCooldown(cooldownKey, goodJobRank().cooldownMs);
     btn.disabled = character.jail.inJail || remaining > 0;
-    btn.textContent = remaining > 0 ? `Work (${Math.ceil(remaining / 1000)}s)` : 'Work';
+    // Both the plain and the x10 button read the same cooldown key, so a batch shift correctly
+    // greys out BOTH of that skill's buttons for the full 10x duration.
+    const count = Number(btn.dataset.workCount) || 1;
+    const label = count > 1 ? `\u00d7${count} Shift` : 'Work';
+    btn.textContent = remaining > 0 ? `${label} (${Math.ceil(remaining / 1000)}s)` : label;
   });
 }
 
@@ -481,10 +487,13 @@ function buildBadJobsUI() {
       <p class="job-payout-line">Looks Training Bonus: +${Math.round((badJobSkillTrainMult() - 1) * 100)}% skill gain per click (from ${round1(character.stats.looks)} Looks).</p>
       ${perkLine}
       <p>Each button below pays out and trains that skill. Better skills pay more AND get you caught less &mdash; Speed and Defense also help you dodge a bust, and high Looks trains skills faster.</p>
+      <p class="job-payout-line">&times;10 Shift works ten times in one click for ten times the cooldown &mdash; same pay per second, fewer clicks. It stops at the first bust and still pays out the shifts you completed.</p>
+      <p class="job-payout-line">&#9888;&#65039; Getting booked costs you <b>15% of the cash on hand</b> in NMPD asset forfeiture. Money in the Bank is untouchable &mdash; deposit before a shift.</p>
       ${job.skills.map((sk, i) => `
         <div class="job-skill-row">
           <span>${sk.label}: <b>${s[sk.key].toFixed(2)}</b>/100</span>
           <button data-work-bad="${sk.key}" data-cooldown="badJobSkill${i + 1}">Work</button>
+          <button data-work-bad="${sk.key}" data-cooldown="badJobSkill${i + 1}" data-work-count="10" class="secondary-btn">&times;10 Shift</button>
         </div>
       `).join('')}
       <hr class="hustle-divider">
@@ -498,7 +507,7 @@ function buildBadJobsUI() {
       if (getRemainingCooldown(cooldownKey, badJobRank().cooldownMs) > 0) return;
       attemptMilosAction(async () => {
         try {
-          const result = await apiBadJobWork(btn.dataset.workBad);
+          const result = await apiBadJobWork(btn.dataset.workBad, Number(btn.dataset.workCount) || 1);
           character = result.character;
           logTo(milosLog, result.message, result.cls);
           save();
@@ -533,7 +542,9 @@ function tickBadJobsUI() {
     const cooldownKey = btn.dataset.cooldown;
     const remaining2 = getRemainingCooldown(cooldownKey, badJobRank().cooldownMs);
     btn.disabled = character.jail.inJail || remaining2 > 0;
-    btn.textContent = remaining2 > 0 ? `Work (${Math.ceil(remaining2 / 1000)}s)` : 'Work';
+    const count = Number(btn.dataset.workCount) || 1;
+    const label = count > 1 ? `\u00d7${count} Shift` : 'Work';
+    btn.textContent = remaining2 > 0 ? `${label} (${Math.ceil(remaining2 / 1000)}s)` : label;
   });
 }
 

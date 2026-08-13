@@ -84,10 +84,14 @@ function cryptoMachineScaling(machineTier) {
   return Math.pow(MACHINE_UPGRADE_SCALING, machineTier);
 }
 
+// De-compounded (rebalance) -- MUST match cryptoTrackAddRate/cryptoDailyRate in
+// mfmmoserver/gameLogic.js, which is authoritative for the FC actually credited. The machine-tier
+// scaling multiplier used to apply to the RATE as well as the cost, so a maxed top-tier rig earned
+// ~220 FC/day; rates are now exactly what the tables above say. cryptoNextTrackCost() below KEEPS
+// the scaling -- upgrade costs still climb 1.5x per machine tier.
 function cryptoTrackAddRate(crypto, track) {
   const tier = crypto[`${track}Tier`];
-  const scale = cryptoMachineScaling(crypto.machineTier);
-  return CRYPTO_UPGRADE_TIERS[track].slice(0, tier).reduce((sum, t) => sum + t.addRate * scale, 0);
+  return CRYPTO_UPGRADE_TIERS[track].slice(0, tier).reduce((sum, t) => sum + t.addRate, 0);
 }
 
 function cryptoNextTrackCost(crypto, track) {
@@ -103,7 +107,8 @@ function cryptoTracksMaxed(crypto) {
 
 function cryptoDailyRate(crypto) {
   const machine = CRYPTO_MACHINES[crypto.machineTier];
-  const machineRate = machine.baseRate * cryptoMachineScaling(crypto.machineTier);
+  // No cryptoMachineScaling() -- see cryptoTrackAddRate above.
+  const machineRate = machine.baseRate;
   const upgradeRate = cryptoTrackAddRate(crypto, 'ram') + cryptoTrackAddRate(crypto, 'cpu') + cryptoTrackAddRate(crypto, 'gpu');
   return (machineRate + upgradeRate) * cryptoPrestigeRateMultiplier(crypto.prestigeLevel);
 }
