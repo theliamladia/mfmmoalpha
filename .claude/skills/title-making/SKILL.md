@@ -132,10 +132,25 @@ If you ever add a **fourth** suffix, check it against all six regexes above (bot
 that the prestige/NMG regexes both require digits after their marker while `_foil` is a bare word —
 that's exactly what keeps them disjoint. A new suffix ending in digits is the dangerous case.
 
-Foils are deliberately **excluded** from Prestige (js/inventory.js `prestigeTitle`/`canPrestige`),
-from NMG submission (js/nmg.js `nmgSubmitCandidates` + the server's `/nmg/submit`), and from
+Foils **can** be graded and regraded. The two synthesized suffixes compose in one direction only —
+`${base}_foil_nmg${N}` — because `getItemDef()` runs its NMG branch before its foil branch, so the
+graded def resolves its base through the foil branch and inherits `foil: true`, `rarity`, and the
+`title-foil` art class by spread. Nothing needs per-title wiring for this.
+
+Foils are deliberately **excluded** from Prestige (js/inventory.js `prestigeTitle`/`canPrestige`) —
+a `_foil_p1` id has no resolver — from **selling to the system** (`sellTitle` plus the `sellPrice`
+gate in *both* `titleStackCardHtml` and `renderGradedTitlesGrid`; a graded foil spreads `foil: true`
+through, so both call sites need the check or the button renders and silently no-ops), and from
 `COSMETIXX_MARKET_TITLES` — that array is a hand-maintained list of plain base ids that the server
 mints slabs from, so a foil id can only ever appear there if someone types one in. Don't.
+Player-to-player MTN listings of foils are allowed and intentionally unfiltered.
+
+**Inventory placement.** Ungraded foils live in the **Titles** tab (`data-invcat="cosmetics"` —
+internal key, label renamed), inside their source crate's ✨ Foil sub-tab; graded foils live in
+**Graded Titles** like any other slab. The single `!item.nmgGrade` filter in `renderCosmeticsGrid()`
+is what enforces that split — there is no foil-specific branch. `groupTitleStacksByCrate()` checks
+the foil bucket **first**, because a foil id carries no `_p${level}` and would otherwise be filed as
+Regular. Sub-tabs other than Regular are hidden when their bucket is empty.
 
 ## 5. Sanity checklist before calling it done
 

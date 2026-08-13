@@ -29,7 +29,11 @@ function titleStackCardHtml(stack) {
   const { level } = parsePrestigeId(stack.id);
   // Only crate/store titles carry a `rarity` -- leaderboard/achievement/custom titles have
   // none and so get neither button (selling/prestiging those wouldn't make sense).
-  const sellPrice = item.rarity ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
+  // Foils are unsellable. The price table is keyed on base rarity, so a Foil would sell for the
+  // same flat price as any one plain copy -- far under the 3 copies + $25,000 it cost to forge.
+  // There's no price that makes the trade sane (a Foil is meant to be terminal), so the action is
+  // removed rather than repriced. Mirrored in sellTitle().
+  const sellPrice = item.rarity && !item.foil ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
   // Base (unprestiged) stacks need 6 so one copy survives the prestige; already-prestiged
   // stacks fully convert at 5, since there's no reason to keep the lower prestige rank around.
   const prestigeThreshold = level === 0 ? PRESTIGE_COST + 1 : PRESTIGE_COST;
@@ -46,6 +50,7 @@ function titleStackCardHtml(stack) {
     <div class="hustle-card">
       <h3>${itemLabel(item)}</h3>
       <p class="item-subheading">Title${item.rarity ? ` &middot; ${item.rarity}` : ''}</p>
+      ${item.foil ? '<p class="foil-ascended-line">FOIL ASCENDED</p>' : ''}
       <div class="title-preview">${titleBadgeMarkup(item)}</div>
       <p>&times; ${stack.qty}</p>
       ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
@@ -54,9 +59,20 @@ function titleStackCardHtml(stack) {
   `;
 }
 
-// Groups owned title stacks by the crate they (or their prestige base) came from, then splits
-// each crate's stacks into Regular (prestige level 0) and Prestige (level >= 1) buckets, sorted
-// per the user's ask: Regular by rarity, Prestige by prestige level (then rarity as a tiebreak).
+// Groups owned title stacks by the crate they (or their prestige/foil base) came from, then splits
+// each crate's stacks into Regular (prestige level 0), Prestige (level >= 1), and Foil buckets,
+// sorted per the user's ask: Regular by rarity, Prestige by prestige level (then rarity as a
+// tiebreak).
+//
+// Foils live here, under their own crate, rather than in a seventh top-level inventory tab: a Foil
+// Krogger is a Krogger, and the category row was already carrying six tabs of which three would
+// have been "titles in a different state". GRADED foils are the exception and still go to the
+// Graded Titles tab -- renderCosmeticsGrid()'s `!item.nmgGrade` filter keeps them out of here
+// entirely, so "ungraded foil -> Titles > Foil, graded foil -> Graded Titles" holds without any
+// special-casing in this function.
+const TITLE_SUBTABS = ['regular', 'prestige', 'foil'];
+const TITLE_SUBTAB_LABELS = { regular: 'Regular', prestige: 'Prestige', foil: '\u2728 Foil' };
+
 function groupTitleStacksByCrate(titleStacks) {
   const groups = new Map();
   const byRarityThenPrestige = compareTitleStacksByRarityThenPrestige((s) => s.id, (s) => getItemDef(s.id));
@@ -64,22 +80,28 @@ function groupTitleStacksByCrate(titleStacks) {
   titleStacks.forEach((stack) => {
     const item = getItemDef(stack.id);
     const label = titleCrateGroupLabel(item);
-    if (!groups.has(label)) groups.set(label, { regular: [], prestige: [] });
-    const bucket = parsePrestigeId(stack.id).level === 0 ? 'regular' : 'prestige';
+    if (!groups.has(label)) groups.set(label, { regular: [], prestige: [], foil: [] });
+    // Foil is checked FIRST: a foil id carries no `_p${level}` suffix, so parsePrestigeId() reports
+    // level 0 for it and it would otherwise be filed under Regular.
+    const bucket = item.foil ? 'foil' : (parsePrestigeId(stack.id).level === 0 ? 'regular' : 'prestige');
     groups.get(label)[bucket].push(stack);
   });
 
   groups.forEach((g) => {
-    g.regular.sort(byRarityThenPrestige);
-    g.prestige.sort(byRarityThenPrestige);
+    TITLE_SUBTABS.forEach((b) => g[b].sort(byRarityThenPrestige));
   });
 
   return groups;
 }
 
+// Renders the Titles tab (data-invcat="cosmetics" -- internal key kept for the existing wiring in
+// js/milos.js and js/badges.js; only the visible label was renamed from "Cosmetics").
+//
+// UNGRADED foils render here, inside their own crate's Foil sub-tab. GRADED anything -- foils
+// included -- is excluded by the `!item.nmgGrade` filter below and belongs to the Graded Titles
+// tab instead (renderGradedTitlesGrid, js/nmg.js). That single filter is what enforces the whole
+// "ungraded foil here / graded foil there" rule.
 function renderCosmeticsGrid() {
-  // Graded (NMG) titles get their own dedicated Graded Titles tab, kept separate from Cosmetics --
-  // see renderGradedTitlesGrid() in js/nmg.js.
   const titleStacks = character.inventory.filter((stack) => {
     const item = getItemDef(stack.id);
     return item && item.type === 'title' && !item.nmgGrade;
@@ -96,14 +118,22 @@ function renderCosmeticsGrid() {
     .filter((label) => groups.has(label))
     .map((label) => {
       const g = groups.get(label);
-      const totalQty = [...g.regular, ...g.prestige].reduce((sum, s) => sum + s.qty, 0);
+      const totalQty = TITLE_SUBTABS.reduce((sum, b) => sum + g[b].reduce((n, st) => n + st.qty, 0), 0);
       const isExpanded = cosmeticsExpandedCrate === label;
-      const hasPrestige = g.prestige.length > 0;
-      const activeTab = hasPrestige ? (cosmeticsActiveSubTab[label] || 'regular') : 'regular';
-      const stacksForTab = activeTab === 'prestige' ? g.prestige : g.regular;
+      // Regular is always shown; Prestige and Foil appear only once the player owns one, matching
+      // the behavior Prestige already had (no point offering an always-empty sub-tab).
+      const visibleTabs = TITLE_SUBTABS.filter((b) => b === 'regular' || g[b].length > 0);
+      // A stored active tab can go stale -- e.g. the last foil from a crate gets graded, which
+      // moves it to the Graded Titles tab and empties this bucket. Fall back to Regular rather
+      // than rendering a sub-tab that is no longer offered.
+      const storedTab = cosmeticsActiveSubTab[label];
+      const activeTab = visibleTabs.includes(storedTab) ? storedTab : 'regular';
+      const stacksForTab = g[activeTab];
       const cardsHtml = stacksForTab.length
         ? stacksForTab.map(titleStackCardHtml).join('')
-        : `<p class="equip-picker-empty">No ${activeTab} titles from this crate yet.</p>`;
+        : (activeTab === 'foil'
+          ? '<p class="equip-picker-empty">No Foil titles from this crate yet. Forge one at Cosmetixxx &rarr; Foil Ascension.</p>'
+          : `<p class="equip-picker-empty">No ${activeTab} titles from this crate yet.</p>`);
 
       return `
         <div class="crate-cosmetics-section">
@@ -115,8 +145,7 @@ function renderCosmeticsGrid() {
           ${isExpanded ? `
             <div class="crate-cosmetics-body">
               <div class="crate-cosmetics-subtabs">
-                <button class="crate-subtab-btn${activeTab === 'regular' ? ' active' : ''}" data-crate-subtab="${escapeHtml(label)}::regular">Regular</button>
-                ${hasPrestige ? `<button class="crate-subtab-btn${activeTab === 'prestige' ? ' active' : ''}" data-crate-subtab="${escapeHtml(label)}::prestige">Prestige</button>` : ''}
+                ${visibleTabs.map((b) => `<button class="crate-subtab-btn${activeTab === b ? ' active' : ''}${b === 'foil' ? ' crate-subtab-foil' : ''}" data-crate-subtab="${escapeHtml(label)}::${b}">${TITLE_SUBTAB_LABELS[b]}</button>`).join('')}
               </div>
               <div class="hustle-grid">${cardsHtml}</div>
             </div>
@@ -236,7 +265,7 @@ function buildInventoryGrid() {
 // so Sell/Prestige are plain local mutations + the usual debounced sync, no server route needed.
 function sellTitle(stackId) {
   const item = getItemDef(stackId);
-  if (!item || !item.rarity) return;
+  if (!item || !item.rarity || item.foil) return;
   const price = TITLE_SELL_PRICE_BY_RARITY[item.rarity];
   if (!confirm(`Sell 1x ${itemLabel(item)} for $${price.toLocaleString()}? This cannot be undone.`)) return;
 

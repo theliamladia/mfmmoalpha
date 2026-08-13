@@ -78,6 +78,7 @@ function nmgSlabHtml(item) {
           <p>${escapeHtml(titleCrateGroupLabel(baseTitle).replace(/^\S+\s/, ''))}</p>
           <p>${escapeHtml(itemLabel(baseTitle))}</p>
           <p>${escapeHtml(titleOddsLabel(baseTitle))}</p>
+          ${item.foil ? '<p class="foil-ascended-line">FOIL ASCENDED</p>' : ''}
         </div>
         <div class="nmg-slab-grade-box${isElite ? ' nmg-slab-grade-elite' : ''}">
           <span class="nmg-slab-grade-label">${tier.label}</span>
@@ -197,8 +198,11 @@ function nmgSubmitCandidates() {
   return character.inventory
     .filter((stack) => stack.qty > 0)
     .map((stack) => getItemDef(stack.id))
-    // Foils are excluded from grading (kept simple -- mirrored server-side in /nmg/submit).
-    .filter((t) => t && t.type === 'title' && !t.nmgGrade && !t.foil);
+    // Foils ARE gradeable. The resulting `${base}_foil_nmg${N}` id needs no new plumbing: the NMG
+    // branch in getItemDef() runs BEFORE the foil branch and resolves the base to `${base}_foil`,
+    // which then resolves through the foil branch -- so the graded def inherits `foil: true`,
+    // `rarity`, and the `title-foil` art class by spread. Only Prestige stays closed to foils.
+    .filter((t) => t && t.type === 'title' && !t.nmgGrade);
 }
 
 function openNmgSubmitModal() {
@@ -473,11 +477,16 @@ function renderGradedTitlesGrid() {
     // so the existing sellTitle() (js/inventory.js) works unchanged -- same price table as any
     // other title of that base rarity, same confirm-dialog/remove/pay-out flow. This doubles as
     // the "delete" option: there's nothing else useful to do with a graded slab you don't want.
-    const sellPrice = item.rarity ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
+    //
+    // `!item.foil` mirrors the same gate titleStackCardHtml() applies: a graded foil spreads
+    // `foil: true` through the NMG branch, and sellTitle() already early-returns on it, so without
+    // this the button would render and then silently do nothing when clicked.
+    const sellPrice = item.rarity && !item.foil ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
     return `
     <div class="hustle-card">
       <h3>${itemLabel(item)}</h3>
       <p class="item-subheading">${escapeHtml(tier.label)} ${item.nmgGrade} &middot; ${escapeHtml(titleCrateGroupLabel(baseTitle).replace(/^\S+\s/, ''))}</p>
+      ${item.foil ? '<p class="foil-ascended-line">FOIL ASCENDED</p>' : ''}
       ${nmgGradedRowPreviewHtml(item)}
       <p>&times; ${stack.qty}</p>
       <button data-nmg-showcase="${stack.id}" class="secondary-btn">Add to Showcase</button>

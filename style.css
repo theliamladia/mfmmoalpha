@@ -915,23 +915,31 @@ button.is-pending {
 }
 
 /* ---------- Foil Ascension ---------- */
-/* `title-foil` is a GENERIC overlay applied alongside whatever art class the base title already
-   has (see the _foil branch in getItemDef, js/core.js) -- one rule covers every current and future
-   title, no per-title foil art needed.
+/* `title-foil` is a GENERIC overlay class appended to whatever art class the base title already
+   carries (see the _foil branch in getItemDef, js/core.js) -- one rule covers every current and
+   future title, no per-title foil art needed.
 
    Colors here are HARDCODED, not var(--token), on purpose: this is title ART, and per this repo's
    convention VISIONS reskins UI chrome only and must never be able to recolor a cosmetic a player
-   paid for. The sweep is a ::after pseudo-element rather than a background layer so it composites
-   on top of a background-image art class without replacing it.
+   paid for.
 
-   position:relative is applied to the badge itself so the absolutely-positioned sweep is clipped
-   by the badge's existing overflow:hidden. */
-.title-badge.title-foil {
+   The selector is deliberately UNSCOPED (not `.title-badge.title-foil`). The class reaches four
+   different surfaces, each with its own markup: the badge chip (titleBadgeMarkup, js/market.js),
+   the full slab's art panel and the compact inventory preview (nmgSlabHtml /
+   nmgGradedRowPreviewHtml, js/nmg.js -- both reachable now that foils are gradeable), and the
+   Profile banner (renderProfileBanner, js/profile.js). Scoping this to .title-badge is exactly why
+   the shimmer was invisible on every slab surface. `overflow: hidden` + `position: relative` are
+   set on the host here rather than per-surface so the sweep is always clipped to the host's own
+   rounded corners no matter which of the four it lands on.
+
+   On the full slab this lands on .nmg-slab-art, which is inset inside .nmg-slab's grey plastic
+   frame -- so the shimmer reads as sitting under the casing rather than painted on top of it. */
+.title-foil {
   position: relative;
-  box-shadow: 0 0 8px rgba(190, 230, 255, 0.55), inset 0 0 6px rgba(255, 255, 255, 0.25);
+  overflow: hidden;
 }
 
-.title-badge.title-foil::after {
+.title-foil::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -947,10 +955,10 @@ button.is-pending {
   background-size: 260% 100%;
   mix-blend-mode: screen;
   animation: title-foil-sweep 2.8s linear infinite;
-  /* Constant iridescent hairline on top of the moving sweep, so a foil is still identifiable in a
-     still frame (and under prefers-reduced-motion). Lives on the ::after rather than the badge
-     itself because several base art classes set their own box-shadow glow at equal-or-higher
-     specificity and would otherwise win. */
+  /* Constant iridescent hairline under the moving sweep, so a foil is still identifiable in a
+     still frame (and under prefers-reduced-motion). Lives on the ::after rather than the host
+     because several base art classes set their own box-shadow glow at equal-or-higher specificity
+     and would otherwise win. */
   box-shadow: inset 0 0 0 1px rgba(215, 245, 255, 0.6), inset 0 0 7px rgba(255, 200, 245, 0.3);
   border-radius: inherit;
 }
@@ -960,47 +968,66 @@ button.is-pending {
   to { background-position: -60% 0; }
 }
 
-/* The shimmer is decorative; honour a reduced-motion preference by parking the sweep mid-badge so
-   the foil still reads as foil without animating. */
+/* The shimmer is decorative and this page already carries a heavy pulsing-animation load, so a
+   reduced-motion preference parks the sweep mid-host -- the foil still reads as foil, it just
+   stops repainting. */
 @media (prefers-reduced-motion: reduce) {
-  .title-badge.title-foil::after {
+  .title-foil::after {
     animation: none;
     background-position: 50% 0;
   }
 }
 
-/* The Profile banner renders a title's cssClass onto its own element (renderProfileBanner,
-   js/profile.js), so an equipped Foil shimmers there too -- but that element has neither
-   .title-badge's overflow:hidden nor its position:relative, so the sweep needs both here or it
-   would escape the banner's rounded corners. */
-.profile-banner.title-foil {
-  position: relative;
-  overflow: hidden;
+/* The grade chip sits on top of the art panel, so it needs to out-paint the sweep (a pseudo-element
+   is painted after its element's positioned children by default) or the grade number washes out. */
+.nmg-mini-grade-badge {
+  z-index: 1;
 }
 
-.profile-banner.title-foil::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    rgba(255, 255, 255, 0) 30%,
-    rgba(255, 190, 240, 0.28) 42%,
-    rgba(190, 235, 255, 0.5) 50%,
-    rgba(215, 255, 200, 0.28) 58%,
-    rgba(255, 255, 255, 0) 70%
-  );
-  background-size: 260% 100%;
-  mix-blend-mode: screen;
-  animation: title-foil-sweep 2.8s linear infinite;
+/* "FOIL ASCENDED" status line, shown under the rarity/odds wherever a foil's rarity is displayed:
+   the plain foil card (titleStackCardHtml, js/inventory.js), the graded-slab card, and the full
+   slab header (both js/nmg.js). Hardcoded gradient in the same icy-pink-to-blue palette as the
+   sweep above so it reads as part of one treatment -- again NOT tokenized, VISIONS must not
+   recolor it. `color` is set first as the fallback for the background-clip. */
+/* Class doubled purely for specificity: `.hustle-card p` sets a muted grey at the same (0,1,1)
+   weight and later in the file, so it would win the fallback `color`. Only matters in a browser
+   without background-clip:text -- -webkit-text-fill-color already carries the gradient elsewhere --
+   but a grey fallback would be wrong. */
+p.foil-ascended-line.foil-ascended-line {
+  margin: 2px 0 0;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  color: #bfe9ff;
+  background: linear-gradient(100deg, #ffbef0, #bfeaff, #d7ffc8, #ffbef0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .profile-banner.title-foil::after {
-    animation: none;
-    background-position: 50% 0;
-  }
+/* The slab's own header text rule (.nmg-slab .nmg-slab-header-text p) sets a dark #333 on white,
+   which would otherwise win over the gradient above and render the line invisible-ish. */
+.nmg-slab .nmg-slab-header-text p.foil-ascended-line {
+  color: #7a3fa0;
+  background: linear-gradient(100deg, #c23fa8, #2f7fc0, #3f9a5a, #c23fa8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+}
+
+/* The Foil sub-tab inside each crate accordion (Regular / Prestige / Foil). Tinted so the third
+   option reads as the special one at a glance without needing to be a different shape. */
+.crate-subtab-btn.crate-subtab-foil {
+  border-color: rgba(190, 235, 255, 0.55);
+  color: #cdeeff;
+}
+
+.crate-subtab-btn.crate-subtab-foil.active {
+  background: linear-gradient(100deg, rgba(255, 190, 240, 0.22), rgba(190, 235, 255, 0.28));
+  border-color: rgba(215, 245, 255, 0.8);
+  color: #ffffff;
 }
 
 .title-anima-common-goku,
@@ -4539,6 +4566,10 @@ button.is-pending {
 
 .crate-cosmetics-subtabs {
   display: flex;
+  /* Wraps for the same reason the .market-tabs / .milos-cat-pills rows do -- this row went from two
+     buttons to three (Regular / Prestige / Foil) and renders inside the ~300px character side panel,
+     where three pills are already close to the edge. */
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 14px;
 }
