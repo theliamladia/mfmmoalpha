@@ -109,6 +109,7 @@ function tickCooldownUI() {
     // wire (the cooldown it reads can't update until that response lands).
     const pending = hustleInFlight.has(type);
     btn.disabled = remaining > 0 || pending;
+    setCooldownSweep(btn, remaining, COOLDOWN_MS);
     // The x5 batch button keeps its own compact label rather than the emoji + verb one -- it sits
     // right next to the full-size button, which already says which hustle this is.
     const batchCount = Number(btn.dataset.hustleCount) || 1;
@@ -199,6 +200,7 @@ function renderGym() {
   btnStretchHeight.textContent = stretchRemaining > 0
     ? `Stretch (${Math.ceil(stretchRemaining / 1000)}s)`
     : hasMuscle ? 'Stretch' : `Need ${STRETCH_HEIGHT_MUSCLE_COST} lbs Muscle`;
+  setCooldownSweep(btnStretchHeight, stretchRemaining, STRETCH_HEIGHT_COOLDOWN_MS);
 }
 
 // Gym actions (Workout, steroid tier, Roid Escape) are server-authoritative -- same shape as the

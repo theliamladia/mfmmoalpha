@@ -1386,9 +1386,8 @@ function renderAll() {
   looksTierEl.textContent = `(${looksTier(s.looks)})`;
   statHeightEl.textContent = formatHeight(character.height);
   statWeightEl.textContent = `${round1(150 + character.fatGained + character.muscleGained)} lbs`;
-  cashEl.textContent = formatMoney(character.cash);
+  updateCashDisplays(character.cash);
   casinoChipCounterEl.textContent = formatChips(character.chips);
-  walletCashEl.textContent = formatMoney(character.cash);
   walletChipsEl.textContent = formatChips(character.chips);
   statAllianceEl.textContent = allianceLabel(character.alliance);
   if (typeof renderVarietyStatus === 'function') renderVarietyStatus();
@@ -1463,6 +1462,32 @@ function setStatMeter(id, value) {
   el.style.width = `${Math.max(0, Math.min(100, (value / STAT_CAP) * 100))}%`;
 }
 
+// ---------- cooldown sweep bars ----------
+// Shared by market.js's and milos.js's 250ms tick loops. No new DOM nodes/timers -- the tick loop
+// already recomputes `remaining` every 250ms for the disabled-state check, so it just also hands
+// that same number here and a CSS custom property (--cd, 0..1) drives a linear-gradient sweep.
+// Buttons disabled for other reasons (is-pending, jailed, paused, insufficient cash) never call
+// this with remaining > 0, so they never get a sweep.
+function setCooldownSweep(btn, remaining, totalMs) {
+  if (!btn) return;
+  const inCooldown = remaining > 0 && totalMs > 0;
+  if (!inCooldown) {
+    if (btn.classList.contains('cooldown-sweep')) {
+      // Was mid-cooldown last tick and just cleared -- that's the ready moment, fire the pulse.
+      btn.classList.remove('cooldown-sweep');
+      btn.style.removeProperty('--cd');
+      btn.classList.remove('cooldown-ready');
+      void btn.offsetWidth; // reflow so re-adding the class retriggers the animation
+      btn.classList.add('cooldown-ready');
+      setTimeout(() => btn.classList.remove('cooldown-ready'), 300);
+    }
+    return;
+  }
+  const progress = Math.max(0, Math.min(1, 1 - remaining / totalMs));
+  btn.style.setProperty('--cd', progress.toFixed(4));
+  btn.classList.add('cooldown-sweep');
+}
+
 // Money/chips formatting. character.cash used to render as a bare `452310.55` in the sidebar and
 // the wallet widget while every shop price in the game used toLocaleString() -- the most-read
 // number in the game was the one hardest to read. Matches the convention already used in
@@ -1473,6 +1498,93 @@ function formatMoney(n) {
 
 function formatChips(n) {
   return Math.floor(n || 0).toLocaleString();
+}
+
+// ---------- cash tick animation + floating deltas ----------
+// renderAll() runs 1-2x per click and rewrites cashEl/walletCashEl every time, even when the value
+// hasn't moved. moneyAnimState tracks the last *displayed* value per element (not per character) so
+// we only animate real changes -- first render and repeated renderAll() calls with an unchanged
+// value just snap the text, no tween, no floater.
+const moneyAnimState = new WeakMap();
+let lastRenderedCash = null;
+const MAX_CASH_FLOATERS = 3;
+const activeCashFloaters = [];
+
+function animateMoneyElement(el, newValue, skipAnimation) {
+  if (!el) return;
+  const prev = moneyAnimState.get(el);
+  if (!prev || skipAnimation) {
+    el.textContent = formatMoney(newValue);
+    moneyAnimState.set(el, { displayed: newValue, raf: null });
+    return;
+  }
+  if (prev.raf) cancelAnimationFrame(prev.raf);
+  const from = prev.displayed;
+  if (from === newValue) {
+    el.textContent = formatMoney(newValue);
+    moneyAnimState.set(el, { displayed: newValue, raf: null });
+    return;
+  }
+  const duration = 400;
+  const start = performance.now();
+  const delta = newValue - from;
+  const state = { displayed: from, raf: null };
+  moneyAnimState.set(el, state);
+  function step(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    const current = from + delta * eased;
+    el.textContent = formatMoney(current);
+    if (t < 1) {
+      state.displayed = current;
+      state.raf = requestAnimationFrame(step);
+    } else {
+      state.displayed = newValue;
+      state.raf = null;
+      el.textContent = formatMoney(newValue);
+    }
+  }
+  state.raf = requestAnimationFrame(step);
+}
+
+// Small "+$240.00" / "-$1,500.00" tag that drifts up and fades near the wallet widget. Capped at
+// MAX_CASH_FLOATERS concurrent so a ×5/×10 batch action doesn't spam the corner.
+function spawnCashFloater(delta) {
+  if (!delta || !walletCashEl) return;
+  const container = walletCashEl.closest('.wallet-widget-item');
+  if (!container) return;
+  while (activeCashFloaters.length >= MAX_CASH_FLOATERS) {
+    const oldest = activeCashFloaters.shift();
+    clearTimeout(oldest.timer);
+    if (oldest.el.parentNode) oldest.el.parentNode.removeChild(oldest.el);
+  }
+  const isGain = delta > 0;
+  const floater = document.createElement('span');
+  floater.className = `cash-floater ${isGain ? 'cash-floater-gain' : 'cash-floater-loss'}`;
+  floater.textContent = `${isGain ? '+' : '-'}$${formatMoney(Math.abs(delta))}`;
+  container.appendChild(floater);
+  const entry = { el: floater, timer: null };
+  entry.timer = setTimeout(() => {
+    if (floater.parentNode) floater.parentNode.removeChild(floater);
+    const idx = activeCashFloaters.indexOf(entry);
+    if (idx !== -1) activeCashFloaters.splice(idx, 1);
+  }, 900);
+  activeCashFloaters.push(entry);
+}
+
+// Single entry point renderAll() uses to write the cash figure -- keeps the tween + floater in sync
+// with the exact same read/write path renderAll() already relies on, instead of a parallel loop.
+function updateCashDisplays(newCash) {
+  const paused = typeof isGamePaused === 'function' && isGamePaused();
+  if (lastRenderedCash !== null && !paused) {
+    const delta = newCash - lastRenderedCash;
+    if (Math.abs(delta) > 0.001) {
+      spawnCashFloater(delta);
+    }
+  }
+  lastRenderedCash = newCash;
+  animateMoneyElement(cashEl, newCash, paused);
+  animateMoneyElement(walletCashEl, newCash, paused);
 }
 
 function logTo(el, text, cls) {

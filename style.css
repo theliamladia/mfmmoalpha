@@ -70,6 +70,11 @@ body {
   color: var(--text-primary);
   line-height: 1.5;
   letter-spacing: 0.1px;
+  /* Digits shouldn't jitter in width as money/stats/timers tick -- applied broadly here (and on
+     button below, since UA stylesheets reset form-control font shorthand) rather than sprinkled
+     per money/stat/timer/chip selector. Headers opt back out just below: Bebas Neue is the game's
+     identity and shouldn't be touched. */
+  font-variant-numeric: tabular-nums;
 }
 
 .hidden { display: none !important; }
@@ -92,6 +97,7 @@ h1, h2, h3, h4 {
   font-family: var(--font-display);
   letter-spacing: 0.03em;
   font-weight: 400;
+  font-variant-numeric: normal;
 }
 
 h2 {
@@ -202,6 +208,9 @@ button {
   background: var(--accent);
   color: var(--accent-foreground);
   transition: background 0.12s ease, transform 0.12s ease;
+  /* UA stylesheets reset the whole font shorthand on form controls, which wipes out the
+     tabular-nums set on body -- re-declare so cooldown/timer digits on buttons don't jitter. */
+  font-variant-numeric: tabular-nums;
 }
 
 button:hover:not(:disabled) {
@@ -223,6 +232,32 @@ button:disabled {
 button.is-pending {
   opacity: 0.75;
   cursor: progress;
+}
+
+/* Cooldown sweep: js/market.js and js/milos.js tick loops set --cd (0..1, elapsed/total) on any
+   button gated by an active cooldown via setCooldownSweep() in core.js. Pure background overlay,
+   no extra DOM nodes -- color-mix() over var(--accent) so VISIONS reskins keep the sweep on-token. */
+button.cooldown-sweep {
+  --cd: 0;
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--accent) 55%, transparent) calc(var(--cd) * 100%),
+    transparent calc(var(--cd) * 100%)
+  );
+}
+
+/* One-shot pulse when a cooldown-swept button reaches ready. */
+button.cooldown-ready {
+  animation: cooldown-ready-pulse 300ms ease-out;
+}
+
+@keyframes cooldown-ready-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 65%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent);
+  }
 }
 
 #btnCreate {
@@ -2430,6 +2465,7 @@ p.foil-ascended-line.foil-ascended-line {
 }
 
 .wallet-widget-item {
+  position: relative;
   flex: 1;
   background: var(--surface-3);
   border: 1px solid var(--border-hairline);
@@ -2441,6 +2477,39 @@ p.foil-ascended-line.foil-ascended-line {
 
 .wallet-widget-item b {
   color: var(--text-primary);
+}
+
+/* Floating +/- delta spawned near the wallet widget by updateCashDisplays() in core.js when the
+   displayed cash changes. Drifts up ~24px and fades over ~900ms, then the JS removes the node. */
+.cash-floater {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: cash-floater-drift 900ms ease-out forwards;
+}
+
+.cash-floater-gain {
+  color: var(--success);
+}
+
+.cash-floater-loss {
+  color: var(--danger);
+}
+
+@keyframes cash-floater-drift {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
 }
 
 #characterSidePanel .hustle-grid {

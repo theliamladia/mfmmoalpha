@@ -188,6 +188,7 @@ function tickMilosCooldownUI() {
   btnSellDrugs.disabled = character.jail.inJail || !meetsGuzman || !drugSellSelect.value;
 
   const robberyRemaining = getRemainingCooldown('robbery', ROBBERY_COOLDOWN_MS);
+  setCooldownSweep(btnRobbery, robberyRemaining, ROBBERY_COOLDOWN_MS);
   if (!meetsGuzman) {
     btnRobbery.disabled = true;
     btnRobbery.textContent = 'Requires Bad Alliance or Worse';
@@ -407,6 +408,7 @@ function tickGoodJobsUI() {
     const count = Number(btn.dataset.workCount) || 1;
     const label = count > 1 ? `\u00d7${count} Shift` : 'Work';
     btn.textContent = remaining > 0 ? `${label} (${Math.ceil(remaining / 1000)}s)` : label;
+    setCooldownSweep(btn, remaining, goodJobRank().cooldownMs);
   });
 }
 
@@ -545,6 +547,7 @@ function tickBadJobsUI() {
     const count = Number(btn.dataset.workCount) || 1;
     const label = count > 1 ? `\u00d7${count} Shift` : 'Work';
     btn.textContent = remaining2 > 0 ? `${label} (${Math.ceil(remaining2 / 1000)}s)` : label;
+    setCooldownSweep(btn, remaining2, badJobRank().cooldownMs);
   });
 }
 
@@ -630,6 +633,7 @@ function tickDealerUI() {
     const remaining = getRemainingCooldown(`dealer_${dealerId}`, DEALER_QUICK_COOLDOWN_MS);
     btn.disabled = character.jail.inJail || remaining > 0;
     btn.textContent = remaining > 0 ? `Quick Deal (${Math.ceil(remaining / 1000)}s)` : 'Quick Deal';
+    setCooldownSweep(btn, remaining, DEALER_QUICK_COOLDOWN_MS);
   });
 }
 
@@ -809,6 +813,7 @@ function tickCrimeUI() {
     const remaining = getRemainingCooldown(`crime_${tierId}`, CRIME_COOLDOWN_MS);
     btn.disabled = character.jail.inJail || remaining > 0;
     btn.textContent = remaining > 0 ? `Attempt (${Math.ceil(remaining / 1000)}s)` : 'Attempt';
+    setCooldownSweep(btn, remaining, CRIME_COOLDOWN_MS);
   });
 
   if (!btnCommunityService) return;
@@ -818,6 +823,7 @@ function tickCrimeUI() {
   btnCommunityService.textContent = remaining > 0
     ? `Community Service (${Math.ceil(remaining / 1000)}s)`
     : `Community Service ($${cost.toLocaleString()})`;
+  setCooldownSweep(btnCommunityService, remaining, COMMUNITY_SERVICE_COOLDOWN_MS);
 }
 
 btnCommunityService.addEventListener('click', async () => {
@@ -1097,6 +1103,7 @@ function renderCombat() {
   btnFindFight.textContent = !combat.active && remaining > 0
     ? `🥊 Find a Fight (${Math.ceil(remaining / 1000)}s)`
     : '🥊 Find a Fight';
+  setCooldownSweep(btnFindFight, combat.active ? 0 : remaining, COMBAT_COOLDOWN_MS);
 }
 
 // Equipped guns and melee weapons add flat Attack in a fight; melee is the cost-effective option.
@@ -1721,12 +1728,15 @@ function renderGunRange() {
 
   btnRangeShoot.disabled = !hasWeapon || character.jail.inJail || shootRemaining > 0;
   btnRangeShoot.textContent = shootRemaining > 0 ? `Shoot (${Math.ceil(shootRemaining / 1000)}s)` : 'Shoot';
+  setCooldownSweep(btnRangeShoot, hasWeapon ? shootRemaining : 0, RANGE_COOLDOWN_MS);
 
   btnRangeDraw.disabled = !hasWeapon || character.jail.inJail || drawRemaining > 0;
   btnRangeDraw.textContent = drawRemaining > 0 ? `Draw (${Math.ceil(drawRemaining / 1000)}s)` : 'Draw';
+  setCooldownSweep(btnRangeDraw, hasWeapon ? drawRemaining : 0, RANGE_COOLDOWN_MS);
 
   btnRangeReload.disabled = !hasWeapon || character.jail.inJail || reloadRemaining > 0;
   btnRangeReload.textContent = reloadRemaining > 0 ? `Reload Mag (${Math.ceil(reloadRemaining / 1000)}s)` : 'Reload Mag';
+  setCooldownSweep(btnRangeReload, hasWeapon ? reloadRemaining : 0, RANGE_COOLDOWN_MS);
 }
 
 btnRangeShoot.addEventListener('click', () => {
