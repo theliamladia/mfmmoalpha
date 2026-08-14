@@ -98,6 +98,17 @@ function nmgValueCrateInfo(baseId) {
     ].forEach(({ titles, crateCost, archived }) => {
       titles.forEach((t) => nmgValueCrateMap.set(t.id, { crateCost, archived, weight: t.weight }));
     });
+    // The hidden Autos carry no `weight` of their own (they're deliberately absent from the crates'
+    // published odds), so their effective pull rate is derived: a spin must first land on that
+    // side's Presidential Rare (weight 5), then pass the 1% hiddenAuto swap -- 5 * 0.01 = 0.05, the
+    // same rarity as a Milos Legends mythic. Mirrors the two rotationExcluded entries in the
+    // server's COSMETIXX_MARKET_TITLES: priceable, but never stocked by the store.
+    [CRATE_RED, CRATE_BLUE].forEach((crate) => {
+      const { fromId, toId, chance } = crate.hiddenAuto;
+      const parent = crate.titles.find((t) => t.id === fromId);
+      if (!parent) return;
+      nmgValueCrateMap.set(toId, { crateCost: crate.cost, archived: true, weight: parent.weight * chance });
+    });
   }
   return nmgValueCrateMap.get(baseId) || null;
 }
