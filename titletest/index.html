@@ -83,25 +83,33 @@
   }
 
   /* ---------- art ----------
-     Non-mythic tiers use the STILL variant. background-position is tuned per title: several
-     sources are square or portrait and a chip is 3:1, so `cover` crops ~60% of the height --
-     centring vertically would decapitate them. Landscape sources keep plain `center`. */
-  .a2-naruto  { background-image:url('https://media.giphy.com/media/qMnhxcHyeBJDFlxnZa/giphy_s.gif'); background-position:center 28%; }
-  .a2-ichigo  { background-image:url('https://media.giphy.com/media/JLYQnbND9gkYU/giphy_s.gif'); }
-  .a2-tanjiro { background-image:url('https://media.giphy.com/media/HlnAuBeR5PCMy3WxYC/giphy_s.gif'); }
-  .a2-deku    { background-image:url('https://media.giphy.com/media/WYbbmUWZ7P25o75gDn/giphy_s.gif'); background-position:center 25%; }
-  .a2-edward  { background-image:url('https://media.giphy.com/media/NOHzmFYti2A6c/giphy_s.gif'); }
+     Non-mythic tiers use the STILL variant. Every background-position below was set by opening the
+     source image and locating the subject's face, NOT guessed: a chip is 3:1, so `cover` throws away
+     50-70% of a square or portrait source, and being 15% off vertically is the difference between a
+     face and a forehead.
 
-  .a2-levi    { background-image:url('https://media.giphy.com/media/9KCPkAcRqU9j2/giphy_s.gif'); background-position:center 30%; }
-  .a2-vegeta  { background-image:url('https://media.giphy.com/media/do0xfdH2Ssh56/giphy_s.gif'); }
-  .a2-gojo    { background-image:url('https://media.giphy.com/media/veZ4IKlyBUGRUHV5zV/giphy_s.gif'); background-position:center 30%; }
+     Three sources were REPLACED outright rather than re-cropped, because no crop could save them:
+       Edward  - was a wide establishing shot of a transmutation circle; Edward was a silhouette
+       Eren    - was a meme edit, "@antizsm" watermark plus ABSOLUTE DEPRESSION across the bottom
+       Ichigo  - was a long shot with the character tiny in frame
+     (A fourth candidate found while replacing Eren turned out to be a livestreamer named "Eren Val",
+     which is exactly why each one gets looked at before it ships.) */
+  .a2-naruto  { background-image:url('https://media.giphy.com/media/qMnhxcHyeBJDFlxnZa/giphy_s.gif'); background-position:center 22%; } /* full body, face high */
+  .a2-ichigo  { background-image:url('https://media.giphy.com/media/8uaOiZk0xg2Na/giphy_s.gif');      background-position:center 25%; } /* REPLACED */
+  .a2-tanjiro { background-image:url('https://media.giphy.com/media/HlnAuBeR5PCMy3WxYC/giphy_s.gif'); background-position:center 42%; } /* eye close-up; 42% also clears the watermark */
+  .a2-deku    { background-image:url('https://media.giphy.com/media/WYbbmUWZ7P25o75gDn/giphy_s.gif'); background-position:center 52%; } /* face close-up: 25% was showing hair */
+  .a2-edward  { background-image:url('https://media.giphy.com/media/SgMZCcCv8Thm0/giphy_s.gif');      background-position:center 45%; } /* REPLACED */
 
-  .a2-saitama { background-image:url('https://media.giphy.com/media/arbHBoiUWUgmc/giphy_s.gif'); }
-  .a2-eren    { background-image:url('https://media.giphy.com/media/NYLNImnqr0tPb15pVv/giphy_s.gif'); background-position:center 28%; }
+  .a2-levi    { background-image:url('https://media.giphy.com/media/9KCPkAcRqU9j2/giphy_s.gif');      background-position:center 38%; }
+  .a2-vegeta  { background-image:url('https://media.giphy.com/media/do0xfdH2Ssh56/giphy_s.gif');      background-position:center 20%; } /* mid-scream, head near top */
+  .a2-gojo    { background-image:url('https://media.giphy.com/media/veZ4IKlyBUGRUHV5zV/giphy_s.gif'); background-position:center 45%; } /* blindfold + smirk; clears the watermark */
+
+  .a2-saitama { background-image:url('https://media.giphy.com/media/arbHBoiUWUgmc/giphy_s.gif');      background-position:center 33%; }
+  .a2-eren    { background-image:url('https://media.giphy.com/media/9SvQFZ5xoGHza/giphy_s.gif');      background-position:center 38%; } /* REPLACED - Colossal Titan */
 
   /* Mythics: full animated GIF (198KB / 685KB -- deliberately picked light ones). */
-  .a2-sukuna  { background-image:url('https://media.giphy.com/media/Gy2JTYgbB7RGqzarXB/giphy.gif'); background-position:center 30%; }
-  .a2-madara  { background-image:url('https://media.giphy.com/media/RDnBOLf1rwsIo/giphy.gif'); background-position:center 25%; }
+  .a2-sukuna  { background-image:url('https://media.giphy.com/media/Gy2JTYgbB7RGqzarXB/giphy.gif');   background-position:center 40%; }
+  .a2-madara  { background-image:url('https://media.giphy.com/media/RDnBOLf1rwsIo/giphy.gif');        background-position:center 48%; }
 </style>
 </head>
 <body>
