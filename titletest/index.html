@@ -65,21 +65,60 @@
     50%     { box-shadow:0 0 16px 4px var(--a2c), inset 0 0 0 1px rgba(255,255,255,.5); }
   }
 
-  /* MYTHIC: animated GIF + rotating conic aura ring. The chip is overflow:hidden, so the aura
-     lives on a masked wrapper around it -- same structural trick as Anima 1's hyper tier. */
+  /* MYTHIC: animated GIF + an electrified border -- two independent layers so the result reads as
+     live current rather than a spinning ring.
+
+     NOTE: the previous version rotated the pseudo-element itself (transform:rotate). That only
+     works on a SQUARE box; on a 120x40 chip it swept the rectangle out into a giant tilted slab
+     hanging off the badge. The fix is to rotate the GRADIENT, not the element -- @property lets an
+     <angle> custom property be animated, so `conic-gradient(from var(--a2volt) ...)` spins in place
+     with the box perfectly still.
+
+     Layer 1 (wrapper ::before): a masked ring carrying two bright arcs that travel around the
+       perimeter -- current running the circuit.
+     Layer 2 (the chip border): a fast, irregular flicker on border-colour and glow, using
+       steps(1,end) so it snaps between states instead of easing. Even timing reads as "pulsing";
+       uneven timing reads as "arcing". The keyframe stops below are deliberately not evenly spaced.
+
+     If @property is unsupported the arcs simply hold still and the flicker carries the effect, so
+     it degrades to "buzzing" rather than breaking. */
+  @property --a2volt { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+
   .a2-mythic-wrap { position:relative; display:inline-block; border-radius:9px; padding:3px; }
   .a2-mythic-wrap::before {
     content:''; position:absolute; inset:0; border-radius:9px; padding:3px;
-    background:conic-gradient(from 0deg, #ff4dd2, #4dd2ff, #ffe14d, #7dff4d, #ff4dd2);
+    background:conic-gradient(from var(--a2volt),
+      transparent 0 8%, #7ae1ff 13%, #ffffff 16%, #7ae1ff 19%, transparent 24% 54%,
+      #4dd2ff 59%, #eaffff 62%, #4dd2ff 65%, transparent 70% 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
-    animation:a2-spin 3.4s linear infinite;
+    animation:a2-arc 1.25s linear infinite, a2-arc-flicker .28s steps(1,end) infinite;
   }
-  @keyframes a2-spin { to { transform:rotate(360deg); } }
-  .a2-mythic { border:2px solid rgba(255,255,255,.85); }
+  @keyframes a2-arc { to { --a2volt:360deg; } }
+  @keyframes a2-arc-flicker {
+    0%,100% { opacity:1; } 40% { opacity:.55; } 55% { opacity:1; } 78% { opacity:.75; }
+  }
 
+  /* Irregular stops = arcing, not pulsing. */
+  .a2-mythic {
+    border:2px solid #bff2ff;
+    animation:a2-volt .9s steps(1,end) infinite;
+  }
+  @keyframes a2-volt {
+    0%   { border-color:#9fe8ff; box-shadow:0 0 4px #4dd2ff, 0 0 9px rgba(77,210,255,.55); }
+    9%   { border-color:#ffffff; box-shadow:0 0 9px #8fe9ff, 0 0 20px rgba(122,225,255,.95); }
+    14%  { border-color:#7ac8ff; box-shadow:0 0 3px #2f9fd6, 0 0 7px rgba(47,159,214,.45); }
+    31%  { border-color:#eaffff; box-shadow:0 0 8px #7ae1ff, 0 0 17px rgba(122,225,255,.8); }
+    38%  { border-color:#9fe8ff; box-shadow:0 0 4px #4dd2ff, 0 0 10px rgba(77,210,255,.5); }
+    62%  { border-color:#ffffff; box-shadow:0 0 11px #b9f2ff, 0 0 24px rgba(185,242,255,1); }
+    69%  { border-color:#6fbfe6; box-shadow:0 0 2px #2f9fd6, 0 0 6px rgba(47,159,214,.35); }
+    88%  { border-color:#d8faff; box-shadow:0 0 7px #7ae1ff, 0 0 15px rgba(122,225,255,.7); }
+  }
+
+  /* Sweeps convey state and stay; the electric flicker is decoration and stops. */
   @media (prefers-reduced-motion: reduce) {
-    .a2-rare, .a2-mythic-wrap::before { animation-play-state:paused; }
+    .a2-rare, .a2-mythic, .a2-mythic-wrap::before { animation:none; }
+    .a2-mythic { border-color:#bff2ff; box-shadow:0 0 8px rgba(122,225,255,.7); }
   }
 
   /* ---------- art ----------
