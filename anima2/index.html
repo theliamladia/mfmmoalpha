@@ -132,13 +132,18 @@
   .a2-tanjiro { background-image:url('https://media.giphy.com/media/HlnAuBeR5PCMy3WxYC/giphy_s.gif'); background-position:center 42%; }
   .a2-deku    { background-image:url('https://media.giphy.com/media/WYbbmUWZ7P25o75gDn/giphy_s.gif'); background-position:center 52%; }
   .a2-edward  { background-image:url('https://media.giphy.com/media/SgMZCcCv8Thm0/giphy_s.gif');      background-position:center 45%; }
+  .a2-denji   { background-image:url('https://media.giphy.com/media/jK3MV0tbM6CF8CACq6/giphy_s.gif'); background-position:center 48%; }
+  .a2-killua  { background-image:url('https://media.giphy.com/media/ijsYTyxaMzZh6/giphy_s.gif');      background-position:center 32%; }
 
   .a2-levi    { background-image:url('https://media.giphy.com/media/9KCPkAcRqU9j2/giphy_s.gif');      background-position:center 38%; }
   .a2-vegeta  { background-image:url('https://media.giphy.com/media/do0xfdH2Ssh56/giphy_s.gif');      background-position:center 20%; }
   .a2-eren    { background-image:url('https://media.giphy.com/media/9SvQFZ5xoGHza/giphy_s.gif');      background-position:center 38%; }
+  .a2-kakashi { background-image:url('https://media.giphy.com/media/vXyIMuWbGTMtO/giphy_s.gif');      background-position:center 45%; }
+  .a2-rengoku { background-image:url('https://media.giphy.com/media/D6gVnzfoZSOOEehnhM/giphy_s.gif'); background-position:center 14%; } /* 14% keeps the head and clears the watermark */
 
   .a2-saitama { background-image:url('https://media.giphy.com/media/arbHBoiUWUgmc/giphy_s.gif');      background-position:center 33%; }
   .a2-madara  { background-image:url('https://media.giphy.com/media/RDnBOLf1rwsIo/giphy_s.gif');      background-position:center 48%; }
+  .a2-muzan   { background-image:url('https://media.giphy.com/media/HQ6fxLDUW4ZgaumSyz/giphy_s.gif'); background-position:center 28%; } /* 28% clears the two-line copyright strip */
 
   /* Mythics: full animated GIF. 198KB and 814KB -- both chosen partly on weight, against Gojo
      candidates that ran 1.1MB to 3.6MB. */
@@ -159,7 +164,7 @@
 <div class="banner">
   <div>
     <h3>&#127918; ANIMA 2 CRATE</h3>
-    <p>The sequel crate. 12 titles &middot; 2 mythics at 0.05% &middot; proposed $20,000/spin</p>
+    <p>The sequel crate. 17 titles &middot; 2 mythics at 0.05% &middot; proposed $20,000/spin</p>
   </div>
   <div class="banner-actions">
     <button class="btn">View Crate</button>
@@ -168,7 +173,7 @@
 </div>
 
 <div class="tier">
-  <div class="tier-head"><h2>COMMON</h2><span class="pct">15% each &middot; 75% total &middot; static still</span></div>
+  <div class="tier-head"><h2>COMMON</h2><span class="pct">10.5% each &middot; 73.5% total &middot; static still</span></div>
   <p class="tier-note">Flat art in a 3px white frame. No colour, no glow, no motion — commons read as
     "a picture in a frame" so the tiers above have somewhere to escalate to.</p>
   <div class="row">
@@ -177,11 +182,13 @@
     <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-tanjiro"><span class="title-text title-text-hidden">Tanjiro</span></span><span class="chip-label">Tanjiro</span><span class="chip-src">Demon Slayer</span></div>
     <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-deku"><span class="title-text title-text-hidden">Deku</span></span><span class="chip-label">Deku</span><span class="chip-src">My Hero Academia</span></div>
     <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-edward"><span class="title-text title-text-hidden">Fullmetal</span></span><span class="chip-label">Fullmetal</span><span class="chip-src">FMA: Brotherhood</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-denji"><span class="title-text title-text-hidden">Chainsaw</span></span><span class="chip-label">Chainsaw</span><span class="chip-src">Chainsaw Man</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-killua"><span class="title-text title-text-hidden">Killua</span></span><span class="chip-label">Killua</span><span class="chip-src">Hunter x Hunter</span></div>
   </div>
 </div>
 
 <div class="tier">
-  <div class="tier-head"><h2>UNCOMMON</h2><span class="pct">7.3% each &middot; 21.9% total &middot; coloured border</span></div>
+  <div class="tier-head"><h2>UNCOMMON</h2><span class="pct">4.5% each &middot; 22.5% total &middot; coloured border</span></div>
   <p class="tier-note">Same still art, saturated per-title border plus a 1px inner rim so the hue stays
     readable against bright art. Still no motion — the step up is purely chromatic, which survives at
     12px in a chat line.</p>
@@ -189,17 +196,20 @@
     <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-levi" style="--a2c:#8fa37a"><span class="title-text title-text-hidden">Captain Levi</span></span><span class="chip-label">Captain Levi</span><span class="chip-src">Attack on Titan</span></div>
     <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-vegeta" style="--a2c:#2f80ed"><span class="title-text title-text-hidden">The Prince</span></span><span class="chip-label">The Prince</span><span class="chip-src">Dragon Ball</span></div>
     <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-eren" style="--a2c:#d4342c"><span class="title-text title-text-hidden">Rumbling</span></span><span class="chip-label">Rumbling</span><span class="chip-src">Attack on Titan</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-kakashi" style="--a2c:#b8cfe8"><span class="title-text title-text-hidden">Copy Ninja</span></span><span class="chip-label">Copy Ninja</span><span class="chip-src">Naruto</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-rengoku" style="--a2c:#ff7a2f"><span class="title-text title-text-hidden">Flame Hashira</span></span><span class="chip-label">Flame Hashira</span><span class="chip-src">Demon Slayer</span></div>
   </div>
 </div>
 
 <div class="tier">
-  <div class="tier-head"><h2>RARE</h2><span class="pct">1.5% each &middot; 3% total &middot; glow border</span></div>
+  <div class="tier-head"><h2>RARE</h2><span class="pct">1.3% each &middot; 3.9% total &middot; glow border</span></div>
   <p class="tier-note">Coloured frame plus a slow pulsing halo bleeding outside the chip — the first tier
     that pulls your eye across a list of names. Uses <code>box-shadow</code> rather than a wrapper, so it
     adds no DOM and can't be clipped by the chip's own <code>overflow:hidden</code>.</p>
   <div class="row">
     <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-saitama" style="--a2c:#ffd34d"><span class="title-text title-text-hidden">One Punch</span></span><span class="chip-label">One Punch</span><span class="chip-src">One Punch Man</span></div>
-    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-madara" style="--a2c:#e05c5c"><span class="title-text title-text-hidden">Madara</span></span><span class="chip-label">Madara</span><span class="chip-src">Naruto</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-madara" style="--a2c:#ff6b35"><span class="title-text title-text-hidden">Madara</span></span><span class="chip-label">Madara</span><span class="chip-src">Naruto</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-muzan" style="--a2c:#ff2d55"><span class="title-text title-text-hidden">Demon King</span></span><span class="chip-label">Demon King</span><span class="chip-src">Demon Slayer</span></div>
   </div>
 </div>
 
@@ -251,16 +261,21 @@
   <table>
     <thead><tr><th>id</th><th>name</th><th>rarity</th><th class="num">weight</th><th>cssClass</th></tr></thead>
     <tbody>
-      <tr><td><code>a2Naruto</code></td><td>Naruto</td><td>common</td><td class="num">15</td><td><code>title-a2-naruto</code></td></tr>
-      <tr><td><code>a2Ichigo</code></td><td>Ichigo</td><td>common</td><td class="num">15</td><td><code>title-a2-ichigo</code></td></tr>
-      <tr><td><code>a2Tanjiro</code></td><td>Tanjiro</td><td>common</td><td class="num">15</td><td><code>title-a2-tanjiro</code></td></tr>
-      <tr><td><code>a2Deku</code></td><td>Deku</td><td>common</td><td class="num">15</td><td><code>title-a2-deku</code></td></tr>
-      <tr><td><code>a2Fullmetal</code></td><td>Fullmetal</td><td>common</td><td class="num">15</td><td><code>title-a2-fullmetal</code></td></tr>
-      <tr><td><code>a2Levi</code></td><td>Captain Levi</td><td>uncommon</td><td class="num">7.3</td><td><code>title-a2-levi</code></td></tr>
-      <tr><td><code>a2Prince</code></td><td>The Prince</td><td>uncommon</td><td class="num">7.3</td><td><code>title-a2-prince</code></td></tr>
-      <tr><td><code>a2Rumbling</code></td><td>Rumbling</td><td>uncommon</td><td class="num">7.3</td><td><code>title-a2-rumbling</code></td></tr>
-      <tr><td><code>a2OnePunch</code></td><td>One Punch</td><td>rare</td><td class="num">1.5</td><td><code>title-a2-onepunch</code></td></tr>
-      <tr><td><code>a2Madara</code></td><td>Madara</td><td>rare</td><td class="num">1.5</td><td><code>title-a2-madara</code></td></tr>
+      <tr><td><code>a2Naruto</code></td><td>Naruto</td><td>common</td><td class="num">10.5</td><td><code>title-a2-naruto</code></td></tr>
+      <tr><td><code>a2Ichigo</code></td><td>Ichigo</td><td>common</td><td class="num">10.5</td><td><code>title-a2-ichigo</code></td></tr>
+      <tr><td><code>a2Tanjiro</code></td><td>Tanjiro</td><td>common</td><td class="num">10.5</td><td><code>title-a2-tanjiro</code></td></tr>
+      <tr><td><code>a2Deku</code></td><td>Deku</td><td>common</td><td class="num">10.5</td><td><code>title-a2-deku</code></td></tr>
+      <tr><td><code>a2Fullmetal</code></td><td>Fullmetal</td><td>common</td><td class="num">10.5</td><td><code>title-a2-fullmetal</code></td></tr>
+      <tr><td><code>a2Chainsaw</code></td><td>Chainsaw</td><td>common</td><td class="num">10.5</td><td><code>title-a2-chainsaw</code></td></tr>
+      <tr><td><code>a2Killua</code></td><td>Killua</td><td>common</td><td class="num">10.5</td><td><code>title-a2-killua</code></td></tr>
+      <tr><td><code>a2Levi</code></td><td>Captain Levi</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-levi</code></td></tr>
+      <tr><td><code>a2Prince</code></td><td>The Prince</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-prince</code></td></tr>
+      <tr><td><code>a2Rumbling</code></td><td>Rumbling</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-rumbling</code></td></tr>
+      <tr><td><code>a2CopyNinja</code></td><td>Copy Ninja</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-copyninja</code></td></tr>
+      <tr><td><code>a2FlameHashira</code></td><td>Flame Hashira</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-flamehashira</code></td></tr>
+      <tr><td><code>a2OnePunch</code></td><td>One Punch</td><td>rare</td><td class="num">1.3</td><td><code>title-a2-onepunch</code></td></tr>
+      <tr><td><code>a2Madara</code></td><td>Madara</td><td>rare</td><td class="num">1.3</td><td><code>title-a2-madara</code></td></tr>
+      <tr><td><code>a2DemonKing</code></td><td>Demon King</td><td>rare</td><td class="num">1.3</td><td><code>title-a2-demonking</code></td></tr>
       <tr><td><code>a2KingOfCurses</code></td><td>King of Curses</td><td>mythic</td><td class="num">0.05</td><td><code>title-a2-kingofcurses</code></td></tr>
       <tr><td><code>a2SixEyes</code></td><td>Six Eyes</td><td>mythic</td><td class="num">0.05</td><td><code>title-a2-sixeyes</code></td></tr>
     </tbody>
