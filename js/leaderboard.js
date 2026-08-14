@@ -8,12 +8,14 @@ const leaderboardSubpages = {
   networth: document.getElementById('leaderboard-networth'),
   level: document.getElementById('leaderboard-level'),
   height: document.getElementById('leaderboard-height'),
+  kollector: document.getElementById('leaderboard-kollector'),
 };
 const leaderboardListEls = {
   looks: document.getElementById('leaderboardLooksList'),
   networth: document.getElementById('leaderboardNetworthList'),
   level: document.getElementById('leaderboardLevelList'),
   height: document.getElementById('leaderboardHeightList'),
+  kollector: document.getElementById('leaderboardKollectorList'),
 };
 const leaderboardRefreshNote = document.getElementById('leaderboardRefreshNote');
 
@@ -33,6 +35,7 @@ const LEADERBOARD_VALUE_FORMAT = {
   networth: (v) => `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   level: (v) => v,
   height: (v) => formatHeight(v),
+  kollector: (v) => `$${v.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
 };
 
 function renderLeaderboardCategory(category, entries) {
@@ -66,6 +69,7 @@ async function refreshLeaderboard() {
     renderLeaderboardCategory('networth', result.networth);
     renderLeaderboardCategory('level', result.level);
     renderLeaderboardCategory('height', result.height);
+    renderLeaderboardCategory('kollector', result.kollector);
     leaderboardRefreshNote.textContent = `Next title check in ${formatCountdown(result.nextRefreshAt - Date.now())}.`;
   } catch {
     // Best-effort, same as the other polled views.

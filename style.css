@@ -5309,6 +5309,18 @@ p.foil-ascended-line.foil-ascended-line {
   text-shadow: 0 0 4px #00000080;
 }
 
+.title-kollector {
+  background: url('assets/kollector-bg.gif') center/cover no-repeat;
+  border: 1px solid #ff1a1a;
+}
+
+.title-kollector .title-text {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ff1a1a;
+  text-shadow: 0 0 4px #000000, 0 0 8px #000000, 1px 1px 0 #000000;
+}
+
 /* ---------- Leaderboard page ---------- */
 .leaderboard-refresh-note {
   color: #8a8c96;

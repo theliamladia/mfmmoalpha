@@ -343,6 +343,7 @@ const LOOKSMAXXER_TITLE = { id: 'looksmaxxer', name: 'LOOKSMAXXER', cssClass: 't
 const NETWORTH_TITLE = { id: 'highestNetWorth', name: 'HIGHEST NET WORTH', cssClass: 'title-networth', how: '#1 on the Money leaderboard (cash + bank + chips - credit owed). Lost automatically if someone overtakes you.' };
 const HIGHEST_LEVEL_TITLE = { id: 'highestLevel', name: 'HIGHEST LEVEL', cssClass: 'title-highestlevel', how: '#1 on the Level leaderboard. Lost automatically if someone overtakes you.' };
 const HEIGHTMAXXED_TITLE = { id: 'heightmaxxed', name: 'HeightMAXXED', cssClass: 'title-heightmaxxed', how: '#1 on the Height leaderboard. Lost automatically if someone overtakes you.' };
+const KOLLECTOR_TITLE = { id: 'kollector', name: 'KOLLECTOR', cssClass: 'title-kollector', how: '#1 on the Kollector leaderboard (total CosmetixxMarket value of your graded slab collection). Lost automatically if someone overtakes you.' };
 
 const BETA_SPIN_COST = 5000;
 const BETA_SPIN_TITLES = [

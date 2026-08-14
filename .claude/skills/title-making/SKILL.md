@@ -170,3 +170,34 @@ Regular. Sub-tabs other than Regular are hidden when their bucket is empty.
       title catalog of its own, so a crate skipped here is a crate that can never appear in the
       rotation. This is the exact "forgot to update the mirror" mistake that slipped through for both
       Milos Legends and Leems Larudo x GOOD on the old NMG eligibility list.
+
+## 6. Leaderboard reward titles (LOOKSMAXXER / HIGHEST NET WORTH / HIGHEST LEVEL / HeightMAXXED / KOLLECTOR)
+
+A different, much lighter pattern from a crate title — there's no crate, no rarity, no pull odds.
+The server directly grants/revokes these onto `titles.owned`/`titles.equipped` once a day (see
+`maybeRecomputeLeaderboard()` in mfmmoserver/server.js and `LEADERBOARD_TITLES` /
+`LEADERBOARD_CATEGORIES` / `computeLeaderboardWinners` / `buildLeaderboardBoard` in gameLogic.js).
+To add a new leaderboard category + title:
+
+- **Ids have no shared prefix.** `looksmaxxer`, `highestNetWorth`, `highestLevel`, `heightmaxxed`,
+  `kollector` are all bare words — don't invent an `lb`-style prefix that doesn't exist in the code.
+- Server: add the category to `LEADERBOARD_TITLES` + `LEADERBOARD_CATEGORIES`, a branch in
+  `leaderboardValue()`, a `server_state` bolt-on column (`db.js`, same pattern as
+  `looks_leader_user_id` etc.) plumbed through `getLeaderboardState()`/`updateLeaderboardState()`,
+  and a `prevLeaderKey` entry + response field in server.js's `maybeRecomputeLeaderboard()` and
+  `/leaderboard` route.
+- Client: a `const X_TITLE = { id, name, cssClass, how }` in core.js (no `rarity` key — that's what
+  keeps it out of Sell/Prestige/Foil Ascension eligibility, same gate as every other leaderboard
+  title), spread into `allTitleDefsFor()` in market.js (**only** this one market.js wiring point —
+  leaderboard titles are NOT crate titles, so skip `CRATE_TITLE_IDS`/`TITLE_CRATE_GROUPS`/the crate
+  object; they fall into the "🎖️ Other Titles" bucket automatically via `titleCrateGroupLabel()`),
+  a CSS class, a leaderboard tab button + subpage in index.html, and a `leaderboardListEls`/
+  `leaderboardSubpages`/`LEADERBOARD_VALUE_FORMAT` entry plus a `renderLeaderboardCategory()` call
+  in js/leaderboard.js.
+- If the ranked value needs a new computation (KOLLECTOR's was "total CosmetixxMarket value of every
+  graded slab owned"), write it as its own exported gameLogic.js function and call it from
+  `leaderboardValue()`'s new branch, rather than inlining it there.
+- Scratch-DB test tip: `maybeRecomputeLeaderboard()` only recomputes once every 24h
+  (`LEADERBOARD_RECHECK_MS`), gated by the `leaderboard_last_check` column. After seeding test data,
+  `UPDATE server_state SET leaderboard_last_check = 0` before hitting any route to force an
+  immediate recompute instead of waiting a day or faking the clock.
