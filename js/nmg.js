@@ -60,6 +60,93 @@ function titleOddsLabel(item) {
   return item.rarity ? item.rarity.toUpperCase() : '';
 }
 
+// ---------- Estimated slab value ----------
+// Display-only mirror of the server's cosmetixxSlabPrice() / foilSlabValue() (mfmmoserver
+// gameLogic.js) -- the same algorithm the CosmetixxMarket prices its daily rotation with and the
+// KOLLECTOR leaderboard ranks collections by. Client and server hand-mirror game constants
+// throughout this codebase (see HANDOFF.md); the server stays authoritative and this is only a
+// label, so a drift here misprices a caption, never a transaction.
+//
+// The catalog itself is NOT duplicated: every crate title already carries its real pull `weight`
+// client-side, and crate costs are constants in core.js, so the only thing this needs is which
+// crate a title came from. Open Beta and GOOD(R) Season 1 are deliberately absent below because the
+// server's COSMETIXX_MARKET_TITLES excludes them too -- their slabs genuinely have no market price.
+const NMG_VALUE_BASELINE_WEIGHT = 15;
+const NMG_VALUE_GRADE_MULT = {
+  1: 0.4, 2: 0.45, 3: 0.5,
+  4: 0.7, 5: 0.85, 6: 1, 7: 1.2,
+  8: 1.7, 9: 2.4, 10: 3.5,
+};
+const NMG_VALUE_MIN_PRICE = 500;
+const NMG_VALUE_MAX_PRICE = 1500000;
+const NMG_VALUE_ARCHIVED_MULT = 10;
+const NMG_VALUE_ARCHIVED_MAX_PRICE = 3000000;
+
+// Built lazily: core.js defines these arrays/constants, and while it does load first, a lazy map
+// keeps this independent of script order in index.html.
+let nmgValueCrateMap = null;
+function nmgValueCrateInfo(baseId) {
+  if (!nmgValueCrateMap) {
+    nmgValueCrateMap = new Map();
+    [
+      { titles: ANIMA_CRATE_TITLES, crateCost: ANIMA_CRATE_COST, archived: true },
+      { titles: COUNTERFINISH_CRATE_TITLES, crateCost: COUNTERFINISH_CRATE_COST, archived: true },
+      { titles: RED_CRATE_TITLES, crateCost: RED_CRATE_COST, archived: true },
+      { titles: BLUE_CRATE_TITLES, crateCost: BLUE_CRATE_COST, archived: true },
+      { titles: LEEMS_LARUDO_GOOD_TITLES, crateCost: LLG_CRATE_COST, archived: false },
+      { titles: MILOS_LEGENDS_TITLES, crateCost: MILOS_LEGENDS_CRATE_COST, archived: false },
+    ].forEach(({ titles, crateCost, archived }) => {
+      titles.forEach((t) => nmgValueCrateMap.set(t.id, { crateCost, archived, weight: t.weight }));
+    });
+  }
+  return nmgValueCrateMap.get(baseId) || null;
+}
+
+// Returns a Floydbucks estimate for a graded slab def, or null when the slab has no market price
+// (a title outside the market catalog, an unpriceable one-off like the Auto pulls -- which carry no
+// `weight` and so never enter the map above -- or anything that isn't a graded slab at all).
+function estimatedSlabValue(def) {
+  if (!def || !def.nmgGrade) return null;
+  const gradeMult = NMG_VALUE_GRADE_MULT[def.nmgGrade];
+  if (!gradeMult) return null;
+
+  // A graded foil's nmgBaseId is the FOIL id (`mlKrogger_foil`); foilBaseId spreads through
+  // getItemDef's NMG branch and is already the plain base. A graded prestiged slab's nmgBaseId
+  // still carries its `_p2` suffix, so strip that too before looking up the crate.
+  const preGradeId = def.foilBaseId || def.nmgBaseId;
+  const baseId = parsePrestigeId(preGradeId).baseId;
+  const info = nmgValueCrateInfo(baseId);
+  if (!info || !info.weight) return null;
+
+  const archivedMult = info.archived ? NMG_VALUE_ARCHIVED_MULT : 1;
+  const rarityFactor = Math.sqrt(NMG_VALUE_BASELINE_WEIGHT / info.weight);
+  const basePreGrade = info.crateCost * rarityFactor * archivedMult;
+
+  // A Foil consumed FOIL_ASCENSION_COPIES copies plus FOIL_ASCENSION_COST in cash, so it is priced
+  // from that recipe rather than a flat multiplier -- which makes the premium taper from ~3.8x on a
+  // cheap title down toward 3x on a mythic, since the flat cash is a shrinking share of the cost.
+  const raw = def.foil
+    ? (FOIL_ASCENSION_COPIES * basePreGrade + FOIL_ASCENSION_COST) * gradeMult
+    : basePreGrade * gradeMult;
+
+  // Clamp mirrors the server's foilSlabValue() literally (3 * cap + 75000) rather than deriving the
+  // 75000 from FOIL_ASCENSION_COST, so the two expressions can't drift apart if that fee changes.
+  const cap = info.archived ? NMG_VALUE_ARCHIVED_MAX_PRICE : NMG_VALUE_MAX_PRICE;
+  const max = def.foil ? 3 * cap + 75000 : cap;
+  const rounded = Math.round(raw / 100) * 100;
+  return Math.min(max, Math.max(NMG_VALUE_MIN_PRICE, rounded));
+}
+
+// Small caption under a showcased slab. Renders nothing at all for slabs with no market price --
+// an "Est. value: --" line would read as a bug rather than as "this collection was never priced".
+function slabEstValueHtml(def) {
+  const value = estimatedSlabValue(def);
+  if (value === null) return '';
+  // Whole Floydbucks, not formatMoney() -- slab prices are always round hundreds, so trailing
+  // cents would be pure noise next to the existing .profile-slab-market-price captions.
+  return `<p class="slab-est-value" title="Estimated at the price the CosmetixxMarket would list this slab for. Not a sale offer.">Est. value <b>$${value.toLocaleString()}</b></p>`;
+}
+
 // Used for the reveal modal's "big reveal" moment, where there's room for the full header/
 // wordmark/art treatment. `item` must already be the resolved graded def (has nmgGrade/nmgBaseId
 // set, see the NMG_ID_RE branch in getItemDef, js/core.js). The Graded Titles inventory list uses

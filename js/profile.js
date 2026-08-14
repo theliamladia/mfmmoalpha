@@ -304,6 +304,7 @@ function renderProfileSlabShowcase() {
     ? slabDefs.map((def) => `
       <div class="profile-slab-slot">
         ${nmgSlabHtml(def)}
+        ${slabEstValueHtml(def)}
         ${isOwner ? `
           <div class="profile-slab-slot-actions">
             <button class="secondary-btn" data-slab-showcase-remove="${def.id}">Remove</button>
