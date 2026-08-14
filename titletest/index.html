@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANIMA 2 — Title Treatment Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Standalone preview. Mirrors the real .title-badge contract from style.css so anything that
+     looks right here looks right in the sidebar, chat, dropdown and Showcase:
+       .title-badge          inline-block, 2px 10px padding, 6px radius, 12px, nowrap, overflow hidden
+       .title-text-hidden    visibility:hidden (NOT display:none) -- keeps its layout box
+       :has(.title-text-hidden) -> fixed 120x40 so invisible name text can't change chip width  */
+  :root {
+    --surface-0:#17181c; --surface-1:#1b1d22; --surface-2:#1e2027; --surface-3:#24262e;
+    --border-default:#35373f; --text-primary:#e8e8ea; --text-secondary:#b9bbc4; --text-muted:#9a9ca6;
+    --accent:#f2c94c;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:32px; background:var(--surface-0); color:var(--text-primary);
+         font-family:Inter,system-ui,sans-serif; font-variant-numeric:tabular-nums; }
+  h1 { font-family:'Bebas Neue',sans-serif; font-size:44px; letter-spacing:1px; margin:0 0 4px; color:var(--accent); }
+  h2 { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; margin:0 0 2px; }
+  .sub { color:var(--text-muted); font-size:13px; margin:0 0 28px; max-width:70ch; line-height:1.55; }
+  .tier { background:var(--surface-2); border:1px solid var(--border-default); border-radius:14px;
+          padding:20px 22px; margin-bottom:20px; }
+  .tier-head { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
+  .tier-note { color:var(--text-muted); font-size:12.5px; margin:0 0 16px; line-height:1.5; max-width:78ch; }
+  .row { display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+  .chip-wrap { display:flex; flex-direction:column; align-items:center; gap:7px; }
+  .chip-label { font-size:11px; color:var(--text-muted); }
+  .pct { font-size:11px; color:var(--accent); font-weight:700; }
+  .ctx { margin-top:18px; padding:12px 14px; background:var(--surface-1);
+         border:1px solid var(--border-default); border-radius:10px; font-size:13px; color:var(--text-secondary); }
+  .ctx b { color:var(--text-primary); }
+
+  /* ---------- real badge contract ---------- */
+  .title-badge { display:inline-block; padding:2px 10px; border-radius:6px; font-size:12px;
+                 line-height:1.6; white-space:nowrap; overflow:hidden; }
+  .title-text-hidden { visibility:hidden; }
+  .title-badge:has(.title-text-hidden) { width:120px; height:40px; }
+
+  /* ================= ANIMA 2 — TIER TREATMENTS =================
+     COMMON   flat static art, thin neutral frame
+     UNCOMMON static art + saturated colored border (per-title hue)
+     RARE     static art + animated glow/halo bleeding outside the chip
+     MYTHIC   animated background + rotating conic aura                        */
+
+  .a2-art { background-size:cover; background-position:center; }
+
+  /* --- COMMON: 3px flat white frame, no effects --- */
+  .a2-common { border:3px solid #fff; }
+
+  /* --- UNCOMMON: colored border, faint matching inner rim --- */
+  .a2-uncommon { border:3px solid var(--a2c); box-shadow:inset 0 0 0 1px rgba(255,255,255,.25); }
+
+  /* --- RARE: colored border + pulsing outer glow --- */
+  .a2-rare { border:3px solid var(--a2c); animation:a2-glow 2.2s ease-in-out infinite; }
+  @keyframes a2-glow {
+    0%,100% { box-shadow:0 0 6px 0 var(--a2c), inset 0 0 0 1px rgba(255,255,255,.3); }
+    50%     { box-shadow:0 0 16px 4px var(--a2c), inset 0 0 0 1px rgba(255,255,255,.5); }
+  }
+
+  /* --- MYTHIC: animated bg + rotating conic aura ring ---
+     position:relative + ::before inset:-2px, matching the existing Anima hyper tier. The chip keeps
+     overflow:hidden, so the aura is drawn on a wrapper instead of the chip itself. */
+  .a2-mythic-wrap { position:relative; display:inline-block; border-radius:9px; padding:3px; }
+  .a2-mythic-wrap::before {
+    content:''; position:absolute; inset:0; border-radius:9px; padding:3px;
+    background:conic-gradient(from 0deg, #ff4dd2, #4dd2ff, #ffe14d, #7dff4d, #ff4dd2);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:a2-spin 3.4s linear infinite;
+  }
+  @keyframes a2-spin { to { transform:rotate(360deg); } }
+  .a2-mythic { border:2px solid rgba(255,255,255,.85); position:relative; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .a2-rare, .a2-mythic-wrap::before { animation-play-state:paused; }
+  }
+
+  /* ---------- placeholder art (authored here, not sourced) ----------
+     Self-drawn SVG data URIs standing in for real art, so the TREATMENTS can be judged without
+     shipping anyone else's images. Swap each background-image for the real URL; nothing else
+     about a tier needs to change. */
+  .a2-ph1 { background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='80'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23f7b733'/><stop offset='1' stop-color='%23fc4a1a'/></linearGradient></defs><rect width='240' height='80' fill='url(%23g)'/><circle cx='60' cy='40' r='22' fill='%23fff' opacity='.85'/><path d='M0 66 L60 30 L120 60 L180 24 L240 54 L240 80 L0 80Z' fill='%23000' opacity='.28'/></svg>"); }
+  .a2-ph2 { background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='80'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%232193b0'/><stop offset='1' stop-color='%236dd5ed'/></linearGradient></defs><rect width='240' height='80' fill='url(%23g)'/><g fill='%23fff' opacity='.9'><rect x='150' y='18' width='6' height='44'/><rect x='166' y='28' width='6' height='34'/><rect x='182' y='12' width='6' height='50'/></g><circle cx='64' cy='36' r='20' fill='%23fff' opacity='.75'/></svg>"); }
+  .a2-ph3 { background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='80'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23654ea3'/><stop offset='1' stop-color='%23eaafc8'/></linearGradient></defs><rect width='240' height='80' fill='url(%23g)'/><path d='M120 8 L134 34 L162 38 L141 58 L146 74 L120 62 L94 74 L99 58 L78 38 L106 34Z' fill='%23fff' opacity='.9'/></svg>"); }
+  .a2-ph4 { background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='80'><defs><radialGradient id='g'><stop offset='0' stop-color='%23fff'/><stop offset='1' stop-color='%23111'/></radialGradient></defs><rect width='240' height='80' fill='%23111'/><circle cx='120' cy='40' r='40' fill='url(%23g)' opacity='.55'/><g stroke='%23fff' stroke-width='2' opacity='.8' fill='none'><circle cx='120' cy='40' r='16'/><circle cx='120' cy='40' r='28'/></g></svg>"); }
+  /* Mythic uses a real animated GIF, proving the animated-background path works end to end. */
+  .a2-phGif { background-image:url('../assets/kollector-bg.gif'); }
+</style>
+</head>
+<body>
+
+<h1>ANIMA 2 — TITLE TREATMENT TEST</h1>
+<p class="sub">
+  Four rarity treatments rendered through the <b>real</b> <code>.title-badge</code> contract — same
+  120&times;40 fixed size, same <code>visibility:hidden</code> name handling — so what you see here is
+  what renders in the sidebar, chat, Switch Title dropdown and Showcase.
+  <b>The artwork below is placeholder art I drew, not sourced anime images</b>; each one is a single
+  <code>background-image</code> swap away from final. Judge the treatments, not the pictures.
+</p>
+
+<div class="tier">
+  <div class="tier-head"><h2>COMMON</h2><span class="pct">15% each &middot; static image</span></div>
+  <p class="tier-note">Flat art behind a 3px white frame. No border colour, no glow, no motion — commons
+    should read as "a picture in a frame" and nothing more, so the higher tiers have somewhere to go.
+    Identical treatment to Anima 1's commons.</p>
+  <div class="row">
+    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-ph1"><span class="title-text title-text-hidden">Ember Fist</span></span><span class="chip-label">Ember Fist</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-ph2"><span class="title-text title-text-hidden">Tidecaller</span></span><span class="chip-label">Tidecaller</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-ph3"><span class="title-text title-text-hidden">Starbound</span></span><span class="chip-label">Starbound</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-ph4"><span class="title-text title-text-hidden">Null Sigil</span></span><span class="chip-label">Null Sigil</span></div>
+  </div>
+</div>
+
+<div class="tier">
+  <div class="tier-head"><h2>UNCOMMON</h2><span class="pct">8% each &middot; coloured border</span></div>
+  <p class="tier-note">Same flat art, but the frame takes a saturated per-title hue plus a 1px inner rim
+    so the colour reads even against a bright image. Still no motion — the jump from common is purely
+    chromatic, which keeps it legible at 12px in a chat line.</p>
+  <div class="row">
+    <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-ph2" style="--a2c:#4dd2ff"><span class="title-text title-text-hidden">Frostline</span></span><span class="chip-label">Frostline &middot; cyan</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-ph1" style="--a2c:#ff7a2f"><span class="title-text title-text-hidden">Cinderstep</span></span><span class="chip-label">Cinderstep &middot; ember</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-ph3" style="--a2c:#b47dff"><span class="title-text title-text-hidden">Duskweaver</span></span><span class="chip-label">Duskweaver &middot; violet</span></div>
+  </div>
+</div>
+
+<div class="tier">
+  <div class="tier-head"><h2>RARE</h2><span class="pct">1.5% each &middot; glow border</span></div>
+  <p class="tier-note">Coloured frame plus a slow pulsing halo that bleeds <i>outside</i> the chip — the
+    first tier that draws the eye in a list of names. Uses <code>box-shadow</code> rather than a wrapper,
+    so it costs no extra DOM and can't be clipped by the chip's own <code>overflow:hidden</code>.</p>
+  <div class="row">
+    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-ph3" style="--a2c:#ff4dd2"><span class="title-text title-text-hidden">Hollow Crown</span></span><span class="chip-label">Hollow Crown</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-ph4" style="--a2c:#4dffc3"><span class="title-text title-text-hidden">Voidsong</span></span><span class="chip-label">Voidsong</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-ph1" style="--a2c:#ffd34d"><span class="title-text title-text-hidden">Sunspear</span></span><span class="chip-label">Sunspear</span></div>
+  </div>
+</div>
+
+<div class="tier">
+  <div class="tier-head"><h2>MYTHIC</h2><span class="pct">0.05% each &middot; animated GIF bg</span></div>
+  <p class="tier-note">Live animated background plus a rotating conic aura ring. Because the chip itself
+    is <code>overflow:hidden</code>, the aura lives on a thin wrapper around it (masked to a ring) —
+    the same structural trick Anima 1's hyper tier uses. The GIF below is a real animated file, proving
+    the animated-background path works end to end at chip size.</p>
+  <div class="row">
+    <div class="chip-wrap"><span class="a2-mythic-wrap"><span class="title-badge a2-art a2-mythic a2-phGif"><span class="title-text title-text-hidden">Ascendant Zero</span></span></span><span class="chip-label">Ascendant Zero</span></div>
+    <div class="chip-wrap"><span class="a2-mythic-wrap"><span class="title-badge a2-art a2-mythic a2-phGif"><span class="title-text title-text-hidden">Final Verse</span></span></span><span class="chip-label">Final Verse</span></div>
+  </div>
+  <div class="ctx">
+    <b>In context</b> — how a mythic reads inline next to a name, which is the only size that really matters:
+    <div style="margin-top:10px; display:flex; align-items:center; gap:8px; font-size:14px;">
+      <span style="color:var(--text-primary); font-weight:600;">The Q</span>
+      <span class="a2-mythic-wrap"><span class="title-badge a2-art a2-mythic a2-phGif"><span class="title-text title-text-hidden">Ascendant Zero</span></span></span>
+      <span style="color:var(--text-muted);">just pulled something stupid out of ANIMA 2</span>
+    </div>
+  </div>
+</div>
+
+<div class="tier">
+  <div class="tier-head"><h2>ALL FOUR, SIDE BY SIDE</h2></div>
+  <p class="tier-note">The real test: consistent 120&times;40 sizing across every tier, and a clear
+    escalation from flat &rarr; coloured &rarr; glowing &rarr; alive.</p>
+  <div class="row">
+    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-ph1"><span class="title-text title-text-hidden">Common</span></span><span class="chip-label">COMMON</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-ph2" style="--a2c:#4dd2ff"><span class="title-text title-text-hidden">Uncommon</span></span><span class="chip-label">UNCOMMON</span></div>
+    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-ph3" style="--a2c:#ff4dd2"><span class="title-text title-text-hidden">Rare</span></span><span class="chip-label">RARE</span></div>
+    <div class="chip-wrap"><span class="a2-mythic-wrap"><span class="title-badge a2-art a2-mythic a2-phGif"><span class="title-text title-text-hidden">Mythic</span></span></span><span class="chip-label">MYTHIC</span></div>
+  </div>
+</div>
+
+</body>
+</html>
