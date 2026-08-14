@@ -3,15 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ANIMA 2 CRATE — Preview</title>
+<title>ANIMA 2 CRATE — Out Now in Cosmetixxx</title>
+<meta name="description" content="17 new titles. Two mythics at 0.05%. Out now in Cosmetixxx for $20,000 a spin.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ANIMA 2 crate preview. Every chip uses the REAL .title-badge contract from style.css --
-     inline-block, 2px 10px padding, 6px radius, 12px/1.6, nowrap, overflow:hidden, and the
-     :has(.title-text-hidden) fixed 120x40 -- so what reads well here reads well in the sidebar,
-     chat, Switch Title dropdown, Showcase and NMG slabs. */
   :root {
     --surface-0:#17181c; --surface-1:#1b1d22; --surface-2:#1e2027; --surface-3:#24262e;
     --border-default:#35373f; --border-hairline:#2a2c33;
@@ -19,75 +16,66 @@
     --accent:#f2c94c;
   }
   * { box-sizing:border-box; }
-  body { margin:0; padding:28px; background:var(--surface-0); color:var(--text-primary);
+  body { margin:0; padding:0; background:var(--surface-0); color:var(--text-primary);
          font-family:Inter,system-ui,sans-serif; font-variant-numeric:tabular-nums; }
-  .wrap { max-width:1080px; margin:0 auto; }
-  h1 { font-family:'Bebas Neue',sans-serif; font-size:46px; letter-spacing:1.5px; margin:0 0 2px; color:var(--accent); }
-  h2 { font-family:'Bebas Neue',sans-serif; font-size:25px; letter-spacing:1px; margin:0; }
-  .sub { color:var(--text-muted); font-size:13px; margin:0 0 22px; line-height:1.55; max-width:78ch; }
+  .wrap { max-width:1000px; margin:0 auto; padding:0 22px 64px; }
 
-  .banner { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
-    background:linear-gradient(135deg,#241a33,#1a2433 60%,#1b1d22);
-    border:1px solid #4a3a6b; border-radius:14px; padding:18px 20px; margin-bottom:22px; }
-  .banner h3 { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:1.5px; margin:0; }
-  .banner p { margin:4px 0 0; font-size:12.5px; color:var(--text-muted); }
-  .banner-actions { display:flex; gap:8px; align-items:center; }
-  .btn { font:inherit; font-size:13px; font-weight:600; padding:8px 14px; border-radius:999px;
-         border:1px solid var(--border-default); background:var(--surface-3); color:var(--text-primary); cursor:pointer; }
+  /* ---------- hero ---------- */
+  .hero { position:relative; overflow:hidden; text-align:center; padding:64px 22px 52px; margin-bottom:44px;
+          background:radial-gradient(120% 130% at 50% 0%, #2b1b45 0%, #1b2340 42%, #17181c 78%);
+          border-bottom:1px solid #4a3a6b; }
+  .hero::after { content:''; position:absolute; inset:0; pointer-events:none;
+                 background:radial-gradient(60% 50% at 50% 0%, rgba(168,85,247,.20), transparent 70%); }
+  .eyebrow { position:relative; font-size:12px; letter-spacing:2.5px; text-transform:uppercase;
+             color:var(--accent); font-weight:700; margin:0 0 10px; }
+  .hero h1 { position:relative; font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,10vw,92px);
+             letter-spacing:2px; line-height:.95; margin:0 0 14px; }
+  .hero h1 span { color:var(--accent); }
+  .hero p { position:relative; margin:0 auto; max-width:56ch; font-size:16px; line-height:1.6; color:var(--text-secondary); }
+  .hero-cta { position:relative; margin-top:26px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn { font:inherit; font-size:14px; font-weight:700; padding:12px 24px; border-radius:999px;
+         border:1px solid var(--border-default); background:var(--surface-3); color:var(--text-primary);
+         cursor:pointer; text-decoration:none; display:inline-block; }
   .btn-primary { background:var(--accent); color:#17181c; border-color:var(--accent); }
+  .hero-stats { position:relative; margin-top:34px; display:flex; gap:34px; justify-content:center; flex-wrap:wrap; }
+  .stat b { display:block; font-family:'Bebas Neue',sans-serif; font-size:34px; letter-spacing:1px; color:var(--accent); }
+  .stat span { font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--text-muted); }
 
-  .tier { background:var(--surface-2); border:1px solid var(--border-default); border-radius:14px;
-          padding:18px 20px; margin-bottom:18px; }
-  .tier-head { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:3px; }
-  .pct { font-size:11px; color:var(--accent); font-weight:700; }
-  .tier-note { color:var(--text-muted); font-size:12.5px; margin:0 0 14px; line-height:1.5; max-width:80ch; }
-  .row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start; }
-  .chip-wrap { display:flex; flex-direction:column; align-items:center; gap:6px; width:128px; }
-  .chip-label { font-size:11.5px; color:var(--text-primary); font-weight:600; text-align:center; }
-  .chip-src { font-size:10px; color:var(--text-muted); text-align:center; }
+  /* ---------- sections ---------- */
+  .sec { margin-bottom:40px; }
+  .sec-head { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+  .sec-head h2 { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:1.2px; margin:0; }
+  .odds { font-size:12px; font-weight:700; color:var(--accent); }
+  .sec-note { color:var(--text-muted); font-size:13.5px; margin:0 0 18px; line-height:1.55; max-width:70ch; }
+  .row { display:flex; gap:16px; flex-wrap:wrap; }
+  .chip-wrap { display:flex; flex-direction:column; align-items:center; gap:7px; width:130px; }
+  .chip-label { font-size:12px; color:var(--text-primary); font-weight:600; text-align:center; }
+  .chip-src { font-size:10.5px; color:var(--text-muted); text-align:center; }
 
-  table { border-collapse:collapse; width:100%; font-size:12.5px; }
-  th,td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--border-hairline); }
-  th { color:var(--text-muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.4px; }
-  td.num { text-align:right; font-variant-numeric:tabular-nums; }
-  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11.5px; color:var(--text-secondary); }
-  .ctx { margin-top:16px; padding:12px 14px; background:var(--surface-1); border:1px solid var(--border-default);
-         border-radius:10px; font-size:13px; color:var(--text-secondary); }
-  .ctx b { color:var(--text-primary); }
-  .scroll { overflow-x:auto; }
+  .closer { text-align:center; padding:44px 22px; background:var(--surface-1);
+            border:1px solid var(--border-default); border-radius:16px; }
+  .closer h2 { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:1.2px; margin:0 0 8px; }
+  .closer p { margin:0 auto 22px; max-width:52ch; color:var(--text-secondary); font-size:14.5px; line-height:1.6; }
+  .fine { text-align:center; color:var(--text-muted); font-size:11.5px; margin-top:26px; line-height:1.6; }
 
-  /* ---------- real badge contract ---------- */
+  /* ---------- badge rendering ---------- */
   .title-badge { display:inline-block; padding:2px 10px; border-radius:6px; font-size:12px;
                  line-height:1.6; white-space:nowrap; overflow:hidden; }
   .title-text-hidden { visibility:hidden; }
   .title-badge:has(.title-text-hidden) { width:120px; height:40px; }
 
-  /* ================= TIER TREATMENTS ================= */
   .a2-art { background-size:cover; background-position:center; }
   .a2-common   { border:3px solid #fff; }
   .a2-uncommon { border:3px solid var(--a2c); box-shadow:inset 0 0 0 1px rgba(255,255,255,.25); }
-
   .a2-rare { border:3px solid var(--a2c); animation:a2-glow 2.2s ease-in-out infinite; }
   @keyframes a2-glow {
     0%,100% { box-shadow:0 0 6px 0 var(--a2c), inset 0 0 0 1px rgba(255,255,255,.3); }
     50%     { box-shadow:0 0 16px 4px var(--a2c), inset 0 0 0 1px rgba(255,255,255,.5); }
   }
 
-  /* MYTHIC: animated GIF + an electrified border, two independent layers so it reads as live
-     current rather than a spinning ring.
-
-     The angle is animated via @property, NOT via transform:rotate on the element -- rotating the
-     pseudo-element only works on a square box, and on a 120x40 chip it sweeps the rectangle out
-     into a large tilted slab. Rotating the GRADIENT keeps the box perfectly still.
-
-     Colour is parameterised through --volt / --volt-hot / --volt-dim, set on the WRAPPER so both
-     the arc ring (::before) and the chip's own flicker inherit the same palette. */
   @property --a2volt { syntax:'<angle>'; initial-value:0deg; inherits:false; }
-
-  .a2-mythic-wrap {
-    position:relative; display:inline-block; border-radius:9px; padding:3px;
-    --volt:#4dd2ff; --volt-hot:#ffffff; --volt-dim:#2f9fd6;
-  }
+  .a2-mythic-wrap { position:relative; display:inline-block; border-radius:9px; padding:3px;
+                    --volt:#4dd2ff; --volt-hot:#ffffff; --volt-dim:#2f9fd6; }
   .a2-mythic-wrap::before {
     content:''; position:absolute; inset:0; border-radius:9px; padding:3px;
     background:conic-gradient(from var(--a2volt),
@@ -99,8 +87,6 @@
   }
   @keyframes a2-arc { to { --a2volt:360deg; } }
   @keyframes a2-arc-flicker { 0%,100%{opacity:1} 40%{opacity:.55} 55%{opacity:1} 78%{opacity:.75} }
-
-  /* Unevenly spaced stops: even timing reads as "pulsing", uneven reads as "arcing". */
   .a2-mythic { border:2px solid var(--volt-hot); animation:a2-volt .9s steps(1,end) infinite; }
   @keyframes a2-volt {
     0%   { border-color:var(--volt);     box-shadow:0 0 4px var(--volt), 0 0 9px color-mix(in srgb, var(--volt) 55%, transparent); }
@@ -112,8 +98,6 @@
     69%  { border-color:var(--volt-dim); box-shadow:0 0 2px var(--volt-dim), 0 0 6px color-mix(in srgb, var(--volt-dim) 35%, transparent); }
     88%  { border-color:var(--volt-hot); box-shadow:0 0 7px var(--volt), 0 0 15px color-mix(in srgb, var(--volt) 70%, transparent); }
   }
-
-  /* Per-mythic palettes. Sukuna = cursed purple, Gojo = his own Blue. */
   .volt-purple { --volt:#a855f7; --volt-hot:#f5d0fe; --volt-dim:#6d28d9; }
   .volt-blue   { --volt:#4dd2ff; --volt-hot:#ffffff; --volt-dim:#2f9fd6; }
 
@@ -122,60 +106,49 @@
     .a2-mythic { border-color:var(--volt-hot); box-shadow:0 0 8px var(--volt); }
   }
 
-  /* ---------- art ----------
-     Non-mythic tiers use Giphy's STILL variant (giphy_s.gif); only the two mythics animate.
-     Every background-position was set by opening the source and locating the subject's face --
-     a chip is 3:1, so `cover` discards 50-70% of a square or portrait source and a 15% error is
-     the difference between a face and a forehead. */
   .a2-naruto  { background-image:url('https://media.giphy.com/media/qMnhxcHyeBJDFlxnZa/giphy_s.gif'); background-position:center 22%; }
   .a2-ichigo  { background-image:url('https://media.giphy.com/media/8uaOiZk0xg2Na/giphy_s.gif');      background-position:center 25%; }
   .a2-tanjiro { background-image:url('https://media.giphy.com/media/HlnAuBeR5PCMy3WxYC/giphy_s.gif'); background-position:center 42%; }
   .a2-deku    { background-image:url('https://media.giphy.com/media/WYbbmUWZ7P25o75gDn/giphy_s.gif'); background-position:center 52%; }
   .a2-edward  { background-image:url('https://media.giphy.com/media/SgMZCcCv8Thm0/giphy_s.gif');      background-position:center 45%; }
-  .a2-denji   { background-image:url('https://media.giphy.com/media/jK3MV0tbM6CF8CACq6/giphy_s.gif'); background-position:center 48%; }
+  .a2-denji   { background-image:url('https://media.giphy.com/media/ppsHFdRAAlG8UapZXc/giphy_s.gif'); background-position:center 30%; }
   .a2-killua  { background-image:url('https://media.giphy.com/media/ijsYTyxaMzZh6/giphy_s.gif');      background-position:center 32%; }
-
   .a2-levi    { background-image:url('https://media.giphy.com/media/9KCPkAcRqU9j2/giphy_s.gif');      background-position:center 38%; }
   .a2-vegeta  { background-image:url('https://media.giphy.com/media/do0xfdH2Ssh56/giphy_s.gif');      background-position:center 20%; }
   .a2-eren    { background-image:url('https://media.giphy.com/media/9SvQFZ5xoGHza/giphy_s.gif');      background-position:center 38%; }
   .a2-kakashi { background-image:url('https://media.giphy.com/media/vXyIMuWbGTMtO/giphy_s.gif');      background-position:center 45%; }
-  .a2-rengoku { background-image:url('https://media.giphy.com/media/D6gVnzfoZSOOEehnhM/giphy_s.gif'); background-position:center 14%; } /* 14% keeps the head and clears the watermark */
-
+  .a2-rengoku { background-image:url('https://media.giphy.com/media/D6gVnzfoZSOOEehnhM/giphy_s.gif'); background-position:center 14%; }
   .a2-saitama { background-image:url('https://media.giphy.com/media/arbHBoiUWUgmc/giphy_s.gif');      background-position:center 33%; }
   .a2-madara  { background-image:url('https://media.giphy.com/media/RDnBOLf1rwsIo/giphy_s.gif');      background-position:center 48%; }
-  .a2-muzan   { background-image:url('https://media.giphy.com/media/HQ6fxLDUW4ZgaumSyz/giphy_s.gif'); background-position:center 28%; } /* 28% clears the two-line copyright strip */
-
-  /* Mythics: full animated GIF. 198KB and 814KB -- both chosen partly on weight, against Gojo
-     candidates that ran 1.1MB to 3.6MB. */
+  .a2-muzan   { background-image:url('https://media.giphy.com/media/HQ6fxLDUW4ZgaumSyz/giphy_s.gif'); background-position:center 28%; }
   .a2-sukuna  { background-image:url('https://media.giphy.com/media/Gy2JTYgbB7RGqzarXB/giphy.gif');   background-position:center 40%; }
   .a2-gojo    { background-image:url('https://media.giphy.com/media/Da7tyT3iQ1gKK1MKiK/giphy.gif');   background-position:center 32%; }
 </style>
 </head>
 <body>
+
+<header class="hero">
+  <p class="eyebrow">Out now in Cosmetixxx</p>
+  <h1>ANIMA <span>2</span></h1>
+  <p>The sequel crate. 17 new titles to hunt, from the everyday to the two you will
+     probably never see. Every pull is yours to equip, trade, grade or hoard.</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="https://mfmmo.com">Open a Crate</a>
+    <a class="btn" href="#odds">See the Odds</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><b>17</b><span>Titles</span></div>
+    <div class="stat"><b>$20,000</b><span>Per Spin</span></div>
+    <div class="stat"><b>0.05%</b><span>Mythic Odds</span></div>
+  </div>
+</header>
+
 <div class="wrap">
 
-<h1>ANIMA 2 CRATE</h1>
-<p class="sub">
-  12 titles across four rarity treatments. Every chip below renders through the real
-  <code>.title-badge</code> contract at a fixed 120&times;40, so this is exactly how they will read in
-  the sidebar, chat, Switch Title dropdown, Showcase and on NMG slabs. Weights total exactly 100.
-</p>
-
-<div class="banner">
-  <div>
-    <h3>&#127918; ANIMA 2 CRATE</h3>
-    <p>The sequel crate. 17 titles &middot; 2 mythics at 0.05% &middot; proposed $20,000/spin</p>
-  </div>
-  <div class="banner-actions">
-    <button class="btn">View Crate</button>
-    <button class="btn btn-primary">Spin ($20,000)</button>
-  </div>
-</div>
-
-<div class="tier">
-  <div class="tier-head"><h2>COMMON</h2><span class="pct">10.5% each &middot; 73.5% total &middot; static still</span></div>
-  <p class="tier-note">Flat art in a 3px white frame. No colour, no glow, no motion — commons read as
-    "a picture in a frame" so the tiers above have somewhere to escalate to.</p>
+<div class="sec" id="odds">
+  <div class="sec-head"><h2>Common</h2><span class="odds">10.5% each</span></div>
+  <p class="sec-note">The backbone of the set. Clean art, white frame, and the ones you will actually
+    see — which is exactly what makes the rest worth chasing.</p>
   <div class="row">
     <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-naruto"><span class="title-text title-text-hidden">Naruto</span></span><span class="chip-label">Naruto</span><span class="chip-src">Naruto</span></div>
     <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-ichigo"><span class="title-text title-text-hidden">Ichigo</span></span><span class="chip-label">Ichigo</span><span class="chip-src">Bleach</span></div>
@@ -187,11 +160,10 @@
   </div>
 </div>
 
-<div class="tier">
-  <div class="tier-head"><h2>UNCOMMON</h2><span class="pct">4.5% each &middot; 22.5% total &middot; coloured border</span></div>
-  <p class="tier-note">Same still art, saturated per-title border plus a 1px inner rim so the hue stays
-    readable against bright art. Still no motion — the step up is purely chromatic, which survives at
-    12px in a chat line.</p>
+<div class="sec">
+  <div class="sec-head"><h2>Uncommon</h2><span class="odds">4.5% each</span></div>
+  <p class="sec-note">Same art quality, but the frame takes a colour of its own — enough to catch an eye
+    in a chat line without shouting.</p>
   <div class="row">
     <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-levi" style="--a2c:#8fa37a"><span class="title-text title-text-hidden">Captain Levi</span></span><span class="chip-label">Captain Levi</span><span class="chip-src">Attack on Titan</span></div>
     <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-vegeta" style="--a2c:#2f80ed"><span class="title-text title-text-hidden">The Prince</span></span><span class="chip-label">The Prince</span><span class="chip-src">Dragon Ball</span></div>
@@ -201,11 +173,10 @@
   </div>
 </div>
 
-<div class="tier">
-  <div class="tier-head"><h2>RARE</h2><span class="pct">1.3% each &middot; 3.9% total &middot; glow border</span></div>
-  <p class="tier-note">Coloured frame plus a slow pulsing halo bleeding outside the chip — the first tier
-    that pulls your eye across a list of names. Uses <code>box-shadow</code> rather than a wrapper, so it
-    adds no DOM and can't be clipped by the chip's own <code>overflow:hidden</code>.</p>
+<div class="sec">
+  <div class="sec-head"><h2>Rare</h2><span class="odds">1.3% each</span></div>
+  <p class="sec-note">These glow. A slow pulse that bleeds past the edge of the badge, so people notice
+    it before they finish reading your name.</p>
   <div class="row">
     <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-saitama" style="--a2c:#ffd34d"><span class="title-text title-text-hidden">One Punch</span></span><span class="chip-label">One Punch</span><span class="chip-src">One Punch Man</span></div>
     <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-madara" style="--a2c:#ff6b35"><span class="title-text title-text-hidden">Madara</span></span><span class="chip-label">Madara</span><span class="chip-src">Naruto</span></div>
@@ -213,81 +184,24 @@
   </div>
 </div>
 
-<div class="tier">
-  <div class="tier-head"><h2>MYTHIC</h2><span class="pct">0.05% each &middot; 0.1% total &middot; animated GIF + electric border</span></div>
-  <p class="tier-note">Live animated background plus an electrified border built from two independent
-    layers: bright arcs travelling the perimeter, and a fast irregular flicker on the chip's own border
-    and glow. The flicker keyframes are deliberately unevenly spaced — even timing reads as
-    <i>pulsing</i>, uneven timing reads as <i>arcing</i>. The two mythics are the Jujutsu Kaisen pair,
-    colour-coded against each other: cursed purple versus Gojo's own Blue. 0.05% matches Anima 1's
-    mythic rarity exactly, so CosmetixxMarket pricing and KOLLECTOR valuation land consistently.</p>
+<div class="sec">
+  <div class="sec-head"><h2>Mythic</h2><span class="odds">0.05% each &mdash; 1 in 2,000</span></div>
+  <p class="sec-note">Two of them, and they move. Live animated art wrapped in a border that arcs with
+    current — purple for the King of Curses, blue for the Six Eyes. Pull one and everyone in New Milos
+    City will know before you say anything.</p>
   <div class="row">
-    <div class="chip-wrap"><span class="a2-mythic-wrap volt-purple"><span class="title-badge a2-art a2-mythic a2-sukuna"><span class="title-text title-text-hidden">King of Curses</span></span></span><span class="chip-label">King of Curses</span><span class="chip-src">Sukuna &middot; purple</span></div>
-    <div class="chip-wrap"><span class="a2-mythic-wrap volt-blue"><span class="title-badge a2-art a2-mythic a2-gojo"><span class="title-text title-text-hidden">Six Eyes</span></span></span><span class="chip-label">Six Eyes</span><span class="chip-src">Gojo &middot; blue</span></div>
-  </div>
-  <div class="ctx">
-    <b>In context</b> — the only size that really matters, inline beside a name:
-    <div style="margin-top:10px; display:flex; align-items:center; gap:8px; font-size:14px; flex-wrap:wrap;">
-      <span style="color:var(--text-primary); font-weight:600;">The Q</span>
-      <span class="a2-mythic-wrap volt-purple"><span class="title-badge a2-art a2-mythic a2-sukuna"><span class="title-text title-text-hidden">King of Curses</span></span></span>
-      <span style="color:var(--text-muted);">just pulled something stupid out of ANIMA 2</span>
-    </div>
-    <div style="margin-top:8px; display:flex; align-items:center; gap:8px; font-size:14px; flex-wrap:wrap;">
-      <span style="color:var(--text-primary); font-weight:600;">mrleems</span>
-      <span class="a2-mythic-wrap volt-blue"><span class="title-badge a2-art a2-mythic a2-gojo"><span class="title-text title-text-hidden">Six Eyes</span></span></span>
-      <span style="color:var(--text-muted);">nah I'd win</span>
-    </div>
+    <div class="chip-wrap"><span class="a2-mythic-wrap volt-purple"><span class="title-badge a2-art a2-mythic a2-sukuna"><span class="title-text title-text-hidden">King of Curses</span></span></span><span class="chip-label">King of Curses</span><span class="chip-src">Jujutsu Kaisen</span></div>
+    <div class="chip-wrap"><span class="a2-mythic-wrap volt-blue"><span class="title-badge a2-art a2-mythic a2-gojo"><span class="title-text title-text-hidden">Six Eyes</span></span></span><span class="chip-label">Six Eyes</span><span class="chip-src">Jujutsu Kaisen</span></div>
   </div>
 </div>
 
-<div class="tier">
-  <div class="tier-head"><h2>ALL FOUR, SIDE BY SIDE</h2></div>
-  <p class="tier-note">Consistent 120&times;40 across every tier, escalating flat &rarr; coloured &rarr;
-    glowing &rarr; alive.</p>
-  <div class="row">
-    <div class="chip-wrap"><span class="title-badge a2-art a2-common a2-tanjiro"><span class="title-text title-text-hidden">Common</span></span><span class="chip-label">COMMON</span></div>
-    <div class="chip-wrap"><span class="title-badge a2-art a2-uncommon a2-vegeta" style="--a2c:#2f80ed"><span class="title-text title-text-hidden">Uncommon</span></span><span class="chip-label">UNCOMMON</span></div>
-    <div class="chip-wrap"><span class="title-badge a2-art a2-rare a2-saitama" style="--a2c:#ffd34d"><span class="title-text title-text-hidden">Rare</span></span><span class="chip-label">RARE</span></div>
-    <div class="chip-wrap"><span class="a2-mythic-wrap volt-purple"><span class="title-badge a2-art a2-mythic a2-sukuna"><span class="title-text title-text-hidden">Mythic</span></span></span><span class="chip-label">MYTHIC</span></div>
-  </div>
-</div>
-
-<div class="tier">
-  <div class="tier-head"><h2>CRATE DATA</h2><span class="pct">weights total 100.00</span></div>
-  <p class="tier-note">The values that would go into <code>ANIMA2_CRATE_TITLES</code> in
-    <code>js/core.js</code>. Every title needs <code>hideNameOnBadge: true</code> — the art is the title,
-    so the fallback font-rendered name must not paint over it.</p>
-  <div class="scroll">
-  <table>
-    <thead><tr><th>id</th><th>name</th><th>rarity</th><th class="num">weight</th><th>cssClass</th></tr></thead>
-    <tbody>
-      <tr><td><code>a2Naruto</code></td><td>Naruto</td><td>common</td><td class="num">10.5</td><td><code>title-a2-naruto</code></td></tr>
-      <tr><td><code>a2Ichigo</code></td><td>Ichigo</td><td>common</td><td class="num">10.5</td><td><code>title-a2-ichigo</code></td></tr>
-      <tr><td><code>a2Tanjiro</code></td><td>Tanjiro</td><td>common</td><td class="num">10.5</td><td><code>title-a2-tanjiro</code></td></tr>
-      <tr><td><code>a2Deku</code></td><td>Deku</td><td>common</td><td class="num">10.5</td><td><code>title-a2-deku</code></td></tr>
-      <tr><td><code>a2Fullmetal</code></td><td>Fullmetal</td><td>common</td><td class="num">10.5</td><td><code>title-a2-fullmetal</code></td></tr>
-      <tr><td><code>a2Chainsaw</code></td><td>Chainsaw</td><td>common</td><td class="num">10.5</td><td><code>title-a2-chainsaw</code></td></tr>
-      <tr><td><code>a2Killua</code></td><td>Killua</td><td>common</td><td class="num">10.5</td><td><code>title-a2-killua</code></td></tr>
-      <tr><td><code>a2Levi</code></td><td>Captain Levi</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-levi</code></td></tr>
-      <tr><td><code>a2Prince</code></td><td>The Prince</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-prince</code></td></tr>
-      <tr><td><code>a2Rumbling</code></td><td>Rumbling</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-rumbling</code></td></tr>
-      <tr><td><code>a2CopyNinja</code></td><td>Copy Ninja</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-copyninja</code></td></tr>
-      <tr><td><code>a2FlameHashira</code></td><td>Flame Hashira</td><td>uncommon</td><td class="num">4.5</td><td><code>title-a2-flamehashira</code></td></tr>
-      <tr><td><code>a2OnePunch</code></td><td>One Punch</td><td>rare</td><td class="num">1.3</td><td><code>title-a2-onepunch</code></td></tr>
-      <tr><td><code>a2Madara</code></td><td>Madara</td><td>rare</td><td class="num">1.3</td><td><code>title-a2-madara</code></td></tr>
-      <tr><td><code>a2DemonKing</code></td><td>Demon King</td><td>rare</td><td class="num">1.3</td><td><code>title-a2-demonking</code></td></tr>
-      <tr><td><code>a2KingOfCurses</code></td><td>King of Curses</td><td>mythic</td><td class="num">0.05</td><td><code>title-a2-kingofcurses</code></td></tr>
-      <tr><td><code>a2SixEyes</code></td><td>Six Eyes</td><td>mythic</td><td class="num">0.05</td><td><code>title-a2-sixeyes</code></td></tr>
-    </tbody>
-  </table>
-  </div>
-  <div class="ctx" style="margin-top:14px;">
-    <b>Still to do before this ships</b> — the four <code>js/market.js</code> wiring points
-    (<code>allTitleDefsFor</code>, <code>CRATE_TITLE_IDS</code>, <code>TITLE_CRATE_GROUPS</code>, the crate
-    object), the <code>#shop-good</code> banner markup, and the
-    <code>COSMETIXX_MARKET_TITLES</code> mirror in <code>mfmmoserver/gameLogic.js</code> — without that
-    last one the crate can never appear in the CosmetixxMarket rotation or be valued by KOLLECTOR.
-  </div>
+<div class="closer">
+  <h2>Good luck.</h2>
+  <p>ANIMA 2 is live in <b>Milos Market &rarr; GOOD&reg;</b>. $20,000 a spin, open as many as you can
+    afford, and the mythics are not going to pull themselves.</p>
+  <a class="btn btn-primary" href="https://mfmmo.com">Play mfmmo</a>
+  <p class="fine">Titles are cosmetic. Every pull can be equipped, traded on the Milos Trading Network,
+    graded at New Milos Grading, or forged into a Foil.</p>
 </div>
 
 </div>
