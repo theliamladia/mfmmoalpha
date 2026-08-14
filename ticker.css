@@ -1,0 +1,93 @@
+/* ---------- City Pulse ticker ----------
+   Chrome uses var(--token) so VISIONS can reskin it, same rule the rest of style.css follows (see
+   HANDOFF.md's CSS gotcha). All ticker-specific rules live in this file, never in style.css.
+
+   Layout choice: RESERVE SPACE, not overlay. #cityTicker keeps a constant 28px height (and its
+   hairline border) whether it's showing events or not -- only its *contents* fade in/out via the
+   .city-ticker-empty class. An overlay would have needed the same reserved gap anyway (to avoid
+   covering the topbar or the first row of page content), so reserving it directly is simpler and
+   guarantees zero layout shift in every state, including the one frame right after a failed poll. */
+
+.city-ticker {
+  height: 28px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border-hairline);
+  transition: opacity 0.25s ease;
+}
+
+.city-ticker-empty {
+  opacity: 0;
+  pointer-events: none;
+  border-bottom-color: transparent;
+}
+
+.city-ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: city-ticker-scroll var(--city-ticker-duration, 30s) linear infinite;
+  will-change: transform;
+}
+
+/* Pause on hover so a player can actually read whatever's scrolling by. */
+.city-ticker:hover .city-ticker-track {
+  animation-play-state: paused;
+}
+
+.city-ticker-half {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+@keyframes city-ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.city-ticker-item {
+  padding: 0 var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  transition: color 4s ease, background-color 4s ease;
+  border-radius: var(--radius-pill);
+}
+
+.city-ticker-sep {
+  color: var(--text-disabled);
+  margin: 0 var(--space-2);
+}
+
+/* Brief highlight for events that arrived since the last poll -- faded back to normal by
+   ticker.js after CITY_TICKER_HIGHLIGHT_MS via a class removal, not a CSS animation, so it settles
+   at whatever the transition above lands on rather than snapping. */
+.city-ticker-item-new {
+  color: var(--accent);
+  background: var(--accent-soft-bg);
+  padding: 2px var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .city-ticker-track {
+    animation: none;
+  }
+  .city-ticker {
+    overflow-x: auto;
+  }
+  /* Only one copy needed once it's not auto-scrolling -- the second half exists purely to make the
+     looping animation seamless. */
+  .city-ticker-half:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .city-ticker-item {
+    font-size: var(--text-xs);
+  }
+}

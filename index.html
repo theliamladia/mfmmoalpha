@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&family=Xanh+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="ticker.css">
 </head>
 <body>
 
@@ -142,6 +143,10 @@
       <button id="btnAdmin" title="Admin">Admin</button>
       <button id="btnReset" title="Delete character and start over">Reset</button>
     </div>
+  </div>
+
+  <div id="cityTicker" class="city-ticker city-ticker-empty" aria-live="off">
+    <div class="city-ticker-track" id="cityTickerTrack"></div>
   </div>
 
   <div id="sidebarBackdrop"></div>
@@ -2114,6 +2119,7 @@
 </section>
 
 <script src="js/api.js"></script>
+<script src="js/ticker.js"></script>
 <script src="js/core.js"></script>
 <script src="js/nameStyle.js"></script>
 <script src="js/serverstate.js"></script>
