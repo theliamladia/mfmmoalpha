@@ -358,7 +358,7 @@ function allTitleDefsFor(char) {
     LOOKSMAXXER_TITLE, NETWORTH_TITLE, HIGHEST_LEVEL_TITLE, HEIGHTMAXXED_TITLE, KOLLECTOR_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
     ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
-    ...MILOS_LEGENDS_TITLES,
+    ...MILOS_LEGENDS_TITLES, ...ANIMA2_CRATE_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];
 }
@@ -371,7 +371,7 @@ function allTitleDefs() {
 const CRATE_TITLE_IDS = new Set([
   ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
   ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
-  ...MILOS_LEGENDS_TITLES,
+  ...MILOS_LEGENDS_TITLES, ...ANIMA2_CRATE_TITLES,
 ].map((t) => t.id));
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
 CRATE_TITLE_IDS.add(ADMIN_TITLE.id);
@@ -396,6 +396,7 @@ const TITLE_CRATE_GROUPS = [
   { label: '🔵 BLUE CRATE', ids: new Set([...BLUE_CRATE_TITLES.map((t) => t.id), 'blueBidenAuto']) },
   { label: '✅ LEEMS LARUDO x GOOD®', ids: new Set(LEEMS_LARUDO_GOOD_TITLES.map((t) => t.id)) },
   { label: '🎖️ MILOS LEGENDS 1', ids: new Set(MILOS_LEGENDS_TITLES.map((t) => t.id)) },
+  { label: '🎮 ANIMA 2 CRATE', ids: new Set(ANIMA2_CRATE_TITLES.map((t) => t.id)) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';
 const NMG_GRADED_LABEL = '🏅 Graded Titles';
@@ -575,6 +576,10 @@ const CRATE_LLG = { name: 'LEEMS LARUDO x GOOD®', icon: '\u{2601}\u{FE0F}', cos
 const CRATE_VISIONS = { name: 'VISIONS', icon: '\u{1F300}', cost: VISIONS_CRATE_COST, titles: VISIONS_TITLES };
 // Lives in Cosmetixxx (#shop-titles), not the GOOD tab -- confirmed by the user.
 const CRATE_MILOS_LEGENDS = { name: 'MILOS LEGENDS 1', icon: '\u{1F3C6}', cost: MILOS_LEGENDS_CRATE_COST, titles: MILOS_LEGENDS_TITLES };
+// Lives in Cosmetixxx (#shop-titles), this repo's default placement for new crates -- GOOD
+// (#shop-good) is reserved for crates the owner explicitly designates as GOOD releases (LLG,
+// VISIONS). Plain client-side spin, no shared server stock (not `limited`), same as Milos Legends.
+const CRATE_ANIMA2 = { name: 'ANIMA 2 CRATE', icon: '\u{1F3AE}', cost: ANIMA2_CRATE_COST, titles: ANIMA2_CRATE_TITLES };
 
 // Rolled once per drawn title -- if it's not that crate's Presidential Rare (or the crate has no
 // hidden swap at all), the draw stands untouched.
@@ -608,6 +613,11 @@ const btnMlSpin = document.getElementById('btnMlSpin');
 const mlSpinMessage = document.getElementById('mlSpinMessage');
 const btnViewMlCrate = document.getElementById('btnViewMlCrate');
 const mlSpinQtyInput = document.getElementById('mlSpinQty');
+
+const btnAnima2Spin = document.getElementById('btnAnima2Spin');
+const anima2SpinMessage = document.getElementById('anima2SpinMessage');
+const btnViewAnima2Crate = document.getElementById('btnViewAnima2Crate');
+const anima2SpinQtyInput = document.getElementById('anima2SpinQty');
 
 // Archived (Update 4): View Crate / odds + the stock-remaining label only, no spin controls.
 const btnViewRedCrate = document.getElementById('btnViewRedCrate');
@@ -712,6 +722,7 @@ btnViewBlueCrate.addEventListener('click', () => showCrateOdds(CRATE_BLUE));
 btnViewLlgCrate.addEventListener('click', () => showCrateOdds(CRATE_LLG));
 btnViewVisionsCrate.addEventListener('click', () => showCrateOdds(CRATE_VISIONS));
 btnViewMlCrate.addEventListener('click', () => showCrateOdds(CRATE_MILOS_LEGENDS));
+btnViewAnima2Crate.addEventListener('click', () => showCrateOdds(CRATE_ANIMA2));
 
 btnCrateOddsClose.addEventListener('click', () => {
   crateOddsModal.classList.add('hidden');
@@ -1053,10 +1064,12 @@ async function spinCrate(crate, buttons, messageEl, opts = {}) {
 registerCrateQtyInput(CRATE_LLG, llgSpinQtyInput, btnLlgSpin);
 registerCrateQtyInput(CRATE_VISIONS, visionsSpinQtyInput, btnVisionsSpin);
 registerCrateQtyInput(CRATE_MILOS_LEGENDS, mlSpinQtyInput, btnMlSpin);
+registerCrateQtyInput(CRATE_ANIMA2, anima2SpinQtyInput, btnAnima2Spin);
 
 btnLlgSpin.addEventListener('click', () => spinCrate(CRATE_LLG, [btnLlgSpin, btnViewLlgCrate], llgSpinMessage));
 btnVisionsSpin.addEventListener('click', () => spinCrate(CRATE_VISIONS, [btnVisionsSpin, btnViewVisionsCrate], visionsSpinMessage));
 btnMlSpin.addEventListener('click', () => spinCrate(CRATE_MILOS_LEGENDS, [btnMlSpin, btnViewMlCrate], mlSpinMessage));
+btnAnima2Spin.addEventListener('click', () => spinCrate(CRATE_ANIMA2, [btnAnima2Spin, btnViewAnima2Crate], anima2SpinMessage));
 
 
 // ---------- Foil Ascension (Cosmetixxx) ----------

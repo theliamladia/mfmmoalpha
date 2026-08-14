@@ -1846,6 +1846,115 @@ p.foil-ascended-line.foil-ascended-line {
 .title-ml-otaku { background-image: url('assets/titles/milos-legends/otaku.png'); }
 .title-ml-pileit { background-image: url('assets/titles/milos-legends/pileit.png'); }
 
+/* ---------- ANIMA 2 Crate ---------- */
+/* Sequel to Anima, hot-linked anime portraits from Giphy (non-mythics use the still `giphy_s.gif`
+   variant, the two mythics use the full animated `giphy.gif`). Every background-position below was
+   set by eye against the source art per the design doc -- do not adjust them, a few % either way
+   crops the subject's face out of a 3:1 chip.
+
+   Mythic wrapper note: the design doc's preview built the electrified border as a masked wrapper
+   element (`.a2-mythic-wrap::before` with an animated conic-gradient angle) around `.title-badge`.
+   That can't be ported directly -- `titleBadgeMarkup()` (js/market.js) emits a single bare
+   `<span class="title-badge ...">` and is called from 15+ sites across admin.js, inventory.js,
+   market.js, profile.js, mtn.js and milos.js, several of which assume a single top-level element
+   (innerHTML targets, inline concatenation next to a name). Introducing a wrapper span would need
+   auditing every one of those call sites for layout fallout, for an effect that's mostly additive
+   polish. Instead the two mythic classes below carry the flicker/glow layer only (the `a2MythicVolt`
+   keyframes, ported from the doc's `.a2-mythic` rule) directly on `.title-badge` itself via CSS
+   custom properties (`--a2-volt` family) -- no wrapper, no DOM change, works at every call site for
+   free. `box-shadow` is not clipped by the chip's own `overflow:hidden` (that only clips descendant
+   content, not the element's own shadow), so the glow still reads outside the 120x40 box. The
+   travelling conic-gradient arc itself is dropped; per the design doc's own fallback guidance the
+   flicker carries most of the effect, and a simpler treatment that renders correctly everywhere
+   beats a fancier one that risks breaking the sidebar/chat/dropdown. */
+.title-a2-naruto,
+.title-a2-ichigo,
+.title-a2-tanjiro,
+.title-a2-deku,
+.title-a2-fullmetal,
+.title-a2-chainsaw,
+.title-a2-killua,
+.title-a2-levi,
+.title-a2-prince,
+.title-a2-rumbling,
+.title-a2-copyninja,
+.title-a2-flamehashira,
+.title-a2-onepunch,
+.title-a2-madara,
+.title-a2-demonking,
+.title-a2-kingofcurses,
+.title-a2-sixeyes {
+  background-size: cover;
+}
+.title-a2-naruto { background-image: url('https://media.giphy.com/media/qMnhxcHyeBJDFlxnZa/giphy_s.gif'); background-position: center 22%; }
+.title-a2-ichigo { background-image: url('https://media.giphy.com/media/8uaOiZk0xg2Na/giphy_s.gif'); background-position: center 25%; }
+.title-a2-tanjiro { background-image: url('https://media.giphy.com/media/HlnAuBeR5PCMy3WxYC/giphy_s.gif'); background-position: center 42%; }
+.title-a2-deku { background-image: url('https://media.giphy.com/media/WYbbmUWZ7P25o75gDn/giphy_s.gif'); background-position: center 52%; }
+.title-a2-fullmetal { background-image: url('https://media.giphy.com/media/SgMZCcCv8Thm0/giphy_s.gif'); background-position: center 45%; }
+.title-a2-chainsaw { background-image: url('https://media.giphy.com/media/ppsHFdRAAlG8UapZXc/giphy_s.gif'); background-position: center 30%; }
+.title-a2-killua { background-image: url('https://media.giphy.com/media/ijsYTyxaMzZh6/giphy_s.gif'); background-position: center 32%; }
+
+/* Common: flat art in a plain white frame, no color/glow/motion. */
+.title-a2-naruto,
+.title-a2-ichigo,
+.title-a2-tanjiro,
+.title-a2-deku,
+.title-a2-fullmetal,
+.title-a2-chainsaw,
+.title-a2-killua {
+  border: 3px solid #fff;
+}
+
+/* Uncommon: same still art, saturated per-title border + a 1px inner rim. */
+.title-a2-levi { background-image: url('https://media.giphy.com/media/9KCPkAcRqU9j2/giphy_s.gif'); background-position: center 38%; border: 3px solid #8fa37a; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-a2-prince { background-image: url('https://media.giphy.com/media/do0xfdH2Ssh56/giphy_s.gif'); background-position: center 20%; border: 3px solid #2f80ed; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-a2-rumbling { background-image: url('https://media.giphy.com/media/9SvQFZ5xoGHza/giphy_s.gif'); background-position: center 38%; border: 3px solid #d4342c; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-a2-copyninja { background-image: url('https://media.giphy.com/media/vXyIMuWbGTMtO/giphy_s.gif'); background-position: center 45%; border: 3px solid #b8cfe8; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-a2-flamehashira { background-image: url('https://media.giphy.com/media/D6gVnzfoZSOOEehnhM/giphy_s.gif'); background-position: center 14%; border: 3px solid #ff7a2f; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+
+/* Rare: coloured border + a slow pulsing halo bleeding outside the chip. */
+@keyframes a2RareGlow {
+  0%, 100% { box-shadow: 0 0 6px 0 var(--a2-rare-c), inset 0 0 0 1px rgba(255, 255, 255, 0.3); }
+  50% { box-shadow: 0 0 16px 4px var(--a2-rare-c), inset 0 0 0 1px rgba(255, 255, 255, 0.5); }
+}
+.title-a2-onepunch { background-image: url('https://media.giphy.com/media/arbHBoiUWUgmc/giphy_s.gif'); background-position: center 33%; border: 3px solid #ffd34d; --a2-rare-c: #ffd34d; animation: a2RareGlow 2.2s ease-in-out infinite; }
+.title-a2-madara { background-image: url('https://media.giphy.com/media/RDnBOLf1rwsIo/giphy_s.gif'); background-position: center 48%; border: 3px solid #ff6b35; --a2-rare-c: #ff6b35; animation: a2RareGlow 2.2s ease-in-out infinite; }
+.title-a2-demonking { background-image: url('https://media.giphy.com/media/HQ6fxLDUW4ZgaumSyz/giphy_s.gif'); background-position: center 28%; border: 3px solid #ff2d55; --a2-rare-c: #ff2d55; animation: a2RareGlow 2.2s ease-in-out infinite; }
+
+/* Mythic: full animated GIF + an unevenly-spaced steps(1,end) electric flicker on the chip's own
+   border/glow (see the file-header note above for why there's no travelling-arc wrapper). Colour
+   parameterised via --a2-volt/--a2-volt-hot/--a2-volt-dim: King of Curses = cursed purple, Six Eyes
+   = Gojo's own Blue. Unevenly spaced keyframe stops read as "arcing"; even spacing would read as
+   plain pulsing. */
+@keyframes a2MythicVolt {
+  0% { border-color: var(--a2-volt); box-shadow: 0 0 4px var(--a2-volt), 0 0 9px color-mix(in srgb, var(--a2-volt) 55%, transparent); }
+  9% { border-color: var(--a2-volt-hot); box-shadow: 0 0 9px var(--a2-volt-hot), 0 0 20px color-mix(in srgb, var(--a2-volt) 95%, transparent); }
+  14% { border-color: var(--a2-volt-dim); box-shadow: 0 0 3px var(--a2-volt-dim), 0 0 7px color-mix(in srgb, var(--a2-volt-dim) 45%, transparent); }
+  31% { border-color: var(--a2-volt-hot); box-shadow: 0 0 8px var(--a2-volt), 0 0 17px color-mix(in srgb, var(--a2-volt) 80%, transparent); }
+  38% { border-color: var(--a2-volt); box-shadow: 0 0 4px var(--a2-volt), 0 0 10px color-mix(in srgb, var(--a2-volt) 50%, transparent); }
+  62% { border-color: var(--a2-volt-hot); box-shadow: 0 0 11px var(--a2-volt-hot), 0 0 24px var(--a2-volt); }
+  69% { border-color: var(--a2-volt-dim); box-shadow: 0 0 2px var(--a2-volt-dim), 0 0 6px color-mix(in srgb, var(--a2-volt-dim) 35%, transparent); }
+  88% { border-color: var(--a2-volt-hot); box-shadow: 0 0 7px var(--a2-volt), 0 0 15px color-mix(in srgb, var(--a2-volt) 70%, transparent); }
+}
+.title-a2-kingofcurses {
+  background-image: url('https://media.giphy.com/media/Gy2JTYgbB7RGqzarXB/giphy.gif');
+  background-position: center 40%;
+  border: 2px solid #f5d0fe;
+  --a2-volt: #a855f7;
+  --a2-volt-hot: #f5d0fe;
+  --a2-volt-dim: #6d28d9;
+  animation: a2MythicVolt 0.9s steps(1, end) infinite;
+}
+.title-a2-sixeyes {
+  background-image: url('https://media.giphy.com/media/Da7tyT3iQ1gKK1MKiK/giphy.gif');
+  background-position: center 32%;
+  border: 2px solid #ffffff;
+  --a2-volt: #4dd2ff;
+  --a2-volt-hot: #ffffff;
+  --a2-volt-dim: #2f9fd6;
+  animation: a2MythicVolt 0.9s steps(1, end) infinite;
+}
+
 /* ---------- Balaclava Badges ---------- */
 /* Small inline chip (renders before the title everywhere a name shows, see badgeChipMarkup in
    core.js) and a bigger preview square for the Badges inventory tab -- same asset, two sizes. */

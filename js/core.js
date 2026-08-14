@@ -538,6 +538,31 @@ const MILOS_LEGENDS_TITLES = [
   { id: 'mlKrogger', name: 'Krogger', hideNameOnBadge: true, cssClass: 'title-ml-krogger', weight: 0.05, rarity: 'mythic', how: 'Won from a Milos Legends 1 spin (mythic! 0.05% odds).' },
 ];
 
+// ANIMA 2 Crate: sequel to Anima, anime-portrait art (wordmark-style, art IS the title), so every
+// entry hides its name on the badge chip same as LLG/Milos Legends. Lives in Cosmetixxx
+// (shop-titles), the repo's default placement for new crates -- GOOD (shop-good) is reserved for
+// crates the owner explicitly designates as GOOD releases.
+const ANIMA2_CRATE_COST = 20000;
+const ANIMA2_CRATE_TITLES = [
+  { id: 'a2Naruto', name: 'Naruto', hideNameOnBadge: true, cssClass: 'title-a2-naruto', weight: 10.5, rarity: 'common', how: 'Won from an ANIMA 2 spin (common).' },
+  { id: 'a2Ichigo', name: 'Ichigo', hideNameOnBadge: true, cssClass: 'title-a2-ichigo', weight: 10.5, rarity: 'common', how: 'Won from an ANIMA 2 spin (common).' },
+  { id: 'a2Tanjiro', name: 'Tanjiro', hideNameOnBadge: true, cssClass: 'title-a2-tanjiro', weight: 10.5, rarity: 'common', how: 'Won from an ANIMA 2 spin (common).' },
+  { id: 'a2Deku', name: 'Deku', hideNameOnBadge: true, cssClass: 'title-a2-deku', weight: 10.5, rarity: 'common', how: 'Won from an ANIMA 2 spin (common).' },
+  { id: 'a2Fullmetal', name: 'Fullmetal', hideNameOnBadge: true, cssClass: 'title-a2-fullmetal', weight: 10.5, rarity: 'common', how: 'Won from an ANIMA 2 spin (common).' },
+  { id: 'a2Chainsaw', name: 'Chainsaw', hideNameOnBadge: true, cssClass: 'title-a2-chainsaw', weight: 10.5, rarity: 'common', how: 'Won from an ANIMA 2 spin (common).' },
+  { id: 'a2Killua', name: 'Killua', hideNameOnBadge: true, cssClass: 'title-a2-killua', weight: 10.5, rarity: 'common', how: 'Won from an ANIMA 2 spin (common).' },
+  { id: 'a2Levi', name: 'Captain Levi', hideNameOnBadge: true, cssClass: 'title-a2-levi', weight: 4.5, rarity: 'uncommon', how: 'Won from an ANIMA 2 spin (uncommon).' },
+  { id: 'a2Prince', name: 'The Prince', hideNameOnBadge: true, cssClass: 'title-a2-prince', weight: 4.5, rarity: 'uncommon', how: 'Won from an ANIMA 2 spin (uncommon).' },
+  { id: 'a2Rumbling', name: 'Rumbling', hideNameOnBadge: true, cssClass: 'title-a2-rumbling', weight: 4.5, rarity: 'uncommon', how: 'Won from an ANIMA 2 spin (uncommon).' },
+  { id: 'a2CopyNinja', name: 'Copy Ninja', hideNameOnBadge: true, cssClass: 'title-a2-copyninja', weight: 4.5, rarity: 'uncommon', how: 'Won from an ANIMA 2 spin (uncommon).' },
+  { id: 'a2FlameHashira', name: 'Flame Hashira', hideNameOnBadge: true, cssClass: 'title-a2-flamehashira', weight: 4.5, rarity: 'uncommon', how: 'Won from an ANIMA 2 spin (uncommon).' },
+  { id: 'a2OnePunch', name: 'One Punch', hideNameOnBadge: true, cssClass: 'title-a2-onepunch', weight: 1.3, rarity: 'rare', how: 'Won from an ANIMA 2 spin (rare).' },
+  { id: 'a2Madara', name: 'Madara', hideNameOnBadge: true, cssClass: 'title-a2-madara', weight: 1.3, rarity: 'rare', how: 'Won from an ANIMA 2 spin (rare).' },
+  { id: 'a2DemonKing', name: 'Demon King', hideNameOnBadge: true, cssClass: 'title-a2-demonking', weight: 1.3, rarity: 'rare', how: 'Won from an ANIMA 2 spin (rare).' },
+  { id: 'a2KingOfCurses', name: 'King of Curses', hideNameOnBadge: true, cssClass: 'title-a2-kingofcurses', weight: 0.05, rarity: 'mythic', how: 'Won from an ANIMA 2 spin (mythic! 0.05% odds).' },
+  { id: 'a2SixEyes', name: 'Six Eyes', hideNameOnBadge: true, cssClass: 'title-a2-sixeyes', weight: 0.05, rarity: 'mythic', how: 'Won from an ANIMA 2 spin (mythic! 0.05% odds).' },
+];
+
 const RENAME_COST = 10000;
 
 const PISTOL_ITEMS = [

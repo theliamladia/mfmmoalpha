@@ -95,8 +95,9 @@ Open, uniformly for every crate. Do not duplicate its logic per-crate.
 ## 4. HTML markup — `index.html`
 
 Inside the relevant `.shop` container (Milos Market's crate-bearing tabs; check `#shop-titles` /
-`#shop-good` for the two current homes — **new crates default to `#shop-good`** unless there's a specific
-reason for a standalone banner, per this repo's placement convention):
+`#shop-good` for the two current homes — **new crates default to Cosmetixxx (`#shop-titles`)**.
+`#shop-good` is reserved for crates the owner explicitly designates as GOOD® releases (Leems Larudo x
+GOOD®, VISIONS) — do not place a new crate there unless the owner says so:
 
 ```html
 <div class="feature-banner">
