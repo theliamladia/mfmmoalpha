@@ -1574,8 +1574,10 @@ function spawnCashFloater(delta) {
 
 // Single entry point renderAll() uses to write the cash figure -- keeps the tween + floater in sync
 // with the exact same read/write path renderAll() already relies on, instead of a parallel loop.
+// prefersReducedMotion folds into the same `paused` gate the game-pause banner already uses: both
+// mean "snap straight to the new value, skip the tween and the drifting +/- floater".
 function updateCashDisplays(newCash) {
-  const paused = typeof isGamePaused === 'function' && isGamePaused();
+  const paused = (typeof isGamePaused === 'function' && isGamePaused()) || prefersReducedMotion;
   if (lastRenderedCash !== null && !paused) {
     const delta = newCash - lastRenderedCash;
     if (Math.abs(delta) > 0.001) {
@@ -1587,10 +1589,38 @@ function updateCashDisplays(newCash) {
   animateMoneyElement(walletCashEl, newCash, paused);
 }
 
+// Cached once (not re-read per call) -- gates the typewriter reveal here and the cash tween/
+// floaters in updateCashDisplays()/spawnCashFloater() below.
+const prefersReducedMotion = typeof window.matchMedia === 'function'
+  && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Single append point for every .log element in the game (activityLog, and every per-page log --
+// bankLog, cryptoLog, milosLog, etc. -- all funnel through this one function). Two things live
+// here so every log entry gets them for free instead of per call site: a dimmed HH:MM timestamp,
+// and a one-time typewriter reveal on the entry that was JUST added (never on the other 29 that
+// scroll up beneath it, and never at all under prefers-reduced-motion).
 function logTo(el, text, cls) {
   const p = document.createElement('p');
-  p.textContent = text;
   if (cls) p.classList.add(cls);
+
+  const now = new Date();
+  const ts = document.createElement('span');
+  ts.className = 'log-ts';
+  ts.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  p.appendChild(ts);
+
+  // textContent, not innerHTML -- log messages can contain arbitrary player-facing text (item
+  // names, other players' usernames) and must never be interpreted as markup.
+  const msg = document.createElement('span');
+  msg.className = 'log-text';
+  msg.textContent = text;
+  p.appendChild(msg);
+
+  if (!prefersReducedMotion) {
+    p.classList.add('log-entry-new');
+    p.addEventListener('animationend', () => p.classList.remove('log-entry-new'), { once: true });
+  }
+
   el.prepend(p);
   while (el.children.length > 30) {
     el.removeChild(el.lastChild);

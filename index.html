@@ -196,32 +196,36 @@
       <div id="page-streets" class="page hidden">
         <h2>🛣️ Da Skreetz</h2>
         <p>Each hustle pays out instantly, then needs 10 seconds to cool down. The &times;5 button runs five independent attempts back to back for five times the cooldown &mdash; identical earnings per second, far fewer clicks.</p>
-        <div class="hustle-grid">
-          <div class="hustle-card">
-            <h3>💼 Work</h3>
-            <p>10-30 Floydbucks per click. Safe.</p>
-            <div class="hustle-btn-row">
+        <div class="action-row-list">
+          <div class="action-row">
+            <span class="action-row-icon">💼</span>
+            <span class="action-row-name">Work</span>
+            <span class="action-row-hint">$10&ndash;30 &middot; safe</span>
+            <div class="action-row-actions">
               <button class="hustle-btn" data-hustle="work">Work</button>
               <button class="hustle-btn secondary-btn" data-hustle="work" data-hustle-count="5">&times;5</button>
             </div>
           </div>
-          <div class="hustle-card">
-            <h3>💋 Slut</h3>
-            <p>5-60 Floydbucks per click. 30% chance to get robbed for the same amount. Nudges your Alliance toward Bad.</p>
-            <div class="hustle-btn-row">
+          <div class="action-row">
+            <span class="action-row-icon">💋</span>
+            <span class="action-row-name">Slut</span>
+            <span class="action-row-hint">$5&ndash;60 &middot; 30% robbed</span>
+            <div class="action-row-actions">
               <button class="hustle-btn" data-hustle="slut">Slut</button>
               <button class="hustle-btn secondary-btn" data-hustle="slut" data-hustle-count="5">&times;5</button>
             </div>
           </div>
-          <div class="hustle-card">
-            <h3>🔪 Crime</h3>
-            <p>80-400 Floydbucks per click. 30% chance to land in Jail &mdash; and the NMPD seizes 15% of the cash you're carrying when they book you (money in the Bank is safe). Nudges your Alliance toward Bad, and every time you're caught your criminal record makes the next sentence longer (see New Milos City &rarr; Crime for Community Service). A &times;5 run stops at the first bust.</p>
-            <div class="hustle-btn-row">
+          <div class="action-row">
+            <span class="action-row-icon">🔪</span>
+            <span class="action-row-name">Crime</span>
+            <span class="action-row-hint">$80&ndash;400 &middot; 30% jail</span>
+            <div class="action-row-actions">
               <button class="hustle-btn" data-hustle="crime">Crime</button>
               <button class="hustle-btn secondary-btn" data-hustle="crime" data-hustle-count="5">&times;5</button>
             </div>
           </div>
         </div>
+        <p>Slut has a 30% chance to get robbed for the same amount and nudges your Alliance toward Bad. Crime seizes 15% of cash on hand if caught (Bank money is safe), nudges Alliance toward Bad, and lengthens future sentences &mdash; see New Milos City &rarr; Crime for Community Service. A &times;5 run stops at the first bust.</p>
 
         <p id="hustleToast" class="hustle-toast hidden"></p>
         <div id="activityLog" class="log"></div>
@@ -247,21 +251,30 @@
             <button id="btnRoidEscape">Pay $80 to Get Out Early</button>
           </div>
 
-          <div class="hustle-grid">
-            <div class="hustle-card">
-              <h3>🏋️ Workout</h3>
-              <p>$20, burns 0.5 lbs Fat &rarr; +0.6 Speed, +0.15 lbs Muscle, +0.1 Defense, +Looks. Requires 0.5 lbs of Fat.</p>
-              <button id="btnWorkout">Workout ($20)</button>
+          <div class="action-row-list">
+            <div class="action-row" title="Burns 0.5 lbs Fat -> +0.6 Speed, +0.15 lbs Muscle, +0.1 Defense, +Looks. Requires 0.5 lbs of Fat.">
+              <span class="action-row-icon">🏋️</span>
+              <span class="action-row-name">Workout</span>
+              <span class="action-row-hint">+Speed/Muscle/Defense/Looks</span>
+              <div class="action-row-actions">
+                <button id="btnWorkout">Workout ($20)</button>
+              </div>
             </div>
+            <div class="action-row" title="Costs a fixed 60 lbs of Muscle. Build up Muscle from Workouts first.">
+              <span class="action-row-icon">📏</span>
+              <span class="action-row-name">Stretch for Height</span>
+              <span class="action-row-hint">60 lbs Muscle &middot; +1&Prime; Height</span>
+              <div class="action-row-actions">
+                <button id="btnStretchHeight">Stretch</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hustle-grid">
             <div class="hustle-card">
               <h3>💉 Steroids</h3>
               <p id="steroidTierDesc">No cycle active.</p>
               <div id="steroidTierButtons" class="admin-alliance-buttons"></div>
-            </div>
-            <div class="hustle-card">
-              <h3>📏 Stretch for Height</h3>
-              <p>Costs a fixed 60 lbs of Muscle &rarr; +1" Height. Build up Muscle from Workouts first.</p>
-              <button id="btnStretchHeight">Stretch</button>
             </div>
           </div>
         </div>
@@ -269,7 +282,7 @@
         <div id="shop-pizza" class="shop hidden">
           <div id="pizzaLog" class="log log-single-line"></div>
           <p>Eating adds weight (fuel for the gym), permanently raises Defense, temporarily costs Speed, and costs a little Looks (less than a Workout gains back). Looks = 90% eating/workouts + 10% Face (Luke's Maxxerstore).</p>
-          <div class="hustle-grid" id="foodGrid"></div>
+          <div class="action-row-list" id="foodGrid"></div>
         </div>
 
         <div id="shop-maxx" class="shop hidden">
@@ -649,13 +662,16 @@
               <div id="crimeLog" class="log log-single-line"></div>
               <p>Real crimes with a real record. Reward and sentence are fixed per crime &mdash; your Attack and Speed lower your odds of getting caught. Getting caught raises your record, and every future sentence gets longer until you pay it down. Bad alliance or worse required.</p>
               <p id="crimeRecordStatus"></p>
-              <div id="crimeContainer" class="hustle-grid"></div>
+              <div id="crimeContainer" class="action-row-list"></div>
 
-              <div class="hustle-grid">
-                <div class="hustle-card">
-                  <h3>🙏 Community Service</h3>
-                  <p>Dedicate cash (scales with your record) to knock strikes off your criminal record and shorten your next sentence.</p>
-                  <button id="btnCommunityService">Community Service</button>
+              <div class="action-row-list">
+                <div class="action-row" title="Dedicate cash (scales with your record) to knock strikes off your criminal record and shorten your next sentence.">
+                  <span class="action-row-icon">🙏</span>
+                  <span class="action-row-name">Community Service</span>
+                  <span class="action-row-hint">Clears strikes &middot; cost scales with record</span>
+                  <div class="action-row-actions">
+                    <button id="btnCommunityService">Community Service</button>
+                  </div>
                 </div>
               </div>
 
@@ -721,21 +737,30 @@
                   <h3>🎯 Select a Weapon</h3>
                   <select id="rangeWeaponSelect"></select>
                 </div>
-                <div class="hustle-grid">
-                  <div class="hustle-card">
-                    <h3>🎯 Live Fire</h3>
-                    <p>Click every 3 seconds to shoot. Score 0.01&ndash;0.10 added to SHOOTING.</p>
-                    <button id="btnRangeShoot">Shoot</button>
+                <div class="action-row-list">
+                  <div class="action-row">
+                    <span class="action-row-icon">🎯</span>
+                    <span class="action-row-name">Live Fire</span>
+                    <span class="action-row-hint">+0.01&ndash;0.10 Shooting &middot; 3s cooldown</span>
+                    <div class="action-row-actions">
+                      <button id="btnRangeShoot">Shoot</button>
+                    </div>
                   </div>
-                  <div class="hustle-card">
-                    <h3>⚡ Draw Practice</h3>
-                    <p>+0.01 DRAW every 3 seconds.</p>
-                    <button id="btnRangeDraw">Draw</button>
+                  <div class="action-row">
+                    <span class="action-row-icon">⚡</span>
+                    <span class="action-row-name">Draw Practice</span>
+                    <span class="action-row-hint">+0.01 Draw &middot; 3s cooldown</span>
+                    <div class="action-row-actions">
+                      <button id="btnRangeDraw">Draw</button>
+                    </div>
                   </div>
-                  <div class="hustle-card">
-                    <h3>🔄 Reload Practice</h3>
-                    <p>+0.01 MAG RELOAD every 3 seconds.</p>
-                    <button id="btnRangeReload">Reload Mag</button>
+                  <div class="action-row">
+                    <span class="action-row-icon">🔄</span>
+                    <span class="action-row-name">Reload Practice</span>
+                    <span class="action-row-hint">+0.01 Mag Reload &middot; 3s cooldown</span>
+                    <div class="action-row-actions">
+                      <button id="btnRangeReload">Reload Mag</button>
+                    </div>
                   </div>
                 </div>
               </div>

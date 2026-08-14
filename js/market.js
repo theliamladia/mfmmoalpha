@@ -96,8 +96,6 @@ hustleButtons.forEach((btn) => {
   });
 });
 
-const HUSTLE_EMOJI = { work: '💼', slut: '💋', crime: '🔪' };
-
 function tickCooldownUI() {
   if (!character) return;
   renderServerBanners();
@@ -110,12 +108,14 @@ function tickCooldownUI() {
     const pending = hustleInFlight.has(type);
     btn.disabled = remaining > 0 || pending;
     setCooldownSweep(btn, remaining, COOLDOWN_MS);
-    // The x5 batch button keeps its own compact label rather than the emoji + verb one -- it sits
-    // right next to the full-size button, which already says which hustle this is.
+    // The x5 batch button keeps its own compact label rather than the plain verb one -- it sits
+    // right next to the full-size button, which already says which hustle this is. The action-row
+    // this button lives in already shows the emoji in its own icon slot, so the button label is
+    // just the verb now -- no more duplicate emoji baked in.
     const batchCount = Number(btn.dataset.hustleCount) || 1;
     const label = batchCount > 1
       ? `\u00d7${batchCount}`
-      : `${HUSTLE_EMOJI[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}`.trim();
+      : type.charAt(0).toUpperCase() + type.slice(1);
     // Surface the in-flight guard instead of just silently swallowing the click -- otherwise a
     // rapid-clicker gets no feedback at all for the clicks the guard drops.
     btn.classList.toggle('is-pending', pending);
@@ -270,14 +270,17 @@ function buildFoodGrid() {
   FOOD_ITEMS.forEach((item) => {
     const lbs = item.calories / CALORIES_PER_LB;
     const cost = round2(item.cost * (discounted ? 0.8 : 1));
-    const card = document.createElement('div');
-    card.className = 'hustle-card';
-    card.innerHTML = `
-      <h3>${item.name}</h3>
-      <p>${item.calories} cal &asymp; +${round1(lbs)} lbs Fat (fuel for the gym).<br>-${round1(lbs * SPEED_LOSS_PER_LB)} Speed.</p>
-      <button data-food="${item.id}">Buy ($${cost.toFixed(2)})${discounted ? ' – Employee Discount' : ''}</button>
+    const row = document.createElement('div');
+    row.className = 'action-row';
+    row.title = `${item.calories} cal ~ +${round1(lbs)} lbs Fat (fuel for the gym), -${round1(lbs * SPEED_LOSS_PER_LB)} Speed.`;
+    row.innerHTML = `
+      <span class="action-row-name">${item.name}</span>
+      <span class="action-row-hint">$${cost.toFixed(2)} &middot; +${round1(lbs)}lb Fat &middot; -${round1(lbs * SPEED_LOSS_PER_LB)} Spd</span>
+      <div class="action-row-actions">
+        <button data-food="${item.id}">Buy${discounted ? ' (Employee Discount)' : ''}</button>
+      </div>
     `;
-    foodGrid.appendChild(card);
+    foodGrid.appendChild(row);
   });
 
   foodGrid.querySelectorAll('button[data-food]').forEach((btn) => {

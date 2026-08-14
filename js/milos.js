@@ -319,13 +319,18 @@ function buildGoodJobsUI() {
       ${ceoLine}
       <p>Each button below pays out and trains that skill. Higher Looks trains skills faster. Promotions raise both your pay and your cooldown speed &mdash; the grind gets a lot better at the top.</p>
       <p class="job-payout-line">&times;10 Shift works ten times in one click for ten times the cooldown &mdash; exactly the same pay and skill gain per second, just fewer clicks.</p>
-      ${job.skills.map((sk, i) => `
-        <div class="job-skill-row">
-          <span>${sk.label}: <b>${s[sk.key].toFixed(2)}</b>/100</span>
-          <button data-work-good="${sk.key}" data-cooldown="jobSkill${i + 1}">Work</button>
-          <button data-work-good="${sk.key}" data-cooldown="jobSkill${i + 1}" data-work-count="10" class="secondary-btn">&times;10 Shift</button>
-        </div>
-      `).join('')}
+      <div class="action-row-list">
+        ${job.skills.map((sk, i) => `
+          <div class="action-row">
+            <span class="action-row-name">${sk.label}</span>
+            <span class="action-row-hint">${s[sk.key].toFixed(2)}/100</span>
+            <div class="action-row-actions">
+              <button data-work-good="${sk.key}" data-cooldown="jobSkill${i + 1}">Work</button>
+              <button data-work-good="${sk.key}" data-cooldown="jobSkill${i + 1}" data-work-count="10" class="secondary-btn">&times;10 Shift</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
       ${job.id === 'wrestler' && perkUnlocked ? buildWrestlingGearStoreHtml() : ''}
       <hr class="hustle-divider">
       <button id="btnResignGood" class="secondary-btn">Resign</button>
@@ -491,13 +496,18 @@ function buildBadJobsUI() {
       <p>Each button below pays out and trains that skill. Better skills pay more AND get you caught less &mdash; Speed and Defense also help you dodge a bust, and high Looks trains skills faster.</p>
       <p class="job-payout-line">&times;10 Shift works ten times in one click for ten times the cooldown &mdash; same pay per second, fewer clicks. It stops at the first bust and still pays out the shifts you completed.</p>
       <p class="job-payout-line">&#9888;&#65039; Getting booked costs you <b>15% of the cash on hand</b> in NMPD asset forfeiture. Money in the Bank is untouchable &mdash; deposit before a shift.</p>
-      ${job.skills.map((sk, i) => `
-        <div class="job-skill-row">
-          <span>${sk.label}: <b>${s[sk.key].toFixed(2)}</b>/100</span>
-          <button data-work-bad="${sk.key}" data-cooldown="badJobSkill${i + 1}">Work</button>
-          <button data-work-bad="${sk.key}" data-cooldown="badJobSkill${i + 1}" data-work-count="10" class="secondary-btn">&times;10 Shift</button>
-        </div>
-      `).join('')}
+      <div class="action-row-list">
+        ${job.skills.map((sk, i) => `
+          <div class="action-row">
+            <span class="action-row-name">${sk.label}</span>
+            <span class="action-row-hint">${s[sk.key].toFixed(2)}/100</span>
+            <div class="action-row-actions">
+              <button data-work-bad="${sk.key}" data-cooldown="badJobSkill${i + 1}">Work</button>
+              <button data-work-bad="${sk.key}" data-cooldown="badJobSkill${i + 1}" data-work-count="10" class="secondary-btn">&times;10 Shift</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
       <hr class="hustle-divider">
       <button id="btnResignBad" class="secondary-btn">Resign</button>
     </div>
@@ -775,11 +785,12 @@ function buildCrimeUI() {
   }
 
   crimeContainer.innerHTML = CRIME_TIERS.map((tier) => `
-    <div class="hustle-card">
-      <h3>${tier.name}</h3>
-      <p>${tier.desc}</p>
-      <p class="job-payout-line">Payout: <b>$${tier.minReward.toLocaleString()}&ndash;$${tier.maxReward.toLocaleString()}</b>. If caught: <b>${tier.jailYears}+ year(s)</b>. Odds of getting caught: <b>${Math.round(crimeFailChance(tier) * 100)}%</b> (Attack &amp; Speed lower this).</p>
-      <button data-crime="${tier.id}" ${character.jail.inJail ? 'disabled' : ''}>Attempt</button>
+    <div class="action-row" title="${escapeHtml(tier.desc)}">
+      <span class="action-row-name">${tier.name}</span>
+      <span class="action-row-hint">$${tier.minReward.toLocaleString()}&ndash;$${tier.maxReward.toLocaleString()} &middot; ${tier.jailYears}+yr &middot; ${Math.round(crimeFailChance(tier) * 100)}% caught</span>
+      <div class="action-row-actions">
+        <button data-crime="${tier.id}" ${character.jail.inJail ? 'disabled' : ''}>Attempt</button>
+      </div>
     </div>
   `).join('');
 

@@ -2609,6 +2609,95 @@ p.foil-ascended-line.foil-ascended-line {
   background: var(--success);
 }
 
+/* Compact "row mode" for repeat actions that are just name + one line + button -- a .hustle-card
+   is dead weight for these (Da Skreetz, job skill grinds, crime tiers, gym/food, gun range).
+   .action-row-list is the card: it carries the raised-surface background/border/radius so a group
+   of rows still reads as one panel, same as .hustle-grid's cards do individually. Rows inside it
+   are flat, separated only by a hairline, Torn-style. */
+.action-row-list {
+  background: linear-gradient(180deg, var(--surface-4), var(--surface-3) 60%);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+  margin: var(--space-4) 0;
+  overflow: hidden;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 44px;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--border-hairline);
+  transition: background-color 0.12s ease;
+}
+
+.action-row:last-child {
+  border-bottom: none;
+}
+
+.action-row:hover {
+  background: var(--surface-3);
+}
+
+.action-row-icon {
+  flex: 0 0 auto;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.action-row-name {
+  /* flex-shrink: 0 -- overflow:hidden below would otherwise zero out this item's automatic min
+     width per the flexbox spec, letting the hint's flex-grow squeeze the name down to nothing
+     before the hint itself gives up any space. The name is short and known (a hustle/skill/crime
+     name); the hint is the long, variable-length one, so it should be the side that gives first.
+     max-width is a last-resort clamp for the rare long name, not the normal case. */
+  flex: 0 0 auto;
+  max-width: 60%;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Payout/cost/cooldown hint -- muted and tabular so a column of numbers lines up as you scan down
+   a list of rows, same reasoning as the wallet/cooldown digits elsewhere. */
+.action-row-hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Buttons inside a row run at the .secondary-btn scale (compact) regardless of tier -- a
+   full-size primary button would blow past the 44px row height. */
+.action-row-actions button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* The x5/x10 batch button sits smaller still, right of the main action button -- mirrors
+   .hustle-btn-row's plain/batch pairing but at row scale. */
+.action-row-actions button.secondary-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
 .status-box {
   margin-top: 20px;
   padding: 16px;
@@ -2652,13 +2741,43 @@ p.foil-ascended-line.foil-ascended-line {
   font-size: 13px;
 }
 
+/* The comedic flavor lines are the game's best asset -- give them their own voice instead of
+   rendering at UI-chrome size. Slightly larger than the rest of the interface, generous
+   line-height for the longer one-liners, and full --text-primary (not the muted grey the rest of
+   the log chrome uses) so they read as the main event, not a footnote. */
 .log p {
-  margin: 4px 0;
-  color: var(--text-muted);
+  margin: 8px 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .log p.gain { color: var(--success); }
 .log p.loss { color: var(--danger); }
+
+/* Dimmed HH:MM prefix set once per entry by logTo() in js/core.js -- tabular so a column of
+   timestamps lines up, sized down from the message text so it reads as metadata, not content. */
+.log-ts {
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--text-disabled);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Typewriter-style reveal on the newest entry only, added/removed by logTo(). A left-to-right
+   clip-path wipe rather than a fake-monospace steps() width trick -- clip-path operates on the
+   element's full (possibly multi-line, wrapped) rendered box, so it stays correct for the long
+   flavor lines that wrap inside the log's 460px width, where a width/steps() reveal would have to
+   force white-space: nowrap and break wrapping entirely. */
+.log-entry-new {
+  animation: log-entry-reveal 0.5s steps(20, end) forwards;
+}
+
+@keyframes log-entry-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
 
 .log-single-line {
   margin-top: 12px;
@@ -4373,36 +4492,6 @@ p.foil-ascended-line.foil-ascended-line {
   width: 100%;
 }
 
-.job-skill-row {
-  display: flex;
-  /* Was nowrap, back when each row held one button. With the x10 Shift button beside it the pair
-     no longer fits at the narrow column widths this card renders at, so the batch button is allowed
-     to drop to its own line rather than overflowing the card. */
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px 16px;
-  padding: 6px 0;
-  font-size: 13px;
-}
-
-.job-skill-row span {
-  white-space: nowrap;
-}
-
-.job-skill-row button {
-  flex-shrink: 0;
-  min-width: 92px;
-}
-
-/* The x10 batch button sits beside the plain Work button as a smaller secondary action -- gap-8
-   pushes it away from the skill label so the pair reads as one control group. */
-.job-skill-row button + button {
-  margin-left: auto;
-  min-width: 78px;
-  font-size: 12px;
-}
-
 /* Da Skreetz cards: the plain hustle button and its x5 sibling share one row. */
 .hustle-btn-row {
   display: flex;
@@ -4701,6 +4790,53 @@ p.foil-ascended-line.foil-ascended-line {
 }
 
 /* ============================================================
+   Accessibility: prefers-reduced-motion
+   ============================================================ */
+
+/* Every decorative loop in the game, in one place. `animation-play-state: paused` (not `none`) on
+   the 13 color/glow/gradient pulses below -- these are crate/title/badge ART with hardcoded colors
+   (see the token-system note at the top of this file), so removing the animation outright would
+   often strip the only place a color/background is ever set and leave the element blank. Pausing
+   freezes it on whatever frame it's on: still fully colored, still identifiable as foil/rare/glowing,
+   just no longer repainting every frame. Same approach already used for .title-foil::after below --
+   with that one this is the full set an old audit counted as "14 pulsing animations" (zero
+   prefers-reduced-motion guards). The ticker (js/ticker.js, ticker.css) handles its own and is left
+   alone; cooldown-sweep fill bars convey cooldown STATE (information) and also stay -- only the
+   `cooldown-ready` flash and the newest-log-entry reveal are decoration and get fully disabled. */
+@media (prefers-reduced-motion: reduce) {
+  button.cooldown-ready {
+    animation: none;
+  }
+
+  .log-entry-new {
+    animation: none;
+    clip-path: none;
+  }
+
+  .title-admin .title-text,
+  .title-gs1-rare,
+  .title-godisgood-rare,
+  .title-gewd-rare .title-text,
+  .title-sowwy-mythic .title-text,
+  .title-anima-hyper-gear5::before,
+  .title-anima-hyper-makima::before,
+  .title-red-trumpfistup,
+  .title-red-trumpauto,
+  .title-blue-darkbrandon,
+  .title-blue-bidenauto,
+  .name-style-hyper-rainbow,
+  .pledge-limited-tag,
+  .feature-banner.rgb-blue-banner,
+  .feature-banner.anima-banner,
+  .feature-banner.counterfinish-banner,
+  .feature-banner.ml-banner,
+  .title-ml-special-unit,
+  .title-ml-krogger {
+    animation-play-state: paused;
+  }
+}
+
+/* ============================================================
    Mobile / responsive
    ============================================================ */
 
@@ -4806,16 +4942,26 @@ p.foil-ascended-line.foil-ascended-line {
     min-width: 0;
   }
 
-  .job-skill-row {
+  /* Rows stay single-line where they fit; once the name+hint+buttons no longer do, wrap the hint
+     under the name instead of letting the row force horizontal scroll on the page. */
+  .action-row {
     flex-wrap: wrap;
+    min-height: 0;
+    padding: 8px 14px;
   }
 
-  .job-skill-row span {
+  .action-row-name {
     white-space: normal;
   }
 
-  .job-skill-row button {
+  .action-row-hint {
     flex: 1 1 100%;
+    white-space: normal;
+    text-overflow: clip;
+  }
+
+  .action-row-actions {
+    margin-left: auto;
   }
 
   .admin-box {
