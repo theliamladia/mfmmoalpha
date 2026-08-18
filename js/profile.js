@@ -210,7 +210,13 @@ function renderProfile() {
   // profileStatusText above. profileEquippedTitle already re-validates against viewedChar's actual
   // ownership, so a title that's since been traded/cracked away can't linger here.
   const equippedTitleDef = profileEquippedTitle(viewedChar);
-  profileNameTitleBadge.innerHTML = equippedTitleDef ? titleBadgeMarkup(equippedTitleDef) : '';
+  // "Rank" here is the equipped Balaclava BADGE (the chip that renders before the title everywhere
+  // else -- see badgeChipMarkup in core.js), per the owner's clarification. It leads the title in
+  // the name row for the same reason it leads it in chat/roster: badge, then title, then name reads
+  // as one identity unit. badgeChipMarkup is already parameterized on the viewed character and
+  // returns '' when nothing is equipped, so other players' profiles and badge-less players both
+  // come for free.
+  profileNameTitleBadge.innerHTML = badgeChipMarkup(viewedChar) + (equippedTitleDef ? titleBadgeMarkup(equippedTitleDef) : '');
 
   btnProfileStatus.classList.toggle('hidden', !isOwner);
   const status = profileState.status || '';

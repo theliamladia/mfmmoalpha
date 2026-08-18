@@ -1757,6 +1757,23 @@ p.foil-ascended-line.foil-ascended-line {
   color: #ffe9b3;
 }
 
+/* WAIFU CRATE -- same shifting-gradient banner treatment as Milos Legends, tuned pink/magenta to
+   match the crate's love-pulse mythic border below. */
+.feature-banner.waifu-banner {
+  background: linear-gradient(120deg, #2a0a18, #5c1030, #b3266b, #5c1030, #2a0a18);
+  background-size: 300% 300%;
+  animation: mlBannerShift 5s ease infinite;
+  border-color: #ff4d8d;
+}
+
+.waifu-banner .feature-banner-text h3 {
+  color: #fff;
+}
+
+.waifu-banner .feature-banner-text p {
+  color: #ffd6e7;
+}
+
 /* Balaclava Badge Crate -- same photo-banner-with-dark-overlay treatment as LLG/pledge, using the
    Bronze badge art itself as the background so it visually reads as "a badge" at a glance, per the
    user's explicit ask, rather than just being another text banner. */
@@ -1953,6 +1970,88 @@ p.foil-ascended-line.foil-ascended-line {
   --a2-volt-hot: #ffffff;
   --a2-volt-dim: #2f9fd6;
   animation: a2MythicVolt 0.9s steps(1, end) infinite;
+}
+
+/* ---------- WAIFU CRATE ---------- */
+/* Same convention as ANIMA 2 above: art IS the title (hideNameOnBadge: true on every entry), so
+   only the CSS art class matters -- no wrapper element, sizing comes from the shared
+   `.title-badge:has(.title-text-hidden)` rule. Female-character roster, no overlap with ANIMA 2's
+   cast. Positions set by eye from where each source clip's face actually sits. */
+.title-wf-makima,
+.title-wf-nezuko,
+.title-wf-mikasa,
+.title-wf-miku,
+.title-wf-erza,
+.title-wf-asuna,
+.title-wf-frieren,
+.title-wf-hinata,
+.title-wf-zerotwo,
+.title-wf-rem,
+.title-wf-marin,
+.title-wf-yor,
+.title-wf-shinobu,
+.title-wf-robin,
+.title-wf-boahancock,
+.title-wf-mai,
+.title-wf-kurisu,
+.title-wf-tsunade,
+.title-wf-power,
+.title-wf-rukia {
+  background-size: cover;
+}
+
+/* Common: flat art in a plain white frame, no color/glow/motion. */
+.title-wf-makima { background-image: url('https://media.giphy.com/media/2vi7YMqmZLrg1pk1FC/giphy_s.gif'); background-position: center 25%; border: 3px solid #fff; }
+.title-wf-nezuko { background-image: url('https://media.giphy.com/media/nekkldT5J7Pd1kdBGf/giphy_s.gif'); background-position: center 40%; border: 3px solid #fff; }
+.title-wf-mikasa { background-image: url('https://media.giphy.com/media/huUDJJZ54gQxJf16a8/giphy_s.gif'); background-position: center 35%; border: 3px solid #fff; }
+.title-wf-miku { background-image: url('https://media.giphy.com/media/FKDbDiRdvs3WU/giphy_s.gif'); background-position: center 30%; border: 3px solid #fff; }
+.title-wf-erza { background-image: url('https://media.giphy.com/media/TIrft6okJ8BtBKsNYe/giphy_s.gif'); background-position: center 15%; border: 3px solid #fff; }
+.title-wf-asuna { background-image: url('https://media.giphy.com/media/yBeej2d9kB4FYXeg2Z/giphy_s.gif'); background-position: 30% 20%; border: 3px solid #fff; }
+.title-wf-frieren { background-image: url('https://media.giphy.com/media/0bSb4Zvrc4D8bv6c1z/giphy_s.gif'); background-position: center 35%; border: 3px solid #fff; }
+.title-wf-hinata { background-image: url('https://media.giphy.com/media/3K5gZ7GcNRg3u/giphy_s.gif'); background-position: center 35%; border: 3px solid #fff; }
+
+/* Uncommon: same still art, saturated per-title border + a 1px inner rim -- colours picked to read
+   against each still and stay distinct from one another within the tier. */
+.title-wf-zerotwo { background-image: url('https://media.giphy.com/media/AzFAdzZPHWeSWEVRmf/giphy_s.gif'); background-position: center 30%; border: 3px solid #ff6b81; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-wf-rem { background-image: url('https://media.giphy.com/media/fT3E89g0tBB0w5Ivm1/giphy_s.gif'); background-position: center 25%; border: 3px solid #4dd2ff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-wf-marin { background-image: url('https://media.giphy.com/media/piVmVtAGcMjMKsSqhE/giphy_s.gif'); background-position: center 30%; border: 3px solid #f5c542; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-wf-yor { background-image: url('https://media.giphy.com/media/Nii2FhtCqITxT6uHnE/giphy_s.gif'); background-position: 18% 35%; border: 3px solid #b91c3c; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-wf-shinobu { background-image: url('https://media.giphy.com/media/If4wTrEdm2rheHpBAf/giphy_s.gif'); background-position: center 25%; border: 3px solid #a78bfa; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.title-wf-robin { background-image: url('https://media.giphy.com/media/E6yz5LCAMQRyEtlxZz/giphy_s.gif'); background-position: center 30%; border: 3px solid #14b8a6; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+
+/* Rare: coloured border + a slow pulsing halo bleeding outside the chip (reuses ANIMA 2's
+   a2RareGlow keyframes, parameterised the same way via --a2-rare-c). */
+.title-wf-boahancock { background-image: url('https://media.giphy.com/media/XkC4mpQ9JJsEo/giphy_s.gif'); background-position: center 35%; border: 3px solid #ffd700; --a2-rare-c: #ffd700; animation: a2RareGlow 2.2s ease-in-out infinite; }
+.title-wf-mai { background-image: url('https://media.giphy.com/media/JrY7yFe52MVLiLjcce/giphy_s.gif'); background-position: center 25%; border: 3px solid #60a5fa; --a2-rare-c: #60a5fa; animation: a2RareGlow 2.2s ease-in-out infinite; }
+.title-wf-kurisu { background-image: url('https://media.giphy.com/media/0041tLPzGTz75UkS5p/giphy_s.gif'); background-position: center 25%; border: 3px solid #dc2626; --a2-rare-c: #dc2626; animation: a2RareGlow 2.2s ease-in-out infinite; }
+.title-wf-tsunade { background-image: url('https://media.giphy.com/media/mhm1hgWhVMMZ8fZiFv/giphy_s.gif'); background-position: center 20%; border: 3px solid #f59e0b; --a2-rare-c: #f59e0b; animation: a2RareGlow 2.2s ease-in-out infinite; }
+
+/* Mythic: full animated GIF + a "love-pulsing" heartbeat border/glow -- the owner's specific ask.
+   Unlike ANIMA 2's evenly-flickering volt effect, this is a deliberate double-thump cardiogram
+   rhythm (quick swell, quick swell, long rest) so it reads as a heartbeat rather than generic
+   pulsing: both thumps land in the first ~34% of a 1.1s cycle, then the border rests at a dim pink
+   for the remaining ~66%. Border/box-shadow keyframes only, no wrapper element -- titleBadgeMarkup()
+   emits a bare span used by 15+ call sites (see the ANIMA 2 mythic note above for why a wrapper is a
+   known regression risk). Both mythics share one palette (love pink, not per-title like ANIMA 2's
+   volt colours) per the owner's ask. */
+@keyframes wfHeartbeat {
+  0%, 100% { border-color: #c2185b; box-shadow: 0 0 4px #c2185b, 0 0 8px rgba(194, 24, 91, 0.4); }
+  8% { border-color: #ffd6e7; box-shadow: 0 0 15px #ff4d8d, 0 0 28px rgba(255, 77, 141, 0.75); }
+  16% { border-color: #ff4d8d; box-shadow: 0 0 6px #ff4d8d, 0 0 12px rgba(255, 77, 141, 0.5); }
+  24% { border-color: #ffd6e7; box-shadow: 0 0 19px #ffd6e7, 0 0 34px rgba(255, 77, 141, 0.85); }
+  34% { border-color: #c2185b; box-shadow: 0 0 4px #c2185b, 0 0 9px rgba(194, 24, 91, 0.4); }
+}
+.title-wf-power {
+  background-image: url('https://media.giphy.com/media/NkwjY0o4vgkvZx29Tz/giphy.gif');
+  background-position: center 22%;
+  border: 2px solid #ff4d8d;
+  animation: wfHeartbeat 1.1s ease-in-out infinite;
+}
+.title-wf-rukia {
+  background-image: url('https://media.giphy.com/media/FlGmdHyBjNaMM/giphy.gif');
+  background-position: center 45%;
+  border: 2px solid #ff4d8d;
+  animation: wfHeartbeat 1.1s ease-in-out infinite;
 }
 
 /* ---------- Balaclava Badges ---------- */
@@ -4941,8 +5040,16 @@ p.foil-ascended-line.foil-ascended-line {
   .feature-banner.counterfinish-banner,
   .feature-banner.ml-banner,
   .title-ml-special-unit,
-  .title-ml-krogger {
+  .title-ml-krogger,
+  .feature-banner.waifu-banner {
     animation-play-state: paused;
+  }
+
+  .title-wf-power,
+  .title-wf-rukia {
+    animation: none;
+    border-color: #ff4d8d;
+    box-shadow: 0 0 8px 2px rgba(255, 77, 141, 0.6);
   }
 }
 
@@ -5623,6 +5730,13 @@ p.foil-ascended-line.foil-ascended-line {
 .profile-name {
   font-size: 26px;
   margin: 0;
+}
+
+.profile-name-title-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
 }
 
 .profile-name-title-badge:empty {
