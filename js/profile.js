@@ -12,6 +12,7 @@ const btnProfileVisionChange = document.getElementById('btnProfileVisionChange')
 const profileBannerEl = document.getElementById('profileBanner');
 const btnProfileShuffleBanner = document.getElementById('btnProfileShuffleBanner');
 const profileNameEl = document.getElementById('profileName');
+const profileNameTitleBadge = document.getElementById('profileNameTitleBadge');
 const btnProfileStatus = document.getElementById('btnProfileStatus');
 const profileStatusText = document.getElementById('profileStatusText');
 const profileLevelBadge = document.getElementById('profileLevelBadge');
@@ -203,11 +204,22 @@ function renderProfile() {
   const fullName = `${viewedChar.firstName} ${viewedChar.lastName}`;
   profileNameEl.innerHTML = profileNameHtml(fullName);
 
+  // Equipped title, rendered with the exact same markup helper the rest of the game uses (chat,
+  // showcase, dropdowns) -- foils/mythic effects/hidden-name art all come along for free. Renders
+  // nothing (no empty chip) when no title is equipped, same "omit entirely" idiom as
+  // profileStatusText above. profileEquippedTitle already re-validates against viewedChar's actual
+  // ownership, so a title that's since been traded/cracked away can't linger here.
+  const equippedTitleDef = profileEquippedTitle(viewedChar);
+  profileNameTitleBadge.innerHTML = equippedTitleDef ? titleBadgeMarkup(equippedTitleDef) : '';
+
   btnProfileStatus.classList.toggle('hidden', !isOwner);
   const status = profileState.status || '';
   profileStatusText.textContent = status;
   profileStatusText.classList.toggle('hidden', !status);
 
+  // "Rank" per the game's existing terminology -- there's no separate ranking system, just the
+  // same Level shown in the topbar (see levelBadgeEl in core.js) and leaderboard, computed
+  // server-side into profileViewCache.level so it's correct for other players too.
   profileLevelBadge.textContent = `⭐ Lvl ${level}`;
   profileAllianceBadge.textContent = allianceLabel(viewedChar.alliance, viewedChar);
 

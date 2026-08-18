@@ -3453,6 +3453,7 @@ p.foil-ascended-line.foil-ascended-line {
   border: 1px solid var(--border-default);
   border-radius: 6px;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 
 .stock-ticker-card h3 {
@@ -5553,8 +5554,12 @@ p.foil-ascended-line.foil-ascended-line {
 
 .profile-banner {
   position: relative;
-  height: 180px;
-  border-radius: 10px;
+  /* 2x the old 180px -- background-size:cover means taller = more of the source title art
+     actually visible instead of a thin cropped strip. Scaled back down at the 900px/520px
+     breakpoints below so it doesn't dominate the viewport on a phone. */
+  height: 300px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
   /* background-color, not the `background` shorthand -- a title's own CSS class (e.g.
      .title-anima-hyper-gear5) sets its background-image directly on this same element, and since
      this rule comes later in the file at equal specificity, a `background:` shorthand here would
@@ -5566,6 +5571,19 @@ p.foil-ascended-line.foil-ascended-line {
   margin-bottom: 18px;
 }
 
+/* Bottom scrim so the shuffle control (and any future overlaid text) stays legible over bright
+   art -- a flat dark fade, not a token color, since it has to work over arbitrary hardcoded art
+   backgrounds rather than the chrome surface tokens. Purely decorative + non-interactive, so it
+   can never sit between a click and the shuffle button above it. */
+.profile-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+
 .profile-banner-shuffle {
   position: absolute;
   right: 12px;
@@ -5574,6 +5592,7 @@ p.foil-ascended-line.foil-ascended-line {
   border-radius: 50%;
   font-size: 16px;
   line-height: 1;
+  z-index: 1;
 }
 
 .profile-header-row {
@@ -5592,16 +5611,33 @@ p.foil-ascended-line.foil-ascended-line {
   flex-wrap: wrap;
 }
 
+/* Name row: display name + equipped title badge + Level chip, all one line that wraps to a
+   second line on narrow viewports rather than truncating or overlapping. */
+.profile-name-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
 .profile-name {
   font-size: 26px;
   margin: 0;
 }
 
+.profile-name-title-badge:empty {
+  display: none;
+}
+
+.profile-level-chip {
+  font-variant-numeric: tabular-nums;
+}
+
 .profile-status-btn {
   background: var(--surface-raised);
-  border: 1px solid #383a44;
+  border: 1px solid var(--border-default);
   color: var(--text-muted);
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   padding: 6px 14px;
   font-size: 13px;
   cursor: pointer;
@@ -5630,10 +5666,15 @@ p.foil-ascended-line.foil-ascended-line {
 .profile-stat-pill {
   background: var(--surface-3);
   border: 1px solid var(--border-default);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 8px 14px;
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.profile-stat-pill b {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .profile-privacy-toggle {
@@ -5672,8 +5713,15 @@ p.foil-ascended-line.foil-ascended-line {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid #2c2e36;
+  padding: 8px 6px;
+  margin: 0 -6px;
+  border-radius: var(--radius-sm);
+  border-bottom: 1px solid var(--border-hairline);
+  transition: background-color 0.12s ease;
+}
+
+.profile-showcase-item:hover {
+  background: var(--surface-3);
 }
 
 .profile-showcase-item:last-child {
@@ -5721,6 +5769,13 @@ p.foil-ascended-line.foil-ascended-line {
   align-items: center;
   gap: 8px;
   width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.12s ease;
+}
+
+.profile-slab-slot:hover {
+  background: var(--surface-3);
 }
 
 .profile-slab-slot-actions {
@@ -5737,6 +5792,7 @@ p.foil-ascended-line.foil-ascended-line {
   margin: 0;
   font-weight: 700;
   font-size: 15px;
+  font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
 
@@ -5765,11 +5821,14 @@ p.foil-ascended-line.foil-ascended-line {
   flex: 1;
 }
 
+/* Sits at the same pill radius as the rest of the modern button system rather than its own
+   bespoke 8px -- the green fill is the one thing that stays bespoke, marking this specifically as
+   a "post" action distinct from .secondary-btn's neutral tier. */
 .profile-wall-post-btn {
   background: var(--success);
-  color: #16321f;
+  color: var(--surface-0);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   padding: 0 20px;
   font-weight: 700;
   cursor: pointer;
@@ -5785,7 +5844,7 @@ p.foil-ascended-line.foil-ascended-line {
 .profile-wall-post {
   background: var(--surface-3);
   border: 1px solid var(--border-default);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
 
@@ -5813,7 +5872,7 @@ p.foil-ascended-line.foil-ascended-line {
 .profile-wall-post p {
   margin: 0;
   font-size: 13px;
-  color: #d5d6db;
+  color: var(--text-secondary);
 }
 
 .profile-wall-pagination {
@@ -5825,4 +5884,39 @@ p.foil-ascended-line.foil-ascended-line {
 .profile-wall-pagination button {
   padding: 5px 11px;
   font-size: 12px;
+}
+
+/* Profile responsive overrides -- kept here, after the base .profile-* rules above, rather than in
+   the generic mobile media blocks near the top of the sheet: those come earlier in the file, so a
+   same-specificity base rule declared later (as all of .profile-* is, being a late-added page)
+   would otherwise win the cascade regardless of which media query matched. */
+@media (max-width: 900px) {
+  /* Scale the 300px desktop banner back down so the taller art doesn't eat the whole first
+     screen on a tablet-width viewport, while still showing a lot more than the old 180px did. */
+  .profile-banner {
+    height: 220px;
+  }
+
+  .profile-columns {
+    flex-direction: column;
+  }
+
+  .profile-portfolio-card,
+  .profile-showcase-card {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .profile-banner {
+    height: 170px;
+  }
+
+  .profile-name {
+    font-size: 22px;
+  }
+
+  .profile-header-row {
+    justify-content: flex-start;
+  }
 }
