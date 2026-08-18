@@ -563,6 +563,33 @@ const ANIMA2_CRATE_TITLES = [
   { id: 'a2SixEyes', name: 'Six Eyes', hideNameOnBadge: true, cssClass: 'title-a2-sixeyes', weight: 0.05, rarity: 'mythic', how: 'Won from an ANIMA 2 spin (mythic! 0.05% odds).' },
 ];
 
+// WAIFU CRATE: anime-portrait art, female-character roster (no overlap with ANIMA 2's cast), same
+// hidden-name/art-IS-the-title convention. Lives in Cosmetixxx (shop-titles), the repo's default
+// placement for new crates. 8 common / 6 uncommon / 4 rare / 2 mythic, weights sum to exactly 100.
+const WAIFU_CRATE_COST = 50000;
+const WAIFU_CRATE_TITLES = [
+  { id: 'wfMakima', name: 'Makima', hideNameOnBadge: true, cssClass: 'title-wf-makima', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfNezuko', name: 'Nezuko', hideNameOnBadge: true, cssClass: 'title-wf-nezuko', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfMikasa', name: 'Mikasa', hideNameOnBadge: true, cssClass: 'title-wf-mikasa', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfMiku', name: 'Miku', hideNameOnBadge: true, cssClass: 'title-wf-miku', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfErza', name: 'Erza', hideNameOnBadge: true, cssClass: 'title-wf-erza', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfAsuna', name: 'Asuna', hideNameOnBadge: true, cssClass: 'title-wf-asuna', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfFrieren', name: 'Frieren', hideNameOnBadge: true, cssClass: 'title-wf-frieren', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfHinata', name: 'Hinata', hideNameOnBadge: true, cssClass: 'title-wf-hinata', weight: 7.5, rarity: 'common', how: 'Won from a WAIFU CRATE spin (common).' },
+  { id: 'wfZeroTwo', name: 'Zero Two', hideNameOnBadge: true, cssClass: 'title-wf-zerotwo', weight: 4.65, rarity: 'uncommon', how: 'Won from a WAIFU CRATE spin (uncommon).' },
+  { id: 'wfRem', name: 'Rem', hideNameOnBadge: true, cssClass: 'title-wf-rem', weight: 4.65, rarity: 'uncommon', how: 'Won from a WAIFU CRATE spin (uncommon).' },
+  { id: 'wfMarin', name: 'Marin', hideNameOnBadge: true, cssClass: 'title-wf-marin', weight: 4.65, rarity: 'uncommon', how: 'Won from a WAIFU CRATE spin (uncommon).' },
+  { id: 'wfYor', name: 'Yor', hideNameOnBadge: true, cssClass: 'title-wf-yor', weight: 4.65, rarity: 'uncommon', how: 'Won from a WAIFU CRATE spin (uncommon).' },
+  { id: 'wfShinobu', name: 'Shinobu', hideNameOnBadge: true, cssClass: 'title-wf-shinobu', weight: 4.65, rarity: 'uncommon', how: 'Won from a WAIFU CRATE spin (uncommon).' },
+  { id: 'wfRobin', name: 'Robin', hideNameOnBadge: true, cssClass: 'title-wf-robin', weight: 4.65, rarity: 'uncommon', how: 'Won from a WAIFU CRATE spin (uncommon).' },
+  { id: 'wfBoaHancock', name: 'Boa Hancock', hideNameOnBadge: true, cssClass: 'title-wf-boahancock', weight: 3, rarity: 'rare', how: 'Won from a WAIFU CRATE spin (rare).' },
+  { id: 'wfMai', name: 'Mai', hideNameOnBadge: true, cssClass: 'title-wf-mai', weight: 3, rarity: 'rare', how: 'Won from a WAIFU CRATE spin (rare).' },
+  { id: 'wfKurisu', name: 'Kurisu', hideNameOnBadge: true, cssClass: 'title-wf-kurisu', weight: 3, rarity: 'rare', how: 'Won from a WAIFU CRATE spin (rare).' },
+  { id: 'wfTsunade', name: 'Tsunade', hideNameOnBadge: true, cssClass: 'title-wf-tsunade', weight: 3, rarity: 'rare', how: 'Won from a WAIFU CRATE spin (rare).' },
+  { id: 'wfPower', name: 'Power', hideNameOnBadge: true, cssClass: 'title-wf-power', weight: 0.05, rarity: 'mythic', how: 'Won from a WAIFU CRATE spin (mythic! 0.05% odds).' },
+  { id: 'wfRukia', name: 'Rukia', hideNameOnBadge: true, cssClass: 'title-wf-rukia', weight: 0.05, rarity: 'mythic', how: 'Won from a WAIFU CRATE spin (mythic! 0.05% odds).' },
+];
+
 const RENAME_COST = 10000;
 
 const PISTOL_ITEMS = [
