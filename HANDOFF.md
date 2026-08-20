@@ -100,8 +100,11 @@ sqlite3 data.sqlite "select count(*) from users;"
 CORS uses `credentials: true` — required for the `sendBeacon` save-on-tab-close path.
 
 ### Backups
-There are ad-hoc `data.sqlite.bak-*` snapshots in `~/mfmmoserver`. **There is no automated backup.**
-Worth fixing — see Open Items.
+Nightly automated snapshot at 04:17 UTC via the deploy user's crontab: `scripts/nightly-backup.js`
+(SQLite backup API, integrity-checked, newest 7 kept in `~/backups`, log at `~/backups/backup.log`).
+On-box only — protects against corruption and bad migrations, not disk loss; off-box replication is
+the remaining gap. Ad-hoc `data.sqlite.bak-*` snapshots also accumulate in `~/mfmmoserver` before
+schema deploys.
 
 ---
 
@@ -228,7 +231,7 @@ Fuller detail lives in the git history of the fixes, but these are the ones that
 ## 8. Open items
 
 **Infrastructure**
-- No automated DB backups (only manual `data.sqlite.bak-*` files). Highest-priority gap.
+- Backups: nightly on-box snapshots exist (see Deploy > Backups); off-box replication still missing.
 - No rate limiting on any route.
 
 **Known bugs / debt**
