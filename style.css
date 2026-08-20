@@ -926,6 +926,56 @@ button.cooldown-ready {
   font-weight: 700;
 }
 
+/* --- Set Registry achievement titles --- */
+/* Text-rendered only, hardcoded art (no image assets) -- earned permanently, no rarity, so
+   unsellable/unprestigeable by construction just like PEAK CIVILIAN et al above. */
+
+/* REGISTRY COLLECTOR: clean silver -- the "you finished your first set" badge, understated. */
+.title-registrycollector {
+  background: linear-gradient(135deg, #4a4c52, #cfd2d8, #8a8d94, #eef0f4, #4a4c52);
+  border: 1px solid #b6bac2;
+  font-weight: 700;
+}
+.title-registrycollector .title-text {
+  color: #1c1d20;
+  text-shadow: 0 0 3px #ffffffb0;
+}
+
+/* MASTER SET: gold -- a real GPA-8+ across an entire set. */
+.title-masterset {
+  background: linear-gradient(135deg, #6b4f08, #f2c94c, #c9a227, #fff3b0, #6b4f08);
+  border: 1px solid #c9a227;
+  font-weight: 800;
+}
+.title-masterset .title-text {
+  color: #2a1a00;
+  text-shadow: 0 0 4px #fff3b0aa;
+}
+
+/* PERFECT SET: an all-10 set. Nobody will get this soon -- that's the point, so it gets the
+   showiest treatment in the whole title catalog: a shifting holographic gradient plus a pulsing
+   glow, distinct from every other animated title in this file. */
+@keyframes perfectSetShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes perfectSetGlow {
+  from { text-shadow: 0 0 4px #fff, 0 0 10px #b06bff, 0 0 18px #6bd6ff; }
+  to { text-shadow: 0 0 8px #fff, 0 0 20px #ff6bd6, 0 0 32px #6bffb0; }
+}
+.title-perfectset {
+  background: linear-gradient(90deg, #ff2e6d, #ffb02e, #f5f52e, #2eff8f, #2ecbff, #b02eff, #ff2e6d);
+  background-size: 300% 100%;
+  animation: perfectSetShift 3s linear infinite;
+  border: 1px solid #fff;
+  font-weight: 900;
+}
+.title-perfectset .title-text {
+  color: #fff;
+  letter-spacing: 1px;
+  animation: perfectSetGlow 1.4s ease-in-out infinite alternate;
+}
+
 /* --- Anima Crate --- */
 @keyframes rainbowShift {
   0% { background-position: 0% 50%; }
@@ -6442,3 +6492,81 @@ p.foil-ascended-line.foil-ascended-line {
 .nmg-cert-event-mtn_sale,
 .nmg-cert-event-market_buy { border-left-color: #0a7d2e; }
 .nmg-cert-event-cracked { border-left-color: #e0393e; }
+
+/* --- Set Registry --- */
+.nmg-reg-controls { display: flex; justify-content: flex-end; margin-bottom: 6px; }
+.nmg-reg-section-title { margin: 18px 0 8px; font-size: 13px; letter-spacing: 1px; opacity: 0.8; }
+
+.nmg-reg-set {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: var(--surface-1);
+  padding: 12px;
+}
+.nmg-reg-set-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.nmg-reg-set-name { font-weight: 800; font-size: 13px; }
+.nmg-reg-set-count { font-size: 11px; color: var(--text-secondary); }
+.nmg-reg-set.nmg-reg-complete .nmg-reg-set-count { color: #2ecc71; font-weight: 700; }
+.nmg-reg-set-gpa {
+  font-weight: 900;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--accent-contrast, #fff);
+}
+.nmg-reg-progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2, var(--border));
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.nmg-reg-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+.nmg-reg-set.nmg-reg-complete .nmg-reg-progress-fill { background: #2ecc71; }
+.nmg-reg-missing { display: flex; flex-wrap: wrap; gap: 5px; }
+.nmg-reg-missing-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--surface-2, var(--border));
+  color: var(--text-secondary);
+  border: 1px dashed var(--border);
+}
+.nmg-reg-set-complete-note { font-size: 11px; color: #2ecc71; font-weight: 700; }
+
+.nmg-reg-board-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.nmg-reg-board-table th {
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+.nmg-reg-board-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.nmg-reg-board-rank { font-weight: 900; opacity: 0.7; width: 24px; }
+.nmg-reg-board-name a { color: var(--text-primary); font-weight: 700; text-decoration: none; }
+.nmg-reg-board-name a:hover { text-decoration: underline; }
+.nmg-reg-board-gpa { font-weight: 900; text-align: right; }
+.nmg-reg-board-mix { color: var(--text-secondary); font-size: 11px; }
+.nmg-reg-board-date { color: var(--text-secondary); font-size: 11px; white-space: nowrap; }

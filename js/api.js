@@ -744,6 +744,11 @@ function apiGradingCert(grader, seriesNo) {
 function apiGradingMyCerts() {
   return apiRequest('/grading/my-certs');
 }
+// Set Registry: your own progress (computed server-side from your inventory + escrowed MTN
+// listings) plus the public ranked table of every player's currently-complete sets, per crate.
+function apiGradingRegistry() {
+  return apiRequest('/grading/registry');
+}
 function apiFoilAscension(stackId) {
   return apiRequest('/cosmetics/foil-ascension', { method: 'POST', body: JSON.stringify({ stackId }) });
 }

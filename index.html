@@ -423,6 +423,7 @@
             <button class="nmg-subtab-btn active" data-nmg-subtab="grade">🏅 Grading Counter</button>
             <button class="nmg-subtab-btn" data-nmg-subtab="pop">📊 Pop Report</button>
             <button class="nmg-subtab-btn" data-nmg-subtab="cert">🔎 Cert Lookup</button>
+            <button class="nmg-subtab-btn" data-nmg-subtab="reg">📇 Set Registry</button>
           </div>
 
           <div data-nmg-panel="grade">
@@ -479,6 +480,19 @@
               <button id="btnNmgCertLookup">Look Up</button>
             </div>
             <div id="nmgCertLookupResult"></div>
+          </div>
+
+          <div data-nmg-panel="reg" class="hidden">
+            <h3 class="gunclub-section-title">📇 Set Registry</h3>
+            <p>Slab every title in a crate &mdash; any grader, any grade &mdash; and the set is complete. Your Set GPA is the average of your best copy of each title. Best copies stay best forever: a later crack of a completed set does not take back what you already earned.</p>
+            <div class="nmg-reg-controls">
+              <button id="btnNmgRegistryRefresh" class="secondary-btn">Refresh</button>
+            </div>
+            <p id="nmgRegistryMeta" class="item-subheading"></p>
+            <h4 class="nmg-reg-section-title">Your Progress</h4>
+            <div id="nmgRegistryProgress"></div>
+            <h4 class="nmg-reg-section-title">The Registry</h4>
+            <div id="nmgRegistryBoard"></div>
           </div>
         </div>
 

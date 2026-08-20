@@ -1101,8 +1101,125 @@ if (nmgCertLookupInput) {
   });
 }
 
-// The Pop Report is a whole extra aggregate query, so it loads lazily on its own sub-tab click --
-// same reasoning as the NMG slot state and the CosmetixxMarket rotation above.
+// ---------- Set Registry ----------
+// PSA Set Registry parody: own a graded slab (any grader, any grade) of every title in a crate and
+// the set is complete. The server does all the aggregation (your progress + the public ranked
+// board) and caches it for 60s, same as the Pop Report above -- see GET /grading/registry.
+const nmgRegistryProgressEl = document.getElementById('nmgRegistryProgress');
+const nmgRegistryBoardEl = document.getElementById('nmgRegistryBoard');
+const nmgRegistryMeta = document.getElementById('nmgRegistryMeta');
+const btnNmgRegistryRefresh = document.getElementById('btnNmgRegistryRefresh');
+
+let registryCache = null;
+
+// Matches the icon each set's crate already carries in TITLE_CRATE_GROUPS (js/market.js), keyed by
+// the server's crate `key` (mfmmoserver/gameLogic.js REGISTRY_CRATE_DEFS) rather than re-deriving
+// it, since the server owns which titles belong to which set.
+const REGISTRY_CRATE_ICONS = {
+  anima: '🎮', counterfinish: '🎨', red: '🔴', blue: '🔵', llg: '✅',
+  milosLegends: '🎖️', anima2: '🎮', waifu: '💖',
+};
+
+function registrySetIcon(key) {
+  return REGISTRY_CRATE_ICONS[key] || '📇';
+}
+
+async function refreshRegistry(force) {
+  try {
+    registryCache = await apiGradingRegistry();
+  } catch (err) {
+    if (!registryCache) {
+      if (nmgRegistryProgressEl) nmgRegistryProgressEl.innerHTML = '<p class="equip-picker-empty">Could not load the Set Registry.</p>';
+      if (nmgRegistryBoardEl) nmgRegistryBoardEl.innerHTML = '';
+      return;
+    }
+  }
+  void force;
+  buildRegistryProgress();
+  buildRegistryBoard();
+}
+
+function buildRegistryProgress() {
+  if (!nmgRegistryProgressEl || !registryCache) return;
+  if (nmgRegistryMeta) {
+    const ageS = Math.max(0, Math.round((Date.now() + clockOffsetMs - registryCache.cachedAt) / 1000));
+    nmgRegistryMeta.textContent = `Updated ${ageS}s ago`;
+  }
+  if (!registryCache.yourProgress.length) {
+    nmgRegistryProgressEl.innerHTML = '<p class="equip-picker-empty">No sets to chase yet.</p>';
+    return;
+  }
+  nmgRegistryProgressEl.innerHTML = registryCache.yourProgress.map((set) => {
+    const pct = set.total ? Math.round((set.haveCount / set.total) * 100) : 0;
+    const missingBadges = set.missing.map((id) => {
+      const def = getItemDef(id);
+      return `<span class="nmg-reg-missing-badge">${escapeHtml(def ? itemLabel(def) : id)}</span>`;
+    }).join('');
+    return `
+      <div class="nmg-reg-set${set.complete ? ' nmg-reg-complete' : ''}">
+        <div class="nmg-reg-set-head">
+          <span class="nmg-reg-set-name">${registrySetIcon(set.key)} ${escapeHtml(set.name)}</span>
+          <span class="nmg-reg-set-count">${set.haveCount}/${set.total} titles</span>
+          ${set.complete ? `<span class="nmg-reg-set-gpa">GPA ${set.gpa.toFixed(2)}</span>` : ''}
+        </div>
+        <div class="nmg-reg-progress-bar"><div class="nmg-reg-progress-fill" style="width:${pct}%"></div></div>
+        ${set.complete
+          ? '<p class="nmg-reg-set-complete-note">Set complete. Sitting in the public Registry below.</p>'
+          : `<div class="nmg-reg-missing">${missingBadges}</div>`}
+      </div>
+    `;
+  }).join('');
+}
+
+function buildRegistryBoard() {
+  if (!nmgRegistryBoardEl || !registryCache) return;
+  const blocks = registryCache.sets.map((set) => {
+    const rows = (registryCache.registry[set.key] || []);
+    const body = rows.length
+      ? `
+        <table class="nmg-reg-board-table">
+          <thead><tr><th></th><th>Player</th><th>Grader Mix</th><th>Completed</th><th>GPA</th></tr></thead>
+          <tbody>
+            ${rows.map((r, i) => {
+              const mix = Object.entries(r.graderMix || {})
+                .sort((a, b) => b[1] - a[1])
+                .map(([g, n]) => `${n} ${(GRADERS[g] && GRADERS[g].short) || g.toUpperCase()}`)
+                .join(' · ');
+              const when = new Date(r.completedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+              return `
+                <tr>
+                  <td class="nmg-reg-board-rank">${i + 1}</td>
+                  <td class="nmg-reg-board-name"><a href="#" onclick="viewProfile('${escapeHtml(r.username)}'); return false;">${escapeHtml(r.name)}</a></td>
+                  <td class="nmg-reg-board-mix">${escapeHtml(mix)}</td>
+                  <td class="nmg-reg-board-date">${escapeHtml(when)}</td>
+                  <td class="nmg-reg-board-gpa">${r.gpa.toFixed(2)}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `
+      : '<p class="equip-picker-empty">Nobody has finished this set yet. Be the first name on the board.</p>';
+    return `
+      <details class="nmg-pop-crate" open>
+        <summary>
+          <span class="nmg-pop-crate-label">${registrySetIcon(set.key)} ${escapeHtml(set.name)}</span>
+          <span class="nmg-pop-crate-summary">${rows.length} completed set${rows.length === 1 ? '' : 's'}</span>
+        </summary>
+        ${body}
+      </details>
+    `;
+  }).join('');
+  nmgRegistryBoardEl.innerHTML = blocks;
+}
+
+if (btnNmgRegistryRefresh) {
+  btnNmgRegistryRefresh.addEventListener('click', () => refreshRegistry(true));
+}
+
+// The Pop Report and Set Registry are each a whole extra aggregate query, so both load lazily on
+// their own sub-tab click -- same reasoning as the NMG slot state and the CosmetixxMarket rotation
+// above.
 document.querySelectorAll('[data-nmg-subtab]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.nmgSubtab;
@@ -1111,5 +1228,6 @@ document.querySelectorAll('[data-nmg-subtab]').forEach((btn) => {
       panel.classList.toggle('hidden', panel.dataset.nmgPanel !== target);
     });
     if (target === 'pop') refreshPopReport();
+    if (target === 'reg') refreshRegistry();
   });
 });

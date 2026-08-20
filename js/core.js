@@ -336,6 +336,14 @@ const ADMIN_TITLE = { id: 'adminTitle', name: 'ADMIN', cssClass: 'title-admin', 
 const FAT_FUCK_TITLE = { id: 'fatFuck', name: 'FAT FUCK', cssClass: 'title-fatfuck', how: 'Eat 10,000 food items at Pete\'sza.' };
 const LOOSE_TITLE = { id: 'looseTitle', name: 'LOOSE', cssClass: 'title-loose', how: 'Slut out 500 times.' };
 
+// Set Registry rewards (mfmmoserver's grading/registry route grants these server-side, same
+// achievement-title pattern as everything else on this page -- see the long comment above
+// REGISTRY_REWARD_TITLES in gameLogic.js for why they're permanent once earned and never revoked
+// by a later crack).
+const REGISTRY_COLLECTOR_TITLE = { id: 'registryCollector', name: 'REGISTRY COLLECTOR', cssClass: 'title-registrycollector', how: 'Complete your first Set Registry set (own a graded slab, any grader, of every title in a crate).' };
+const MASTER_SET_TITLE = { id: 'masterSet', name: 'MASTER SET', cssClass: 'title-masterset', how: 'Complete a Set Registry set with a Set GPA of 8.0 or higher.' };
+const PERFECT_SET_TITLE = { id: 'perfectSet', name: 'PERFECT SET', cssClass: 'title-perfectset', how: 'Complete a Set Registry set with every slab graded a perfect 10.' };
+
 // Leaderboard titles: server-assigned, one holder at a time per category, rechecked daily. Ids
 // must match LEADERBOARD_TITLES in mfmmoserver/gameLogic.js exactly -- the server grants/revokes
 // these directly onto titles.owned/equipped, same as it does for combat/jail/etc.
