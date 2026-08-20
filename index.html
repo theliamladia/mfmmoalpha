@@ -238,7 +238,7 @@
           <button class="market-tab-btn" data-shop="pizza">🍕 Pete's Pies</button>
           <button class="market-tab-btn" data-shop="maxx">💈 Luke's Maxxerstore</button>
           <button class="market-tab-btn" data-shop="titles">🎖️ Cosmetixxx</button>
-          <button class="market-tab-btn" data-shop="nmg">🏅 New Milos Grading</button>
+          <button class="market-tab-btn" data-shop="nmg">🏅 Grading District</button>
           <button class="market-tab-btn" data-shop="good">✅ GOOD&reg;</button>
         </div>
 
@@ -354,7 +354,7 @@
           <div class="hustle-card profile-slab-section-card">
             <h3>&#10024; Foil Ascension</h3>
             <p class="item-subheading">Burn <b>3 copies</b> of the same title plus <b>$25,000</b> to forge one Foil version &mdash; the same art under a moving shimmer. Any crate qualifies, archived ones included. The 3 copies are destroyed permanently.</p>
-            <p class="item-subheading">Foils are equippable like any title, but cannot be prestiged or submitted to New Milos Grading.</p>
+            <p class="item-subheading">Foils are equippable like any title, and can be graded by any of the three graders &mdash; but they cannot be prestiged.</p>
             <div id="foilAscensionEligible" class="profile-slab-grid"></div>
             <button id="btnFoilAscensionOpen">Choose a Title to Ascend</button>
             <div id="foilLog" class="log log-single-line"></div>
@@ -412,18 +412,74 @@
           <div class="hustle-grid" id="titleGrid"></div>
         </div>
 
+        <!-- The Grading District hosts all three graders on ONE page rather than giving MGA and CCG
+             their own Milos Market tabs. Chosen because the market tab strip is already eight
+             entries wide and three more would push it to eleven for what is one activity with three
+             price points; the graders compete for the same four slots and the same submission, so
+             they belong behind one door. The brand differences live where they matter -- in the
+             submission picker and on the slab art itself. -->
         <div id="shop-nmg" class="shop hidden">
-          <div id="nmgLog" class="log log-single-line"></div>
-          <p>Submit an owned title to New Milos Grading for an authoritative 1-10 grade. Graded titles can no longer be equipped, but can still be shown in your Profile's Title Showcase.</p>
-          <div class="hustle-grid" id="nmgSlotsGrid"></div>
+          <div class="nmg-subtabs">
+            <button class="nmg-subtab-btn active" data-nmg-subtab="grade">🏅 Grading Counter</button>
+            <button class="nmg-subtab-btn" data-nmg-subtab="pop">📊 Pop Report</button>
+            <button class="nmg-subtab-btn" data-nmg-subtab="cert">🔎 Cert Lookup</button>
+          </div>
 
-          <h3 class="gunclub-section-title">🔨 Crack a Slab</h3>
-          <p>Remove the grade from a graded title in your inventory, returning it to its equippable form. This cannot be undone.</p>
-          <button id="btnNmgCrackOpen">Crack a Title ($50,000)</button>
+          <div data-nmg-panel="grade">
+            <div id="nmgLog" class="log log-single-line"></div>
+            <p>Three graders work this block. Submit an owned title, pick who slabs it, pick how fast you want it back, and get an authoritative 1&ndash;10 grade. Graded titles can no longer be equipped, but can still be shown in your Profile's Title Showcase &mdash; and every slab now carries a permanent cert number.</p>
 
-          <h3 class="gunclub-section-title">&#9851; Regrade a Slab</h3>
-          <p>Not happy with a grade? Send the slab back through New Milos Grading for a fresh 1-10 roll. It takes a grading slot for the usual turnaround, and costs less than cracking the slab and resubmitting it. <b class="loss">The new grade replaces the old one and can be LOWER.</b></p>
-          <button id="btnNmgRegradeOpen">Regrade a Slab</button>
+            <div class="nmg-grader-strip">
+              <div class="nmg-grader-card nmg-grader-ccg">
+                <h4>Cheap Cool Grading <span>CCG</span></h4>
+                <p>The bargain bin. $2,000&ndash;$8,000. Grade only, no frills, and the market values a CCG slab at half. Nobody respects it. You still get a slab.</p>
+              </div>
+              <div class="nmg-grader-card nmg-grader-nmg">
+                <h4>New Milos Grading <span>NMG</span></h4>
+                <p>The standard. $5,000&ndash;$20,000. A number, and nothing you didn't ask for. Everybody's first slab.</p>
+              </div>
+              <div class="nmg-grader-card nmg-grader-mga">
+                <h4>Milos Grading Association <span>MGA</span></h4>
+                <p>$15,000&ndash;$60,000, and they'll tell you your stitching is a 9. Every MGA slab is itemised into four <b>SUBGAINS</b> &mdash; Gloss, Stitching, Aura, Drip. A 10 with all four perfect is a <b>BLACK LABEL</b>.</p>
+              </div>
+            </div>
+
+            <div class="hustle-grid" id="nmgSlotsGrid"></div>
+
+            <h3 class="gunclub-section-title">🔨 Crack a Slab</h3>
+            <p>Remove the grade from a graded title in your inventory, returning it to its equippable form. This cannot be undone &mdash; and the slab's cert is <b>retired</b> in the registry forever.</p>
+            <button id="btnNmgCrackOpen">Crack a Title ($50,000)</button>
+
+            <h3 class="gunclub-section-title">&#9851; Regrade a Slab</h3>
+            <p>Not happy with a grade? Send the slab back through <b>the same grader that graded it</b> for a fresh 1&ndash;10 roll (and fresh SUBGAINS, at MGA). It takes a grading slot for the usual turnaround and costs less than cracking and resubmitting. The cert keeps its number &mdash; the regrade is recorded in its provenance. <b class="loss">The new grade replaces the old one and can be LOWER.</b></p>
+            <button id="btnNmgRegradeOpen">Regrade a Slab</button>
+          </div>
+
+          <div data-nmg-panel="pop" class="hidden">
+            <h3 class="gunclub-section-title">📊 Population Report</h3>
+            <p>Every title, every grade, every living slab in New Milos City. A <b>POP 1</b> is the only one that exists. Cracked slabs leave the census permanently.</p>
+            <div class="nmg-pop-controls">
+              <div id="nmgPopReportGraderTabs" class="nmg-pop-grader-tabs"></div>
+              <button id="btnNmgPopReportRefresh" class="secondary-btn">Refresh</button>
+            </div>
+            <p id="nmgPopReportMeta" class="item-subheading"></p>
+            <div id="nmgPopReportBody"></div>
+          </div>
+
+          <div data-nmg-panel="cert" class="hidden">
+            <h3 class="gunclub-section-title">🔎 Cert Lookup</h3>
+            <p>Every slab carries a cert number. Look one up to see the slab, who holds it now, its SUBGAINS, and everywhere it has been.</p>
+            <div class="nmg-cert-lookup-form">
+              <select id="nmgCertLookupGrader">
+                <option value="ccg">CCG</option>
+                <option value="nmg" selected>NMG</option>
+                <option value="mga">MGA</option>
+              </select>
+              <input id="nmgCertLookupInput" type="text" inputmode="numeric" placeholder="e.g. 000482" maxlength="10">
+              <button id="btnNmgCertLookup">Look Up</button>
+            </div>
+            <div id="nmgCertLookupResult"></div>
+          </div>
         </div>
 
         <div id="shop-good" class="shop hidden">
@@ -1210,6 +1266,22 @@
         <p>What's changed, most recent first.</p>
 
         <div class="update-entry">
+          <div class="update-entry-header"><h3>&#127942; The Collectibility Update: Three Graders, Cert Numbers &amp; the Pop Report</h3><span class="update-date">2026-08-20</span></div>
+          <ul>
+            <li><b>&#127973; NEW &mdash; two rival graders open up shop.</b> New Milos Grading is no longer the only game in town. Milos Market &rarr; <b>Grading District</b> now hosts three counters sharing the same 4 slots: <b>CCG (Cheap Cool Grading)</b> at $2,000&ndash;$8,000, <b>NMG</b> unchanged at $5,000&ndash;$20,000, and <b>MGA (Milos Grading Association)</b> at $15,000&ndash;$60,000. Each one has its own slab case, its own cert series, and its own reputation.</li>
+            <li><b>&#128142; MGA rolls SUBGAINS.</b> Every MGA slab is itemised into four component scores &mdash; <b>Gloss, Stitching, Aura, Drip</b> &mdash; each within 2 of the main grade. A main-grade 10 with all four subgains at 10 is a <b>BLACK LABEL</b>: roughly 1 in 11 MGA 10s, with its own black-and-gold case. It is the rarest thing the grading system can produce.</li>
+            <li><b>&#128176; CCG is cheap, and the market knows it.</b> CCG slabs cost 60% less to make and are valued at <b>half</b> everywhere value is shown &mdash; Est. value captions and the KOLLECTOR leaderboard. They're affordable slabs to flex, not investments. MGA slabs are valued exactly the same as NMG: what a Black Label is worth is between you and whoever wants it.</li>
+            <li><b>&#128290; NEW &mdash; every slab now has a cert number.</b> NMG #000482, MGA #000017, CCG #000009. Printed on the slab, permanent, and independent per grader. <b>Every slab you already own has been retroactively certified</b> &mdash; you keep your place in line, and the oldest collections got the lowest numbers.</li>
+            <li><b>&#127991;&#65039; NEW &mdash; First Edition.</b> A slab graded while its crate is still <b>active</b> is stamped <b>FIRST EDITION</b>. Existing slabs were stamped on the same rule, generously: if the crate is still open today, your slab is a First Edition. Once a crate archives, nothing graded after that gets the stamp &mdash; ever.</li>
+            <li><b>&#128202; NEW &mdash; the Population Report.</b> Grading District &rarr; <b>Pop Report</b>: every title, every grade, every living slab in the city, split by grader and grouped by crate. A <b>POP 1</b> is the only one that exists anywhere. Cracking a slab removes it from the census permanently &mdash; which now means something.</li>
+            <li><b>&#128269; NEW &mdash; Cert Lookup.</b> Type any cert number to see the slab, who holds it right now, its subgains, and its <b>full provenance</b> &mdash; every grade, regrade, and sale it has ever been through, with prices.</li>
+            <li><b>&#9851;&#65039; Regrading is now part of a slab's story.</b> A slab goes back to <b>the grader that graded it</b> (an MGA slab regrades at MGA prices with fresh subgains). The cert <b>keeps its number</b> and the regrade is written into its history &mdash; so a 6 that became a 10 shows exactly that. MGA regrades run $39,000/$48,000/$66,000; CCG's are a flat 2&times; the grading fee at $4,000/$8,000/$16,000.</li>
+            <li><b>&#128296; Cracking is permanent, and public.</b> Same $50,000, same result &mdash; but the cert is now <b>retired</b> in the registry forever and the slab leaves the population count. The confirm dialog tells you which cert number you're about to destroy.</li>
+            <li><b>&#127974; Legacy slabs can still get subgains.</b> Nothing graded before today has subgains recorded. Regrading an old slab at MGA is how you give it a set &mdash; and the only route a long-time collector has to a Black Label on a title they've held for months.</li>
+          </ul>
+        </div>
+
+        <div class="update-entry">
           <div class="update-entry-header"><h3>&#128176; The Economy Update: Asset Forfeiture, Batch Hustles, Foil Ascension &amp; NMG Regrade</h3><span class="update-date">2026-08-13</span></div>
           <ul>
             <li><b>&#9878;&#65039; Asset Forfeiture &mdash; getting arrested now costs you money.</b> Any arrest, from any source, lets the NMPD seize <b>15% of the Floydbucks you're carrying</b>. Money in the <b>Bank</b> is untouched. Crime has never actually had a cash downside until now, and the Bank has never actually protected anything until now. Both of those are fixed in one change &mdash; bank your cash before you go do something stupid.</li>
@@ -1735,7 +1807,7 @@
       </div>
 
       <div class="admin-block">
-        <p>🏅 New Milos Grading</p>
+        <p>🏅 Grading District</p>
         <div class="admin-row">
           <button id="btnAdminNmgFastForward">Fast-Forward All Pending Grading</button>
         </div>
@@ -2011,8 +2083,15 @@
         <p class="section-desc">Only titles with a rarity (crate/prestige titles) can be graded.</p>
         <div id="nmgSubmitPickerList" class="equip-picker-list"></div>
       </div>
+      <div id="nmgSubmitGraderStep" class="hidden">
+        <p>Who grades <b id="nmgSubmitGraderTitleName"></b>?</p>
+        <div class="nmg-grader-options" id="nmgSubmitGraderOptions"></div>
+        <button id="btnNmgSubmitGraderBack" class="secondary-btn">Back</button>
+      </div>
       <div id="nmgSubmitTierStep" class="hidden">
         <p>Grading: <b id="nmgSubmitSelectedTitleName"></b></p>
+        <!-- Tier prices are per-grader and get relabelled in buildNmgSubmitGraderOptions()
+             (js/nmg.js) the moment a grader is chosen; these are the NMG defaults. -->
         <div class="nmg-tier-options">
           <button class="nmg-tier-btn" data-tier="3hr">3 Hour Turnaround<br>$5,000</button>
           <button class="nmg-tier-btn" data-tier="1hr">1 Hour Turnaround<br>$10,000</button>
@@ -2029,7 +2108,9 @@
 
   <div id="nmgRevealModal" class="modal-overlay hidden" data-no-backdrop-close>
     <div class="modal-box">
-      <h3>🏅 New Milos Grading</h3>
+      <!-- Grader-neutral: this modal is shared by all three graders, and the slab itself carries
+           the brand. -->
+      <h3>🏅 Grading Result</h3>
       <p id="nmgRevealStatus">Grading...</p>
       <div id="nmgRevealSlab" class="hidden"></div>
       <div class="modal-actions">

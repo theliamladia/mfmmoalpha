@@ -776,7 +776,58 @@ function badgeChipMarkup(char) {
 // prestige level is -- so no separate persisted-full-def array is needed, the id alone is
 // self-describing. This is the client's single source of truth for label/color display; the
 // server's own copy (gameLogic.js NMG_GRADE_WEIGHTS) only needs the numeric odds, never these.
-const NMG_ID_RE = /^(.+)_nmg(\d{1,2})$/;
+// THREE graders now share this id shape (see GRADERS below): `_nmg7`, `_mga7`, `_ccg7`. Mirrors the
+// server's NMG_GRADED_ID_CAPTURE_RE in mfmmoserver/gameLogic.js, which asserts the disjointness of
+// all three against `_p\d+` and `_foil` at module load. The old NMG_ID_RE name is kept as an alias
+// below so nothing that referenced it breaks.
+const GRADED_ID_RE = /^(.+)_(nmg|mga|ccg)(\d{1,2})$/;
+const NMG_ID_RE = GRADED_ID_RE;
+
+// ---------- The three graders ----------
+// Display mirror of mfmmoserver/gameLogic.js GRADERS. The server is authoritative for what is
+// actually charged and rolled; this exists so the picker, the slab art and the "Est. value" caption
+// can render without a round-trip. Client/server hand-mirroring of game constants is the
+// established convention in this codebase (see HANDOFF.md).
+const GRADERS = {
+  ccg: {
+    id: 'ccg', suffix: '_ccg', short: 'CCG', name: 'Cheap Cool Grading',
+    pitch: 'Cheap. Cool. Graded. No notes.',
+    blurb: 'The bargain bin. Nobody respects it. You still get a slab.',
+    subgains: false, blackLabel: false,
+    // See the valuation comment on graderValueMult() in js/nmg.js -- this 0.5x is an economy
+    // decision mirrored from the server, not decoration.
+    valueMult: 0.5,
+    slabClass: 'nmg-slab-ccg',
+    tiers: { '3hr': 2000, '1hr': 4000, '10min': 8000 },
+    regradeFees: { '3hr': 4000, '1hr': 8000, '10min': 16000 },
+  },
+  nmg: {
+    id: 'nmg', suffix: '_nmg', short: 'NMG', name: 'New Milos Grading',
+    pitch: "The standard. Everybody's first slab.",
+    blurb: 'The everyman grader. A number, and nothing you did not ask for.',
+    subgains: false, blackLabel: false,
+    valueMult: 1,
+    slabClass: '',
+    tiers: { '3hr': 5000, '1hr': 10000, '10min': 20000 },
+    regradeFees: { '3hr': 33000, '1hr': 36000, '10min': 42000 },
+  },
+  mga: {
+    id: 'mga', suffix: '_mga', short: 'MGA', name: 'Milos Grading Association',
+    pitch: "Triple the price, and they'll tell you your stitching is a 9.",
+    blurb: 'Itemised SUBGAINS on every slab. All four perfect on a 10 is a BLACK LABEL.',
+    subgains: true, blackLabel: true,
+    valueMult: 1,
+    slabClass: 'nmg-slab-mga',
+    tiers: { '3hr': 15000, '1hr': 30000, '10min': 60000 },
+    regradeFees: { '3hr': 39000, '1hr': 48000, '10min': 66000 },
+  },
+};
+const GRADER_IDS = ['ccg', 'nmg', 'mga'];
+const SUBGAIN_ORDER = [['gloss', 'Gloss'], ['stitch', 'Stitching'], ['aura', 'Aura'], ['drip', 'Drip']];
+
+function getGraderDef(graderId) {
+  return GRADERS[graderId] || null;
+}
 
 // ---------- Foil Ascension ----------
 // Burn 3 copies of one plain title + $25,000 at Cosmetixxx -> 1 Foil (see js/market.js
@@ -844,22 +895,30 @@ function getItemDef(itemId, char = character) {
   // Checked before the plain prestige branch below since a graded PRESTIGED title's id wraps the
   // prestige id (`${baseId}_p2_nmg7`) -- the two regexes have disjoint literal markers (`_p` vs
   // `_nmg`) so trying this one first never misfires on a plain (non-graded) prestige id.
-  const nmgMatch = NMG_ID_RE.exec(itemId);
+  const nmgMatch = GRADED_ID_RE.exec(itemId);
   if (nmgMatch) {
-    const [, baseId, gradeStr] = nmgMatch;
+    const [, baseId, graderId, gradeStr] = nmgMatch;
     const baseTitle = getItemDef(baseId, char);
     if (!baseTitle) return null;
     const grade = Number(gradeStr);
     const tier = NMG_GRADE_TIERS[grade];
+    if (!tier) return null;
+    const grader = GRADERS[graderId] || GRADERS.nmg;
     return {
       ...baseTitle,
       id: itemId,
-      name: `${baseTitle.name} NMG ${grade}`,
-      how: `${baseTitle.how} (New Milos Graded: ${tier.label} ${grade}.)`,
+      name: `${baseTitle.name} ${grader.short} ${grade}`,
+      how: `${baseTitle.how} (Graded by ${grader.name}: ${tier.label} ${grade}.)`,
       type: 'title',
       nonEquippable: true,
+      // `nmgGrade` deliberately keeps its original name across all three graders. It is the "this is
+      // a slab" marker in roughly fifteen places (inventory filters, showcase filters, prestige and
+      // foil gates, the Graded Titles tab, sellTitle, the Portfolio Showcase); renaming it would be
+      // a large, purely cosmetic regression surface on a live game for no behavioural gain. The new
+      // `grader` field is what code branches on when it needs to know WHICH grader.
       nmgGrade: grade,
       nmgBaseId: baseId,
+      grader: grader.id,
     };
   }
 

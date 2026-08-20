@@ -116,27 +116,49 @@ spin animation and results reveal for every crate — no per-crate modal markup 
 
 ## 4b. Synthesized id suffixes — check before inventing a new one
 
-Three id shapes are synthesized on the fly from a base title id rather than existing in any catalog.
+Id shapes synthesized on the fly from a base title id rather than existing in any catalog.
 `getItemDef()` (js/core.js) has one branch per shape, and each one is hand-mirrored server-side:
 
 | Shape | Client regex (core.js) | Server mirror (gameLogic.js) | Made by |
 |---|---|---|---|
 | `${baseId}_p${level}` | `PRESTIGE_ID_RE` | `NMG_PRESTIGE_ID_RE` | Prestige (js/inventory.js) |
-| `${baseId}_nmg${grade}` | `NMG_ID_RE` | `NMG_GRADED_ID_RE` | NMG reveal (server) |
+| `${baseId}_nmg${grade}` | `GRADED_ID_RE` | `NMG_GRADED_ID_RE` | NMG reveal (server) |
+| `${baseId}_mga${grade}` | `GRADED_ID_RE` | `NMG_GRADED_ID_RE` | MGA reveal (server) |
+| `${baseId}_ccg${grade}` | `GRADED_ID_RE` | `NMG_GRADED_ID_RE` | CCG reveal (server) |
 | `${baseId}_foil` | `FOIL_ID_RE` | `FOIL_ID_RE` | Foil Ascension (server) |
+
+The three grader suffixes share **one** regex on each side — `GRADED_ID_RE` /
+`NMG_GRADED_ID_CAPTURE_RE` capture the grader as a group (`nmg|mga|ccg`), so a fourth grader is a
+one-word change to an alternation plus an entry in the `GRADERS` table on both sides, not a new
+branch. `parseGradedId()` (server) and the `GRADED_ID_RE` branch in `getItemDef()` (client) both
+return the grader alongside the grade.
 
 **Foil is the one shape that needs no per-title work** — `title-foil` is a generic CSS overlay class
 appended to whatever `cssClass` the base title already has, so every current and future title gets a
 working Foil for free. Nothing to add per crate.
 
-If you ever add a **fourth** suffix, check it against all six regexes above (both sides), and note
-that the prestige/NMG regexes both require digits after their marker while `_foil` is a bare word —
-that's exactly what keeps them disjoint. A new suffix ending in digits is the dangerous case.
+If you ever add another suffix, check it against every regex above **on both sides**, and note that
+the prestige/graded regexes all require digits after their marker while `_foil` is a bare word —
+that's exactly what keeps them disjoint. A new suffix ending in digits is the dangerous case, which
+is why `assertGradedIdShapesAreDisjoint()` in mfmmoserver/gameLogic.js now proves the property at
+module load: it round-trips every grader suffix against every base shape (plain, prestiged, foil,
+prestiged-foil) and refuses to boot if any of them collide. Extend that assertion, don't replace it.
 
-Foils **can** be graded and regraded. The two synthesized suffixes compose in one direction only —
-`${base}_foil_nmg${N}` — because `getItemDef()` runs its NMG branch before its foil branch, so the
-graded def resolves its base through the foil branch and inherits `foil: true`, `rarity`, and the
-`title-foil` art class by spread. Nothing needs per-title wiring for this.
+Note the grader suffix is **not** free of downstream work the way foil is. Adding one touches:
+`GRADERS` (both sides), the slab CSS case treatment, `graderValueMult`/`estimatedSlabValue`, the
+regrade fee table + its module-load assertion, the cert series (`grading_certs.grader`), the Pop
+Report sections, and the Cert Lookup grader `<select>`.
+
+Titles **can** be graded and regraded at any grader, foils included. The suffixes compose in one
+direction only — `${base}_foil_nmg${N}` / `_foil_mga${N}` / `_foil_ccg${N}` — because `getItemDef()`
+runs its graded branch before its foil branch, so the graded def resolves its base through the foil
+branch and inherits `foil: true`, `rarity`, and the `title-foil` art class by spread. Nothing needs
+per-title wiring for this.
+
+Every minted slab, at every grader, also gets a **cert** row in `grading_certs` (mfmmoserver/db.js).
+Read the fungibility-contract comment above that table before touching anything that moves a graded
+id between players — a path that moves one without calling a cert hook silently corrupts the Pop
+Report.
 
 Foils are deliberately **excluded** from Prestige (js/inventory.js `prestigeTitle`/`canPrestige`) —
 a `_foil_p1` id has no resolver — from **selling to the system** (`sellTitle` plus the `sellPrice`

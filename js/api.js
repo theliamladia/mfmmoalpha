@@ -717,16 +717,32 @@ function apiSpinRedBlueCrate(crateKey, qty) {
 function apiNmgState() {
   return apiRequest('/nmg/state');
 }
-function apiNmgSubmit(stackId, tier) {
-  return apiRequest('/nmg/submit', { method: 'POST', body: JSON.stringify({ stackId, tier }) });
+function apiNmgSubmit(stackId, tier, grader) {
+  return apiRequest('/nmg/submit', { method: 'POST', body: JSON.stringify({ stackId, tier, grader }) });
 }
 function apiNmgReveal(slotId) {
   return apiRequest('/nmg/reveal', { method: 'POST', body: JSON.stringify({ slotId }) });
 }
 // Regrade reuses the /nmg/reveal flow verbatim -- the server stores the slab's pre-grade id in the
-// slot, so revealing it mints `${preGradeId}_nmg${newGrade}` through the exact same path.
+// slot, so revealing it mints `${preGradeId}${graderSuffix}${newGrade}` through the exact same path.
+// No `grader` argument: a slab always goes back to the grader that graded it, and the server reads
+// that off the slab's own id rather than trusting the request.
 function apiNmgRegrade(stackId, tier) {
   return apiRequest('/nmg/regrade', { method: 'POST', body: JSON.stringify({ stackId, tier }) });
+}
+// Crack moved server-side with the cert registry: a crack RETIRES a cert, and a retirement the
+// server never hears about is a permanent, silent Pop Report lie. Replaces the old local mutation.
+function apiNmgCrack(stackId) {
+  return apiRequest('/nmg/crack', { method: 'POST', body: JSON.stringify({ stackId }) });
+}
+function apiGradingPopReport() {
+  return apiRequest('/grading/pop-report');
+}
+function apiGradingCert(grader, seriesNo) {
+  return apiRequest(`/grading/cert/${encodeURIComponent(grader)}/${encodeURIComponent(seriesNo)}`);
+}
+function apiGradingMyCerts() {
+  return apiRequest('/grading/my-certs');
 }
 function apiFoilAscension(stackId) {
   return apiRequest('/cosmetics/foil-ascension', { method: 'POST', body: JSON.stringify({ stackId }) });

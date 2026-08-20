@@ -311,6 +311,11 @@ function renderProfile() {
 // Portfolio Showcase: same pin/unpin shape as the Title Showcase above, restricted to graded slabs
 // (nmgGrade truthy) and rendered full-size via nmgSlabHtml (js/nmg.js) instead of the small badge
 // chip -- the whole point of this section is showing off the actual slab art.
+// NOTE on the `isOwner ? undefined : null` passed to nmgSlabHtml() below: the client's cert cache
+// holds only the VIEWER'S OWN certs. On someone else's profile, letting the slab resolve a cert from
+// that cache would print your cert number on their slab whenever you happen to own the same graded
+// id. `null` suppresses the cert line entirely there -- the slab renders without one rather than
+// with a wrong one. (The same reasoning applies to the CosmetixxMarket rotation in js/nmg.js.)
 function renderProfileSlabShowcase() {
   if (!profileViewCache) return;
   const { character: viewedChar, isOwner } = profileViewCache;
@@ -321,7 +326,7 @@ function renderProfileSlabShowcase() {
   profileSlabShowcaseGrid.innerHTML = slabDefs.length
     ? slabDefs.map((def) => `
       <div class="profile-slab-slot">
-        ${nmgSlabHtml(def)}
+        ${nmgSlabHtml(def, isOwner ? undefined : null)}
         ${slabEstValueHtml(def)}
         ${isOwner ? `
           <div class="profile-slab-slot-actions">
@@ -366,7 +371,7 @@ function renderProfileSlabMarket() {
       if (!def) return '';
       return `
         <div class="profile-slab-slot">
-          ${nmgSlabHtml(def)}
+          ${nmgSlabHtml(def, isOwner ? undefined : null)}
           <p class="profile-slab-market-price">$${listing.pricePerUnit.toLocaleString()}</p>
           <div class="profile-slab-slot-actions">
             ${isOwner
