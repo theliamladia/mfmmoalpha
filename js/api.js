@@ -752,6 +752,12 @@ function apiGradingPopReport() {
 function apiGradingCert(grader, seriesNo) {
   return apiRequest(`/grading/cert/${encodeURIComponent(grader)}/${encodeURIComponent(seriesNo)}`);
 }
+// Selling a slab for cash DESTROYS it, so its cert is deleted outright (not retired like a crack).
+// Registry-only: the cash and the inventory removal stay client-side like every other title sale.
+function apiGradingDestroyCert(gradedId) {
+  return apiRequest('/grading/cert/destroy', { method: 'POST', body: JSON.stringify({ gradedId }) });
+}
+
 function apiGradingMyCerts() {
   return apiRequest('/grading/my-certs');
 }
