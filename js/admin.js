@@ -285,6 +285,33 @@ btnAdminNmgFastForward.addEventListener('click', async () => {
   }
 });
 
+// ---------- Grading registry: reconcile ----------
+// Also runs at boot server-side; this is the on-demand trigger, and the only way to see the counts
+// without reading the droplet's logs. Dry run first is the point of having two buttons: the real
+// run DELETES certs (a slab nobody holds) and cannot be undone.
+const btnAdminGradingReconcileDry = document.getElementById('btnAdminGradingReconcileDry');
+const btnAdminGradingReconcile = document.getElementById('btnAdminGradingReconcile');
+const adminGradingReconcileResult = document.getElementById('adminGradingReconcileResult');
+
+function renderGradingReconcileResult(result) {
+  const counts = `${result.minted} minted (${result.feMinted} First Edition), ${result.deleted || 0} cert(s) deleted, `
+    + `${result.purged || 0} ghost(s) purged, ${result.retired || 0} retired, across ${result.checkedUsers} character(s).`;
+  adminGradingReconcileResult.innerHTML = `<p class="gain">${result.dryRun ? 'DRY RUN -- nothing changed. Would be: ' : ''}${counts}</p>`;
+}
+
+async function runGradingReconcile(dryRun) {
+  adminGradingReconcileResult.innerHTML = '';
+  if (!dryRun && !confirm('Reconcile the grading registry for real? Certs for slabs nobody holds any more (sold slabs) are DELETED, and this cannot be undone. Run the dry run first.')) return;
+  try {
+    renderGradingReconcileResult(await apiAdminGradingReconcile(dryRun));
+  } catch (err) {
+    adminGradingReconcileResult.innerHTML = `<p class="loss">${err.reason || 'Could not reach the server.'}</p>`;
+  }
+}
+
+btnAdminGradingReconcileDry.addEventListener('click', () => runGradingReconcile(true));
+btnAdminGradingReconcile.addEventListener('click', () => runGradingReconcile(false));
+
 // ---------- CosmetixxMarket: force regenerate ----------
 // Regen is normally lazy (next state request after 24h) and never retroactive -- a pricing/catalog
 // change that lands mid-rotation doesn't apply until the batch naturally expires. This forces it

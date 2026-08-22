@@ -370,6 +370,13 @@ function apiAdminGrantSlab(username, baseId, grader, grade, subgains) {
   });
 }
 
+// Rebuilds the cert registry from an inventory scan: mints for a slab with no cert, DELETES certs
+// for slabs nobody holds any more (a sold slab, in practice), and purges the ghosts the old
+// retire-on-drift behaviour left behind. `dryRun` reports the counts and changes nothing.
+function apiAdminGradingReconcile(dryRun) {
+  return apiRequest('/admin/grading-reconcile', { method: 'POST', body: JSON.stringify({ dryRun: !!dryRun }) });
+}
+
 function apiAdminNmgFastForwardAll() {
   return apiRequest('/admin/nmg-fast-forward-all', { method: 'POST' });
 }
