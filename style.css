@@ -4181,6 +4181,18 @@ p.foil-ascended-line.foil-ascended-line {
   color: var(--text-secondary);
 }
 
+/* Slab Granter preview: the real .nmg-slab (340px) dropped into the admin menu, centred with a
+   little breathing room so the picker above it and the Mint button below it stay readable. */
+.admin-slab-preview {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.admin-slab-preview .arrest-record-empty {
+  margin: 0;
+}
+
 /* --- Admin: Transaction Log dashboard --- */
 .txlog-box {
   width: 860px;

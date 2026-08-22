@@ -24,8 +24,8 @@ let characterRev = null;
 
 async function apiRequest(path, options = {}) {
   // Flush any character edit still sitting in save()'s debounce before anything else goes out --
-  // otherwise a server-authoritative action fired right after a client-side-only edit (e.g. the
-  // admin Title Maker) can read/save the character on the server *before* that edit ever arrives,
+  // otherwise a server-authoritative action fired right after a client-side-only edit (e.g. an
+  // admin stat/cash editor) can read/save the character on the server *before* that edit ever arrives,
   // then hand the client back that edit-less version, silently discarding it (or, if the debounced
   // sync fires after, rejecting it as stale). See flushCharacterSync() in js/core.js. A no-op if
   // nothing is pending -- and this request loop is guarded against re-entering itself, since
@@ -357,6 +357,17 @@ function apiAdminGrantItem(username, itemId, qty) {
 
 function apiAdminGrantCash(username, amount) {
   return apiRequest('/admin/grant-cash', { method: 'POST', body: JSON.stringify({ username, amount }) });
+}
+
+// Mints a graded slab AND its cert in one go -- see the Slab Granter block in js/admin.js for why
+// apiAdminGrantItem can't do this. `subgains` is null to let the server roll them (or for a grader
+// that doesn't have them) or { gloss, stitch, aura, drip } to set them exactly; the server validates
+// the values and derives blackLabel itself rather than trusting a flag off the wire.
+function apiAdminGrantSlab(username, baseId, grader, grade, subgains) {
+  return apiRequest('/admin/grant-slab', {
+    method: 'POST',
+    body: JSON.stringify({ username, baseId, grader, grade, subgains: subgains || null }),
+  });
 }
 
 function apiAdminNmgFastForwardAll() {
