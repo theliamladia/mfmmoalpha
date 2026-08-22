@@ -351,6 +351,7 @@
             </div>
             <div class="feature-banner-actions">
               <button id="btnViewBadgesInvcat" class="secondary-btn">My Badges</button>
+              <input type="number" id="badgeCrateQtyBanner" class="crate-qty-input" min="1" max="10" value="1" title="How many crates to open">
               <button id="btnBuyBadgeCrateBanner">Buy ($960)</button>
             </div>
           </div>
@@ -1665,7 +1666,10 @@
           <div class="hustle-card">
             <h3>🥷 Balaclava Badge Crate <span class="price">$960</span></h3>
             <p>100% guaranteed Bronze Balaclava Badge. Rank it up through a full prestige chain: Bronze &rarr; Silver &rarr; Gold &rarr; Platinum &rarr; Master &rarr; Grandmaster &rarr; a Gem of your choice (Ruby/Sapphire/Emerald) &rarr; collect all 3 Gems for the UNITS Balaclava.</p>
-            <button id="btnBuyBadgeCrate">Buy ($960)</button>
+            <div class="badge-buy-row">
+              <input type="number" id="badgeCrateQty" class="crate-qty-input" min="1" max="10" value="1" title="How many crates to open">
+              <button id="btnBuyBadgeCrate">Buy ($960)</button>
+            </div>
           </div>
           <div class="hustle-grid" id="badgesGrid"></div>
         </div>

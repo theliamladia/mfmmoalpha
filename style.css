@@ -4521,6 +4521,17 @@ p.foil-ascended-line.foil-ascended-line {
   color: var(--accent-foreground);
 }
 
+/* Badge buy / merge rows: the qty spinner sits inline with its button, same shape the crate
+   banners use, so multi-buy and multi-merge read as one control rather than two stacked ones. */
+.badge-buy-row,
+.badge-rankup-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .cosmetixx-tab-btn {
   background: var(--surface-3);
   color: var(--text-secondary);
