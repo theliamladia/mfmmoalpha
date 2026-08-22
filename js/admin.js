@@ -302,80 +302,156 @@ btnAdminCosmetixxMarketRegen.addEventListener('click', async () => {
   }
 });
 
-// ---------- Title Maker ----------
-// Client-side only, like the rest of this admin menu (Give ADMIN Title, stat editors) -- creates a
-// full title definition (not just a name) and stores it directly on this character's own save
-// (character.titles.customTitles), then adds it to Inventory the same way Give ADMIN Title does.
-// Storing the full def alongside the owner's own data (rather than in some separate catalog) is
-// what lets OTHER players' clients render it correctly when they see it equipped -- see
-// allTitleDefsFor()/displayBadgeMarkupFor() in js/market.js.
-const titleMakerLabel = document.getElementById('titleMakerLabel');
-const titleMakerBgColor = document.getElementById('titleMakerBgColor');
-const titleMakerBorderColor = document.getElementById('titleMakerBorderColor');
-const titleMakerTextColor = document.getElementById('titleMakerTextColor');
-const titleMakerGifUrl = document.getElementById('titleMakerGifUrl');
-const titleMakerPreview = document.getElementById('titleMakerPreview');
-const titleMakerError = document.getElementById('titleMakerError');
-const btnTitleMakerCreate = document.getElementById('btnTitleMakerCreate');
+// ---------- Slab Granter ----------
+// Mints a graded slab AND its registry cert in one server call (/admin/grant-slab). Grant Item
+// above cannot do this: it only pushes an id into inventory, and BLACK LABEL / SUBGAINS live on the
+// cert, not the id (see the comment in nmgSlabHtml, js/nmg.js) -- so a slab granted that way renders
+// with "--" subgains, no cert number, and no black case until reconcileCerts() backfills it a
+// subgain-less legacy cert. This block is the supported route for handing out a real slab.
+//
+// The server is authoritative for every rule here (grader/grade validity, the subgain spread, and
+// whether the result is actually a Black Label). The client-side mirror below exists so the picker
+// can't offer an impossible combination and the preview shows the true slab before it's minted.
+const adminGrantSlabUsernameInput = document.getElementById('adminGrantSlabUsernameInput');
+const adminGrantSlabBaseIdInput = document.getElementById('adminGrantSlabBaseIdInput');
+const adminGrantSlabGraderSelect = document.getElementById('adminGrantSlabGraderSelect');
+const adminGrantSlabGradeSelect = document.getElementById('adminGrantSlabGradeSelect');
+const adminGrantSlabSubgainsRow = document.getElementById('adminGrantSlabSubgainsRow');
+const adminGrantSlabSubgainsSelect = document.getElementById('adminGrantSlabSubgainsSelect');
+const adminGrantSlabManualRow = document.getElementById('adminGrantSlabManualRow');
+const adminGrantSlabPreview = document.getElementById('adminGrantSlabPreview');
+const adminGrantSlabError = document.getElementById('adminGrantSlabError');
+const btnAdminGrantSlab = document.getElementById('btnAdminGrantSlab');
+const adminGrantSlabResult = document.getElementById('adminGrantSlabResult');
 
-// https:// only (blocks javascript: etc.) and no characters that could break out of the CSS
-// url('...') or the surrounding HTML attribute it's embedded in.
-const GIF_URL_RE = /^https:\/\/[^\s"'<>()]+$/i;
+const adminSlabSubgainInputs = {
+  gloss: document.getElementById('adminGrantSlabGloss'),
+  stitch: document.getElementById('adminGrantSlabStitch'),
+  aura: document.getElementById('adminGrantSlabAura'),
+  drip: document.getElementById('adminGrantSlabDrip'),
+};
 
-function buildTitleMakerPreviewDef() {
-  const gifUrl = titleMakerGifUrl.value.trim();
-  return {
-    id: 'preview',
-    name: titleMakerLabel.value.trim() || 'Preview',
-    custom: true,
-    background: gifUrl || titleMakerBgColor.value,
-    isGif: !!gifUrl,
-    borderColor: titleMakerBorderColor.value,
-    textColor: titleMakerTextColor.value,
-    how: 'Custom title created by an admin.',
-  };
-}
+// Mirrors SUBGAIN_SPREAD in mfmmoserver/gameLogic.js: a rolled subgain is always within 2 of the
+// main grade, so a hand-set one is held to the same window -- an MGA 10 with a 3 for Drip is not a
+// slab the grading system could ever have produced, and the registry should not contain one.
+const ADMIN_SLAB_SUBGAIN_SPREAD = 2;
 
-function refreshTitleMakerPreview() {
-  titleMakerPreview.innerHTML = titleBadgeMarkup(buildTitleMakerPreviewDef());
-}
-
-[titleMakerLabel, titleMakerBgColor, titleMakerBorderColor, titleMakerTextColor, titleMakerGifUrl].forEach((el) => {
-  el.addEventListener('input', refreshTitleMakerPreview);
+GRADER_IDS.forEach((id) => {
+  const option = document.createElement('option');
+  option.value = id;
+  option.textContent = GRADERS[id].short;
+  adminGrantSlabGraderSelect.appendChild(option);
 });
-refreshTitleMakerPreview();
+adminGrantSlabGraderSelect.value = 'mga';
 
-btnTitleMakerCreate.addEventListener('click', () => {
-  titleMakerError.textContent = '';
-  const label = titleMakerLabel.value.trim();
-  if (!label) { titleMakerError.textContent = 'Enter a title label.'; return; }
+for (let grade = 10; grade >= 1; grade -= 1) {
+  const option = document.createElement('option');
+  option.value = String(grade);
+  option.textContent = `${grade} -- ${NMG_GRADE_TIERS[grade].label}`;
+  adminGrantSlabGradeSelect.appendChild(option);
+}
+adminGrantSlabGradeSelect.value = '10';
 
-  const gifUrl = titleMakerGifUrl.value.trim();
-  if (gifUrl && !GIF_URL_RE.test(gifUrl)) {
-    titleMakerError.textContent = 'GIF/image URL must start with https:// and contain no quotes, parentheses, or spaces.';
+function adminSlabGrader() {
+  return getGraderDef(adminGrantSlabGraderSelect.value) || GRADERS.nmg;
+}
+
+function adminSlabGrade() {
+  return Number(adminGrantSlabGradeSelect.value);
+}
+
+// The BLACK LABEL option only exists where a Black Label can: MGA, main grade 10.
+function refreshAdminSlabBlackLabelOption() {
+  const grader = adminSlabGrader();
+  const allowed = !!grader.blackLabel && adminSlabGrade() === 10;
+  const option = adminGrantSlabSubgainsSelect.querySelector('option[value="black"]');
+  option.disabled = !allowed;
+  option.textContent = allowed ? 'BLACK LABEL (all 10s)' : 'BLACK LABEL (MGA 10 only)';
+  if (!allowed && adminGrantSlabSubgainsSelect.value === 'black') adminGrantSlabSubgainsSelect.value = 'roll';
+}
+
+// Manual subgains are clamped into the legal window every time the grade or mode changes, so the
+// inputs can never sit on a value the Mint button would reject.
+function clampAdminSlabSubgainInputs() {
+  const grade = adminSlabGrade();
+  const min = Math.max(1, grade - ADMIN_SLAB_SUBGAIN_SPREAD);
+  const max = Math.min(10, grade + ADMIN_SLAB_SUBGAIN_SPREAD);
+  Object.values(adminSlabSubgainInputs).forEach((input) => {
+    input.min = String(min);
+    input.max = String(max);
+    const v = Math.round(+input.value);
+    input.value = String(Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : grade);
+  });
+}
+
+// The subgains this mint will ask for: null = let the server roll them (or a grader that has none).
+function adminSlabSubgains() {
+  const grader = adminSlabGrader();
+  if (!grader.subgains) return null;
+  const mode = adminGrantSlabSubgainsSelect.value;
+  if (mode === 'roll') return null;
+  if (mode === 'black') return { gloss: 10, stitch: 10, aura: 10, drip: 10 };
+  const subs = {};
+  Object.entries(adminSlabSubgainInputs).forEach(([key, input]) => { subs[key] = Math.round(+input.value); });
+  return subs;
+}
+
+function refreshAdminSlabPreview() {
+  const grader = adminSlabGrader();
+  refreshAdminSlabBlackLabelOption();
+
+  const hasSubgains = !!grader.subgains;
+  adminGrantSlabSubgainsRow.classList.toggle('hidden', !hasSubgains);
+  adminGrantSlabManualRow.classList.toggle('hidden', !hasSubgains || adminGrantSlabSubgainsSelect.value !== 'manual');
+  if (hasSubgains) clampAdminSlabSubgainInputs();
+
+  const baseId = adminGrantSlabBaseIdInput.value.trim();
+  const item = baseId ? getItemDef(`${baseId}${grader.suffix}${adminSlabGrade()}`) : null;
+  if (!item) {
+    adminGrantSlabPreview.innerHTML = baseId
+      ? `<p class="arrest-record-empty">No title with id "${escapeHtml(baseId)}".</p>`
+      : '<p class="arrest-record-empty">Enter a base title id to preview the slab.</p>';
     return;
   }
 
-  const def = {
-    id: `custom_${Date.now()}`,
-    name: escapeHtml(label),
-    custom: true,
-    background: gifUrl || titleMakerBgColor.value,
-    isGif: !!gifUrl,
-    borderColor: titleMakerBorderColor.value,
-    textColor: titleMakerTextColor.value,
-    how: 'Custom title created by an admin.',
+  // A preview cert, not a real one -- same shape /grading/my-certs returns, so the slab renders
+  // exactly as it will once minted. `blackLabel` is derived here the same way the server derives
+  // it (all four at 10 on a 10), never taken from the picker.
+  const subs = adminSlabSubgains();
+  const previewCert = {
+    label: 'PREVIEW',
+    subgains: subs,
+    blackLabel: !!(grader.blackLabel && adminSlabGrade() === 10 && subs
+      && SUBGAIN_ORDER.every(([key]) => subs[key] === 10)),
+    firstEdition: false,
   };
+  adminGrantSlabPreview.innerHTML = nmgSlabHtml(item, previewCert);
+}
 
-  if (!character.titles.customTitles) character.titles.customTitles = [];
-  character.titles.customTitles.push(def);
-  addToInventory(def.id, 1);
-  save();
-  renderAll();
+[adminGrantSlabBaseIdInput, adminGrantSlabGraderSelect, adminGrantSlabGradeSelect, adminGrantSlabSubgainsSelect]
+  .forEach((el) => el.addEventListener('input', refreshAdminSlabPreview));
+Object.values(adminSlabSubgainInputs).forEach((input) => input.addEventListener('input', refreshAdminSlabPreview));
+refreshAdminSlabPreview();
 
-  titleMakerLabel.value = '';
-  titleMakerGifUrl.value = '';
-  refreshTitleMakerPreview();
-  alert(`"${label}" added to your Inventory (Cosmetics).`);
+btnAdminGrantSlab.addEventListener('click', async () => {
+  adminGrantSlabError.textContent = '';
+  adminGrantSlabResult.innerHTML = '';
+
+  const username = adminGrantSlabUsernameInput.value.trim();
+  const baseId = adminGrantSlabBaseIdInput.value.trim();
+  if (!username) { adminGrantSlabError.textContent = 'Enter a player username.'; return; }
+  if (!baseId) { adminGrantSlabError.textContent = 'Enter a base title id.'; return; }
+  if (!getItemDef(baseId)) { adminGrantSlabError.textContent = `No title with id "${baseId}".`; return; }
+
+  const grader = adminSlabGrader();
+  const grade = adminSlabGrade();
+  const subgains = adminSlabSubgains();
+  if (!confirm(`Mint ${baseId} ${grader.short} ${grade} for ${username}? This adds the slab to their inventory and mints a real cert for it in the grading registry.`)) return;
+
+  try {
+    const result = await apiAdminGrantSlab(username, baseId, grader.id, grade, subgains);
+    adminGrantSlabResult.innerHTML = `<p class="gain">${result.message}</p>`;
+  } catch (err) {
+    adminGrantSlabResult.innerHTML = `<p class="loss">${err.reason || 'Could not reach the server.'}</p>`;
+  }
 });
-

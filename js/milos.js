@@ -1246,7 +1246,8 @@ function currentDisplayTitleText() {
 // Resolves to the real badge graphic when possible -- getItemDef works for any static catalog
 // title (crate titles, achievement titles like HIGHEST NET WORTH, etc.) regardless of whose
 // message it is, since those defs don't depend on the sender's own character data. It only fails
-// for another player's CUSTOM (Title Maker) title, since that def lives solely in their own save --
+// for another player's CUSTOM title (minted by the since-removed admin Title Maker, and still held
+// by whoever was given one), since that def lives solely in their own save --
 // falls back to the old bracketed text in that one case.
 function chatTitleMarkup(msg) {
   const badgeChip = typeof badgeChipMarkupById === 'function' ? badgeChipMarkupById(msg.badgeId) : '';
