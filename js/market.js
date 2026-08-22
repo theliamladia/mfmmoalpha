@@ -343,6 +343,25 @@ async function buyMaxx(itemId) {
 
 // ---------- Title Store ----------
 const titleGrid = document.getElementById('titleGrid');
+
+// ---------- Cosmetixxx sub-tabs ----------
+// Store / Ascension / Money Titles. Pure show-hide, same shape as the inventory category tabs
+// (js/milos.js): nothing here re-renders, because every pane's contents are rendered by their own
+// existing code paths on the usual renderAll() cycle whether the pane is visible or not.
+const cosmetixxTabBtns = document.querySelectorAll('.cosmetixx-tab-btn');
+const cosmetixxSubpages = {
+  store: document.getElementById('cosmetixx-store'),
+  ascension: document.getElementById('cosmetixx-ascension'),
+  money: document.getElementById('cosmetixx-money'),
+};
+
+cosmetixxTabBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    cosmetixxTabBtns.forEach((b) => b.classList.toggle('active', b === btn));
+    Object.entries(cosmetixxSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.cosmetixx));
+  });
+});
+
 const titleLog = document.getElementById('titleLog');
 const btnTitleChevron = document.getElementById('btnTitleChevron');
 const titleDropdown = document.getElementById('titleDropdown');
