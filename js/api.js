@@ -370,6 +370,13 @@ function apiAdminGrantSlab(username, baseId, grader, grade, subgains) {
   });
 }
 
+// Rebuilds the cert registry from an inventory scan: mints for a slab with no cert, DELETES certs
+// for slabs nobody holds any more (a sold slab, in practice), and purges the ghosts the old
+// retire-on-drift behaviour left behind. `dryRun` reports the counts and changes nothing.
+function apiAdminGradingReconcile(dryRun) {
+  return apiRequest('/admin/grading-reconcile', { method: 'POST', body: JSON.stringify({ dryRun: !!dryRun }) });
+}
+
 function apiAdminNmgFastForwardAll() {
   return apiRequest('/admin/nmg-fast-forward-all', { method: 'POST' });
 }
@@ -752,6 +759,12 @@ function apiGradingPopReport() {
 function apiGradingCert(grader, seriesNo) {
   return apiRequest(`/grading/cert/${encodeURIComponent(grader)}/${encodeURIComponent(seriesNo)}`);
 }
+// Selling a slab for cash DESTROYS it, so its cert is deleted outright (not retired like a crack).
+// Registry-only: the cash and the inventory removal stay client-side like every other title sale.
+function apiGradingDestroyCert(gradedId) {
+  return apiRequest('/grading/cert/destroy', { method: 'POST', body: JSON.stringify({ gradedId }) });
+}
+
 function apiGradingMyCerts() {
   return apiRequest('/grading/my-certs');
 }

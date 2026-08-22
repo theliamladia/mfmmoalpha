@@ -263,16 +263,39 @@ function buildInventoryGrid() {
 
 // Titles are entirely client-side/trust-based (same as buying a crate spin or equipping a title),
 // so Sell/Prestige are plain local mutations + the usual debounced sync, no server route needed.
-function sellTitle(stackId) {
+//
+// ONE exception: a GRADED slab carries a cert, and the registry is server-authoritative. Selling a
+// slab for cash destroys it, so the cert is destroyed with it -- otherwise the Pop Report keeps
+// counting a slab nobody holds and its number keeps resolving in Cert Lookup. This is the sidebar
+// Sell only; an MTN listing or a profile stall sale moves the slab to another player, and there the
+// cert moves with it and stays alive (see the hook list in mfmmoserver/server.js).
+async function sellTitle(stackId) {
   const item = getItemDef(stackId);
   if (!item || !item.rarity || item.foil) return;
   const price = TITLE_SELL_PRICE_BY_RARITY[item.rarity];
-  if (!confirm(`Sell 1x ${itemLabel(item)} for $${price.toLocaleString()}? This cannot be undone.`)) return;
+  // Named in the confirm the same way Crack names it -- this is the more final of the two: a crack
+  // keeps the number (retired, still looked-up-able), a sale deletes it outright.
+  const cert = item.nmgGrade ? certForGradedId(stackId) : null;
+  const certLine = cert ? `\n\n${cert.label} will be permanently DESTROYED -- struck from the grading registry and the Pop Report.` : '';
+  if (!confirm(`Sell 1x ${itemLabel(item)} for $${price.toLocaleString()}? This cannot be undone.${certLine}`)) return;
+
+  // Cert first, sale second. If the server can't be reached the player still has the slab, which is
+  // the recoverable failure; the other order loses the slab locally while its cert lives on.
+  if (item.nmgGrade) {
+    try {
+      await apiGradingDestroyCert(stackId);
+    } catch (err) {
+      alert(err.reason || 'Could not reach the server. The slab was not sold.');
+      return;
+    }
+  }
 
   removeFromInventory(stackId, 1);
   character.cash = round2(character.cash + price);
-  logTo(inventoryLog, `Sold ${itemLabel(item)} for $${price.toLocaleString()}.`, 'gain');
+  logTo(inventoryLog, `Sold ${itemLabel(item)} for $${price.toLocaleString()}.${cert ? ` ${cert.label} destroyed.` : ''}`, 'gain');
   save();
+  // A duplicate stack's next cert becomes the one on show, so the cache has to catch up.
+  if (item.nmgGrade) await refreshNmgCerts();
   renderAll();
 }
 
