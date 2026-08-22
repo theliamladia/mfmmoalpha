@@ -4521,6 +4521,40 @@ p.foil-ascended-line.foil-ascended-line {
   color: var(--accent-foreground);
 }
 
+/* Badge buy / merge rows: the qty spinner sits inline with its button, same shape the crate
+   banners use, so multi-buy and multi-merge read as one control rather than two stacked ones. */
+.badge-buy-row,
+.badge-rankup-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cosmetixx-tab-btn {
+  background: var(--surface-3);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  padding: 9px 16px;
+}
+
+.cosmetixx-tab-btn.active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.cosmetixx-subpage {
+  margin-top: 16px;
+}
+
+/* Section break inside the Store pane -- same weight as the Archived Crates heading it sits above,
+   so "Crates" and "Archived Crates" read as a matched pair rather than one titled and one not. */
+.cosmetixx-section-heading {
+  margin: 0 0 12px;
+}
+
 .invcat-subpage {
   margin-top: 16px;
   margin-bottom: 16px;

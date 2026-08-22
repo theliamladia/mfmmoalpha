@@ -4,20 +4,34 @@
 // everything else in this economy.
 const btnBuyBadgeCrate = document.getElementById('btnBuyBadgeCrate');
 const btnBuyBadgeCrateBanner = document.getElementById('btnBuyBadgeCrateBanner');
+const badgeCrateQty = document.getElementById('badgeCrateQty');
+const badgeCrateQtyBanner = document.getElementById('badgeCrateQtyBanner');
 const btnViewBadgesInvcat = document.getElementById('btnViewBadgesInvcat');
 const badgesGrid = document.getElementById('badgesGrid');
 
-function buyBadgeCrate() {
-  if (character.cash < BALACLAVA_BADGE_CRATE_COST) { alert('Not enough Floydbucks.'); return; }
-  character.cash = round2(character.cash - BALACLAVA_BADGE_CRATE_COST);
-  addToInventory('badgeBronze', 1);
-  logTo(inventoryLog, 'Opened a Balaclava Badge Crate: 1x Bronze Balaclava!', 'gain');
+// Same 1-10 per action cap the crate spin inputs use -- the badge crate is a guaranteed Bronze
+// rather than a roll, so this is purely "stop me clicking Buy thirty times", but a shared ceiling
+// keeps every multi-buy in the game behaving the same way.
+const BADGE_CRATE_MAX_PER_BUY = 10;
+
+function readBadgeQty(input, max) {
+  const n = Math.floor(+(input && input.value)) || 1;
+  return Math.max(1, Math.min(n, max));
+}
+
+function buyBadgeCrate(qtyInput) {
+  const qty = readBadgeQty(qtyInput, BADGE_CRATE_MAX_PER_BUY);
+  const total = round2(BALACLAVA_BADGE_CRATE_COST * qty);
+  if (character.cash < total) { alert(`Not enough Floydbucks -- ${qty}x costs $${total.toLocaleString()}.`); return; }
+  character.cash = round2(character.cash - total);
+  addToInventory('badgeBronze', qty);
+  logTo(inventoryLog, `Opened ${qty}x Balaclava Badge Crate for $${total.toLocaleString()}: ${qty}x Bronze Balaclava!`, 'gain');
   save();
   renderAll();
 }
 
-btnBuyBadgeCrate.addEventListener('click', buyBadgeCrate);
-if (btnBuyBadgeCrateBanner) btnBuyBadgeCrateBanner.addEventListener('click', buyBadgeCrate);
+btnBuyBadgeCrate.addEventListener('click', () => buyBadgeCrate(badgeCrateQty));
+if (btnBuyBadgeCrateBanner) btnBuyBadgeCrateBanner.addEventListener('click', () => buyBadgeCrate(badgeCrateQtyBanner));
 
 // Jumps straight from the Cosmetixxx banner to the Inventory > Badges sub-tab -- same tab-click
 // idiom as every other cross-link button in this codebase (e.g. btnGoToCoinflip).
@@ -28,17 +42,23 @@ if (btnViewBadgesInvcat) {
   });
 }
 
-function rankUpBadge(fromId) {
+// `times` is how many merges to do at once -- 5 Bronze -> 1 Silver, done N times in one action and
+// one confirm. Clamped to what the stack can actually pay for, so a stale qty input (the grid
+// re-renders on every save) can never consume more badges than are there.
+function rankUpBadge(fromId, times = 1) {
   const idx = BADGE_RANK_CHAIN.indexOf(fromId);
   if (idx === -1 || idx === BADGE_RANK_CHAIN.length - 1) return; // Grandmaster ranks up via tradeGrandmasterForGem instead
-  if (inventoryQty(fromId) < BADGE_RANK_UP_COST) return;
+  const maxTimes = Math.floor(inventoryQty(fromId) / BADGE_RANK_UP_COST);
+  if (maxTimes < 1) return;
+  const count = Math.max(1, Math.min(Math.floor(times) || 1, maxTimes));
   const nextId = BADGE_RANK_CHAIN[idx + 1];
   const fromDef = getBadgeDef(fromId);
   const nextDef = getBadgeDef(nextId);
-  if (!confirm(`Rank up? This consumes ${BADGE_RANK_UP_COST}x ${fromDef.name} and grants 1x ${nextDef.name}. This cannot be undone.`)) return;
-  removeFromInventory(fromId, BADGE_RANK_UP_COST);
-  addToInventory(nextId, 1);
-  logTo(inventoryLog, `Ranked up into ${nextDef.name}!`, 'gain');
+  const spend = BADGE_RANK_UP_COST * count;
+  if (!confirm(`Rank up ${count}x? This consumes ${spend}x ${fromDef.name} and grants ${count}x ${nextDef.name}. This cannot be undone.`)) return;
+  removeFromInventory(fromId, spend);
+  addToInventory(nextId, count);
+  logTo(inventoryLog, `Ranked up into ${count}x ${nextDef.name}!`, 'gain');
   save();
   renderAll();
 }
@@ -89,8 +109,16 @@ function renderBadgesGrid() {
     const chainIdx = BADGE_RANK_CHAIN.indexOf(stack.id);
     let actionHtml = '';
     if (chainIdx !== -1 && chainIdx < BADGE_RANK_CHAIN.length - 1) {
-      const canRankUp = stack.qty >= BADGE_RANK_UP_COST;
-      actionHtml = `<button data-rankup="${stack.id}" ${canRankUp ? '' : 'disabled'}>Rank Up (${stack.qty}/${BADGE_RANK_UP_COST})</button>`;
+      // The qty input only appears once more than one merge is actually affordable -- a lone
+      // "1/1" spinner on a stack of 5 is noise. It defaults to 1 rather than to the max: merging
+      // is irreversible, and the duplicates are somebody's stock for a future rank.
+      const maxTimes = Math.floor(stack.qty / BADGE_RANK_UP_COST);
+      actionHtml = `
+        <div class="badge-rankup-row">
+          ${maxTimes > 1 ? `<input type="number" class="crate-qty-input" data-rankup-qty="${stack.id}" min="1" max="${maxTimes}" value="1" title="How many to merge">` : ''}
+          <button data-rankup="${stack.id}" ${maxTimes >= 1 ? '' : 'disabled'}>Rank Up (${stack.qty}/${BADGE_RANK_UP_COST})</button>
+        </div>
+      `;
     } else if (stack.id === 'badgeGrandmaster') {
       actionHtml = `
         <div class="admin-button-row">
@@ -116,7 +144,10 @@ function renderBadgesGrid() {
     btn.addEventListener('click', () => equipBadge(btn.dataset.equipBadge));
   });
   badgesGrid.querySelectorAll('[data-rankup]').forEach((btn) => {
-    btn.addEventListener('click', () => rankUpBadge(btn.dataset.rankup));
+    btn.addEventListener('click', () => {
+      const qtyInput = badgesGrid.querySelector(`[data-rankup-qty="${btn.dataset.rankup}"]`);
+      rankUpBadge(btn.dataset.rankup, qtyInput ? +qtyInput.value : 1);
+    });
   });
   badgesGrid.querySelectorAll('[data-trade-gem]').forEach((btn) => {
     btn.addEventListener('click', () => tradeGrandmasterForGem(btn.dataset.tradeGem));

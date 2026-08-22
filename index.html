@@ -294,6 +294,18 @@
         <div id="shop-titles" class="shop hidden">
           <div id="titleLog" class="log log-single-line"></div>
 
+          <!-- Cosmetixxx is three different activities that happened to share one scroll: buying
+               (crates, the slab market, the archive), forging (Foil Ascension), and the flat-price
+               title wall. Split into sub-tabs on the same pattern as the inventory categories --
+               same .market-tabs strip, same .active/.hidden toggle (see js/market.js). -->
+          <div class="market-tabs">
+            <button class="cosmetixx-tab-btn active" data-cosmetixx="store">&#127978; Store</button>
+            <button class="cosmetixx-tab-btn" data-cosmetixx="ascension">&#10024; Ascension</button>
+            <button class="cosmetixx-tab-btn" data-cosmetixx="money">&#128176; Money Titles</button>
+          </div>
+
+          <div id="cosmetixx-store" class="cosmetixx-subpage">
+            <h3 class="cosmetixx-section-heading">&#127873; Crates</h3>
           <div class="feature-banner ml-banner">
             <div class="feature-banner-text">
               <h3>&#127942; MILOS LEGENDS 1</h3>
@@ -339,6 +351,7 @@
             </div>
             <div class="feature-banner-actions">
               <button id="btnViewBadgesInvcat" class="secondary-btn">My Badges</button>
+              <input type="number" id="badgeCrateQtyBanner" class="crate-qty-input" min="1" max="10" value="1" title="How many crates to open">
               <button id="btnBuyBadgeCrateBanner">Buy ($960)</button>
             </div>
           </div>
@@ -349,15 +362,6 @@
             <p class="item-subheading">5 randomly graded title slabs, restocked from any collection every 24 hours. First come, first served -- once a slab sells, it's gone until the next rotation.</p>
             <p id="cosmetixxMarketCountdown" class="item-subheading"></p>
             <div id="cosmetixxMarketGrid" class="profile-slab-grid"></div>
-          </div>
-
-          <div class="hustle-card profile-slab-section-card">
-            <h3>&#10024; Foil Ascension</h3>
-            <p class="item-subheading">Burn <b>3 copies</b> of the same title plus <b>$25,000</b> to forge one Foil version &mdash; the same art under a moving shimmer. Any crate qualifies, archived ones included. The 3 copies are destroyed permanently.</p>
-            <p class="item-subheading">Foils are equippable like any title, and can be graded by any of the three graders &mdash; but they cannot be prestiged.</p>
-            <div id="foilAscensionEligible" class="profile-slab-grid"></div>
-            <button id="btnFoilAscensionOpen">Choose a Title to Ascend</button>
-            <div id="foilLog" class="log log-single-line"></div>
           </div>
 
           <h3 class="archived-crates-heading">&#128465;&#65039; Archived Crates</h3>
@@ -407,9 +411,23 @@
               <button id="btnViewCrate" class="secondary-btn">View Crate</button>
             </div>
           </div>
+          </div>
 
+          <div id="cosmetixx-ascension" class="cosmetixx-subpage hidden">
+          <div class="hustle-card profile-slab-section-card">
+            <h3>&#10024; Foil Ascension</h3>
+            <p class="item-subheading">Burn <b>3 copies</b> of the same title plus <b>$25,000</b> to forge one Foil version &mdash; the same art under a moving shimmer. Any crate qualifies, archived ones included. The 3 copies are destroyed permanently.</p>
+            <p class="item-subheading">Foils are equippable like any title, and can be graded by any of the three graders &mdash; but they cannot be prestiged.</p>
+            <div id="foilAscensionEligible" class="profile-slab-grid"></div>
+            <button id="btnFoilAscensionOpen">Choose a Title to Ascend</button>
+            <div id="foilLog" class="log log-single-line"></div>
+          </div>
+          </div>
+
+          <div id="cosmetixx-money" class="cosmetixx-subpage hidden">
           <p>Flex your bank account. Buy a title, then switch which one you display with the chevron next to your name.</p>
           <div class="hustle-grid" id="titleGrid"></div>
+          </div>
         </div>
 
         <!-- The Grading District hosts all three graders on ONE page rather than giving MGA and CCG
@@ -1648,7 +1666,10 @@
           <div class="hustle-card">
             <h3>🥷 Balaclava Badge Crate <span class="price">$960</span></h3>
             <p>100% guaranteed Bronze Balaclava Badge. Rank it up through a full prestige chain: Bronze &rarr; Silver &rarr; Gold &rarr; Platinum &rarr; Master &rarr; Grandmaster &rarr; a Gem of your choice (Ruby/Sapphire/Emerald) &rarr; collect all 3 Gems for the UNITS Balaclava.</p>
-            <button id="btnBuyBadgeCrate">Buy ($960)</button>
+            <div class="badge-buy-row">
+              <input type="number" id="badgeCrateQty" class="crate-qty-input" min="1" max="10" value="1" title="How many crates to open">
+              <button id="btnBuyBadgeCrate">Buy ($960)</button>
+            </div>
           </div>
           <div class="hustle-grid" id="badgesGrid"></div>
         </div>
