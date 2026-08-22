@@ -273,13 +273,21 @@ function renderProfile() {
 
   const showcaseIds = profileState.showcaseTitleIds || [];
   const showcaseDefs = showcaseIds.map((id) => getItemDef(id, viewedChar)).filter(Boolean);
+  // A graded title showcased here renders as the SLAB, not as a badge chip: the chip shows the art
+  // and nothing else, hiding the grade, the SUBGAINS and the cert number -- which is the entire
+  // reason someone pins a graded title rather than the plain one. Same renderer, and the same
+  // `isOwner ? undefined : null` cert rule, as the Portfolio Showcase below (see the note there:
+  // the cert cache holds only the VIEWER'S own certs, so someone else's slab must not resolve one).
+  // The name line is dropped for slabs -- the slab header already says it, louder.
   profileShowcaseList.innerHTML = showcaseDefs.length
     ? showcaseDefs.map((def) => `
-      <div class="profile-showcase-item">
-        ${titleBadgeMarkup(def)}
-        <div class="profile-showcase-text">
-          <p class="profile-showcase-name">${escapeHtml(itemLabel(def))}</p>
-        </div>
+      <div class="profile-showcase-item${def.nmgGrade ? ' profile-showcase-slab' : ''}">
+        ${def.nmgGrade ? nmgSlabHtml(def, isOwner ? undefined : null) : `
+          ${titleBadgeMarkup(def)}
+          <div class="profile-showcase-text">
+            <p class="profile-showcase-name">${escapeHtml(itemLabel(def))}</p>
+          </div>
+        `}
         ${isOwner ? `<button class="secondary-btn" data-showcase-remove="${def.id}">Remove</button>` : ''}
       </div>
     `).join('')
