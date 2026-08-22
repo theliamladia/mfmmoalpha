@@ -451,6 +451,19 @@ btnAdminGrantSlab.addEventListener('click', async () => {
   try {
     const result = await apiAdminGrantSlab(username, baseId, grader.id, grade, subgains);
     adminGrantSlabResult.innerHTML = `<p class="gain">${result.message}</p>`;
+
+    // The mint happened server-side, so THIS client's character and cert cache both predate it --
+    // the slab would otherwise not appear at all until a reload, and the fresh cert (the thing that
+    // carries BLACK LABEL) would be missing from the cache even once it did. Pull both back, the
+    // same way recoverFromStaleSync() does. Only when granting to yourself: another player's grant
+    // changes nothing here. apiRequest() flushes any pending character sync before /me, so this
+    // cannot race a debounced save into overwriting the server's freshly granted inventory.
+    if (username.toLowerCase() === (getMyUsername() || '').toLowerCase()) {
+      const fresh = await apiMe();
+      character = fresh.character;
+      await refreshNmgCerts();
+      renderAll();
+    }
   } catch (err) {
     adminGrantSlabResult.innerHTML = `<p class="loss">${err.reason || 'Could not reach the server.'}</p>`;
   }

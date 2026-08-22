@@ -78,6 +78,12 @@ function enterGameWithCharacter(serverCharacter, serverTime) {
   refreshOnlinePlayers();
   refreshServerState();
   refreshChatMessages();
+  // The cert cache (js/nmg.js) backs EVERY slab render -- Portfolio Showcase, Graded Titles, Cert
+  // Lookup -- but used to be filled only when the Grading District tab refreshed. A session that
+  // went straight to a profile therefore drew every MGA slab with "--" SUBGAINS, no cert line and
+  // no BLACK LABEL case, purely because nothing had loaded the certs yet. Load them up front and
+  // re-render once they land.
+  refreshNmgCerts().then(() => renderAll());
 }
 
 btnLogin.addEventListener('click', async () => {
