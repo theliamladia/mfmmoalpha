@@ -220,9 +220,9 @@ function subgainsLineHtml(subgains, grader) {
 
 // Used for the reveal modal's "big reveal" moment, where there's room for the full header/
 // wordmark/art treatment. `item` must already be the resolved graded def (has nmgGrade/nmgBaseId/
-// grader set, see the GRADED_ID_RE branch in getItemDef, js/core.js). The Graded Titles inventory
-// list uses the much more compact nmgGradedRowPreviewHtml() below instead -- the full slab is too
-// tall/heavy for routine browsing in the narrow character side panel.
+// grader set, see the GRADED_ID_RE branch in getItemDef, js/core.js). This is the ONE slab
+// renderer: the reveal, the Graded Titles sidebar, both profile showcases, the CosmetixxMarket
+// rotation and Cert Lookup all draw through it, so a slab looks the same everywhere it appears.
 //
 // `cert` is optional: pass the cert object straight from a /nmg/reveal response so the brand-new
 // number shows immediately; otherwise it's resolved from the cache above. Passing `null` explicitly
@@ -267,22 +267,6 @@ function nmgSlabHtml(item, cert) {
       <div class="nmg-slab-wordmark">${escapeHtml(grader.short)}${grader.id === 'ccg' ? '<span class="ccg-check">COOL \u2714</span>' : ''}</div>
       <div class="nmg-slab-art ${artClass}" style="${artStyle}"></div>
       ${resolvedCert ? `<div class="nmg-slab-cert-no">${escapeHtml(resolvedCert.label)}</div>` : ''}
-    </div>
-  `;
-}
-
-// Compact preview for the Graded Titles inventory list -- a small landscape art thumbnail with
-// the grade badge overlaid in the corner, matching the same compact/scannable card shape every
-// other inventory card in this sidebar already uses (title, subheading, small preview, qty,
-// actions -- see titleStackCardHtml, js/inventory.js) instead of the full ornate slab.
-function nmgGradedRowPreviewHtml(item) {
-  const baseTitle = getItemDef(item.nmgBaseId);
-  const tier = NMG_GRADE_TIERS[item.nmgGrade];
-  const artClass = baseTitle.custom ? '' : baseTitle.cssClass;
-  const artStyle = titleArtInlineStyle(baseTitle);
-  return `
-    <div class="nmg-mini-preview ${artClass}" style="${artStyle}">
-      <span class="nmg-mini-grade-badge" style="color:${tier.color}">${item.nmgGrade}</span>
     </div>
   `;
 }
@@ -744,9 +728,16 @@ function renderGradedTitlesGrid() {
     return;
   }
 
-  gradedTitlesGrid.innerHTML = gradedStacks.map(({ stack, item }) => {
-    const baseTitle = getItemDef(item.nmgBaseId);
-    const tier = NMG_GRADE_TIERS[item.nmgGrade];
+  // Each slab renders as THE SLAB -- the same nmgSlabHtml() the reveal, the Portfolio Showcase and
+  // Cert Lookup use, not a thumbnail of its art. A slab is the collectible; a card that paraphrases
+  // one in text was hiding the case, the SUBGAINS line and the cert number, which is most of what a
+  // grade is actually worth looking at. The card keeps only what the slab itself cannot say: how
+  // many you hold, and what you can do with them.
+  //
+  // Grouped by grading company, in the GRADER_IDS house order (CCG, NMG, MGA), because a collection
+  // reads by grader first -- the three cases are different objects with different worth, and an
+  // MGA 10 sitting between two CCGs buries the thing you actually want to see.
+  const cardHtml = ({ stack, item }) => {
     // Graded titles still carry `rarity` (inherited via the spread in getItemDef's NMG branch),
     // so the existing sellTitle() (js/inventory.js) works unchanged -- same price table as any
     // other title of that base rarity, same confirm-dialog/remove/pay-out flow. This doubles as
@@ -757,16 +748,34 @@ function renderGradedTitlesGrid() {
     // this the button would render and then silently do nothing when clicked.
     const sellPrice = item.rarity && !item.foil ? TITLE_SELL_PRICE_BY_RARITY[item.rarity] : null;
     return `
-    <div class="hustle-card">
-      <h3>${itemLabel(item)}</h3>
-      <p class="item-subheading">${escapeHtml(tier.label)} ${item.nmgGrade} &middot; ${escapeHtml(titleCrateGroupLabel(baseTitle).replace(/^\S+\s/, ''))}</p>
-      ${item.foil ? '<p class="foil-ascended-line">FOIL ASCENDED</p>' : ''}
-      ${nmgGradedRowPreviewHtml(item)}
-      <p>&times; ${stack.qty}</p>
-      <button data-nmg-showcase="${stack.id}" class="secondary-btn">Add to Showcase</button>
-      ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
-    </div>
-  `;
+      <div class="graded-slab-card">
+        <div class="graded-slab-view" data-nmg-view="${stack.id}" title="View slab">${nmgSlabHtml(item)}</div>
+        ${stack.qty > 1 ? `<p class="graded-slab-qty">&times; ${stack.qty}</p>` : ''}
+        <div class="graded-slab-actions">
+          <button data-nmg-showcase="${stack.id}" class="secondary-btn">Add to Showcase</button>
+          ${sellPrice ? `<button data-sell-title="${stack.id}" class="secondary-btn">Sell ($${sellPrice.toLocaleString()})</button>` : ''}
+        </div>
+      </div>
+    `;
+  };
+
+  gradedTitlesGrid.innerHTML = GRADER_IDS.map((graderId) => {
+    // A slab graded before the three-grader split has no `grader` of its own; getItemDef defaults
+    // those to NMG, so this comparison never drops one into no group at all.
+    const group = gradedStacks.filter(({ item }) => (item.grader || 'nmg') === graderId);
+    if (!group.length) return '';
+    const grader = getGraderDef(graderId);
+    const slabCount = group.reduce((sum, { stack }) => sum + stack.qty, 0);
+    return `
+      <div class="graded-grader-group">
+        <div class="graded-grader-heading">
+          <span class="graded-grader-short">${escapeHtml(grader.short)}</span>
+          <span class="graded-grader-name">${escapeHtml(grader.name)}</span>
+          <span class="graded-grader-count">${slabCount} slab${slabCount === 1 ? '' : 's'}</span>
+        </div>
+        <div class="graded-grader-slabs">${group.map(cardHtml).join('')}</div>
+      </div>
+    `;
   }).join('');
 
   gradedTitlesGrid.querySelectorAll('button[data-sell-title]').forEach((btn) => {
@@ -786,8 +795,13 @@ function renderGradedTitlesGrid() {
     });
   });
 
-  gradedTitlesGrid.querySelectorAll('.nmg-mini-preview').forEach((el, i) => {
-    el.addEventListener('click', () => openNmgViewSlabModal(gradedStacks[i].item));
+  // Keyed by stack id rather than by render order -- grouping reorders the cards, and an index
+  // into gradedStacks would open the wrong slab the moment two graders are in play.
+  gradedTitlesGrid.querySelectorAll('[data-nmg-view]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const item = getItemDef(el.dataset.nmgView);
+      if (item) openNmgViewSlabModal(item);
+    });
   });
 }
 

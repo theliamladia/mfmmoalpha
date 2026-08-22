@@ -674,31 +674,6 @@ button.cooldown-ready {
   background-color: var(--surface-0);
 }
 
-/* Compact preview for the Graded Titles inventory list (nmgGradedRowPreviewHtml, js/nmg.js) --
-   same shape as .title-preview elsewhere in this sidebar, not the full slab (too tall/heavy for
-   routine browsing in a 300px-wide column). */
-.nmg-mini-preview {
-  position: relative;
-  width: 100%;
-  height: 70px;
-  border-radius: 8px;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--surface-0);
-  margin: 8px 0;
-  cursor: pointer;
-}
-
-.nmg-mini-grade-badge {
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  background: #0a0a0a;
-  border-radius: 6px;
-  padding: 1px 8px;
-  font-weight: 900;
-  font-size: 16px;
-}
 
 /* Slot cards -- Market > New Milos Grading, one of 3 states (empty/pending/ready). */
 .nmg-slot-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
@@ -1010,10 +985,9 @@ button.cooldown-ready {
 
    The selector is deliberately UNSCOPED (not `.title-badge.title-foil`). The class reaches four
    different surfaces, each with its own markup: the badge chip (titleBadgeMarkup, js/market.js),
-   the full slab's art panel and the compact inventory preview (nmgSlabHtml /
-   nmgGradedRowPreviewHtml, js/nmg.js -- both reachable now that foils are gradeable), and the
-   Profile banner (renderProfileBanner, js/profile.js). Scoping this to .title-badge is exactly why
-   the shimmer was invisible on every slab surface. `overflow: hidden` + `position: relative` are
+   the full slab's art panel (nmgSlabHtml, js/nmg.js -- reachable now that foils are gradeable),
+   and the Profile banner (renderProfileBanner, js/profile.js). Scoping this to .title-badge is
+   exactly why the shimmer was invisible on every slab surface. `overflow: hidden` + `position: relative` are
    set on the host here rather than per-surface so the sweep is always clipped to the host's own
    rounded corners no matter which of the four it lands on.
 
@@ -1061,12 +1035,6 @@ button.cooldown-ready {
     animation: none;
     background-position: 50% 0;
   }
-}
-
-/* The grade chip sits on top of the art panel, so it needs to out-paint the sweep (a pseudo-element
-   is painted after its element's positioned children by default) or the grade number washes out. */
-.nmg-mini-grade-badge {
-  z-index: 1;
 }
 
 /* "FOIL ASCENDED" status line, shown under the rarity/odds wherever a foil's rarity is displayed:
@@ -4183,6 +4151,84 @@ p.foil-ascended-line.foil-ascended-line {
 
 /* Slab Granter preview: the real .nmg-slab (340px) dropped into the admin menu, centred with a
    little breathing room so the picker above it and the Mint button below it stay readable. */
+/* --- Graded Titles sidebar: real slabs, grouped by grading company ---
+   The cards carry only what a slab cannot say for itself (quantity, actions); everything else --
+   title, grade, SUBGAINS, cert number, case treatment -- is the slab's own render. Each group is a
+   full-width row inside the .hustle-grid so the grader headings read as section breaks rather than
+   as cards in the flow. */
+/* A slab pinned to the Title Showcase gets its own column layout -- the row shape (chip, name,
+   button in a line) is built for a 28px-tall badge and squashes a 340px slab. */
+.profile-showcase-slab {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.graded-grader-group {
+  grid-column: 1 / -1;
+}
+
+.graded-grader-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.graded-grader-short {
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+
+.graded-grader-name {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.graded-grader-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.graded-grader-slabs {
+  display: grid;
+  /* min() rather than a bare 300px: the character sidebar column is ~270px, and a hard 300px track
+     makes the grid wider than its container and pushes the whole panel into horizontal scroll. */
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.graded-slab-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.graded-slab-view {
+  cursor: pointer;
+  width: 100%;
+}
+
+.graded-slab-qty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.graded-slab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
 .admin-slab-preview {
   display: flex;
   justify-content: center;
