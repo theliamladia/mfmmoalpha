@@ -226,7 +226,9 @@ function subgainsLineHtml(subgains, grader) {
 //
 // `cert` is optional: pass the cert object straight from a /nmg/reveal response so the brand-new
 // number shows immediately; otherwise it's resolved from the cache above. Passing `null` explicitly
-// is fine -- system slabs (the CosmetixxMarket rotation) have no cert until someone buys them.
+// is fine -- and so is a cert-SHAPED object with no `label`, which is how the CosmetixxMarket
+// shelf shows a slab's SUBGAINS and BLACK LABEL case before it has a cert to name: an unsold slab
+// has no number yet, so the number line is simply omitted.
 //
 // SLAB ART IS ART: every colour in here and in the matching style.css block is hardcoded, never a
 // var(--token), so Visions cannot reskin a grader's case. That is the same line the crate/title/
@@ -266,7 +268,7 @@ function nmgSlabHtml(item, cert) {
       ${subgainsLineHtml(resolvedCert ? resolvedCert.subgains : null, grader.id)}
       <div class="nmg-slab-wordmark">${escapeHtml(grader.short)}${grader.id === 'ccg' ? '<span class="ccg-check">COOL \u2714</span>' : ''}</div>
       <div class="nmg-slab-art ${artClass}" style="${artStyle}"></div>
-      ${resolvedCert ? `<div class="nmg-slab-cert-no">${escapeHtml(resolvedCert.label)}</div>` : ''}
+      ${resolvedCert && resolvedCert.label ? `<div class="nmg-slab-cert-no">${escapeHtml(resolvedCert.label)}</div>` : ''}
     </div>
   `;
 }
@@ -818,8 +820,11 @@ if (nmgMarketTabBtn) {
 // 5 system-generated graded-title slabs, shared across every player, rotating every 24h -- server
 // owns generation/pricing entirely (see mfmmoserver's /cosmetixx-market/state), same trust boundary
 // as a real NMG grade roll. Rendered with the exact same nmgSlabHtml() used for owned slabs --
-// getItemDef() resolves any `${baseId}_nmg${grade}` id from the id string alone, regardless of
-// whether the viewer owns it, so no separate rendering path is needed here.
+// getItemDef() resolves any graded id from the id string alone, regardless of whether the viewer
+// owns it, so no separate rendering path is needed here.
+//
+// The shelf mixes all three graders, so a rotation can put a CCG 3 (half price, garish case) next
+// to an MGA 10 whose four SUBGAINS are visible before you pay -- and, rarely, a BLACK LABEL.
 const cosmetixxMarketGrid = document.getElementById('cosmetixxMarketGrid');
 const cosmetixxMarketCountdown = document.getElementById('cosmetixxMarketCountdown');
 let cosmetixxMarketCache = { slots: [], nextRotationAt: 0 };
@@ -843,14 +848,21 @@ function buildCosmetixxMarketGrid() {
   }
 
   cosmetixxMarketGrid.innerHTML = slots.map((slot) => {
-    // CosmetixxMarket stocks NMG slabs and only NMG slabs -- the store is the SYSTEM buying
-    // grading, and the system uses the everyman grader (MGA is a player prestige path you opt into,
-    // CCG a player budget choice). Mirrors the same hardcoded choice in /cosmetixx-market/buy.
-    const def = getItemDef(`${slot.titleId}${GRADERS.nmg.suffix}${slot.grade}`);
+    // The rotation stocks all three graders, decided and priced server-side at rotation time (see
+    // generateCosmetixxMarketSlots in mfmmoserver/gameLogic.js). A slab from before that change --
+    // an unsold slot mid-rotation when this deploys -- has no `grader` and is an NMG one.
+    const grader = getGraderDef(slot.grader) || GRADERS.nmg;
+    const def = getItemDef(`${slot.titleId}${grader.suffix}${slot.grade}`);
     if (!def) return '';
+    // A shelf preview, not a cert: no number (the slab has none until someone buys it), but the
+    // SUBGAINS and the BLACK LABEL case are exactly what the buyer will get -- the purchase mints
+    // the cert from these same values.
+    const shelfCert = slot.subgains
+      ? { label: null, subgains: slot.subgains, blackLabel: !!slot.subgains.blackLabel, firstEdition: false }
+      : null;
     return `
       <div class="profile-slab-slot">
-        ${nmgSlabHtml(def, null)}
+        ${nmgSlabHtml(def, shelfCert)}
         <p class="profile-slab-market-price">$${slot.price.toLocaleString()}</p>
         <div class="profile-slab-slot-actions">
           ${slot.sold
