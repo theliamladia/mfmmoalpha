@@ -599,6 +599,12 @@ button.cooldown-ready {
   border: 3px solid #b8b9bd;
   padding: 10px;
   margin: 0 auto;
+  /* Flex column so the ART PANEL absorbs any leftover height (flex-grow on .nmg-slab-art).
+     Per-grader case chrome (wordmark size, header borders) legitimately differs a few pixels --
+     SLAB ART IS ART and stays untouched -- so equal heights come from stretching the slab to its
+     row and letting the art soak up the difference, never from equalizing the chrome. */
+  display: flex;
+  flex-direction: column;
 }
 
 .nmg-slab-header {
@@ -667,7 +673,9 @@ button.cooldown-ready {
 
 .nmg-slab-art {
   width: 100%;
-  height: 150px;
+  height: auto;
+  min-height: 150px;
+  flex: 1 1 auto;
   border-radius: 6px;
   background-size: cover;
   background-position: center;
@@ -4234,6 +4242,15 @@ p.foil-ascended-line.foil-ascended-line {
 .graded-slab-view {
   cursor: pointer;
   width: 100%;
+  /* Grid rows stretch the card; this chain hands that height down to the slab itself so every
+     slab in a row bottoms out on the same line regardless of grader. */
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.graded-slab-view .nmg-slab {
+  flex: 1 1 auto;
 }
 
 .graded-slab-qty {
@@ -6057,9 +6074,16 @@ p.foil-ascended-line.foil-ascended-line {
   align-items: center;
   gap: 8px;
   width: 100%;
+  /* Same stretch chain as .graded-slab-view: the slab grows to fill the slot so mixed-grader
+     rows (CosmetixxMarket, showcases) stay flush. */
   padding: var(--space-3);
   border-radius: var(--radius-sm);
   transition: background-color 0.12s ease;
+}
+
+.profile-slab-slot .nmg-slab {
+  flex: 1 1 auto;
+  align-self: stretch;
 }
 
 .profile-slab-slot:hover {
@@ -6389,6 +6413,13 @@ p.foil-ascended-line.foil-ascended-line {
   border-radius: 4px;
   font-size: 10px;
   color: #333333;
+  /* MGA's SUBGAINS content (header + 4 scores) wraps to two lines at the narrower widths this
+     renders at (e.g. the 300px Graded Titles sidebar); CCG/NMG's one-word filler never needs to.
+     A fixed min-height pins the strip to the two-line case everywhere, so the CCG/NMG/MGA slab
+     heights this box feeds into stay equal at any width instead of only when MGA happens to fit
+     on one line. */
+  min-height: 46px;
+  box-sizing: border-box;
 }
 .nmg-subgains-header {
   font-weight: 900;
@@ -6405,6 +6436,25 @@ p.foil-ascended-line.foil-ascended-line {
 .nmg-subgain b {
   font-weight: 500;
   opacity: 0.7;
+}
+
+/* Filler strip for graders with no SUBGAINS (CCG, NMG) -- same box/padding as the real strip
+   above so a CCG/NMG slab and an MGA slab stack to identical heights everywhere a slab renders,
+   just centred, muted text instead of four scores. */
+.nmg-slab-subgains.nmg-slab-subgains-none {
+  justify-content: center;
+}
+.nmg-slab-subgains-filler {
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 2px;
+  opacity: 0.55;
+}
+/* CCG's white/dashed header context and MGA's Black Label context both restyle .nmg-slab-subgains
+   above (background/border/color) -- the filler inherits those overrides for free since it shares
+   the same .nmg-slab-subgains box, but its own opacity keeps it legible against both. */
+.nmg-slab-black-label .nmg-slab-subgains-filler {
+  opacity: 0.65;
 }
 
 .nmg-slab-cert-no {
@@ -6429,9 +6479,8 @@ p.foil-ascended-line.foil-ascended-line {
 .nmg-slot-grader-nmg { color: var(--text-secondary); }
 .nmg-slot-grader-mga { color: #b9902a; }
 
-/* --- Grader picker (submit modal) + the counter strip on the page --- */
-.nmg-grader-options,
-.nmg-grader-strip {
+/* --- Grader picker (submit modal) --- */
+.nmg-grader-options {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 10px;
@@ -6476,6 +6525,28 @@ p.foil-ascended-line.foil-ascended-line {
 .nmg-grader-btn.nmg-grader-nmg { border-left: 4px solid #3b5fe0; }
 .nmg-grader-btn.nmg-grader-mga { border-left: 4px solid #c9a227; }
 
+/* --- Grader storefront banner (Grading District top-level tabs) --- */
+/* Each grader now owns a whole panel instead of a 1/3-width slot in a strip, so its pitch card
+   reads as a storefront banner: full width, roomier padding, a bigger title, and the left accent
+   border widened to match. */
+.nmg-grader-card-storefront {
+  width: 100%;
+  padding: 20px 24px;
+  margin: 0 0 4px;
+  border-left-width: 6px;
+}
+.nmg-grader-card-storefront h4 { font-size: 18px; }
+.nmg-grader-card-storefront p { font-size: 13px; }
+.nmg-storefront-price {
+  margin: 10px 0 0 !important;
+  font-size: 14px !important;
+  font-weight: 800;
+  color: var(--text-primary) !important;
+}
+.nmg-grader-card-storefront > button {
+  margin-top: 12px;
+}
+
 /* --- Grading District sub-tabs --- */
 .nmg-subtabs {
   display: flex;
@@ -6494,6 +6565,18 @@ p.foil-ascended-line.foil-ascended-line {
   background: var(--accent);
   color: var(--accent-contrast, #fff);
   border-color: var(--accent);
+}
+
+/* --- Grading Search nested strip (Pop Report / Cert Lookup / Set Registry) --- */
+/* Same idiom as .cosmetixx-tab-btn: the shared .market-tabs.sub-tabs rule only touches
+   background/border for the inactive state, so this class supplies its own text color too --
+   otherwise an inactive tab keeps button's default var(--accent-foreground), which reads as
+   invisible dark-on-dark once the background goes transparent. */
+.nmg-search-tab-btn {
+  color: var(--text-secondary);
+}
+.nmg-search-tab-btn.active {
+  color: var(--accent-foreground);
 }
 
 /* --- Pop Report --- */

@@ -210,7 +210,14 @@ function certForGradedId(gradedId) {
 // registry) renders "--" per slot, which reads as "never recorded" rather than as a zero.
 function subgainsLineHtml(subgains, grader) {
   const def = getGraderDef(grader);
-  if (!def || !def.subgains) return '';
+  // A grader without SUBGAINS still renders the strip -- just with a muted filler instead of the
+  // four scores -- so every slab (CCG/NMG/MGA alike) occupies the same box at the same width and
+  // slabs stack to equal heights everywhere they render (sidebar, CosmetixxMarket, showcases, Cert
+  // Lookup). A legacy MGA cert with null subgains is a different case (a grader that DOES have
+  // subgains but never recorded them) and keeps rendering the real strip with its em-dash cells.
+  if (!def || !def.subgains) {
+    return '<div class="nmg-slab-subgains nmg-slab-subgains-none"><span class="nmg-slab-subgains-filler">GRADE ONLY</span></div>';
+  }
   const cells = SUBGAIN_ORDER.map(([key, label]) => {
     const v = subgains && subgains[key] !== null && subgains[key] !== undefined ? subgains[key] : null;
     return `<span class="nmg-subgain"><b>${escapeHtml(label)}</b>${v === null ? '&mdash;' : v}</span>`;
@@ -401,35 +408,50 @@ function graderOptionCardHtml(graderId) {
   `;
 }
 
+// Applies the grader choice (relabel tier buttons, set the picked-grader banner, advance to the
+// tier step) regardless of whether that choice came from the flat-grid grader step (below) or was
+// preselected by a storefront tab (openNmgSubmitModal(graderId)) -- one place owns "what happens
+// once a grader is picked" so the two entry points can't drift.
+function selectNmgSubmitGrader(graderId) {
+  nmgSubmitSelectedGrader = graderId;
+  nmgSubmitSelectedTier = null;
+  btnNmgSubmitConfirm.disabled = true;
+  nmgTierBtns.forEach((b) => b.classList.remove('active'));
+  // Tier prices are per-grader, so the tier buttons are relabelled on every grader choice
+  // rather than being static markup.
+  const g = GRADERS[nmgSubmitSelectedGrader];
+  nmgTierBtns.forEach((b) => {
+    const cost = g.tiers[b.dataset.tier];
+    b.innerHTML = `${escapeHtml(NMG_TIER_LABELS[b.dataset.tier])}<br>$${cost.toLocaleString()}`;
+  });
+  const item = getItemDef(nmgSubmitSelectedStackId);
+  nmgSubmitSelectedTitleName.textContent = `${item ? itemLabel(item) : nmgSubmitSelectedStackId} \u2192 ${g.short}`;
+  nmgSubmitGraderStep.classList.add('hidden');
+  nmgSubmitTierStep.classList.remove('hidden');
+}
+
 function buildNmgSubmitGraderOptions() {
   if (!nmgSubmitGraderOptions) return;
   // Rendered cheapest-first so the ladder reads left to right: CCG -> NMG -> MGA.
   nmgSubmitGraderOptions.innerHTML = GRADER_IDS.map((id) => graderOptionCardHtml(id)).join('');
   nmgSubmitGraderOptions.querySelectorAll('.nmg-grader-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      nmgSubmitSelectedGrader = btn.dataset.grader;
-      nmgSubmitSelectedTier = null;
-      btnNmgSubmitConfirm.disabled = true;
-      nmgTierBtns.forEach((b) => b.classList.remove('active'));
-      // Tier prices are per-grader, so the tier buttons are relabelled on every grader choice
-      // rather than being static markup.
-      const g = GRADERS[nmgSubmitSelectedGrader];
-      nmgTierBtns.forEach((b) => {
-        const cost = g.tiers[b.dataset.tier];
-        b.innerHTML = `${escapeHtml(NMG_TIER_LABELS[b.dataset.tier])}<br>$${cost.toLocaleString()}`;
-      });
-      const item = getItemDef(nmgSubmitSelectedStackId);
-      nmgSubmitSelectedTitleName.textContent = `${item ? itemLabel(item) : nmgSubmitSelectedStackId} \u2192 ${g.short}`;
-      nmgSubmitGraderStep.classList.add('hidden');
-      nmgSubmitTierStep.classList.remove('hidden');
-    });
+    btn.addEventListener('click', () => selectNmgSubmitGrader(btn.dataset.grader));
   });
 }
 
-function openNmgSubmitModal() {
+// Set whenever the modal is opened from a storefront tab (see openNmgSubmitModal below) -- the
+// grader step is skipped and "Back" from the tier step must return to the title picker instead of
+// a grader step the player never saw.
+let nmgSubmitFixedGrader = false;
+
+// `graderId` is optional: passed by a storefront's "Submit a Title to X" button to preselect that
+// grader and skip the flat grader-choice step (title picker -> tier step directly). Every existing
+// caller (the empty-slot grid button) omits it and keeps the original title -> grader -> tier flow.
+function openNmgSubmitModal(graderId) {
   nmgSubmitSelectedStackId = null;
   nmgSubmitSelectedTier = null;
   nmgSubmitSelectedGrader = null;
+  nmgSubmitFixedGrader = !!graderId;
   nmgSubmitTierStep.classList.add('hidden');
   if (nmgSubmitGraderStep) nmgSubmitGraderStep.classList.add('hidden');
   nmgSubmitPickerStep.classList.remove('hidden');
@@ -441,16 +463,26 @@ function openNmgSubmitModal() {
     const item = getItemDef(titleId);
     if (nmgSubmitGraderTitleName) nmgSubmitGraderTitleName.textContent = item ? itemLabel(item) : titleId;
     nmgSubmitPickerStep.classList.add('hidden');
-    nmgSubmitGraderStep.classList.remove('hidden');
+    if (nmgSubmitFixedGrader) {
+      selectNmgSubmitGrader(graderId);
+    } else {
+      nmgSubmitGraderStep.classList.remove('hidden');
+    }
   }, null, nmgSubmitPickerList);
   nmgSubmitModal.classList.remove('hidden');
 }
 
 // Back from the tier step lands on the GRADER step (not all the way back to the title picker) --
-// changing your mind about 3hr-vs-10min at MGA shouldn't cost you your title selection.
+// changing your mind about 3hr-vs-10min at MGA shouldn't cost you your title selection. In fixed-
+// grader mode there is no grader step to land on (the storefront already fixed it), so Back goes
+// all the way to the title picker instead.
 btnNmgSubmitBack.addEventListener('click', () => {
   nmgSubmitTierStep.classList.add('hidden');
-  nmgSubmitGraderStep.classList.remove('hidden');
+  if (nmgSubmitFixedGrader) {
+    nmgSubmitPickerStep.classList.remove('hidden');
+  } else {
+    nmgSubmitGraderStep.classList.remove('hidden');
+  }
 });
 
 if (btnNmgSubmitGraderBack) {
@@ -1243,9 +1275,42 @@ if (btnNmgRegistryRefresh) {
   btnNmgRegistryRefresh.addEventListener('click', () => refreshRegistry(true));
 }
 
-// The Pop Report and Set Registry are each a whole extra aggregate query, so both load lazily on
-// their own sub-tab click -- same reasoning as the NMG slot state and the CosmetixxMarket rotation
-// above.
+// ---------- Storefront tabs (CCG / NMG / MGA / Grading Search) ----------
+// Each grader storefront's price line reuses the exact "cheapest tier" derivation the submit
+// modal's grader cards use (graderOptionCardHtml above) rather than hand-typing a number that
+// could drift from GRADERS[id].tiers.
+document.querySelectorAll('[data-nmg-storefront-price]').forEach((el) => {
+  const g = GRADERS[el.dataset.nmgStorefrontPrice];
+  if (g) el.textContent = `from $${Math.min(...Object.values(g.tiers)).toLocaleString()}`;
+});
+document.querySelectorAll('[data-nmg-storefront-submit]').forEach((btn) => {
+  btn.addEventListener('click', () => openNmgSubmitModal(btn.dataset.nmgStorefrontSubmit));
+});
+
+// Nested Grading Search strip (Pop Report / Cert Lookup / Set Registry). Pop Report and Set
+// Registry are each a whole extra aggregate query, so both load lazily on their own nested-tab
+// click -- same reasoning as the NMG slot state and the CosmetixxMarket rotation above.
+function selectNmgSearchTab(target) {
+  document.querySelectorAll('[data-nmg-search-tab]').forEach((b) => {
+    b.classList.toggle('active', b.dataset.nmgSearchTab === target);
+  });
+  document.querySelectorAll('[data-nmg-search-panel]').forEach((panel) => {
+    panel.classList.toggle('hidden', panel.dataset.nmgSearchPanel !== target);
+  });
+  if (target === 'pop') refreshPopReport();
+  if (target === 'reg') refreshRegistry();
+}
+document.querySelectorAll('[data-nmg-search-tab]').forEach((btn) => {
+  btn.addEventListener('click', () => selectNmgSearchTab(btn.dataset.nmgSearchTab));
+});
+
+const nmgCounterShared = document.getElementById('nmgCounterShared');
+const NMG_GRADER_TABS = new Set(GRADER_IDS);
+
+// Top-level strip: three grader storefronts (their own panel each) + Grading Search (one panel
+// holding the nested strip above). SHARED SERVICES (log, slots grid, Crack, Regrade) live in
+// #nmgCounterShared, outside all three storefront panels, and are shown for any grader tab / hidden
+// for Grading Search -- slots are shared across graders, so the grid is never duplicated per tab.
 document.querySelectorAll('[data-nmg-subtab]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.nmgSubtab;
@@ -1253,7 +1318,9 @@ document.querySelectorAll('[data-nmg-subtab]').forEach((btn) => {
     document.querySelectorAll('[data-nmg-panel]').forEach((panel) => {
       panel.classList.toggle('hidden', panel.dataset.nmgPanel !== target);
     });
-    if (target === 'pop') refreshPopReport();
-    if (target === 'reg') refreshRegistry();
+    if (nmgCounterShared) nmgCounterShared.classList.toggle('hidden', !NMG_GRADER_TABS.has(target));
+    // Grading Search always opens on Pop Report, same as it does the first time the shop is
+    // entered -- there is no persisted "last nested tab" to restore.
+    if (target === 'search') selectNmgSearchTab('pop');
   });
 });
