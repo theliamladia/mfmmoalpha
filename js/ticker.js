@@ -12,7 +12,7 @@ const CITY_TICKER_POLL_MS = 60000;
 const CITY_TICKER_HIGHLIGHT_MS = 8000;
 // Roughly constant scroll speed regardless of how much text is queued up, so a slow news day
 // doesn't look weirdly fast and a busy one doesn't blur past.
-const CITY_TICKER_PX_PER_SEC = 60;
+const CITY_TICKER_PX_PER_SEC = 30;
 
 const cityTickerEl = document.getElementById('cityTicker');
 const cityTickerTrackEl = document.getElementById('cityTickerTrack');
