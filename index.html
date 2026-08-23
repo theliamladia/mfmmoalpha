@@ -298,7 +298,7 @@
                (crates, the slab market, the archive), forging (Foil Ascension), and the flat-price
                title wall. Split into sub-tabs on the same pattern as the inventory categories --
                same .market-tabs strip, same .active/.hidden toggle (see js/market.js). -->
-          <div class="market-tabs">
+          <div class="market-tabs sub-tabs">
             <button class="cosmetixx-tab-btn active" data-cosmetixx="store">&#127978; Store</button>
             <button class="cosmetixx-tab-btn" data-cosmetixx="ascension">&#10024; Ascension</button>
             <button class="cosmetixx-tab-btn" data-cosmetixx="money">&#128176; Money Titles</button>
@@ -1552,6 +1552,7 @@
           </div>
 
           <div id="profileBanner" class="profile-banner">
+            <span id="profileBannerHint" class="profile-banner-hint hidden">Pick a banner title with the 🔄 button</span>
             <button id="btnProfileShuffleBanner" class="profile-banner-shuffle secondary-btn hidden" title="Change profile banner">🔄</button>
           </div>
 
@@ -1639,7 +1640,7 @@
       <div id="inv-items" class="inv-subpage">
         <p>Everything you own. Trade with a player online by typing their username.</p>
 
-        <div class="market-tabs">
+        <div class="market-tabs sub-tabs">
           <button class="invcat-tab-btn active" data-invcat="licenses">📜 Licenses</button>
           <button class="invcat-tab-btn" data-invcat="items">📦 Items</button>
           <button class="invcat-tab-btn" data-invcat="cosmetics">🎖️ Titles</button>
@@ -1680,6 +1681,7 @@
 
         <div class="hustle-card trade-card">
           <h3>🤝 Trade</h3>
+          <p id="tradeEmpty" class="equip-picker-empty hidden">Nobody online to trade with right now.</p>
           <select id="tradeItemSelect"></select>
           <select id="tradeUsernameInput"></select>
           <button id="btnTradeSend">Send Trade</button>

@@ -10,6 +10,7 @@ const profileVisionSwatch = document.getElementById('profileVisionSwatch');
 const profileVisionLabel = document.getElementById('profileVisionLabel');
 const btnProfileVisionChange = document.getElementById('btnProfileVisionChange');
 const profileBannerEl = document.getElementById('profileBanner');
+const profileBannerHint = document.getElementById('profileBannerHint');
 const btnProfileShuffleBanner = document.getElementById('btnProfileShuffleBanner');
 const profileNameEl = document.getElementById('profileName');
 const profileNameTitleBadge = document.getElementById('profileNameTitleBadge');
@@ -80,8 +81,15 @@ function profileBannerTitle(char) {
 // Same background-resolution rules as titleBadgeMarkup (js/market.js), just applied to the big
 // banner div instead of a small chip -- custom titles carry their own background inline, static
 // catalog titles reuse their existing .title-CLASS { background-image/... } CSS rule instead.
-function applyProfileBanner(title) {
-  profileBannerEl.className = 'profile-banner' + (title && !title.custom ? ` ${title.cssClass}` : '');
+//
+// No banner set: the owner sees a hint pointing at the shuffle button (box stays full height so
+// the button keeps its normal spot); anyone else just sees a half-height box instead of a tall
+// empty one.
+function applyProfileBanner(title, isOwner) {
+  const empty = !title;
+  profileBannerEl.className = 'profile-banner'
+    + (title && !title.custom ? ` ${title.cssClass}` : '')
+    + (empty && !isOwner ? ' profile-banner-empty' : '');
   if (title && title.custom) {
     profileBannerEl.style.cssText = title.isGif
       ? `background-image:url('${title.background}');background-size:cover;background-position:center;`
@@ -89,6 +97,7 @@ function applyProfileBanner(title) {
   } else {
     profileBannerEl.style.cssText = '';
   }
+  profileBannerHint.classList.toggle('hidden', !(empty && isOwner));
 }
 
 // Markup version of applyProfileBanner(), for embedding a small banner preview inline (the Players
@@ -198,7 +207,7 @@ function renderProfile() {
   const privacy = profileState.privacy || { cash: false, fc: false, portfolio: false };
 
   const bannerTitle = profileBannerTitle(viewedChar);
-  applyProfileBanner(bannerTitle);
+  applyProfileBanner(bannerTitle, isOwner);
   btnProfileShuffleBanner.classList.toggle('hidden', !isOwner);
 
   const fullName = `${viewedChar.firstName} ${viewedChar.lastName}`;

@@ -2178,11 +2178,6 @@ p.foil-ascended-line.foil-ascended-line {
   line-height: 1.6;
 }
 
-.archived-crates-heading {
-  margin: 20px 0 4px;
-  color: var(--text-muted);
-}
-
 .feature-banner.archived-banner {
   background: #1c1c1c;
   border-color: var(--border-default);
@@ -3027,6 +3022,19 @@ p.foil-ascended-line.foil-ascended-line {
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 22px;
+}
+
+/* Nested strips (Cosmetixxx sub-tabs, inventory category tabs) reuse .market-tabs but sit
+   inside a shop/pane below a primary strip -- shrink and flatten them so they read as a
+   level below, not a second copy of the primary strip. */
+.market-tabs.sub-tabs button {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.market-tabs.sub-tabs button:not(.active) {
+  background: transparent;
+  border: 1px solid var(--border-default);
 }
 
 .market-tab-btn {
@@ -4177,6 +4185,19 @@ p.foil-ascended-line.foil-ascended-line {
   border-bottom: 1px solid var(--border-default);
 }
 
+/* Shared section-heading look -- these three one-off classes each picked their own
+   size/margins; unify on the .graded-grader-heading visual family instead. */
+.archived-crates-heading,
+.gunclub-section-title,
+.cosmetixx-section-heading {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  margin: 18px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-default);
+}
+
 .graded-grader-short {
   font-weight: 900;
   letter-spacing: 2px;
@@ -4551,10 +4572,6 @@ p.foil-ascended-line.foil-ascended-line {
 
 /* Section break inside the Store pane -- same weight as the Archived Crates heading it sits above,
    so "Crates" and "Archived Crates" read as a matched pair rather than one titled and one not. */
-.cosmetixx-section-heading {
-  margin: 0 0 12px;
-}
-
 .invcat-subpage {
   margin-top: 16px;
   margin-bottom: 16px;
@@ -4601,12 +4618,6 @@ p.foil-ascended-line.foil-ascended-line {
   max-width: 480px;
   width: 100%;
   margin-bottom: 16px;
-}
-
-.gunclub-section-title {
-  margin: 20px 0 8px;
-  font-size: 14px;
-  color: var(--text-secondary);
 }
 
 .gunclub-section-title.bad-hustle-title {
@@ -5844,6 +5855,27 @@ p.foil-ascended-line.foil-ascended-line {
   z-index: 1;
 }
 
+/* No banner set, viewer is the owner: centered hint inside the still-full-height box, pointing
+   at the shuffle button. */
+.profile-banner-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* No banner set, viewer is NOT the owner: no hint to show them, so shrink the box instead of
+   leaving a tall empty one. */
+.profile-banner.profile-banner-empty {
+  height: 150px;
+}
+
 .profile-header-row {
   display: flex;
   justify-content: space-between;
@@ -6153,6 +6185,10 @@ p.foil-ascended-line.foil-ascended-line {
     height: 220px;
   }
 
+  .profile-banner.profile-banner-empty {
+    height: 110px;
+  }
+
   .profile-columns {
     flex-direction: column;
   }
@@ -6166,6 +6202,10 @@ p.foil-ascended-line.foil-ascended-line {
 @media (max-width: 520px) {
   .profile-banner {
     height: 170px;
+  }
+
+  .profile-banner.profile-banner-empty {
+    height: 85px;
   }
 
   .profile-name {
