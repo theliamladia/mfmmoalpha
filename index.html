@@ -298,7 +298,7 @@
                (crates, the slab market, the archive), forging (Foil Ascension), and the flat-price
                title wall. Split into sub-tabs on the same pattern as the inventory categories --
                same .market-tabs strip, same .active/.hidden toggle (see js/market.js). -->
-          <div class="market-tabs">
+          <div class="market-tabs sub-tabs">
             <button class="cosmetixx-tab-btn active" data-cosmetixx="store">&#127978; Store</button>
             <button class="cosmetixx-tab-btn" data-cosmetixx="ascension">&#10024; Ascension</button>
             <button class="cosmetixx-tab-btn" data-cosmetixx="money">&#128176; Money Titles</button>
@@ -359,7 +359,7 @@
 
           <div class="hustle-card profile-slab-section-card">
             <h3>🏪 CosmetixxMarket</h3>
-            <p class="item-subheading">5 randomly graded title slabs, restocked from any collection every 24 hours. First come, first served -- once a slab sells, it's gone until the next rotation.</p>
+            <p class="item-subheading">5 randomly graded title slabs, restocked from any collection every 24 hours &mdash; from all three graders, so a cut-price CCG case can sit next to an MGA 10 with its SUBGAINS showing. First come, first served -- once a slab sells, it's gone until the next rotation.</p>
             <p id="cosmetixxMarketCountdown" class="item-subheading"></p>
             <div id="cosmetixxMarketGrid" class="profile-slab-grid"></div>
           </div>
@@ -438,30 +438,42 @@
              submission picker and on the slab art itself. -->
         <div id="shop-nmg" class="shop hidden">
           <div class="nmg-subtabs">
-            <button class="nmg-subtab-btn active" data-nmg-subtab="grade">🏅 Grading Counter</button>
-            <button class="nmg-subtab-btn" data-nmg-subtab="pop">📊 Pop Report</button>
-            <button class="nmg-subtab-btn" data-nmg-subtab="cert">🔎 Cert Lookup</button>
-            <button class="nmg-subtab-btn" data-nmg-subtab="reg">📇 Set Registry</button>
+            <button class="nmg-subtab-btn" data-nmg-subtab="ccg">🏷️ CCG</button>
+            <button class="nmg-subtab-btn active" data-nmg-subtab="nmg">🏅 NMG</button>
+            <button class="nmg-subtab-btn" data-nmg-subtab="mga">💎 MGA</button>
+            <button class="nmg-subtab-btn" data-nmg-subtab="search">🔎 Grading Search</button>
           </div>
 
-          <div data-nmg-panel="grade">
+          <div data-nmg-panel="ccg" class="hidden">
+            <div class="nmg-grader-card nmg-grader-card-storefront nmg-grader-ccg">
+              <h4>Cheap Cool Grading <span>CCG</span></h4>
+              <p>The bargain bin. $2,000&ndash;$8,000. Grade only, no frills, and the market values a CCG slab at half. Nobody respects it. You still get a slab.</p>
+              <p class="nmg-storefront-price" data-nmg-storefront-price="ccg"></p>
+              <button data-nmg-storefront-submit="ccg">Submit a Title to CCG</button>
+            </div>
+          </div>
+
+          <div data-nmg-panel="nmg">
+            <div class="nmg-grader-card nmg-grader-card-storefront nmg-grader-nmg">
+              <h4>New Milos Grading <span>NMG</span></h4>
+              <p>The standard. $5,000&ndash;$20,000. A number, and nothing you didn't ask for. Everybody's first slab.</p>
+              <p class="nmg-storefront-price" data-nmg-storefront-price="nmg"></p>
+              <button data-nmg-storefront-submit="nmg">Submit a Title to NMG</button>
+            </div>
+          </div>
+
+          <div data-nmg-panel="mga" class="hidden">
+            <div class="nmg-grader-card nmg-grader-card-storefront nmg-grader-mga">
+              <h4>Milos Grading Association <span>MGA</span></h4>
+              <p>$15,000&ndash;$60,000, and they'll tell you your stitching is a 9. Every MGA slab is itemised into four <b>SUBGAINS</b> &mdash; Gloss, Stitching, Aura, Drip. A 10 with all four perfect is a <b>BLACK LABEL</b>.</p>
+              <p class="nmg-storefront-price" data-nmg-storefront-price="mga"></p>
+              <button data-nmg-storefront-submit="mga">Submit a Title to MGA</button>
+            </div>
+          </div>
+
+          <div id="nmgCounterShared">
             <div id="nmgLog" class="log log-single-line"></div>
             <p>Three graders work this block. Submit an owned title, pick who slabs it, pick how fast you want it back, and get an authoritative 1&ndash;10 grade. Graded titles can no longer be equipped, but can still be shown in your Profile's Title Showcase &mdash; and every slab now carries a permanent cert number.</p>
-
-            <div class="nmg-grader-strip">
-              <div class="nmg-grader-card nmg-grader-ccg">
-                <h4>Cheap Cool Grading <span>CCG</span></h4>
-                <p>The bargain bin. $2,000&ndash;$8,000. Grade only, no frills, and the market values a CCG slab at half. Nobody respects it. You still get a slab.</p>
-              </div>
-              <div class="nmg-grader-card nmg-grader-nmg">
-                <h4>New Milos Grading <span>NMG</span></h4>
-                <p>The standard. $5,000&ndash;$20,000. A number, and nothing you didn't ask for. Everybody's first slab.</p>
-              </div>
-              <div class="nmg-grader-card nmg-grader-mga">
-                <h4>Milos Grading Association <span>MGA</span></h4>
-                <p>$15,000&ndash;$60,000, and they'll tell you your stitching is a 9. Every MGA slab is itemised into four <b>SUBGAINS</b> &mdash; Gloss, Stitching, Aura, Drip. A 10 with all four perfect is a <b>BLACK LABEL</b>.</p>
-              </div>
-            </div>
 
             <div class="hustle-grid" id="nmgSlotsGrid"></div>
 
@@ -474,43 +486,51 @@
             <button id="btnNmgRegradeOpen">Regrade a Slab</button>
           </div>
 
-          <div data-nmg-panel="pop" class="hidden">
-            <h3 class="gunclub-section-title">📊 Population Report</h3>
-            <p>Every title, every grade, every living slab in New Milos City. A <b>POP 1</b> is the only one that exists. Cracked slabs leave the census permanently.</p>
-            <div class="nmg-pop-controls">
-              <div id="nmgPopReportGraderTabs" class="nmg-pop-grader-tabs"></div>
-              <button id="btnNmgPopReportRefresh" class="secondary-btn">Refresh</button>
+          <div data-nmg-panel="search" class="hidden">
+            <div class="market-tabs sub-tabs">
+              <button class="nmg-search-tab-btn active" data-nmg-search-tab="pop">📊 Pop Report</button>
+              <button class="nmg-search-tab-btn" data-nmg-search-tab="cert">🔎 Cert Lookup</button>
+              <button class="nmg-search-tab-btn" data-nmg-search-tab="reg">📇 Set Registry</button>
             </div>
-            <p id="nmgPopReportMeta" class="item-subheading"></p>
-            <div id="nmgPopReportBody"></div>
-          </div>
 
-          <div data-nmg-panel="cert" class="hidden">
-            <h3 class="gunclub-section-title">🔎 Cert Lookup</h3>
-            <p>Every slab carries a cert number. Look one up to see the slab, who holds it now, its SUBGAINS, and everywhere it has been.</p>
-            <div class="nmg-cert-lookup-form">
-              <select id="nmgCertLookupGrader">
-                <option value="ccg">CCG</option>
-                <option value="nmg" selected>NMG</option>
-                <option value="mga">MGA</option>
-              </select>
-              <input id="nmgCertLookupInput" type="text" inputmode="numeric" placeholder="e.g. 000482" maxlength="10">
-              <button id="btnNmgCertLookup">Look Up</button>
+            <div data-nmg-search-panel="pop">
+              <h3 class="gunclub-section-title">📊 Population Report</h3>
+              <p>Every title, every grade, every living slab in New Milos City. A <b>POP 1</b> is the only one that exists. Cracked slabs leave the census permanently.</p>
+              <div class="nmg-pop-controls">
+                <div id="nmgPopReportGraderTabs" class="nmg-pop-grader-tabs"></div>
+                <button id="btnNmgPopReportRefresh" class="secondary-btn">Refresh</button>
+              </div>
+              <p id="nmgPopReportMeta" class="item-subheading"></p>
+              <div id="nmgPopReportBody"></div>
             </div>
-            <div id="nmgCertLookupResult"></div>
-          </div>
 
-          <div data-nmg-panel="reg" class="hidden">
-            <h3 class="gunclub-section-title">📇 Set Registry</h3>
-            <p>Slab every title in a crate &mdash; any grader, any grade &mdash; and the set is complete. Your Set GPA is the average of your best copy of each title. Best copies stay best forever: a later crack of a completed set does not take back what you already earned.</p>
-            <div class="nmg-reg-controls">
-              <button id="btnNmgRegistryRefresh" class="secondary-btn">Refresh</button>
+            <div data-nmg-search-panel="cert" class="hidden">
+              <h3 class="gunclub-section-title">🔎 Cert Lookup</h3>
+              <p>Every slab carries a cert number. Look one up to see the slab, who holds it now, its SUBGAINS, and everywhere it has been.</p>
+              <div class="nmg-cert-lookup-form">
+                <select id="nmgCertLookupGrader">
+                  <option value="ccg">CCG</option>
+                  <option value="nmg" selected>NMG</option>
+                  <option value="mga">MGA</option>
+                </select>
+                <input id="nmgCertLookupInput" type="text" inputmode="numeric" placeholder="e.g. 000482" maxlength="10">
+                <button id="btnNmgCertLookup">Look Up</button>
+              </div>
+              <div id="nmgCertLookupResult"></div>
             </div>
-            <p id="nmgRegistryMeta" class="item-subheading"></p>
-            <h4 class="nmg-reg-section-title">Your Progress</h4>
-            <div id="nmgRegistryProgress"></div>
-            <h4 class="nmg-reg-section-title">The Registry</h4>
-            <div id="nmgRegistryBoard"></div>
+
+            <div data-nmg-search-panel="reg" class="hidden">
+              <h3 class="gunclub-section-title">📇 Set Registry</h3>
+              <p>Slab every title in a crate &mdash; any grader, any grade &mdash; and the set is complete. Your Set GPA is the average of your best copy of each title. Best copies stay best forever: a later crack of a completed set does not take back what you already earned.</p>
+              <div class="nmg-reg-controls">
+                <button id="btnNmgRegistryRefresh" class="secondary-btn">Refresh</button>
+              </div>
+              <p id="nmgRegistryMeta" class="item-subheading"></p>
+              <h4 class="nmg-reg-section-title">Your Progress</h4>
+              <div id="nmgRegistryProgress"></div>
+              <h4 class="nmg-reg-section-title">The Registry</h4>
+              <div id="nmgRegistryBoard"></div>
+            </div>
           </div>
         </div>
 
@@ -1552,6 +1572,7 @@
           </div>
 
           <div id="profileBanner" class="profile-banner">
+            <span id="profileBannerHint" class="profile-banner-hint hidden">Pick a banner title with the 🔄 button</span>
             <button id="btnProfileShuffleBanner" class="profile-banner-shuffle secondary-btn hidden" title="Change profile banner">🔄</button>
           </div>
 
@@ -1639,7 +1660,7 @@
       <div id="inv-items" class="inv-subpage">
         <p>Everything you own. Trade with a player online by typing their username.</p>
 
-        <div class="market-tabs">
+        <div class="market-tabs sub-tabs">
           <button class="invcat-tab-btn active" data-invcat="licenses">📜 Licenses</button>
           <button class="invcat-tab-btn" data-invcat="items">📦 Items</button>
           <button class="invcat-tab-btn" data-invcat="cosmetics">🎖️ Titles</button>
@@ -1680,6 +1701,7 @@
 
         <div class="hustle-card trade-card">
           <h3>🤝 Trade</h3>
+          <p id="tradeEmpty" class="equip-picker-empty hidden">Nobody online to trade with right now.</p>
           <select id="tradeItemSelect"></select>
           <select id="tradeUsernameInput"></select>
           <button id="btnTradeSend">Send Trade</button>

@@ -6,6 +6,7 @@ const inventoryLog = document.getElementById('inventoryLog');
 const tradeItemSelect = document.getElementById('tradeItemSelect');
 const tradeUsernameInput = document.getElementById('tradeUsernameInput');
 const btnTradeSend = document.getElementById('btnTradeSend');
+const tradeEmpty = document.getElementById('tradeEmpty');
 const equipSlotEls = document.querySelectorAll('.equip-slot');
 const equipPickerModal = document.getElementById('equipPickerModal');
 const equipPickerTitle = document.getElementById('equipPickerTitle');
@@ -259,6 +260,14 @@ function buildInventoryGrid() {
     : '<option value="">No players online</option>';
   if (onlinePlayersCache.some((p) => p.username === prevTradeTarget)) tradeUsernameInput.value = prevTradeTarget;
   btnTradeSend.disabled = !onlinePlayersCache.length;
+
+  // Nothing to trade and nobody to trade with -- the two selects would both just show their
+  // single disabled "none" option, so collapse them into one muted line instead.
+  const tradeDead = !character.inventory.length && !onlinePlayersCache.length;
+  tradeEmpty.classList.toggle('hidden', !tradeDead);
+  tradeItemSelect.classList.toggle('hidden', tradeDead);
+  tradeUsernameInput.classList.toggle('hidden', tradeDead);
+  btnTradeSend.classList.toggle('hidden', tradeDead);
 }
 
 // Titles are entirely client-side/trust-based (same as buying a crate spin or equipping a title),
