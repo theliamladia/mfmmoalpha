@@ -660,15 +660,17 @@ button.cooldown-ready {
 }
 
 .nmg-slab-wordmark {
-  text-align: center;
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin: 6px 0;
-  background: linear-gradient(90deg, #e0393e, #3b5fe0, #7d3be0);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+}
+
+.nmg-slab-wordmark-logo {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 .nmg-slab-art {
@@ -6260,16 +6262,6 @@ p.foil-ascended-line.foil-ascended-line {
   border: 1px solid #c8c3b6;
   box-shadow: 0 1px 0 #ffffff inset;
 }
-.nmg-slab-mga .nmg-slab-wordmark {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 5px;
-  background: linear-gradient(90deg, #cfd4dc, #ffffff 45%, #9ba1ab);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
 .nmg-slab-mga .nmg-slab-grade-box {
   background: #12151a;
   color: #e8eaee;
@@ -6297,20 +6289,6 @@ p.foil-ascended-line.foil-ascended-line {
   background: #ffffff;
   border: 2px dashed #00989f;
   border-radius: 4px;
-}
-.nmg-slab-ccg .nmg-slab-wordmark {
-  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Trebuchet MS', sans-serif;
-  font-weight: 900;
-  font-size: 20px;
-  letter-spacing: 0;
-  background: none;
-  -webkit-text-fill-color: #e0393e;
-  color: #e0393e;
-  text-shadow: 1px 1px 0 #ffffff, 2px 2px 0 #00989f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 .nmg-slab-ccg .ccg-check {
   font-family: 'Comic Sans MS', 'Chalkboard SE', 'Trebuchet MS', sans-serif;
@@ -6360,12 +6338,6 @@ p.foil-ascended-line.foil-ascended-line {
 }
 .nmg-slab.nmg-slab-black-label .nmg-slab-header-text p {
   color: #e8d8a2;
-}
-.nmg-slab-black-label .nmg-slab-wordmark {
-  background: linear-gradient(90deg, #8a6d15, #f7e28a 45%, #8a6d15);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 .nmg-slab-black-label .nmg-slab-grade-box,
 .nmg-slab-black-label .nmg-slab-grade-box.nmg-slab-grade-elite {
@@ -6537,6 +6509,15 @@ p.foil-ascended-line.foil-ascended-line {
 }
 .nmg-grader-card-storefront h4 { font-size: 18px; }
 .nmg-grader-card-storefront p { font-size: 13px; }
+.nmg-storefront-banner-img {
+  display: block;
+  background: #f4f4f6;
+  border-radius: 10px;
+  padding: 6px 14px;
+  height: 72px;
+  width: auto;
+  max-width: 100%;
+}
 .nmg-storefront-price {
   margin: 10px 0 0 !important;
   font-size: 14px !important;

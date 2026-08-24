@@ -273,7 +273,7 @@ function nmgSlabHtml(item, cert) {
         </div>
       </div>
       ${subgainsLineHtml(resolvedCert ? resolvedCert.subgains : null, grader.id)}
-      <div class="nmg-slab-wordmark">${escapeHtml(grader.short)}${grader.id === 'ccg' ? '<span class="ccg-check">COOL \u2714</span>' : ''}</div>
+      <div class="nmg-slab-wordmark"><img class="nmg-slab-wordmark-logo" src="img/grader-logos/${grader.id}.png" alt="${escapeHtml(grader.short)}">${grader.id === 'ccg' ? '<span class="ccg-check">COOL \u2714</span>' : ''}</div>
       <div class="nmg-slab-art ${artClass}" style="${artStyle}"></div>
       ${resolvedCert && resolvedCert.label ? `<div class="nmg-slab-cert-no">${escapeHtml(resolvedCert.label)}</div>` : ''}
     </div>
