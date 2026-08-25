@@ -13,6 +13,9 @@ const CITY_TICKER_HIGHLIGHT_MS = 8000;
 // Roughly constant scroll speed regardless of how much text is queued up, so a slow news day
 // doesn't look weirdly fast and a busy one doesn't blur past.
 const CITY_TICKER_PX_PER_SEC = 30;
+// Mirrors CITY_EVENTS_FEED_LIMIT server-side (server.js) -- the marquee never carries more than a
+// dozen items even if a future server build sends more, so cap defensively on the client too.
+const CITY_TICKER_MAX_ITEMS = 12;
 
 const cityTickerEl = document.getElementById('cityTicker');
 const cityTickerTrackEl = document.getElementById('cityTickerTrack');
@@ -41,10 +44,14 @@ function cityTickerRender(events) {
     return;
   }
 
-  const maxId = events.reduce((m, e) => Math.max(m, e.id), -Infinity);
+  // getRecentCityEvents (db.js) orders newest-first then reverses, so `events` arrives oldest ->
+  // newest -- the newest CITY_TICKER_MAX_ITEMS are the last ones in the array, not the first.
+  const cappedEvents = events.length > CITY_TICKER_MAX_ITEMS ? events.slice(-CITY_TICKER_MAX_ITEMS) : events;
+
+  const maxId = cappedEvents.reduce((m, e) => Math.max(m, e.id), -Infinity);
   const seenBefore = cityTickerLastSeenMaxId;
 
-  const itemsHtml = events.map((e) => {
+  const itemsHtml = cappedEvents.map((e) => {
     const isNew = seenBefore !== Infinity && e.id > seenBefore;
     return `<span class="city-ticker-item${isNew ? ' city-ticker-item-new' : ''}">${cityTickerEscapeHtml(e.message)}</span>`;
   }).join('<span class="city-ticker-sep" aria-hidden="true">&bull;</span>');
