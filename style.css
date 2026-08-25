@@ -6528,19 +6528,12 @@ p.foil-ascended-line.foil-ascended-line {
   padding: 12px;
   background: var(--surface-1);
 }
-.nmg-grader-card h4 { margin: 0 0 6px; font-size: 13px; }
-.nmg-grader-card h4 span {
-  font-size: 10px;
-  letter-spacing: 3px;
-  opacity: 0.6;
-  margin-left: 6px;
-}
 .nmg-grader-card p { margin: 0; font-size: 12px; color: var(--text-secondary); }
-/* A hint of each brand's identity on the page chrome -- a left border only, so Visions still owns
-   the surface behind it. */
-.nmg-grader-card.nmg-grader-ccg { border-left: 4px solid #00c2cb; }
-.nmg-grader-card.nmg-grader-nmg { border-left: 4px solid #3b5fe0; }
-.nmg-grader-card.nmg-grader-mga { border-left: 4px solid #c9a227; }
+/* .nmg-grader-card is now only ever used by the three storefront panels below (each fully
+   repainted per-brand), so the old h4 rule and left-border accent that this class carried from
+   the pre-storefront strip are dead here -- dropped rather than left as a second, overridden
+   paint layer. .nmg-grader-btn keeps its own accent below; that class still drives the submit
+   modal's grader picker, which is out of this panel's scope. */
 .nmg-grader-btn.nmg-grader-ccg { border-left: 4px solid #00c2cb; }
 .nmg-grader-btn.nmg-grader-nmg { border-left: 4px solid #3b5fe0; }
 .nmg-grader-btn.nmg-grader-mga { border-left: 4px solid #c9a227; }
@@ -6575,6 +6568,234 @@ p.foil-ascended-line.foil-ascended-line {
 .nmg-grader-card-storefront > button {
   margin-top: 12px;
 }
+
+/* --- Storefront panel branding (Grading District) ---
+   Each of the three panels above is fully repainted to its own company: MGA the premium
+   institution, NMG the flat corporate letterhead, CCG the deliberately cheap bargain bin. Colors
+   are hardcoded per brand, never var(--tokens) -- same precedent as the slab cases and the banner
+   plate: VISIONS reskins the page, not a company's own storefront. .nmg-storefront-{id} wraps both
+   the pitch card (.nmg-grader-card-storefront) and that grader's 4-slot grid, so the whole panel --
+   not just the pitch card -- reads as the brand. Shared structural rule first, then one block per
+   brand covering panel, pitch card, tagline, banner frame, submit button, and slot cards. */
+.nmg-storefront {
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 4px;
+}
+.nmg-storefront .nmg-grader-card-storefront { margin: 0 0 14px; }
+.nmg-storefront-tagline { margin: 0 0 8px; font-size: 12px; }
+
+/* ===== MGA -- the institution: near-black shell, double gold hairline, serif small-caps. ===== */
+.nmg-storefront-mga {
+  background: #111013;
+  border: 1px solid #c9a227;
+  /* Double-border trick: the 1px border above is the inner ring; this box-shadow repaints a
+     panel-colored gap then a second, slightly darker gold ring outside it. */
+  box-shadow: 0 0 0 4px #111013, 0 0 0 5px #8a6f1c;
+  padding: 22px;
+}
+.nmg-storefront-mga .nmg-grader-card-storefront {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.nmg-storefront-mga .nmg-storefront-tagline {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c9a227;
+}
+.nmg-storefront-mga .nmg-storefront-banner-img { border: 1px solid #3a3227; }
+.nmg-storefront-mga .nmg-grader-card-storefront > p:not(.nmg-storefront-tagline):not(.nmg-storefront-price) {
+  color: #cfc8b8;
+}
+.nmg-storefront-mga .nmg-storefront-price { color: #c9a227 !important; }
+.nmg-storefront-mga .nmg-grader-card-storefront > button {
+  background: #111013;
+  color: #c9a227;
+  border: 1px solid #c9a227;
+  border-radius: var(--radius-sm);
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.nmg-storefront-mga .nmg-grader-card-storefront > button:hover:not(:disabled) {
+  background: #c9a227;
+  color: #111013;
+  transform: none;
+}
+/* Empty/occupied slot cards: near-black with a gold hairline, same register as the panel.
+   Occupied cards keep their normal (token-driven) text -- the app's dark theme already reads
+   light-on-dark, which is exactly right against this near-black card, so no text override needed
+   here the way NMG/CCG's light panels require below. */
+.nmg-storefront-mga .nmg-slot-card {
+  background: #111013;
+  border: 1px solid #c9a227;
+}
+.nmg-storefront-mga .nmg-slot-card h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 13px;
+  color: #c9a227;
+  margin: 0;
+}
+.nmg-storefront-mga .nmg-slot-empty-icon { opacity: 0.6; }
+.nmg-storefront-mga .nmg-slot-card > button {
+  background: #111013;
+  color: #c9a227;
+  border: 1px solid #c9a227;
+  border-radius: var(--radius-sm);
+}
+.nmg-storefront-mga .nmg-slot-card > button:hover:not(:disabled) {
+  background: #c9a227;
+  color: #111013;
+  transform: none;
+}
+
+/* ===== NMG -- 90s corporate card brand: flat blue letterhead, red/blue/white stripe bar. ===== */
+.nmg-storefront-nmg {
+  background: #f2f3f5;
+  border: 3px solid #1d4ed8;
+  padding-top: 0;
+  overflow: hidden;
+}
+.nmg-storefront-nmg::before {
+  content: '';
+  display: block;
+  height: 8px;
+  /* .nmg-storefront-nmg zeroes its own top padding above, so the pseudo already sits flush with
+     the top border -- only the left/right padding needs canceling to bleed the stripe edge to
+     edge, plus a bottom margin to space it from the pitch card that follows. */
+  margin: 0 -16px 16px;
+  background: repeating-linear-gradient(-45deg, #1d4ed8 0 10px, #dc2626 10px 20px, #ffffff 20px 30px);
+}
+.nmg-storefront-nmg .nmg-grader-card-storefront {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.nmg-storefront-nmg .nmg-storefront-tagline {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #1d4ed8;
+  font-size: 13px;
+}
+.nmg-storefront-nmg .nmg-storefront-banner-img { border: 1px solid #c7cad1; }
+.nmg-storefront-nmg .nmg-grader-card-storefront > p:not(.nmg-storefront-tagline):not(.nmg-storefront-price) {
+  color: #333333;
+}
+/* #b91c1c rather than the stripe's #dc2626 -- same red family, but darkened enough that bold
+   14px text on the #f2f3f5 panel clears WCAG AA (4.35:1 on #dc2626 vs 5.83:1 here). */
+.nmg-storefront-nmg .nmg-storefront-price { color: #b91c1c !important; font-weight: 800; }
+.nmg-storefront-nmg .nmg-grader-card-storefront > button {
+  background: #1d4ed8;
+  color: #ffffff;
+  font-weight: 800;
+  font-style: italic;
+}
+.nmg-storefront-nmg .nmg-grader-card-storefront > button:hover:not(:disabled) {
+  background: #dc2626;
+}
+/* Empty slot cards: white with a blue border, blue italic-bold "Empty Slot". Occupied cards are
+   white-backed too, so their countdown/name/grader text -- normally the app's light-on-dark
+   token colors -- has to switch to dark here or it goes invisible on white. */
+.nmg-storefront-nmg .nmg-slot-card {
+  background: #ffffff;
+  border: 2px solid #1d4ed8;
+}
+.nmg-storefront-nmg .nmg-slot-card h3 {
+  color: #1d4ed8;
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0;
+}
+.nmg-storefront-nmg .nmg-slot-empty-icon { opacity: 0.4; }
+.nmg-storefront-nmg .nmg-slot-card > button {
+  background: #1d4ed8;
+  color: #ffffff;
+}
+.nmg-storefront-nmg .nmg-slot-card > button:hover:not(:disabled) { background: #dc2626; }
+.nmg-storefront-nmg .nmg-slot-pending-title { color: #1a1a1a; }
+.nmg-storefront-nmg .nmg-slot-countdown { color: #4a4d55; }
+.nmg-storefront-nmg .nmg-slot-ready-badge { color: #0a7d2e; }
+.nmg-storefront-nmg .nmg-slot-grader { color: #1d4ed8; font-weight: 700; }
+
+/* ===== CCG -- CheapCool(TM): yellow diagonal stripe panel, inner sky-blue rounded card. ===== */
+.nmg-storefront-ccg {
+  background: repeating-linear-gradient(45deg, #ffd93d 0 14px, #ffe66d 14px 28px);
+  border: 3px solid #00c2cb;
+  border-radius: 16px;
+}
+.nmg-storefront-ccg .nmg-grader-card-storefront {
+  background: #aed6f7;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+.nmg-storefront-ccg .nmg-storefront-tagline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #2b3a55;
+}
+.nmg-storefront-ccg .ccg-check {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Trebuchet MS', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: #0a7d2e;
+  background: #ffffff;
+  border: 2px solid #0a7d2e;
+  border-radius: 20px;
+  padding: 1px 7px;
+  text-shadow: none;
+  transform: rotate(-6deg);
+}
+.nmg-storefront-ccg .nmg-storefront-banner-img { border-radius: 16px; background: #ffffff; }
+.nmg-storefront-ccg .nmg-grader-card-storefront > p:not(.nmg-storefront-tagline):not(.nmg-storefront-price) {
+  color: #2b3a55;
+}
+.nmg-storefront-ccg .nmg-storefront-price { color: #2b3a55 !important; }
+.nmg-storefront-ccg .nmg-grader-card-storefront > button,
+.nmg-storefront-ccg .nmg-slot-card > button {
+  background: #2b3a55;
+  color: #ffd93d;
+  border-radius: 999px;
+  padding: 12px 22px;
+  transition: transform 0.15s ease, background 0.12s ease;
+}
+.nmg-storefront-ccg .nmg-grader-card-storefront > button:hover:not(:disabled),
+.nmg-storefront-ccg .nmg-slot-card > button:hover:not(:disabled) {
+  background: #2b3a55;
+  transform: scale(1.06) rotate(-2deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nmg-storefront-ccg .nmg-grader-card-storefront > button:hover:not(:disabled),
+  .nmg-storefront-ccg .nmg-slot-card > button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+/* Empty slot cards: sky-blue with a navy dashed border (dashed = cheap), navy "Empty Slot".
+   Occupied cards get the same light treatment plus the same dark-text override NMG needs above. */
+.nmg-storefront-ccg .nmg-slot-card {
+  background: #aed6f7;
+  border: 2px dashed #2b3a55;
+}
+.nmg-storefront-ccg .nmg-slot-card h3 { color: #2b3a55; margin: 0; }
+.nmg-storefront-ccg .nmg-slot-empty-icon { opacity: 0.55; }
+.nmg-storefront-ccg .nmg-slot-pending-title,
+.nmg-storefront-ccg .nmg-slot-countdown {
+  color: #2b3a55;
+}
+.nmg-storefront-ccg .nmg-slot-ready-badge { color: #0a7d2e; }
+.nmg-storefront-ccg .nmg-slot-grader { color: #2b3a55; font-weight: 700; }
 
 /* --- Grading District sub-tabs --- */
 .nmg-subtabs {
