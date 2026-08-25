@@ -6070,6 +6070,17 @@ p.foil-ascended-line.foil-ascended-line {
   margin: 12px 0;
 }
 
+/* Portfolio Showcase locks to exactly 4 columns (2 rows of 8) instead of the shared
+   auto-fit behavior -- id-scoped so CosmetixxMarket / Foil Ascension / slab market keep
+   auto-fit via the shared .profile-slab-grid class above. minmax(0, 1fr) rather than a
+   bare 1fr: .nmg-slab has a fixed 340px width, so a bare 1fr's implicit auto minimum
+   would use that intrinsic width and overflow the card instead of shrinking to the
+   column -- minmax(0, ...) lets the track (and .nmg-slab's own max-width: 100%) shrink
+   to fit four equal columns in the available width. */
+#profileSlabShowcaseGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .profile-slab-slot {
   display: flex;
   flex-direction: column;
@@ -6223,6 +6234,10 @@ p.foil-ascended-line.foil-ascended-line {
   .profile-showcase-card {
     min-width: 0;
   }
+
+  #profileSlabShowcaseGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 520px) {
@@ -6232,6 +6247,10 @@ p.foil-ascended-line.foil-ascended-line {
 
   .profile-banner.profile-banner-empty {
     height: 85px;
+  }
+
+  #profileSlabShowcaseGrid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .profile-name {

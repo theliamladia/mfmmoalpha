@@ -1,6 +1,6 @@
 // ---------- Player Profiles ----------
 const PROFILE_SHOWCASE_MAX = 4;
-const PROFILE_SLAB_SHOWCASE_MAX = 6;
+const PROFILE_SLAB_SHOWCASE_MAX = 8; // mirror of server PROFILE_SLAB_SHOWCASE_MAX
 const PROFILE_SLAB_MARKET_MAX = 6;
 
 const profileNotFound = document.getElementById('profileNotFound');
