@@ -685,12 +685,26 @@ button.cooldown-ready {
 }
 
 
-/* Slot cards -- Market > New Milos Grading, one of 3 states (empty/pending/ready). */
+/* Slot cards -- Market > New Milos Grading, one of 3 states (empty/pending/ready). One 4-slot grid
+   per grader storefront panel now (data-nmg-slots-grid="ccg|nmg|mga"), same card markup for all. */
+.nmg-slots-grid { margin-top: 14px; }
 .nmg-slot-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
 .nmg-slot-empty-icon { font-size: 40px; opacity: 0.5; }
 .nmg-slot-pending-title { font-weight: 600; }
 .nmg-slot-countdown { font-size: 13px; color: var(--text-muted); }
 .nmg-slot-ready-badge { color: var(--accent); font-weight: 700; }
+
+/* Occupied slot card's art thumbnail -- same background resolution as the full slab's
+   .nmg-slab-art (title cssClass + titleArtInlineStyle), just short and fixed-height since this is
+   a compact card, not the big reveal. */
+.nmg-slot-art {
+  width: 100%;
+  height: 90px;
+  border-radius: 6px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-0);
+}
 
 /* Submit-modal turnaround tier picker. */
 .nmg-tier-options { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }

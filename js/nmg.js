@@ -5,7 +5,12 @@
 // a client-editable ready_at would make the paid turnaround tiers meaningless -- see the comment
 // above the nmg_slots table in db.js. The grade itself is rolled once, server-side, at reveal.
 
-const nmgSlotsGrid = document.getElementById('nmgSlotsGrid');
+// One 4-slot grid per grader storefront panel (CCG/NMG/MGA tabs) rather than a single shared grid
+// -- each renders only that grader's own slots from the /nmg/state cache. Keyed by grader id.
+const nmgSlotsGrids = {};
+GRADER_IDS.forEach((id) => {
+  nmgSlotsGrids[id] = document.querySelector(`[data-nmg-slots-grid="${id}"]`);
+});
 const nmgLog = document.getElementById('nmgLog');
 const gradedTitlesGrid = document.getElementById('gradedTitlesGrid');
 
@@ -49,6 +54,16 @@ function nmgDurationLabel(ms) {
   if (days > 0) return `${days}d ${hours}h`;
   if (hours > 0) return `${hours}h ${minutes}m`;
   return `${minutes}m`;
+}
+
+// HH:MM, zero-padded (e.g. "02:41") -- used only for the occupied slot card's countdown. Every
+// turnaround tier caps at 3 hours, so there's no day component to handle. Under a minute still
+// shows a real countdown (ceil to the next minute) rather than freezing at "00:01"/"00:00" oddly.
+function nmgHHMMLabel(ms) {
+  const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
 // Third header line on the slab shows the title's actual pull odds (e.g. "0.075%") rather than a
@@ -297,14 +312,16 @@ async function refreshNmgState() {
   buildNmgGrid();
 }
 
-function nmgSlotCardHtml(index) {
-  const slot = nmgSlotsCache.find((s) => s.slotIndex === index);
+// One rendering path for a slot card, parameterized by grader id -- called once per index (0-3)
+// for each of the three per-grader grids, never duplicated per grader.
+function nmgSlotCardHtml(graderId, index) {
+  const slot = nmgSlotsCache.find((s) => s.grader === graderId && s.slotIndex === index);
   if (!slot) {
     return `
       <div class="hustle-card nmg-slot-card">
         <div class="nmg-slot-empty-icon">🏅</div>
         <h3>Empty Slot</h3>
-        <button data-nmg-submit-slot="${index}">Submit a Title</button>
+        <button data-nmg-submit-slot="${index}" data-nmg-submit-grader="${graderId}">Submit a Title</button>
       </div>
     `;
   }
@@ -316,10 +333,20 @@ function nmgSlotCardHtml(index) {
   // flight should say who is holding your title.
   const grader = getGraderDef(slot.grader) || GRADERS.nmg;
   const graderLine = `<p class="nmg-slot-grader nmg-slot-grader-${grader.id}">${escapeHtml(grader.short)}${slot.isRegrade ? ' &middot; REGRADE' : ''}</p>`;
+  // Occupied cards (pending or ready) show the title's own art -- same background resolution the
+  // slab renderer uses (title cssClass + titleArtInlineStyle(baseTitle)) -- plus the title's NAME as
+  // text: art-only titles hide their name on the small badge, but the submitter still needs to know
+  // what's cooking in the slot.
+  // slot.titleId is always the pre-grade (plain, equippable) title id -- a fresh submit stores the
+  // stack id as-is, and a regrade stores the slab's pre-grade id (see /nmg/regrade) -- so `item`
+  // itself is already the base title, same as nmgGradedRowPreviewHtml resolved it.
+  const artClass = item && !item.custom ? item.cssClass : '';
+  const artStyle = item ? titleArtInlineStyle(item) : '';
+  const artHtml = `<div class="nmg-slot-art ${artClass || ''}" style="${artStyle}"></div>`;
   if (ready) {
     return `
       <div class="hustle-card nmg-slot-card">
-        <div class="nmg-slot-empty-icon">🏅</div>
+        ${artHtml}
         ${graderLine}
         <p class="nmg-slot-pending-title">${escapeHtml(name)}</p>
         <p class="nmg-slot-ready-badge">Ready!</p>
@@ -329,42 +356,51 @@ function nmgSlotCardHtml(index) {
   }
   return `
     <div class="hustle-card nmg-slot-card">
-      <div class="nmg-slot-empty-icon">⏳</div>
+      ${artHtml}
       ${graderLine}
       <p class="nmg-slot-pending-title">${escapeHtml(name)}</p>
-      <p class="nmg-slot-countdown" data-nmg-countdown="${slot.id}">${nmgDurationLabel(remaining)}</p>
+      <p class="nmg-slot-countdown" data-nmg-countdown="${slot.id}">${nmgHHMMLabel(remaining)}</p>
     </div>
   `;
 }
 
-function buildNmgGrid() {
-  if (!nmgSlotsGrid) return;
-  nmgSlotsGrid.innerHTML = [0, 1, 2, 3].map(nmgSlotCardHtml).join('');
+function buildNmgGraderGrid(graderId) {
+  const grid = nmgSlotsGrids[graderId];
+  if (!grid) return;
+  grid.innerHTML = [0, 1, 2, 3].map((i) => nmgSlotCardHtml(graderId, i)).join('');
 
-  nmgSlotsGrid.querySelectorAll('button[data-nmg-submit-slot]').forEach((btn) => {
-    btn.addEventListener('click', () => openNmgSubmitModal());
+  grid.querySelectorAll('button[data-nmg-submit-slot]').forEach((btn) => {
+    btn.addEventListener('click', () => openNmgSubmitModal(btn.dataset.nmgSubmitGrader));
   });
-  nmgSlotsGrid.querySelectorAll('button[data-nmg-reveal-slot]').forEach((btn) => {
+  grid.querySelectorAll('button[data-nmg-reveal-slot]').forEach((btn) => {
     btn.addEventListener('click', () => startNmgReveal(Number(btn.dataset.nmgRevealSlot)));
   });
+}
+
+function buildNmgGrid() {
+  GRADER_IDS.forEach((id) => buildNmgGraderGrid(id));
 }
 
 // Cheap per-tick update -- only rewrites the countdown text nodes, no full grid rebuild, unless a
 // pending slot's local countdown just crossed zero (then rebuild once to swap in the Reveal
 // button). The server independently re-checks readiness at reveal time regardless, so this local
-// flip is purely a UI nicety, never authoritative.
+// flip is purely a UI nicety, never authoritative. Covers all three per-grader grids.
 function tickNmgSlotsUI() {
-  if (!nmgSlotsGrid || !character) return;
+  if (!character) return;
   let needsRebuild = false;
-  nmgSlotsGrid.querySelectorAll('[data-nmg-countdown]').forEach((el) => {
-    const slot = nmgSlotsCache.find((s) => String(s.id) === el.dataset.nmgCountdown);
-    if (!slot) return;
-    const remaining = slot.readyAt - (Date.now() + clockOffsetMs);
-    if (remaining <= 0) {
-      needsRebuild = true;
-      return;
-    }
-    el.textContent = nmgDurationLabel(remaining);
+  GRADER_IDS.forEach((id) => {
+    const grid = nmgSlotsGrids[id];
+    if (!grid) return;
+    grid.querySelectorAll('[data-nmg-countdown]').forEach((el) => {
+      const slot = nmgSlotsCache.find((s) => String(s.id) === el.dataset.nmgCountdown);
+      if (!slot) return;
+      const remaining = slot.readyAt - (Date.now() + clockOffsetMs);
+      if (remaining <= 0) {
+        needsRebuild = true;
+        return;
+      }
+      el.textContent = nmgHHMMLabel(remaining);
+    });
   });
   if (needsRebuild) buildNmgGrid();
 }
