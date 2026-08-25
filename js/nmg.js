@@ -96,6 +96,8 @@ function nmgValueCrateInfo(baseId) {
       { titles: BLUE_CRATE_TITLES, crateCost: BLUE_CRATE_COST, archived: true },
       { titles: LEEMS_LARUDO_GOOD_TITLES, crateCost: LLG_CRATE_COST, archived: false },
       { titles: MILOS_LEGENDS_TITLES, crateCost: MILOS_LEGENDS_CRATE_COST, archived: false },
+      { titles: ANIMA2_CRATE_TITLES, crateCost: ANIMA2_CRATE_COST, archived: false },
+      { titles: WAIFU_CRATE_TITLES, crateCost: WAIFU_CRATE_COST, archived: false },
     ].forEach(({ titles, crateCost, archived }) => {
       titles.forEach((t) => nmgValueCrateMap.set(t.id, { crateCost, archived, weight: t.weight }));
     });
@@ -161,14 +163,15 @@ function estimatedSlabValue(def) {
   return Math.min(max, Math.max(NMG_VALUE_MIN_PRICE, rounded));
 }
 
-// Small caption under a showcased slab. Renders nothing at all for slabs with no market price --
-// an "Est. value: --" line would read as a bug rather than as "this collection was never priced".
+// Small caption under a showcased slab. Every slab renders this line -- even one with no market
+// price gets an em-dash value -- so grid slots stay a uniform height (a slot missing the caption
+// flex-grows its slab to fill the extra space).
 function slabEstValueHtml(def) {
   const value = estimatedSlabValue(def);
-  if (value === null) return '';
   // Whole Floydbucks, not formatMoney() -- slab prices are always round hundreds, so trailing
   // cents would be pure noise next to the existing .profile-slab-market-price captions.
-  return `<p class="slab-est-value" title="Estimated at the price the CosmetixxMarket would list this slab for. Not a sale offer.">Est. value <b>$${value.toLocaleString()}</b></p>`;
+  const valueHtml = value === null ? '&mdash;' : `$${value.toLocaleString()}`;
+  return `<p class="slab-est-value" title="Estimated at the price the CosmetixxMarket would list this slab for. Not a sale offer.">Est. value <b>${valueHtml}</b></p>`;
 }
 
 // ---------- Cert cache ----------
