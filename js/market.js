@@ -420,14 +420,24 @@ const TITLE_CRATE_GROUPS = [
   { label: '💖 WAIFU CRATE', ids: new Set(WAIFU_CRATE_TITLES.map((t) => t.id)) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';
-const NMG_GRADED_LABEL = '🏅 Graded Titles';
+// One section per grading company rather than a single shared "Graded Titles" bucket -- a
+// collection reads by grader first (see the GRADER_IDS house-order comment in js/nmg.js), and a
+// picker that lumps CCG/NMG/MGA together buries that distinction. Same emoji as the Grading
+// District storefront tabs. Keyed by grader id so titleCrateGroupLabel() below is a straight
+// lookup; `grader` always defaults to 'nmg' for legacy graded ids (getItemDef), so every graded
+// title resolves to one of these three.
+const GRADED_GROUP_LABELS = {
+  ccg: '🏷️ CCG Graded',
+  nmg: '🏅 NMG Graded',
+  mga: '💎 MGA Graded',
+};
 
 function titleCrateGroupLabel(title) {
   // Graded titles get their own section regardless of which crate the base title came from --
   // checked before the crate lookup below since nmgBaseId (not prestigeBaseId) would otherwise
   // just fall through to "Other Titles" (the full `${baseId}_nmg${grade}` id never matches any
   // crate's id Set).
-  if (title.nmgGrade) return NMG_GRADED_LABEL;
+  if (title.nmgGrade) return GRADED_GROUP_LABELS[title.grader || 'nmg'];
   // Foils stay grouped with their source crate (foilBaseId), not in a section of their own -- the
   // shimmer already marks them out visually, and splitting them off would scatter a crate's titles
   // across two sections of the Switch Title dropdown.

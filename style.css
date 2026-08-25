@@ -4207,6 +4207,21 @@ p.foil-ascended-line.foil-ascended-line {
   margin: 4px 0 10px;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border-default);
+  cursor: pointer;
+}
+
+.graded-grader-heading:hover {
+  border-bottom-color: var(--accent);
+}
+
+.graded-grader-chevron {
+  display: inline-block;
+  transition: transform 0.15s ease;
+  color: var(--text-disabled);
+}
+
+.graded-grader-chevron.open {
+  transform: rotate(180deg);
 }
 
 /* Shared section-heading look -- these three one-off classes each picked their own

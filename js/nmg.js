@@ -790,6 +790,16 @@ if (btnNmgViewSlabClose) {
 
 // ---------- Graded Titles inventory tab ----------
 
+// Which grader groups are expanded -- empty means every group renders collapsed. Module-level
+// (not per-render) since renderGradedTitlesGrid() fully re-renders the grid on every renderAll(),
+// same idiom as cosmeticsExpandedCrate (js/inventory.js). Cleared by resetGradedAccordion()
+// whenever the player (re)opens the Graded Titles inventory tab, so every visit starts minimized.
+const gradedExpandedGraders = new Set();
+
+function resetGradedAccordion() {
+  gradedExpandedGraders.clear();
+}
+
 function renderGradedTitlesGrid() {
   if (!gradedTitlesGrid) return;
   const gradedStacks = character.inventory
@@ -839,17 +849,28 @@ function renderGradedTitlesGrid() {
     if (!group.length) return '';
     const grader = getGraderDef(graderId);
     const slabCount = group.reduce((sum, { stack }) => sum + stack.qty, 0);
+    const isExpanded = gradedExpandedGraders.has(graderId);
     return `
       <div class="graded-grader-group">
-        <div class="graded-grader-heading">
+        <div class="graded-grader-heading" data-graded-grader-toggle="${graderId}">
           <span class="graded-grader-short">${escapeHtml(grader.short)}</span>
           <span class="graded-grader-name">${escapeHtml(grader.name)}</span>
           <span class="graded-grader-count">${slabCount} slab${slabCount === 1 ? '' : 's'}</span>
+          <span class="graded-grader-chevron ${isExpanded ? 'open' : ''}">▾</span>
         </div>
-        <div class="graded-grader-slabs">${group.map(cardHtml).join('')}</div>
+        <div class="graded-grader-slabs${isExpanded ? '' : ' hidden'}">${group.map(cardHtml).join('')}</div>
       </div>
     `;
   }).join('');
+
+  gradedTitlesGrid.querySelectorAll('[data-graded-grader-toggle]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const graderId = el.dataset.gradedGraderToggle;
+      if (gradedExpandedGraders.has(graderId)) gradedExpandedGraders.delete(graderId);
+      else gradedExpandedGraders.add(graderId);
+      renderGradedTitlesGrid();
+    });
+  });
 
   gradedTitlesGrid.querySelectorAll('button[data-sell-title]').forEach((btn) => {
     btn.addEventListener('click', () => sellTitle(btn.dataset.sellTitle));

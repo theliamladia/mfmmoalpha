@@ -1037,6 +1037,13 @@ invcatTabBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     invcatTabBtns.forEach((b) => b.classList.toggle('active', b === btn));
     Object.entries(invcatSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.invcat));
+    // Every visit to the Graded Titles tab starts with all three grader accordions collapsed --
+    // resetGradedAccordion() (js/nmg.js) just clears the expanded-graders Set, so re-render the
+    // grid here to reflect that immediately rather than waiting on the next renderAll().
+    if (btn.dataset.invcat === 'graded' && typeof resetGradedAccordion === 'function') {
+      resetGradedAccordion();
+      if (typeof renderGradedTitlesGrid === 'function') renderGradedTitlesGrid();
+    }
   });
 });
 
