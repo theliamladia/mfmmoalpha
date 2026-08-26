@@ -179,6 +179,7 @@
       </div>
 
       <button class="nav-btn active" data-page="profile">👤 Profile</button>
+      <button class="nav-btn" data-page="players">👥 Players</button>
       <button class="nav-btn" data-page="streets">🛣️ Da Skreetz</button>
       <button class="nav-btn" data-page="market">🏬 Milos Market</button>
       <button class="nav-btn" data-page="casino">🎰 Midas Casino</button>
@@ -719,7 +720,6 @@
 
             <div class="market-tabs">
               <button class="milos-tab-btn active" data-milos="hustles" data-milos-category="hustle">💼 Hustles</button>
-              <button class="milos-tab-btn" data-milos="players" data-milos-category="civic">👥 Players</button>
               <button class="milos-tab-btn" data-milos="combat" data-milos-category="hustle">🥊 Combat</button>
               <button class="milos-tab-btn" data-milos="crime" data-milos-category="vice">🚨 Crime</button>
               <button class="milos-tab-btn" data-milos="cityhall" data-milos-category="civic">🏛️ City Hall</button>
@@ -777,11 +777,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div id="milos-players" class="milos-subpage hidden">
-              <p>Every registered player in New Milos City, online or not &mdash; their badge, their title, and a click to their profile.</p>
-              <ul id="playersDirectoryList" class="players-directory-list"></ul>
             </div>
 
             <div id="milos-combat" class="milos-subpage hidden">
@@ -1199,6 +1194,12 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div id="page-players" class="page hidden">
+        <h2>👥 Players</h2>
+        <p>Every registered player in New Milos City, online or not &mdash; their badge, their title, and a click to their profile.</p>
+        <ul id="playersDirectoryList" class="players-directory-list"></ul>
       </div>
 
       <div id="page-jail" class="page hidden">

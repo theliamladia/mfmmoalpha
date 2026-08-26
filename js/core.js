@@ -1466,6 +1466,7 @@ const pageStreets = document.getElementById('page-streets');
 const pageMarket = document.getElementById('page-market');
 const pageCasino = document.getElementById('page-casino');
 const pageMilos = document.getElementById('page-milos');
+const pagePlayers = document.getElementById('page-players');
 const pageJail = document.getElementById('page-jail');
 const pageLeaderboard = document.getElementById('page-leaderboard');
 const characterSidePanel = document.getElementById('characterSidePanel');
@@ -1792,6 +1793,7 @@ function switchPage(pageName) {
   pageMarket.classList.toggle('hidden', pageName !== 'market');
   pageCasino.classList.toggle('hidden', pageName !== 'casino');
   pageMilos.classList.toggle('hidden', pageName !== 'milos');
+  pagePlayers.classList.toggle('hidden', pageName !== 'players');
   pageJail.classList.toggle('hidden', pageName !== 'jail');
   pageLeaderboard.classList.toggle('hidden', pageName !== 'leaderboard');
   pageWiki.classList.toggle('hidden', pageName !== 'wiki');
@@ -1820,6 +1822,7 @@ function switchPage(pageName) {
   // tab you haven't looked at in a while would show stale content until your next action.
   if (pageName === 'jail') renderArrestRecord();
   if (pageName === 'market') { renderGym(); buildFoodGrid(); }
+  if (pageName === 'players' && typeof refreshPlayersDirectory === 'function') refreshPlayersDirectory();
   if (pageName === 'milos') {
     renderBank();
     renderMilos();

@@ -143,8 +143,9 @@ function attachPlayerHoverTolerance() {
 
 // ---------- Players directory ----------
 // Full roster (GET /players/all), unlike Players Online above which is scoped to who's actively
-// looking at Milos right now. Fetched lazily -- on Players subtab open, and again on every
-// re-click -- same idiom as Farms/NMG. No polling loop: this is a directory, not a presence widget.
+// looking at Milos right now. Fetched on entry to the Players page (see switchPage() in
+// js/core.js), refetching every time it's opened. No polling loop: this is a directory, not a
+// presence widget.
 const playersDirectoryList = document.getElementById('playersDirectoryList');
 let playersDirectoryCache = [];
 
@@ -1018,7 +1019,6 @@ function buildMoralsCenterUI() {
 const milosTabBtns = document.querySelectorAll('.milos-tab-btn');
 const milosSubpages = {
   hustles: document.getElementById('milos-hustles'),
-  players: document.getElementById('milos-players'),
   combat: document.getElementById('milos-combat'),
   crime: document.getElementById('milos-crime'),
   cityhall: document.getElementById('milos-cityhall'),
@@ -1040,9 +1040,6 @@ milosTabBtns.forEach((btn) => {
     Object.entries(milosSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.milos));
     if (btn.dataset.milos === 'mtn') refreshMtnListings();
     if (btn.dataset.milos === 'penitentiary') refreshPenitentiaryRecords();
-    // Lazy, refetch-on-reclick like Farms/NMG -- this is a directory browsed occasionally, not a
-    // presence widget, so there's no polling loop for it (unlike Players Online above).
-    if (btn.dataset.milos === 'players') refreshPlayersDirectory();
     if (typeof setCoinflipTabVisible === 'function') setCoinflipTabVisible(btn.dataset.milos === 'coinflip');
     if (btn.dataset.milos === 'farms' && typeof refreshFarms === 'function') refreshFarms();
     if (btn.dataset.milos === 'crypto' && typeof refreshCrypto === 'function') refreshCrypto();
