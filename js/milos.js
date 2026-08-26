@@ -141,6 +141,69 @@ function attachPlayerHoverTolerance() {
   });
 }
 
+// ---------- Players directory ----------
+// Full roster (GET /players/all), unlike Players Online above which is scoped to who's actively
+// looking at Milos right now. Fetched lazily -- on Players subtab open, and again on every
+// re-click -- same idiom as Farms/NMG. No polling loop: this is a directory, not a presence widget.
+const playersDirectoryList = document.getElementById('playersDirectoryList');
+let playersDirectoryCache = [];
+
+// The /players/all payload is deliberately slimmed (see the server.js route comment) to just the
+// fields displayBadgeMarkupFor() (js/market.js) and its allTitleDefsFor/getItemDef dependents
+// actually read -- titles.equipped/customTitles, badges.equipped, stats. It does NOT include
+// titles.owned or inventory, since displayBadgeMarkupFor() only uses those to double-check that an
+// equipped id is legitimately owned before trusting it; the server already only ever reports an id
+// as `titles.equipped` when that's genuinely true, so owned here just needs to contain that one id
+// to pass the same check, not a real owned/inventory list. This wrapper builds that minimal
+// character shape so displayBadgeMarkupFor() and computeLevel() run completely unmodified.
+function directoryCharFor(p) {
+  return {
+    titles: {
+      equipped: p.titles.equipped,
+      owned: p.titles.equipped ? [p.titles.equipped] : [],
+      customTitles: p.titles.customTitles || [],
+    },
+    inventory: [],
+    badges: p.badges,
+    stats: p.stats,
+  };
+}
+
+function renderPlayersDirectory() {
+  if (!playersDirectoryList) return;
+  const myUsername = getMyUsername();
+
+  playersDirectoryList.innerHTML = playersDirectoryCache.map((p) => {
+    const isYou = p.username === myUsername;
+    const fullName = `${p.firstName} ${p.lastName}`;
+    const styledName = styledNameHtmlById(p.titles.equipped, fullName);
+    const otherChar = directoryCharFor(p);
+    return `
+      <li class="player-row players-directory-row${p.online ? '' : ' players-directory-row-offline'}" data-username="${p.username}">
+        <span class="players-directory-dot${p.online ? ' players-directory-dot-online' : ''}"></span>
+        ${displayBadgeMarkupFor(otherChar)}
+        <span class="badge rank-badge players-directory-level">⭐ Lvl ${computeLevel(otherChar)}</span>
+        <span class="player-name">${styledName}${isYou ? ' (you)' : ''}</span>
+      </li>
+    `;
+  }).join('');
+
+  playersDirectoryList.querySelectorAll('.players-directory-row').forEach((row) => {
+    row.addEventListener('click', () => viewProfile(row.dataset.username));
+  });
+}
+
+async function refreshPlayersDirectory() {
+  if (!getAuthToken()) return;
+  try {
+    const result = await apiAllPlayers();
+    playersDirectoryCache = result.players;
+  } catch {
+    // Best-effort -- keep showing the last known roster if the fetch fails.
+  }
+  renderPlayersDirectory();
+}
+
 // Presence is scoped to New Milos City specifically (see /milos/enter, /milos/leave) -- poll
 // periodically while this tab is open so the roster reflects who's actually looking at it right now.
 const ONLINE_POLL_MS = 15000;
@@ -955,6 +1018,7 @@ function buildMoralsCenterUI() {
 const milosTabBtns = document.querySelectorAll('.milos-tab-btn');
 const milosSubpages = {
   hustles: document.getElementById('milos-hustles'),
+  players: document.getElementById('milos-players'),
   combat: document.getElementById('milos-combat'),
   crime: document.getElementById('milos-crime'),
   cityhall: document.getElementById('milos-cityhall'),
@@ -976,6 +1040,9 @@ milosTabBtns.forEach((btn) => {
     Object.entries(milosSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.milos));
     if (btn.dataset.milos === 'mtn') refreshMtnListings();
     if (btn.dataset.milos === 'penitentiary') refreshPenitentiaryRecords();
+    // Lazy, refetch-on-reclick like Farms/NMG -- this is a directory browsed occasionally, not a
+    // presence widget, so there's no polling loop for it (unlike Players Online above).
+    if (btn.dataset.milos === 'players') refreshPlayersDirectory();
     if (typeof setCoinflipTabVisible === 'function') setCoinflipTabVisible(btn.dataset.milos === 'coinflip');
     if (btn.dataset.milos === 'farms' && typeof refreshFarms === 'function') refreshFarms();
     if (btn.dataset.milos === 'crypto' && typeof refreshCrypto === 'function') refreshCrypto();

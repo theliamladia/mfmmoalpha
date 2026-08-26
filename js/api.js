@@ -412,6 +412,10 @@ function apiOnlinePlayers() {
   return apiRequest('/players/online');
 }
 
+function apiAllPlayers() {
+  return apiRequest('/players/all');
+}
+
 function apiGetProfile(username, page) {
   return apiRequest(`/profile/${encodeURIComponent(username)}?page=${page || 1}`);
 }
