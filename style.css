@@ -6552,10 +6552,11 @@ p.foil-ascended-line.foil-ascended-line {
 .nmg-grader-card-storefront p { font-size: 13px; }
 .nmg-storefront-banner-img {
   display: block;
+  margin-inline: auto;
   background: #f4f4f6;
   border-radius: 10px;
   padding: 6px 14px;
-  height: 72px;
+  height: 110px;
   width: auto;
   max-width: 100%;
 }
@@ -6582,8 +6583,12 @@ p.foil-ascended-line.foil-ascended-line {
   padding: 16px;
   margin-bottom: 4px;
 }
-.nmg-storefront .nmg-grader-card-storefront { margin: 0 0 14px; }
+/* Header stack (banner, tagline, pitch text, from-$X line, Submit button) reads as a storefront
+   masthead: centered as a block. The slots grid and #nmgSlabServices below it are outside this
+   card and stay left-aligned/grid as they were. */
+.nmg-storefront .nmg-grader-card-storefront { margin: 0 0 14px; text-align: center; }
 .nmg-storefront-tagline { margin: 0 0 8px; font-size: 12px; }
+.nmg-storefront-ccg .nmg-storefront-tagline { justify-content: center; }
 
 /* ===== MGA -- the institution: near-black shell, double gold hairline, serif small-caps. ===== */
 .nmg-storefront-mga {
@@ -6796,6 +6801,112 @@ p.foil-ascended-line.foil-ascended-line {
 }
 .nmg-storefront-ccg .nmg-slot-ready-badge { color: #0a7d2e; }
 .nmg-storefront-ccg .nmg-slot-grader { color: #2b3a55; font-weight: 700; }
+
+/* --- Crack a Slab / Regrade a Slab, relocated inside the active storefront (js/nmg.js moves
+   #nmgSlabServices into the branded panel on every grader-tab switch). Un-nested here it just
+   inherits the app's dark-theme body text, which is illegible on NMG/CCG's light panels -- so
+   each brand below gives it its own readable surface (a card echoing that brand's pitch card on
+   NMG/CCG, transparent-on-black for MGA) plus its own heading/body/button colors and button
+   style. A thin divider separates it from the slots grid above it. */
+.nmg-storefront #nmgSlabServices {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.nmg-storefront #nmgSlabServices > .gunclub-section-title:first-child { margin-top: 0; }
+.nmg-storefront #nmgSlabServices p { font-size: 12px; margin: 0 0 8px; }
+.nmg-storefront #nmgSlabServices > button { margin-bottom: 14px; }
+.nmg-storefront #nmgSlabServices > button:last-child { margin-bottom: 0; }
+
+/* MGA: transparent on the panel's near-black shell, gold hairline divider, gold-outline buttons
+   matching the pitch card's own submit button. */
+.nmg-storefront-mga #nmgSlabServices {
+  border-top-color: #8a6f1c;
+}
+.nmg-storefront-mga #nmgSlabServices > .gunclub-section-title {
+  color: #c9a227;
+  border-bottom-color: #3a3227;
+}
+.nmg-storefront-mga #nmgSlabServices p { color: #cfc8b8; }
+.nmg-storefront-mga #nmgSlabServices .loss { color: #e0a23a; }
+.nmg-storefront-mga #nmgSlabServices > button {
+  background: #111013;
+  color: #c9a227;
+  border: 1px solid #c9a227;
+  border-radius: var(--radius-sm);
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.nmg-storefront-mga #nmgSlabServices > button:hover:not(:disabled) {
+  background: #c9a227;
+  color: #111013;
+  transform: none;
+}
+
+/* NMG: white card on the flat corporate letterhead, matching the slot cards' white/blue register.
+   Solid blue buttons, same as the panel's own submit button. */
+.nmg-storefront-nmg #nmgSlabServices {
+  background: #ffffff;
+  border: 2px solid #1d4ed8;
+  border-radius: 8px;
+  padding: 14px 16px;
+  border-top-width: 2px;
+}
+.nmg-storefront-nmg #nmgSlabServices > .gunclub-section-title {
+  color: #1d4ed8;
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-bottom-color: #c7cad1;
+}
+.nmg-storefront-nmg #nmgSlabServices p { color: #333333; }
+/* #b91c1c, not the stripe's #dc2626 -- same reasoning as .nmg-storefront-price above: bold text
+   on white needs the darker red to clear WCAG AA (4.35:1 on #dc2626 vs 7.29:1 here). */
+.nmg-storefront-nmg #nmgSlabServices .loss { color: #b91c1c; }
+.nmg-storefront-nmg #nmgSlabServices > button {
+  background: #1d4ed8;
+  color: #ffffff;
+  font-weight: 800;
+  font-style: italic;
+}
+.nmg-storefront-nmg #nmgSlabServices > button:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+/* CCG: sky-blue card, same as the pitch card, navy pill buttons. */
+.nmg-storefront-ccg #nmgSlabServices {
+  background: #aed6f7;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 18px;
+  border-top: 2px dashed #2b3a55;
+}
+.nmg-storefront-ccg #nmgSlabServices > .gunclub-section-title {
+  color: #2b3a55;
+  border-bottom-color: #2b3a55;
+}
+.nmg-storefront-ccg #nmgSlabServices p { color: #2b3a55; }
+/* #a01f1f, not var(--danger)'s #e05c5c -- the latter is tuned for dark surfaces and fails WCAG
+   AA on this sky-blue card (~2.9:1); this darker red clears it (~5.1:1). */
+.nmg-storefront-ccg #nmgSlabServices .loss { color: #a01f1f; }
+.nmg-storefront-ccg #nmgSlabServices > button {
+  background: #2b3a55;
+  color: #ffd93d;
+  border-radius: 999px;
+  padding: 12px 22px;
+  transition: transform 0.15s ease, background 0.12s ease;
+}
+.nmg-storefront-ccg #nmgSlabServices > button:hover:not(:disabled) {
+  background: #2b3a55;
+  transform: scale(1.06) rotate(-2deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nmg-storefront-ccg #nmgSlabServices > button:hover:not(:disabled) {
+    transform: none;
+  }
+}
 
 /* --- Grading District sub-tabs --- */
 .nmg-subtabs {

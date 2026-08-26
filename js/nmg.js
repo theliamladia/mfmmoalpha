@@ -1365,12 +1365,36 @@ document.querySelectorAll('[data-nmg-search-tab]').forEach((btn) => {
 });
 
 const nmgCounterShared = document.getElementById('nmgCounterShared');
+const nmgSlabServices = document.getElementById('nmgSlabServices');
 const NMG_GRADER_TABS = new Set(GRADER_IDS);
 
+// Crack a Slab / Regrade a Slab (#nmgSlabServices) is one DOM node with live listeners on its
+// buttons. It physically MOVES into the active grader's branded storefront panel (right after
+// that grader's slots grid) so it renders inside the branded container -- appendChild relocates
+// the existing node (and its listeners) rather than cloning/rebuilding it, so nothing is ever
+// duplicated and the buttons keep working after every move. On Grading Search it has no branded
+// home, so it goes back into the (hidden) #nmgCounterShared block, same as it started.
+function placeNmgSlabServices(target) {
+  if (!nmgSlabServices) return;
+  if (NMG_GRADER_TABS.has(target)) {
+    const panel = document.querySelector(`[data-nmg-panel="${target}"]`);
+    if (!panel) return;
+    const grid = panel.querySelector('.nmg-slots-grid');
+    if (grid) {
+      grid.insertAdjacentElement('afterend', nmgSlabServices);
+    } else {
+      panel.appendChild(nmgSlabServices);
+    }
+  } else if (nmgCounterShared) {
+    nmgCounterShared.appendChild(nmgSlabServices);
+  }
+}
+
 // Top-level strip: three grader storefronts (their own panel each) + Grading Search (one panel
-// holding the nested strip above). SHARED SERVICES (log, slots grid, Crack, Regrade) live in
-// #nmgCounterShared, outside all three storefront panels, and are shown for any grader tab / hidden
-// for Grading Search -- slots are shared across graders, so the grid is never duplicated per tab.
+// holding the nested strip above). The log + intro line (#nmgCounterShared) are shown for any
+// grader tab / hidden for Grading Search; Crack/Regrade (#nmgSlabServices) instead relocate into
+// whichever branded panel is active -- slots are shared across graders, so the grid itself is
+// never duplicated per tab.
 document.querySelectorAll('[data-nmg-subtab]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.nmgSubtab;
@@ -1379,8 +1403,13 @@ document.querySelectorAll('[data-nmg-subtab]').forEach((btn) => {
       panel.classList.toggle('hidden', panel.dataset.nmgPanel !== target);
     });
     if (nmgCounterShared) nmgCounterShared.classList.toggle('hidden', !NMG_GRADER_TABS.has(target));
+    placeNmgSlabServices(target);
     // Grading Search always opens on Pop Report, same as it does the first time the shop is
     // entered -- there is no persisted "last nested tab" to restore.
     if (target === 'search') selectNmgSearchTab('pop');
   });
 });
+
+// Initial load: the NMG tab starts active by default (see index.html), so place the services
+// block inside NMG's panel immediately, before the user ever clicks a subtab.
+placeNmgSlabServices('nmg');
