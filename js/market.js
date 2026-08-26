@@ -483,9 +483,10 @@ function titleBadgeMarkup(title) {
     return `<span class="title-badge" style="${bg}${border}"><span class="title-text" style="${textColor}">${escapeHtml(title.name)}</span></span>`;
   }
   const textClass = title.hideNameOnBadge ? 'title-text title-text-hidden' : 'title-text';
-  // badgeText: optional short override for the badge chip only (e.g. SHALOM CRATE's shNetanyahu,
+  // badgeText: optional short override for the badge chip only (no current title array sets this --
   // see js/core.js) -- every other surface (Inventory, Trade, MTN, "you won X" toast, hover
-  // popover, Showcase) still reads title.name directly, untouched by this.
+  // popover, Showcase) still reads title.name directly, untouched by this. Note it has no effect
+  // once hideNameOnBadge is also set, since the badge chip text is visibility:hidden either way.
   return `<span class="title-badge ${title.cssClass}"><span class="${textClass}">${escapeHtml(title.badgeText || title.name)}</span></span>`;
 }
 
