@@ -113,6 +113,7 @@ function nmgValueCrateInfo(baseId) {
       { titles: MILOS_LEGENDS_TITLES, crateCost: MILOS_LEGENDS_CRATE_COST, archived: false },
       { titles: ANIMA2_CRATE_TITLES, crateCost: ANIMA2_CRATE_COST, archived: false },
       { titles: WAIFU_CRATE_TITLES, crateCost: WAIFU_CRATE_COST, archived: false },
+      { titles: SHALOM_CRATE_TITLES, crateCost: SHALOM_CRATE_COST, archived: false },
     ].forEach(({ titles, crateCost, archived }) => {
       titles.forEach((t) => nmgValueCrateMap.set(t.id, { crateCost, archived, weight: t.weight }));
     });

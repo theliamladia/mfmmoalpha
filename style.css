@@ -1816,6 +1816,105 @@ p.foil-ascended-line.foil-ascended-line {
   color: #ffd6e7;
 }
 
+/* SHALOM CRATE banner -- the crate's own artwork (img/shalom-banner.jpg, ~2.2:1) with a white
+   rounded box baked into the art at roughly left 46% / top 44% / width 52% / height 40% (settled on
+   by rendering a same-aspect-ratio placeholder locally and fitting the real controls into it -- see
+   the title-making skill / spec). The crate controls sit absolutely positioned inside that rect.
+   Falls back to a solid blue background if the image is missing (asset ships separately). Title/
+   subtitle text is IN the artwork, not repeated here -- the banner carries an aria-label instead. */
+.feature-banner.shalom-banner {
+  position: relative;
+  display: block;
+  padding: 0;
+  aspect-ratio: 2.2 / 1;
+  background-color: #0a3d91;
+  background-image: url('img/shalom-banner.jpg');
+  background-size: cover;
+  background-position: center;
+  border-color: #0038b8;
+  overflow: hidden;
+}
+
+.shalom-banner-box {
+  position: absolute;
+  left: 46%;
+  top: 44%;
+  width: 52%;
+  height: 40%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.shalom-stock-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a1a3d;
+}
+
+.shalom-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Compact button/input footprint inside the box -- the base button/input sizing (built for full
+   rows elsewhere) is too tall to fit three stacked rows into a rect this size. */
+.shalom-banner-actions button {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.shalom-banner-actions .crate-qty-input {
+  width: 40px;
+  padding: 4px;
+}
+
+.shalom-spin-message {
+  margin: 0;
+  font-size: 11px;
+  color: #0a1a3d;
+  min-height: 0;
+}
+
+/* Narrow screens: the white box's rect gets too small to hold usable controls -- drop the artwork
+   entirely and fall back to normal-flow stacked controls, same visual language as every other
+   feature-banner, rather than shrinking buttons into an unusable box. */
+@media (max-width: 700px) {
+  .feature-banner.shalom-banner {
+    aspect-ratio: auto;
+    background-image: none;
+    background-color: transparent;
+    background: linear-gradient(135deg, #1c2a4a, #26386b);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 20px;
+  }
+
+  .shalom-banner-box {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 0;
+  }
+
+  .shalom-stock-label,
+  .shalom-spin-message {
+    color: #e7ecff;
+  }
+}
+
 /* Balaclava Badge Crate -- same photo-banner-with-dark-overlay treatment as LLG/pledge, using the
    Bronze badge art itself as the background so it visually reads as "a badge" at a glance, per the
    user's explicit ask, rather than just being another text banner. */
@@ -2094,6 +2193,175 @@ p.foil-ascended-line.foil-ascended-line {
   background-position: center 45%;
   border: 2px solid #ff4d8d;
   animation: wfHeartbeat 1.1s ease-in-out infinite;
+}
+
+/* --- SHALOM CRATE --- */
+/* Styled TEXT badges (no hideNameOnBadge anywhere in SHALOM_CRATE_TITLES) -- every title's "art" is
+   hardcoded CSS color/gradient work, no external images, per the crate's own theme note in
+   js/core.js. */
+@keyframes shNetanyahuGradient {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.title-sh-netanyahu {
+  background: linear-gradient(90deg, #0038b8, #ffffff, #0038b8);
+  background-size: 200% 100%;
+  animation: shNetanyahuGradient 3s linear infinite;
+  border: 2px solid #0038b8;
+}
+.title-sh-netanyahu .title-text {
+  color: #0038b8;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 4px #ffffff, 0 0 8px #7fa8ff;
+}
+
+.title-sh-galgadot {
+  background: #0a1a4d;
+  border: 2px solid #d4af37;
+}
+.title-sh-galgadot .title-text {
+  color: #ffd700;
+  font-weight: 700;
+}
+.title-sh-galgadot .title-text::before,
+.title-sh-galgadot .title-text::after {
+  content: '\2728';
+  font-size: 10px;
+}
+.title-sh-galgadot .title-text::before { margin-right: 4px; }
+.title-sh-galgadot .title-text::after { margin-left: 4px; }
+
+.title-sh-goldameir {
+  background: #2b2f38;
+  border: 2px solid #5a5f6b;
+}
+.title-sh-goldameir .title-text {
+  color: #f0e9d8;
+  font-weight: 700;
+}
+
+.title-sh-irondome {
+  background: #4aa3d6;
+  border: 2px dashed #e8f4fb;
+}
+.title-sh-irondome .title-text {
+  color: #06263b;
+  font-weight: 700;
+}
+
+.title-sh-mossad {
+  background: #0a0a0a;
+  border: 2px solid #333;
+  box-shadow: inset 0 0 0 3px #1a1a1a;
+}
+.title-sh-mossad .title-text {
+  color: #d0d0d0;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.title-sh-startupnation {
+  background: #050505;
+  border: 2px solid #00ff66;
+}
+.title-sh-startupnation .title-text {
+  color: #00ff66;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  text-shadow: 0 0 6px #00ff66;
+}
+
+.title-sh-kravmaga {
+  background: #1a0000;
+  border: 2px solid #cc0000;
+}
+.title-sh-kravmaga .title-text {
+  color: #ff2b2b;
+  font-weight: 800;
+  text-shadow: 0 0 4px #000;
+}
+
+@keyframes shEurovisionGlitter {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.title-sh-eurovision {
+  background: linear-gradient(120deg, #d900d9, #7a1fff, #ff33cc, #7a1fff, #d900d9);
+  background-size: 300% 300%;
+  animation: shEurovisionGlitter 3.5s ease infinite;
+  border: 2px solid #ff85f5;
+}
+.title-sh-eurovision .title-text {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 0 6px #ff33cc, 0 0 10px #7a1fff;
+}
+
+.title-sh-deadsea {
+  background: linear-gradient(135deg, #0d5c63, #f4f1e6);
+  border: 2px solid #0d5c63;
+}
+.title-sh-deadsea .title-text {
+  color: #063033;
+  font-weight: 700;
+}
+
+.title-sh-israelflag {
+  background: linear-gradient(#0038b8 0 15%, #ffffff 15% 85%, #0038b8 85% 100%);
+  border: 2px solid #0038b8;
+}
+.title-sh-israelflag .title-text {
+  color: #0038b8;
+  font-weight: 700;
+}
+.title-sh-israelflag .title-text::before {
+  content: '\1F1EE\1F1F1';
+  margin-right: 4px;
+}
+
+.title-sh-hummus {
+  background: #c9a35e;
+  border: 2px solid #6b5a2a;
+}
+.title-sh-hummus .title-text {
+  color: #3a2f12;
+  font-weight: 700;
+}
+
+.title-sh-bamba {
+  background: #e0672b;
+  border: 2px solid #a3320b;
+}
+.title-sh-bamba .title-text {
+  color: #fff3e0;
+  font-weight: 700;
+}
+
+.title-sh-shekel {
+  background: #0b3d0b;
+  border: 2px solid #2ecc71;
+}
+.title-sh-shekel .title-text {
+  color: #6cff9e;
+  font-weight: 700;
+}
+
+/* Equipped name-recolor perk (shNetanyahu -- THE chase) -- see js/nameStyle.js. Animated
+   blue-white gradient, same background-clip:text technique as .name-style-hyper-rainbow. */
+.name-style-netanyahu-gradient {
+  font-weight: 700;
+  background: linear-gradient(90deg, #0038b8, #ffffff, #7fa8ff, #ffffff, #0038b8);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 6px rgba(127, 168, 255, 0.5);
+  animation: name-style-rainbow-shift 4s linear infinite;
+}
+.player-name .name-style-netanyahu-gradient {
+  font-size: 19px;
 }
 
 /* ---------- Balaclava Badges ---------- */
@@ -5292,7 +5560,10 @@ p.foil-ascended-line.foil-ascended-line {
   .feature-banner.ml-banner,
   .title-ml-special-unit,
   .title-ml-krogger,
-  .feature-banner.waifu-banner {
+  .feature-banner.waifu-banner,
+  .title-sh-netanyahu,
+  .title-sh-eurovision,
+  .name-style-netanyahu-gradient {
     animation-play-state: paused;
   }
 

@@ -736,6 +736,15 @@ function apiSpinRedBlueCrate(crateKey, qty) {
   return apiRequest('/crates/redblue/spin', { method: 'POST', body: JSON.stringify({ crate: crateKey, qty }) });
 }
 
+// SHALOM CRATE: same globally-limited-stock mechanic as RED/BLUE, own endpoint/column since it's a
+// single crate (not a red/blue pair) -- see mfmmoserver server.js/db.js.
+function apiGetShalomCrateStock() {
+  return apiRequest('/crates/shalom/stock');
+}
+function apiSpinShalomCrate(qty) {
+  return apiRequest('/crates/shalom/spin', { method: 'POST', body: JSON.stringify({ qty }) });
+}
+
 function apiNmgState() {
   return apiRequest('/nmg/state');
 }

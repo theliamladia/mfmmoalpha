@@ -378,7 +378,7 @@ function allTitleDefsFor(char) {
     REGISTRY_COLLECTOR_TITLE, MASTER_SET_TITLE, PERFECT_SET_TITLE,
     ...TITLES, ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
     ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
-    ...MILOS_LEGENDS_TITLES, ...ANIMA2_CRATE_TITLES, ...WAIFU_CRATE_TITLES,
+    ...MILOS_LEGENDS_TITLES, ...ANIMA2_CRATE_TITLES, ...WAIFU_CRATE_TITLES, ...SHALOM_CRATE_TITLES,
     ...((char.titles && char.titles.customTitles) || []),
   ];
 }
@@ -391,7 +391,7 @@ function allTitleDefs() {
 const CRATE_TITLE_IDS = new Set([
   ...BETA_SPIN_TITLES, ...GOOD_SEASON1_TITLES, ...ANIMA_CRATE_TITLES, ...COUNTERFINISH_CRATE_TITLES,
   ...RED_CRATE_TITLES, ...BLUE_CRATE_TITLES, ...RED_BLUE_HIDDEN_TITLES, ...LEEMS_LARUDO_GOOD_TITLES,
-  ...MILOS_LEGENDS_TITLES, ...ANIMA2_CRATE_TITLES, ...WAIFU_CRATE_TITLES,
+  ...MILOS_LEGENDS_TITLES, ...ANIMA2_CRATE_TITLES, ...WAIFU_CRATE_TITLES, ...SHALOM_CRATE_TITLES,
 ].map((t) => t.id));
 CRATE_TITLE_IDS.add(CAESAR_TI_TITLE.id);
 CRATE_TITLE_IDS.add(ADMIN_TITLE.id);
@@ -418,6 +418,7 @@ const TITLE_CRATE_GROUPS = [
   { label: '🎖️ MILOS LEGENDS 1', ids: new Set(MILOS_LEGENDS_TITLES.map((t) => t.id)) },
   { label: '🎮 ANIMA 2 CRATE', ids: new Set(ANIMA2_CRATE_TITLES.map((t) => t.id)) },
   { label: '💖 WAIFU CRATE', ids: new Set(WAIFU_CRATE_TITLES.map((t) => t.id)) },
+  { label: '🇮🇱 SHALOM CRATE', ids: new Set(SHALOM_CRATE_TITLES.map((t) => t.id)) },
 ];
 const OTHER_TITLES_LABEL = '🎖️ Other Titles';
 // One section per grading company rather than a single shared "Graded Titles" bucket -- a
@@ -482,7 +483,10 @@ function titleBadgeMarkup(title) {
     return `<span class="title-badge" style="${bg}${border}"><span class="title-text" style="${textColor}">${escapeHtml(title.name)}</span></span>`;
   }
   const textClass = title.hideNameOnBadge ? 'title-text title-text-hidden' : 'title-text';
-  return `<span class="title-badge ${title.cssClass}"><span class="${textClass}">${escapeHtml(title.name)}</span></span>`;
+  // badgeText: optional short override for the badge chip only (e.g. SHALOM CRATE's shNetanyahu,
+  // see js/core.js) -- every other surface (Inventory, Trade, MTN, "you won X" toast, hover
+  // popover, Showcase) still reads title.name directly, untouched by this.
+  return `<span class="title-badge ${title.cssClass}"><span class="${textClass}">${escapeHtml(title.badgeText || title.name)}</span></span>`;
 }
 
 function titleHoverMarkup(title) {
@@ -614,6 +618,13 @@ const CRATE_ANIMA2 = { name: 'ANIMA 2 CRATE', icon: '\u{1F3AE}', cost: ANIMA2_CR
 // Lives in Cosmetixxx (#shop-titles), this repo's default placement for new crates. Plain
 // client-side spin, no shared server stock (not `limited`), same as ANIMA 2/Milos Legends.
 const CRATE_WAIFU = { name: 'WAIFU CRATE', icon: '\u{1F496}', cost: WAIFU_CRATE_COST, titles: WAIFU_CRATE_TITLES };
+// SHALOM CRATE: globally limited to 333 openings, same shared-server-stock mechanic as RED/BLUE
+// Crate (see apiSpinShalomCrate/shalom_crate_remaining) -- `limited: true, key: 'shalom'` routes it
+// through startLimitedCrateSpin below instead of the local doStartCrateSpin.
+const SHALOM_CRATE_STOCK_MAX = 333;
+const CRATE_SHALOM = {
+  name: 'SHALOM CRATE', icon: '\u{1F1EE}\u{1F1F1}', cost: SHALOM_CRATE_COST, titles: SHALOM_CRATE_TITLES, limited: true, key: 'shalom',
+};
 
 // Rolled once per drawn title -- if it's not that crate's Presidential Rare (or the crate has no
 // hidden swap at all), the draw stands untouched.
@@ -658,19 +669,35 @@ const waifuSpinMessage = document.getElementById('waifuSpinMessage');
 const btnViewWaifuCrate = document.getElementById('btnViewWaifuCrate');
 const waifuSpinQty = document.getElementById('waifuSpinQty');
 
+const btnShSpin = document.getElementById('btnShSpin');
+const shSpinMessage = document.getElementById('shSpinMessage');
+const btnViewShCrate = document.getElementById('btnViewShCrate');
+const shSpinQtyInput = document.getElementById('shSpinQty');
+const shCrateStockLabel = document.getElementById('shCrateStockLabel');
+
 // Archived (Update 4): View Crate / odds + the stock-remaining label only, no spin controls.
 const btnViewRedCrate = document.getElementById('btnViewRedCrate');
 const redCrateStockLabel = document.getElementById('redCrateStockLabel');
 const btnViewBlueCrate = document.getElementById('btnViewBlueCrate');
 const blueCrateStockLabel = document.getElementById('blueCrateStockLabel');
 
-const CRATE_STOCK_LABEL_BY_KEY = { red: redCrateStockLabel, blue: blueCrateStockLabel };
+const CRATE_STOCK_LABEL_BY_KEY = { red: redCrateStockLabel, blue: blueCrateStockLabel, shalom: shCrateStockLabel };
+// RED/BLUE have no spin button left to lock/relabel now that they're archived/view-only -- SHALOM
+// is the one active `limited` crate, so it's the only key with a button entry here.
+const CRATE_SPIN_BUTTON_BY_KEY = { shalom: btnShSpin };
+const CRATE_STOCK_MAX_BY_KEY = { red: CRATE_STOCK_MAX, blue: CRATE_STOCK_MAX, shalom: SHALOM_CRATE_STOCK_MAX };
 
-// Archived (Update 4): just reflects the final remaining count in the banner label -- no spin
-// button left to lock/relabel now that RED/BLUE are view-only.
+// Reflects a just-fetched/just-spent remaining count in the banner, and locks the button once a
+// limited crate sells out -- qty is left alone so it doesn't fight the player mid-edit.
 function renderCrateStock(crateKey, remaining) {
   const label = CRATE_STOCK_LABEL_BY_KEY[crateKey];
-  if (label) label.textContent = `${remaining.toLocaleString()} / ${CRATE_STOCK_MAX.toLocaleString()} left`;
+  const max = CRATE_STOCK_MAX_BY_KEY[crateKey] || CRATE_STOCK_MAX;
+  if (label) label.textContent = `${remaining.toLocaleString()} / ${max.toLocaleString()} left`;
+  const button = CRATE_SPIN_BUTTON_BY_KEY[crateKey];
+  if (button && remaining <= 0) {
+    button.disabled = true;
+    button.textContent = 'SOLD OUT';
+  }
 }
 
 apiGetCrateStock()
@@ -681,6 +708,14 @@ apiGetCrateStock()
   .catch(() => {
     // Best-effort -- the labels just stay blank if this fails, spin still works and reports the
     // real remaining count from its own response.
+  });
+
+apiGetShalomCrateStock()
+  .then((stock) => {
+    renderCrateStock('shalom', stock.remaining);
+  })
+  .catch(() => {
+    // Best-effort, same as the RED/BLUE stock fetch above.
   });
 
 const CRATE_SPIN_MAX_QTY = 10;
@@ -763,6 +798,7 @@ btnViewVisionsCrate.addEventListener('click', () => showCrateOdds(CRATE_VISIONS)
 btnViewMlCrate.addEventListener('click', () => showCrateOdds(CRATE_MILOS_LEGENDS));
 btnViewAnima2Crate.addEventListener('click', () => showCrateOdds(CRATE_ANIMA2));
 btnViewWaifuCrate.addEventListener('click', () => showCrateOdds(CRATE_WAIFU));
+btnViewShCrate.addEventListener('click', () => showCrateOdds(CRATE_SHALOM));
 
 btnCrateOddsClose.addEventListener('click', () => {
   crateOddsModal.classList.add('hidden');
@@ -899,14 +935,14 @@ function doStartCrateSpin(crate, qty) {
   return { ok: true, results };
 }
 
-// RED/BLUE go through the server first -- it's the sole authority on both the cash deduction and
-// the 1,000-per-crate global stock, since that stock is shared across every player. The actual
-// title draw still happens locally afterward (weightedTitleFrom), same as every other crate, once
-// the server confirms the spend went through.
+// RED/BLUE/SHALOM go through the server first -- it's the sole authority on both the cash
+// deduction and the crate's global stock, since that stock is shared across every player. The
+// actual title draw still happens locally afterward (weightedTitleFrom), same as every other
+// crate, once the server confirms the spend went through.
 async function startLimitedCrateSpin(crate, qty) {
   let apiResult;
   try {
-    apiResult = await apiSpinRedBlueCrate(crate.key, qty);
+    apiResult = crate.key === 'shalom' ? await apiSpinShalomCrate(qty) : await apiSpinRedBlueCrate(crate.key, qty);
   } catch (err) {
     return { ok: false, reason: (err && err.reason) || 'Spin failed. Try again.' };
   }
@@ -1106,12 +1142,14 @@ registerCrateQtyInput(CRATE_VISIONS, visionsSpinQtyInput, btnVisionsSpin);
 registerCrateQtyInput(CRATE_MILOS_LEGENDS, mlSpinQtyInput, btnMlSpin);
 registerCrateQtyInput(CRATE_ANIMA2, anima2SpinQtyInput, btnAnima2Spin);
 registerCrateQtyInput(CRATE_WAIFU, waifuSpinQty, btnWaifuSpin);
+registerCrateQtyInput(CRATE_SHALOM, shSpinQtyInput, btnShSpin);
 
 btnLlgSpin.addEventListener('click', () => spinCrate(CRATE_LLG, [btnLlgSpin, btnViewLlgCrate], llgSpinMessage));
 btnVisionsSpin.addEventListener('click', () => spinCrate(CRATE_VISIONS, [btnVisionsSpin, btnViewVisionsCrate], visionsSpinMessage));
 btnMlSpin.addEventListener('click', () => spinCrate(CRATE_MILOS_LEGENDS, [btnMlSpin, btnViewMlCrate], mlSpinMessage));
 btnAnima2Spin.addEventListener('click', () => spinCrate(CRATE_ANIMA2, [btnAnima2Spin, btnViewAnima2Crate], anima2SpinMessage));
 btnWaifuSpin.addEventListener('click', () => spinCrate(CRATE_WAIFU, [btnWaifuSpin, btnViewWaifuCrate], waifuSpinMessage));
+btnShSpin.addEventListener('click', () => spinCrate(CRATE_SHALOM, [btnShSpin, btnViewShCrate], shSpinMessage));
 
 
 // ---------- Foil Ascension (Cosmetixxx) ----------

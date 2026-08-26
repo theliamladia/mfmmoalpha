@@ -13,6 +13,7 @@ const NAME_STYLE_CLASS_BY_TITLE_ID = {
   blueDarkBrandon: 'name-style-democrat-glow',
   redTrumpAuto: 'name-style-republican-glow',
   blueBidenAuto: 'name-style-democrat-glow',
+  shNetanyahu: 'name-style-netanyahu-gradient',
 };
 
 function nameStyleClassForTitleId(titleId) {
