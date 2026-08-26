@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHALOM CRATE — mfmmo.com</title>
+<meta name="description" content="333 SHALOM CRATEs, ever. $3,333 a spin. Promised 3000 years ago, delivered today in New Milos City.">
+<style>
+  :root {
+    --blue-deep: #0a1a4d;
+    --blue: #0038b8;
+    --blue-bright: #2f5dff;
+    --white: #ffffff;
+    --ink: #0c1330;
+    --paper: #f4f6ff;
+    --gold: #d4af37;
+    --line: #d8ddf5;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  img, table { max-width: 100%; }
+  a { color: inherit; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    width: 100%;
+    line-height: 0;
+    background: var(--blue-deep);
+  }
+  .hero-art {
+    position: relative;
+    line-height: 0;
+  }
+  .hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* The banner artwork has a white rounded panel baked in at roughly
+     left 46% / top 44% / width 52% / height 40% -- same geometry the
+     in-game feature banner uses for .shalom-banner-box (see style.css).
+     Overlay the stat tiles + a compact CTA into that rect so the panel
+     isn't empty. Falls back to normal in-flow content below 700px,
+     mirroring the in-game no-artwork breakpoint, but keeps the artwork
+     itself visible (this page always shows the real banner). */
+  .hero-panel {
+    position: absolute;
+    left: 46%;
+    top: 44%;
+    width: 52%;
+    height: 40%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2px, 1.2vw, 10px);
+    padding: 2% 3%;
+    text-align: center;
+    overflow: hidden;
+    color: var(--blue-deep);
+  }
+  .hero-panel-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(4px, 2vw, 18px);
+    width: 100%;
+  }
+  .hero-panel-stats .hero-stat {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+  .hero-panel-stats .hero-stat .n {
+    font-size: clamp(9px, 2.3vw, 20px);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .hero-panel-stats .hero-stat .l {
+    font-size: clamp(5.5px, 0.9vw, 10px);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+  .hero-panel-cta {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--blue), var(--blue-bright));
+    color: var(--white);
+    font-weight: 800;
+    text-decoration: none;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-size: clamp(8px, 1.7vw, 13px);
+    padding: clamp(3px, 0.9vw, 9px) clamp(8px, 2.4vw, 20px);
+  }
+  @media (max-width: 700px) {
+    .hero-panel {
+      position: static;
+      width: 100%;
+      height: auto;
+      padding: 14px 16px 16px;
+      background: var(--blue-deep);
+      color: var(--white);
+    }
+    .hero-panel-stats { flex-wrap: wrap; gap: 14px; }
+    .hero-panel-stats .hero-stat .n { font-size: 18px; }
+    .hero-panel-stats .hero-stat .l { font-size: 10px; color: #9db4f2; }
+    .hero-panel-cta { font-size: 14px; padding: 10px 22px; }
+  }
+  .hero-strip {
+    background: linear-gradient(90deg, var(--blue-deep), var(--blue) 50%, var(--blue-deep));
+    color: var(--white);
+    text-align: center;
+    padding: 10px 12px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ---------- Hype block ---------- */
+  .hype {
+    text-align: center;
+    padding: 40px 0 24px;
+  }
+  .hype h2 {
+    font-size: clamp(22px, 5vw, 32px);
+    margin: 0 0 10px;
+    color: var(--blue-deep);
+  }
+  .hype .tagline {
+    font-style: italic;
+    color: var(--blue);
+    font-weight: 600;
+    margin: 0 0 18px;
+    font-size: 15px;
+  }
+  .hype p {
+    max-width: 620px;
+    margin: 0 auto 14px;
+    line-height: 1.55;
+    font-size: 16px;
+  }
+  /* ---------- The chase ---------- */
+  .chase {
+    padding: 24px 0 8px;
+  }
+  .chase h2 {
+    text-align: center;
+    color: var(--blue-deep);
+    font-size: clamp(20px, 4.5vw, 26px);
+    margin: 0 0 18px;
+  }
+  .chase-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .chase-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 2px solid var(--line);
+    padding: 18px 14px;
+    text-align: center;
+  }
+  .chase-card.chase-card-mythic {
+    background: var(--blue-deep);
+    border-color: var(--gold);
+  }
+  .chase-card .odds {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+  .chase-card-mythic .odds { color: #7fa8ff; }
+  .chase-card-mythic .sub { color: #c9d1ff; }
+  .chase-name {
+    display: inline-block;
+    font-size: 19px;
+    font-weight: 800;
+    padding: 4px 2px;
+  }
+  /* Recreation of .name-style-netanyahu-gradient (style.css) -- same animated
+     blue/white gradient text used when the real title is equipped in-game. */
+  @keyframes bigyahu-netanyahu-shift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+  .netanyahu-gradient-name {
+    background: linear-gradient(90deg, #0038b8, #ffffff, #7fa8ff, #ffffff, #0038b8);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 6px rgba(127, 168, 255, 0.5);
+    animation: bigyahu-netanyahu-shift 4s linear infinite;
+  }
+  .chase-card .sub {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #4a5178;
+  }
+  .galgadot-name {
+    color: var(--gold);
+    background: var(--blue-deep);
+    border-radius: 6px;
+    padding: 2px 10px;
+  }
+
+  /* ---------- Odds table ---------- */
+  .odds-section {
+    padding: 32px 0 8px;
+  }
+  .odds-section h2 {
+    text-align: center;
+    color: var(--blue-deep);
+    font-size: clamp(20px, 4.5vw, 26px);
+    margin: 0 0 6px;
+  }
+  .odds-note {
+    text-align: center;
+    font-size: 13px;
+    color: #4a5178;
+    margin: 0 0 18px;
+  }
+  .odds-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  table.odds-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    font-size: 14px;
+  }
+  .odds-table th, .odds-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .odds-table th {
+    background: var(--blue-deep);
+    color: var(--white);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .odds-table tr:last-child td { border-bottom: none; }
+  .odds-table td.pct { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .rarity-pill {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .rarity-mythic  { background: #2b1650; color: #e9c15a; border: 1px solid #d4af37; }
+  .rarity-rare    { background: #dbe6ff; color: var(--blue-deep); border: 1px solid var(--blue); }
+  .rarity-uncommon{ background: #e6f4ec; color: #1e6b3f; border: 1px solid #2e8a54; }
+  .rarity-common  { background: #eceef7; color: #3c4266; border: 1px solid #b9c0e0; }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    text-align: center;
+    padding: 40px 0 20px;
+  }
+  .cta a.button {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--blue), var(--blue-bright));
+    color: var(--white);
+    font-weight: 800;
+    font-size: 17px;
+    text-decoration: none;
+    padding: 16px 34px;
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(0, 56, 184, 0.35);
+  }
+  .cta .fine {
+    margin: 14px auto 0;
+    max-width: 420px;
+    font-size: 12px;
+    color: #4a5178;
+  }
+
+  footer {
+    text-align: center;
+    padding: 26px 20px 34px;
+    font-size: 13px;
+    color: var(--white);
+    background: var(--blue-deep);
+    margin-top: 30px;
+  }
+
+  @media (max-width: 480px) {
+    .chase-cards { grid-template-columns: 1fr; }
+    main { padding: 0 14px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-art">
+      <img src="/img/shalom-banner.jpg" alt="SHALOM CRATE -- limited-run Israel-themed title crate">
+      <div class="hero-panel">
+        <div class="hero-panel-stats">
+          <div class="hero-stat"><span class="n">333</span><span class="l">Total Openings</span></div>
+          <div class="hero-stat"><span class="n">$3,333</span><span class="l">Per Spin</span></div>
+          <div class="hero-stat"><span class="n">13</span><span class="l">Titles</span></div>
+        </div>
+        <a class="hero-panel-cta" href="https://mfmmo.com">Open the SHALOM CRATE</a>
+      </div>
+    </div>
+    <div class="hero-strip">333 crates ever &middot; $3,333 a spin &middot; when they're gone, they're gone</div>
+  </div>
+
+  <h1 class="visually-hidden">SHALOM CRATE — the SHALOM CRATE title crate at mfmmo.com</h1>
+
+  <main>
+
+    <section class="hype">
+      <h2>The drop the whole city's been waiting for.</h2>
+      <p class="tagline">Promised 3000 years ago. Delivered today, in New Milos City.</p>
+      <p>
+        333 SHALOM CRATEs. That's it. That's the whole run. No restock, no "coming back next
+        season," no quiet re-add three patches later. $3,333 gets you one spin at 13 titles
+        built around one theme, top to bottom -- and once crate #333 pops, the SHALOM CRATE
+        joins RED, BLUE, and the rest of the archive: view-only, forever.
+      </p>
+    </section>
+
+    <section class="chase">
+      <h2>The chase</h2>
+      <div class="chase-cards">
+        <div class="chase-card chase-card-mythic">
+          <div class="odds">0.5% &middot; Mythic</div>
+          <span class="chase-name netanyahu-gradient-name">Animated Netanyahu</span>
+          <p class="sub">The one everyone's spinning for. Recolors your name everywhere
+            in a live blue-white gradient while equipped -- the same animated finish that
+            runs on the game's rarest name-recolor titles. This is a live demo of that
+            gradient, running right on this page.</p>
+        </div>
+        <div class="chase-card">
+          <div class="odds">2.5% &middot; Rare</div>
+          <span class="chase-name galgadot-name">&#10024; Gal Gadot &#10024;</span>
+          <p class="sub">The other name people are actually chasing. Rare, and it shows.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="odds-section">
+      <h2>Full odds</h2>
+      <p class="odds-note">Every title in the pool. Source of truth is SHALOM_CRATE_TITLES in js/core.js.</p>
+      <div class="odds-table-wrap">
+        <table class="odds-table">
+          <thead>
+            <tr><th>Title</th><th>Rarity</th><th>Odds</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Animated Netanyahu</td><td><span class="rarity-pill rarity-mythic">Mythic</span></td><td class="pct">0.5%</td></tr>
+            <tr><td>Gal Gadot</td><td><span class="rarity-pill rarity-rare">Rare</span></td><td class="pct">2.5%</td></tr>
+            <tr><td>Golda Meir</td><td><span class="rarity-pill rarity-rare">Rare</span></td><td class="pct">4%</td></tr>
+            <tr><td>Iron Dome</td><td><span class="rarity-pill rarity-rare">Rare</span></td><td class="pct">5%</td></tr>
+            <tr><td>Mossad</td><td><span class="rarity-pill rarity-rare">Rare</span></td><td class="pct">5%</td></tr>
+            <tr><td>Startup Nation</td><td><span class="rarity-pill rarity-uncommon">Uncommon</span></td><td class="pct">7%</td></tr>
+            <tr><td>Krav Maga</td><td><span class="rarity-pill rarity-uncommon">Uncommon</span></td><td class="pct">7%</td></tr>
+            <tr><td>Eurovision</td><td><span class="rarity-pill rarity-uncommon">Uncommon</span></td><td class="pct">7%</td></tr>
+            <tr><td>Dead Sea</td><td><span class="rarity-pill rarity-uncommon">Uncommon</span></td><td class="pct">8%</td></tr>
+            <tr><td>Israel Flag</td><td><span class="rarity-pill rarity-common">Common</span></td><td class="pct">16%</td></tr>
+            <tr><td>Hummus</td><td><span class="rarity-pill rarity-common">Common</span></td><td class="pct">16%</td></tr>
+            <tr><td>Bamba</td><td><span class="rarity-pill rarity-common">Common</span></td><td class="pct">11%</td></tr>
+            <tr><td>&#8362; Shekel</td><td><span class="rarity-pill rarity-common">Common</span></td><td class="pct">11%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="cta">
+      <a class="button" href="https://mfmmo.com">Open the SHALOM CRATE</a>
+      <p class="fine">The crate lives in Milos Market &rsaquo; Cosmetixxx &rsaquo; Store. 333 total, no restock.</p>
+    </section>
+
+  </main>
+
+  <footer>mfmmo.com &middot; New Milos City</footer>
+
+</body>
+</html>
