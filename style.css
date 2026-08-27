@@ -2196,41 +2196,36 @@ p.foil-ascended-line.foil-ascended-line {
 }
 
 /* --- SHALOM CRATE --- */
-/* 8 of 13 titles have owner-approved sourced Giphy art (photo/GIF, hideNameOnBadge like the Waifu
-   titles below); the other 5 are still awaiting sourced art and keep their original styled-TEXT
+/* 10 of 13 titles have owner-approved sourced art (photo/GIF, hideNameOnBadge like the Waifu
+   titles below); the other 3 are still awaiting sourced art and keep their original styled-TEXT
    badges (hardcoded CSS color/gradient work, no hideNameOnBadge), each flagged with a comment. */
 @keyframes shNetanyahuGlowPulse {
-  0% { box-shadow: 0 0 10px 2px #0038b8, 0 0 20px 4px #7fa8ff; }
-  100% { box-shadow: 0 0 20px 5px #0038b8, 0 0 38px 10px #7fa8ff; }
+  0% { background-position: center, 0% 50%; box-shadow: 0 0 10px 2px #0038b8, 0 0 20px 4px #7fa8ff; }
+  100% { background-position: center, 100% 50%; box-shadow: 0 0 20px 5px #0038b8, 0 0 38px 10px #7fa8ff; }
 }
 .title-sh-netanyahu {
-  /* THE chase mythic -- ANIMATED giphy.gif (not _s), border/glow mirrors how the Presidential
-     Rares (redTrumpFistUp/blueDarkBrandon, see redGlowPulse above) dress their mythic art. */
-  background-image: url('https://media.giphy.com/media/XFnuKIawL1Ub1bomog/giphy.gif');
-  background-size: cover;
-  background-position: center;
-  border: 3px solid #0038b8;
+  /* THE chase mythic -- ANIMATED giphy.gif, border upgraded to a pulsing Israeli blue/white
+     GRADIENT BORDER: a padded gradient background layer (2nd background-image, clipped to
+     border-box) sits behind the photo layer (clipped to padding-box) and is animated via
+     background-position, so only the border ring shows the moving blue<->white gradient. Same
+     1.3s ease-in-out infinite alternate timing as the original glow pulse. */
+  background-image: url('https://media.giphy.com/media/4cLPinc3th5o8ScXS6/giphy.gif'),
+    linear-gradient(90deg, #0038b8, #ffffff, #0038b8);
+  background-size: cover, 300% 100%;
+  background-position: center, 0% 50%;
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+  border: 4px solid transparent;
   animation: shNetanyahuGlowPulse 1.3s ease-in-out infinite alternate;
 }
 
-.title-sh-galgadot { background-image: url('https://media.giphy.com/media/paBifd73JtgB7iRkCK/giphy_s.gif'); background-size: cover; background-position: center; }
+.title-sh-galgadot { background-image: url('https://media.giphy.com/media/12dO4zNfWrDrpe/giphy.gif'); background-size: cover; background-position: center; }
 
 .title-sh-goldameir { background-image: url('https://media.giphy.com/media/SxABAw8GZ9u7g7SosJ/giphy_s.gif'); background-size: cover; background-position: center; }
 
 .title-sh-irondome { background-image: url('https://media.giphy.com/media/WwBiGid6buFacmlv14/giphy_s.gif'); background-size: cover; background-position: center; }
 
-/* shMossad: awaiting owner-supplied Giphy art (see shalom-giphy-map.md) -- still a styled TEXT badge. */
-.title-sh-mossad {
-  background: #0a0a0a;
-  border: 2px solid #333;
-  box-shadow: inset 0 0 0 3px #1a1a1a;
-}
-.title-sh-mossad .title-text {
-  color: #d0d0d0;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
+.title-sh-mossad { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSDerxBQTHC8wRkIgkJFAjk7mw-Smvbr-LKVmnzYi0yw&s'); background-size: cover; background-position: center; }
 
 /* shStartupNation: awaiting owner-supplied Giphy art (see shalom-giphy-map.md) -- still a styled TEXT badge. */
 .title-sh-startupnation {
@@ -2244,7 +2239,7 @@ p.foil-ascended-line.foil-ascended-line {
   text-shadow: 0 0 6px #00ff66;
 }
 
-.title-sh-kravmaga { background-image: url('https://media.giphy.com/media/Ie2uBgdyLhp6XteRC1/giphy_s.gif'); background-size: cover; background-position: center; }
+.title-sh-kravmaga { background-image: url('https://media.giphy.com/media/iIME0fkAEzgSn6VZRl/giphy.gif'); background-size: cover; background-position: center; }
 
 .title-sh-eurovision { background-image: url('https://media.giphy.com/media/1ZrUwc2X6kGyemLQ3l/giphy_s.gif'); background-size: cover; background-position: center; }
 
@@ -2272,15 +2267,7 @@ p.foil-ascended-line.foil-ascended-line {
   font-weight: 700;
 }
 
-/* shShekel: awaiting owner-supplied Giphy art (see shalom-giphy-map.md) -- still a styled TEXT badge. */
-.title-sh-shekel {
-  background: #0b3d0b;
-  border: 2px solid #2ecc71;
-}
-.title-sh-shekel .title-text {
-  color: #6cff9e;
-  font-weight: 700;
-}
+.title-sh-shekel { background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/92/Carthage_EL_shekel_2250013.jpg'); background-size: cover; background-position: center; }
 
 /* Equipped name-recolor perk (shNetanyahu -- THE chase) -- see js/nameStyle.js. Animated
    blue-white gradient, same background-clip:text technique as .name-style-hyper-rainbow. */
@@ -5495,7 +5482,6 @@ p.foil-ascended-line.foil-ascended-line {
   .title-ml-special-unit,
   .title-ml-krogger,
   .feature-banner.waifu-banner,
-  .title-sh-netanyahu,
   .name-style-netanyahu-gradient {
     animation-play-state: paused;
   }
@@ -5505,6 +5491,15 @@ p.foil-ascended-line.foil-ascended-line {
     animation: none;
     border-color: #ff4d8d;
     box-shadow: 0 0 8px 2px rgba(255, 77, 141, 0.6);
+  }
+
+  /* shNetanyahu's border is a moving gradient layer -- pausing mid-animation could freeze on the
+     white portion, so give reduced-motion its own static blue border instead of just pausing. */
+  .title-sh-netanyahu {
+    animation: none;
+    background-image: url('https://media.giphy.com/media/4cLPinc3th5o8ScXS6/giphy.gif');
+    border: 3px solid #0038b8;
+    box-shadow: 0 0 14px 3px #0038b8;
   }
 }
 

@@ -598,12 +598,12 @@ const WAIFU_CRATE_TITLES = [
   { id: 'wfRukia', name: 'Rukia', hideNameOnBadge: true, cssClass: 'title-wf-rukia', weight: 0.05, rarity: 'mythic', how: 'Won from a WAIFU CRATE spin (mythic! 0.05% odds).' },
 ];
 
-// SHALOM CRATE: national/pop-culture Israel theme. 8 of 13 titles are sourced Giphy photo/GIF art
-// (owner-approved media IDs -- see the mapping doc referenced in the art-sourcing task) and use
-// hideNameOnBadge like the Waifu titles; the other 5 (shMossad, shStartupNation, shDeadSea,
-// shBamba, shShekel) have no sourced art yet and keep their original styled-TEXT badges (art IS
-// hardcoded CSS color/gradient work, same as Counterfinish -- no hideNameOnBadge) until art is
-// found. Lives in Cosmetixxx (#shop-titles), this repo's default placement for new crates.
+// SHALOM CRATE: national/pop-culture Israel theme. 10 of 13 titles are sourced photo/GIF art
+// (owner-approved media -- see the mapping doc referenced in the art-sourcing task) and use
+// hideNameOnBadge like the Waifu titles; the other 3 (shStartupNation, shDeadSea, shBamba) have
+// no sourced art yet and keep their original styled-TEXT badges (art IS hardcoded CSS
+// color/gradient work, same as Counterfinish -- no hideNameOnBadge) until art is found. Lives in
+// Cosmetixxx (#shop-titles), this repo's default placement for new crates.
 // Globally limited to 333 openings total (shared across every player, like RED/BLUE Crate was) --
 // see `limited`/`key` on CRATE_SHALOM in js/market.js and shalom_crate_remaining server-side.
 const SHALOM_CRATE_COST = 3333;
@@ -614,15 +614,16 @@ const SHALOM_CRATE_TITLES = [
   { id: 'shGalGadot', name: 'Gal Gadot', hideNameOnBadge: true, cssClass: 'title-sh-galgadot', weight: 2.5, rarity: 'rare', how: 'Won from a SHALOM CRATE spin (rare).' },
   { id: 'shGoldaMeir', name: 'Golda Meir', hideNameOnBadge: true, cssClass: 'title-sh-goldameir', weight: 4, rarity: 'rare', how: 'Won from a SHALOM CRATE spin (rare).' },
   { id: 'shIronDome', name: 'Iron Dome', hideNameOnBadge: true, cssClass: 'title-sh-irondome', weight: 5, rarity: 'rare', how: 'Won from a SHALOM CRATE spin (rare).' },
-  { id: 'shMossad', name: 'Mossad', cssClass: 'title-sh-mossad', weight: 5, rarity: 'rare', how: 'Won from a SHALOM CRATE spin (rare).' },
-  { id: 'shStartupNation', name: 'Startup Nation', cssClass: 'title-sh-startupnation', weight: 7, rarity: 'uncommon', how: 'Won from a SHALOM CRATE spin (uncommon).' },
+  { id: 'shMossad', name: 'Mossad', hideNameOnBadge: true, cssClass: 'title-sh-mossad', weight: 5, rarity: 'rare', how: 'Won from a SHALOM CRATE spin (rare).' },
+  // id predates the rename (SHALOM Crate pulls/inventory reference shStartupNation) -- display name only.
+  { id: 'shStartupNation', name: 'Hassidic Party', cssClass: 'title-sh-startupnation', weight: 7, rarity: 'uncommon', how: 'Won from a SHALOM CRATE spin (uncommon).' },
   { id: 'shKravMaga', name: 'Krav Maga', hideNameOnBadge: true, cssClass: 'title-sh-kravmaga', weight: 7, rarity: 'uncommon', how: 'Won from a SHALOM CRATE spin (uncommon).' },
   { id: 'shEurovision', name: 'Eurovision', hideNameOnBadge: true, cssClass: 'title-sh-eurovision', weight: 7, rarity: 'uncommon', how: 'Won from a SHALOM CRATE spin (uncommon).' },
   { id: 'shDeadSea', name: 'Dead Sea', cssClass: 'title-sh-deadsea', weight: 8, rarity: 'uncommon', how: 'Won from a SHALOM CRATE spin (uncommon).' },
   { id: 'shIsraelFlag', name: 'Israel Flag', hideNameOnBadge: true, cssClass: 'title-sh-israelflag', weight: 16, rarity: 'common', how: 'Won from a SHALOM CRATE spin (common).' },
   { id: 'shHummus', name: 'Hummus', hideNameOnBadge: true, cssClass: 'title-sh-hummus', weight: 16, rarity: 'common', how: 'Won from a SHALOM CRATE spin (common).' },
   { id: 'shBamba', name: 'Bamba', cssClass: 'title-sh-bamba', weight: 11, rarity: 'common', how: 'Won from a SHALOM CRATE spin (common).' },
-  { id: 'shShekel', name: '₪ Shekel', cssClass: 'title-sh-shekel', weight: 11, rarity: 'common', how: 'Won from a SHALOM CRATE spin (common).' },
+  { id: 'shShekel', name: '₪ Shekel', hideNameOnBadge: true, cssClass: 'title-sh-shekel', weight: 11, rarity: 'common', how: 'Won from a SHALOM CRATE spin (common).' },
 ];
 
 const RENAME_COST = 10000;
