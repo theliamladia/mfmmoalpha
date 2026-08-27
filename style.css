@@ -2196,9 +2196,8 @@ p.foil-ascended-line.foil-ascended-line {
 }
 
 /* --- SHALOM CRATE --- */
-/* 10 of 13 titles have owner-approved sourced art (photo/GIF, hideNameOnBadge like the Waifu
-   titles below); the other 3 are still awaiting sourced art and keep their original styled-TEXT
-   badges (hardcoded CSS color/gradient work, no hideNameOnBadge), each flagged with a comment. */
+/* All 13 titles have owner-approved sourced art (photo/GIF, hideNameOnBadge like the Waifu
+   titles below). */
 @keyframes shNetanyahuGlowPulse {
   0% { background-position: center, 0% 50%; box-shadow: 0 0 10px 2px #0038b8, 0 0 20px 4px #7fa8ff; }
   100% { background-position: center, 100% 50%; box-shadow: 0 0 20px 5px #0038b8, 0 0 38px 10px #7fa8ff; }
@@ -2227,45 +2226,19 @@ p.foil-ascended-line.foil-ascended-line {
 
 .title-sh-mossad { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSDerxBQTHC8wRkIgkJFAjk7mw-Smvbr-LKVmnzYi0yw&s'); background-size: cover; background-position: center; }
 
-/* shStartupNation: awaiting owner-supplied Giphy art (see shalom-giphy-map.md) -- still a styled TEXT badge. */
-.title-sh-startupnation {
-  background: #050505;
-  border: 2px solid #00ff66;
-}
-.title-sh-startupnation .title-text {
-  color: #00ff66;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 700;
-  text-shadow: 0 0 6px #00ff66;
-}
+.title-sh-startupnation { background-image: url('https://static01.nyt.com/images/2020/01/02/nyregion/02TALMUDrefer/01talmud01-superJumbo.jpg'); background-size: cover; background-position: center; }
 
 .title-sh-kravmaga { background-image: url('https://media.giphy.com/media/iIME0fkAEzgSn6VZRl/giphy.gif'); background-size: cover; background-position: center; }
 
 .title-sh-eurovision { background-image: url('https://media.giphy.com/media/1ZrUwc2X6kGyemLQ3l/giphy_s.gif'); background-size: cover; background-position: center; }
 
-/* shDeadSea: awaiting owner-supplied Giphy art (see shalom-giphy-map.md) -- still a styled TEXT badge. */
-.title-sh-deadsea {
-  background: linear-gradient(135deg, #0d5c63, #f4f1e6);
-  border: 2px solid #0d5c63;
-}
-.title-sh-deadsea .title-text {
-  color: #063033;
-  font-weight: 700;
-}
+.title-sh-deadsea { background-image: url('https://photos.smugmug.com/MiddleEast/Jordan/The-Dead-Sea/i-hnkv2Q5/0/316e5937/XL/dead-sea-jordan-12-XL.jpg'); background-size: cover; background-position: center; }
 
 .title-sh-israelflag { background-image: url('https://media.giphy.com/media/e4muODbpQOmS7j3tV8/giphy_s.gif'); background-size: cover; background-position: center; }
 
 .title-sh-hummus { background-image: url('https://media.giphy.com/media/3o6Zte5XXYIhOajx60/giphy_s.gif'); background-size: cover; background-position: center; }
 
-/* shBamba: awaiting owner-supplied Giphy art (see shalom-giphy-map.md) -- still a styled TEXT badge. */
-.title-sh-bamba {
-  background: #e0672b;
-  border: 2px solid #a3320b;
-}
-.title-sh-bamba .title-text {
-  color: #fff3e0;
-  font-weight: 700;
-}
+.title-sh-bamba { background-image: url('https://media.giphy.com/media/sM6Vxx8Q6RTeLya7k5/giphy.gif'); background-size: cover; background-position: center; }
 
 .title-sh-shekel { background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/92/Carthage_EL_shekel_2250013.jpg'); background-size: cover; background-position: center; }
 
