@@ -709,6 +709,20 @@ function apiCryptoColdStorageUpgrade() {
   return apiRequest('/crypto/cold-storage/upgrade', { method: 'POST' });
 }
 
+// ---------- Bussdowns (PC scam rig) ----------
+function apiBussdownsState() {
+  return apiRequest('/bussdowns/state');
+}
+function apiBussdownsStart(taskId) {
+  return apiRequest('/bussdowns/start', { method: 'POST', body: JSON.stringify({ taskId }) });
+}
+function apiBussdownsStop() {
+  return apiRequest('/bussdowns/stop', { method: 'POST' });
+}
+function apiBussdownsUpgrade(part) {
+  return apiRequest('/bussdowns/upgrade', { method: 'POST', body: JSON.stringify({ part }) });
+}
+
 // ---------- Altcoins ----------
 function apiAltcoinsList() {
   return apiRequest('/altcoins/list');

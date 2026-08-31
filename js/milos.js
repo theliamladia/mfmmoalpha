@@ -1122,6 +1122,7 @@ hustleTabBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     hustleTabBtns.forEach((b) => b.classList.toggle('active', b === btn));
     Object.entries(hustleSubpages).forEach(([key, el]) => el.classList.toggle('hidden', key !== btn.dataset.hustle));
+    if (typeof setBussdownsTabVisible === 'function') setBussdownsTabVisible(btn.dataset.hustle === 'bad');
   });
 });
 

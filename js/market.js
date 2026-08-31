@@ -126,6 +126,7 @@ function tickCooldownUI() {
   tickBankCountdown();
   tickJailActivityUI();
   tickFarmsUI();
+  if (typeof tickBussdownsUI === 'function') tickBussdownsUI();
   tickSlimedUI();
   if (typeof tickEnjoyedUI === 'function') tickEnjoyedUI();
   if (typeof tickInvestorL2CountdownUI === 'function') tickInvestorL2CountdownUI();

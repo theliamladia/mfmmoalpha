@@ -3544,6 +3544,27 @@ p.foil-ascended-line.foil-ascended-line {
   margin-bottom: 10px;
 }
 
+/* --- Bussdowns (PC scam rig) --- */
+.bussdowns-rig-card {
+  width: 100%;
+}
+
+.bussdowns-gauge-outer {
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  height: 16px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+
+.bussdowns-gauge-inner {
+  background: var(--success);
+  height: 100%;
+  width: 20%;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
 /* --- New Milos City --- */
 #page-milos {
   max-width: 1400px;
