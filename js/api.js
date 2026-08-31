@@ -754,8 +754,11 @@ function apiBussdownsState() {
 function apiBussdownsStart(taskId) {
   return apiRequest('/bussdowns/start', { method: 'POST', body: JSON.stringify({ taskId }) });
 }
-function apiBussdownsStop() {
-  return apiRequest('/bussdowns/stop', { method: 'POST' });
+function apiBussdownsChoice(optionId) {
+  return apiRequest('/bussdowns/choice', { method: 'POST', body: JSON.stringify({ optionId }) });
+}
+function apiBussdownsAbandon() {
+  return apiRequest('/bussdowns/abandon', { method: 'POST' });
 }
 function apiBussdownsUpgrade(part) {
   return apiRequest('/bussdowns/upgrade', { method: 'POST', body: JSON.stringify({ part }) });
