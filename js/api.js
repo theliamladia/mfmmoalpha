@@ -162,6 +162,44 @@ function apiBankPayCredit() {
   return apiRequest('/bank/pay-credit', { method: 'POST' });
 }
 
+// ---------- Cribz ----------
+function apiCribState() {
+  return apiRequest('/crib/state');
+}
+function apiCribBuyPlot(street) {
+  return apiRequest('/crib/plot/buy', { method: 'POST', body: JSON.stringify({ street }) });
+}
+function apiCribUpgrade() {
+  return apiRequest('/crib/upgrade', { method: 'POST' });
+}
+function apiCribVaultDeposit(amount) {
+  return apiRequest('/crib/vault/deposit', { method: 'POST', body: JSON.stringify({ amount }) });
+}
+function apiCribVaultWithdraw(amount) {
+  return apiRequest('/crib/vault/withdraw', { method: 'POST', body: JSON.stringify({ amount }) });
+}
+function apiCribStashDeposit(itemId, qty) {
+  return apiRequest('/crib/stash/deposit', { method: 'POST', body: JSON.stringify({ itemId, qty }) });
+}
+function apiCribStashWithdraw(itemId, qty) {
+  return apiRequest('/crib/stash/withdraw', { method: 'POST', body: JSON.stringify({ itemId, qty }) });
+}
+function apiCribDisplayAdd(gradedId) {
+  return apiRequest('/crib/display/add', { method: 'POST', body: JSON.stringify({ gradedId }) });
+}
+function apiCribDisplayRemove(gradedId) {
+  return apiRequest('/crib/display/remove', { method: 'POST', body: JSON.stringify({ gradedId }) });
+}
+function apiCribVisionEquip(visionId) {
+  return apiRequest('/crib/vision/equip', { method: 'POST', body: JSON.stringify({ visionId }) });
+}
+function apiCribNeighbourhood() {
+  return apiRequest('/crib/neighbourhood');
+}
+function apiCribVisit(username) {
+  return apiRequest(`/crib/visit/${encodeURIComponent(username)}`);
+}
+
 function apiBuyGun(itemId) {
   return apiRequest('/gunclub/gun', { method: 'POST', body: JSON.stringify({ itemId }) });
 }

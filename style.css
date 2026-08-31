@@ -6353,6 +6353,44 @@ p.foil-ascended-line.foil-ascended-line {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* House slab display (Cribz) gets its OWN id-scoped 4-per-row lock, same reasoning as
+   #profileSlabShowcaseGrid above -- the shared .profile-slab-grid class stays auto-fit for
+   everything else, this is not widened onto it. Two separate grids (own house + visited house)
+   need the same rule. */
+#cribDisplayGrid,
+#cribVisitGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.crib-neighbourhood-section {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-default);
+}
+
+.crib-street-group {
+  margin-bottom: 18px;
+}
+
+.crib-street-group h4 {
+  margin: 0 0 8px;
+}
+
+.crib-house-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--surface-1);
+  margin-bottom: 6px;
+}
+
+.crib-house-row:hover {
+  background: var(--surface-2);
+}
+
 .profile-slab-slot {
   display: flex;
   flex-direction: column;
@@ -6510,6 +6548,11 @@ p.foil-ascended-line.foil-ascended-line {
   #profileSlabShowcaseGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  #cribDisplayGrid,
+  #cribVisitGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 520px) {
@@ -6522,6 +6565,11 @@ p.foil-ascended-line.foil-ascended-line {
   }
 
   #profileSlabShowcaseGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #cribDisplayGrid,
+  #cribVisitGrid {
     grid-template-columns: minmax(0, 1fr);
   }
 

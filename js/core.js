@@ -288,6 +288,27 @@ const BANK_CREDIT_LIMIT_PCT = 0.5;
 const BANK_BILLING_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const BANK_DEFAULT_JAIL_YEARS = 2;
 
+// Mirrors mfmmoserver/gameLogic.js's CRIB_STREETS/CRIB_TIERS exactly -- display-only, the server
+// is the real authority on every /crib/* route.
+const CRIB_STREETS = {
+  nma: { id: 'nma', name: 'New Milos Avenue', cost: 250000 },
+  krog: { id: 'krog', name: 'Krog Street', cost: 600000 },
+  jobber: { id: 'jobber', name: 'Jobber Lane', cost: 1200000 },
+  midas: { id: 'midas', name: 'Midas Way', cost: 10000000 },
+};
+const CRIB_STREET_ORDER = ['nma', 'krog', 'jobber', 'midas'];
+const CRIB_TIERS = [
+  { name: 'Cheap Abode', upgradeCost: 0, vaultCap: 50000, stashCap: 25, slabDisplay: 8 },
+  { name: 'Decent Abode', upgradeCost: 150000, vaultCap: 250000, stashCap: 60, slabDisplay: 8 },
+  { name: 'Abode', upgradeCost: 400000, vaultCap: 1000000, stashCap: 120, slabDisplay: 10 },
+  { name: 'Apartment', upgradeCost: 1000000, vaultCap: 3000000, stashCap: 250, slabDisplay: 12 },
+  { name: 'Suite', upgradeCost: 2500000, vaultCap: 8000000, stashCap: 500, slabDisplay: 14 },
+  { name: 'Penthouse', upgradeCost: 6000000, vaultCap: 20000000, stashCap: 1000, slabDisplay: 16 },
+  { name: 'Mansion', upgradeCost: 15000000, vaultCap: 50000000, stashCap: 2000, slabDisplay: 18 },
+  { name: 'Estate', upgradeCost: 40000000, vaultCap: 150000000, stashCap: 5000, slabDisplay: 20 },
+  { name: 'Palacial Estate', upgradeCost: 100000000, vaultCap: 500000000, stashCap: 10000, slabDisplay: 24 },
+];
+
 const COMBAT_COOLDOWN_MS = 5000;
 const NPC_TYPES = {
   citizen: { name: '🧍 Citizen', hp: 20, attack: 5, defense: 2, minReward: 30, maxReward: 90 },
@@ -1473,6 +1494,7 @@ const pageUpdates = document.getElementById('page-updates');
 const pageReport = document.getElementById('page-report');
 const pageProfile = document.getElementById('page-profile');
 const pageCurios = document.getElementById('page-curios');
+const pageCribz = document.getElementById('page-cribz');
 
 const activityLog = document.getElementById('activityLog');
 
@@ -1799,6 +1821,7 @@ function switchPage(pageName) {
   pageReport.classList.toggle('hidden', pageName !== 'report');
   pageProfile.classList.toggle('hidden', pageName !== 'profile');
   pageCurios.classList.toggle('hidden', pageName !== 'curios');
+  pageCribz.classList.toggle('hidden', pageName !== 'cribz');
 
   // profileNavTargetUsername lets viewProfile(username) (js/profile.js) jump straight to someone
   // else's profile through this same switchPage() call, instead of always loading your own and
@@ -1821,6 +1844,8 @@ function switchPage(pageName) {
   if (pageName === 'jail') renderArrestRecord();
   if (pageName === 'market') { renderGym(); buildFoodGrid(); }
   if (pageName === 'players' && typeof refreshPlayersDirectory === 'function') refreshPlayersDirectory();
+  if (pageName === 'cribz' && typeof refreshCribz === 'function') refreshCribz();
+  if (pageName === 'streets' && typeof refreshNeighbourhood === 'function') refreshNeighbourhood();
   if (pageName === 'milos') {
     renderBank();
     renderMilos();
